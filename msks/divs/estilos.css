@@ -1,0 +1,179 @@
+@charset "UTF-8";
+/* CSS Document */
+
+body {
+    font-family:Georgia, "Times New Roman", Times, serif;
+    font-size:12px;
+    color:#666666;
+    text-align:center;
+}
+
+#contenedor{
+	width:904px;
+    border:0px;
+    margin:10px auto;
+    text-align:center;
+	}
+
+#header{
+	width:900px;
+	border:0px;
+	text-align:center;
+	}
+
+#separador{
+	width:900px;
+    height:20px;
+	clear:both;
+	}
+
+#botonera{
+	width:900px;
+    height:50px;
+    float:left;
+	display:inline;
+	clear:both;
+	text-align:left
+	}
+
+#carrusel{
+	clear:both;
+    float:left;
+	display:inline;
+	}
+
+#cuerpo_index1{
+	width:300px;
+	height:450px;
+	float:left;
+	background-image:url(../images/fondo_contenido1.png);
+	background-repeat:no-repeat;
+	background-color:#c1cce2;
+	}
+
+#cuerpo_index2{
+	width:600px;
+	height:450px;
+	float:left;
+	text-align:left;
+	background-color:#c1cce2;
+	background-image:url(../images/fondocontenido2.png);
+	background-repeat:no-repeat;
+	background-color:#c1cce2;
+	}
+
+#contenido1{
+	width:650px;
+	float:left;
+	text-align:left;
+	background-color:#c1cce2;
+	}
+
+#contenido2{
+	width:250px;
+	float:left;
+	text-align:left;
+	background-color:#c1cce2;
+	background-image:url(../images/fondo2.png);
+	}
+
+#footer{
+	width:900px;
+	height:67px;
+	background-color:#003895;
+	background-image:url(../images/footer.png);
+	background-repeat:no-repeat;
+	padding-top:10px;
+	}
+	
+p{
+	text-align:left;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	color:#039;
+	padding-left:20px;
+	padding-right:30px;
+	line-height:18px;
+}
+
+h1{
+	width:270px;
+    font-size:16px;
+	font-family:Arial, Helvetica, sans-serif;
+    color:#006;
+	text-align:left;
+	padding-left:20px;
+}
+
+h4{
+    font-size:22px;
+	font-family:Arial, Helvetica, sans-serif;
+    color:#006;
+	text-align:left;
+	padding-left:20px;
+}
+
+t5{
+	font-family:Arial, Helvetica, sans-serif;
+	color:#FFF;
+	font-size:10px;
+	}
+	
+T1{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:10px;
+	color:#CCC;
+	}
+	
+blockquote{
+	padding-left:25px;
+	font-family:Arial, Helvetica, sans-serif;
+    color:#039;
+	text-align:left;
+	font-size:12px;
+	}
+
+	
+a:link { /* Enlaces sin visitar */
+color:#666; /* Color especial y... */
+text-decoration:none; /* ...sin subrayado */
+}
+a:visited { /* Enlaces ya visitados */
+color:#666;/* Otro color... */
+text-decoration:none; /* ...y también sin subrayado */
+}
+a:hover { /* Efecto al pasar el puntero por encima del enlace */
+color:#000; /* Otro color distinto... */
+text-decoration:underline; /* ...y texto subrayado en esta ocasión*/
+}
+a img { /* Enlaces en imágenes */
+border-width:0; /* Sin borde */
+}
+
+textarea {
+background: #CCC;
+border: 1px solid #006;
+}
+
+input {
+background: #CCC;
+border: 1px solid #006;
+margin-right: 5px;
+}
+
+table{
+	font-family:Arial, Helvetica, sans-serif;
+	color:#666;
+	font-size:10px;
+	text-align:left;
+}
+
+.dvsmsjEXwarning .dvsmsjEX{ background-color:#CCFF33; }
+.dvsmsjEXfade{ position: absolute; background-color:#E0E0E0; }/* Color Fondo Div Bloqueo*/
+div.dvsmsjEX{ font-family:Arial; position: absolute; background-color:#ffffff; width: 500px; font-size: 10px; text-align: left; border: solid 1px #F6D86A ; } 
+div.dvsmsjEX .dvsmsjEXcontainer{ background:url(../archivos/Msj_exclamacion.png); border-top: solid 18px #F6D86A; padding: 5px; font-weight: bold; }
+div.dvsmsjEX .dvsmsjEXclose{ float: left; width: 15px; height:15px; cursor: default; margin: -22px -12px 0 12px; background:url(../archivos/CerrarMsj.png); font-weight: bold; }
+div.dvsmsjEX .dvsmsjEXmessage{ padding: 10px; line-height: 20px; font-size: 11px; color:#006600; }
+div.dvsmsjEX .dvsmsjEXbuttons{ text-align: right; padding: 5px 0 5px 0; border: solid 1px #eeeeee; background-color:#f4f4f4; }
+div.dvsmsjEX button{ padding: 3px 10px; margin: 0 10px; background-color: #314e90; border: solid 1px #f4f4f4; color: #ffffff; font-weight: bold; font-size: 12px; }
+div.dvsmsjEX button:hover{ border: solid 1px #d4d4d4; }

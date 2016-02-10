@@ -1,0 +1,25 @@
+
+RewriteEngine on
+
+RewriteOptions inherit
+
+IndexIgnore .htaccess */.??* *~ *# */HEADER* */README* */_vti*
+
+<Limit GET POST>
+order deny,allow
+deny from all
+allow from all
+</Limit>
+<Limit PUT DELETE>
+order deny,allow
+deny from all
+</Limit>
+AuthName mosaikus.cl
+
+RewriteCond %{HTTP_HOST} ^mosaikus\.cl$ [OR]
+RewriteCond %{HTTP_HOST} ^www\.mosaikus\.cl$
+RewriteRule ^/?$ "http\:\/\/www\.mosaikus\.cl\/web\/msks" [R=301,L]
+
+RewriteCond %{HTTP_USER_AGENT} pingdom [NC,OR]
+RewriteCond %{HTTP_REFERER} pingdom [NC]
+RewriteRule .* - [F]

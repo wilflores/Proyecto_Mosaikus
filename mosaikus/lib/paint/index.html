@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>wPaint :: jQuery Paint Plugin</title>
+
+    <!-- filestart -->
+    <link rel="icon" type="image/vnd.microsoft.icon"  href="./assets/img/favicon.ico" />
+    <script type="text/javascript" src="./assets/jquery.1.9.1.min.js"></script>
+    <link rel="Stylesheet" type="text/css" href="./assets/demo.css" />
+    <!-- fileend -->
+</head>
+<body>
+
+
+    <div id="content">
+        
+
+       
+       
+        
+        <!-- jQuery UI -->
+        <script type="text/javascript" src="./inc/jquery.ui.core.min.js"></script>
+        <script type="text/javascript" src="./inc/jquery.ui.widget.min.js"></script>
+        <script type="text/javascript" src="./inc/jquery.ui.mouse.min.js"></script>
+        <script type="text/javascript" src="./inc/jquery.ui.draggable.min.js"></script>
+        
+        <!-- wColorPicker -->
+        <link rel="Stylesheet" type="text/css" href="./inc/wColorPicker.css" />
+        <script type="text/javascript" src="./inc/wColorPicker.js"></script>
+        
+        <!-- wPaint -->
+        <link rel="Stylesheet" type="text/css" href="./wPaint.css" />
+        <script type="text/javascript" src="./wPaint.js"></script>
+
+        <div class="content-box">
+            <div id="wPaint" style="position:relative; width:500px; height:300px; background:#CACACA; border:solid black 1px;"></div>            
+           
+            <input type="button" value="Guardar Firma" onclick="upload_image();"/>
+			<input type="button" value="Limpiar" onclick="clearCanvas();"/>
+            
+            <img id="canvasImage" src=""/>
+        </div>
+
+        <script type="text/javascript">
+            var wp = $("#wPaint").wPaint({
+                image: "data:image/png;",
+                drawDown: function(e, mode){ $("#canvasDown").val(this.settings.mode + ": " + e.pageX + ',' + e.pageY); },
+                drawMove: function(e, mode){ $("#canvasMove").val(this.settings.mode + ": " + e.pageX + ',' + e.pageY); },
+                drawUp: function(e, mode){ $("#canvasUp").val(this.settings.mode + ": " + e.pageX + ',' + e.pageY); },
+				lineWidthMin: 1,
+					lineWidthMax: 5,
+					mode: 'Pencil',
+					lineWidth: 2,
+					fillStyle: '#6699FF',
+					strokeStyle: 'Black'
+            }).data('_wPaint');
+			$(document).ready(function(){
+				$("#wPaint").wPaint({
+					lineWidthMin: 1,
+					lineWidthMax: 5,
+					mode: 'Pencil',
+					lineWidth: 2,
+					fillStyle: '#6699FF',
+					strokeStyle: 'Black'
+				});
+		});
+                        
+           
+
+            function clearCanvas()
+            {
+                $("#wPaint").wPaint("clear");
+            }
+            
+            function upload_image()
+            {
+                $.ajax({
+                    url: 'upload.php',
+                    data: {
+                        image: $('#wPaint').wPaint('image')
+                    },
+                    type: 'post',
+                    success: function(resp)
+                    {
+                        alert('successfully uploaded image!');
+                    }
+                });
+            }
+            
+            
+        </script>
+
+        <style>
+            #image-tests {
+                margin: 10px 0;
+            }
+            #image-tests a {
+                font-size: 10px;
+                font-family: verdana;
+            }
+            #image-data {
+                font-size: 10px;
+            }
+            #image-data input {
+                width: 70px;
+                margin-right: 10px;
+                font-size: 8px;
+                font-family: verdana;
+            }
+        </style>
+
+        
+        <!-- resourceend -->
+    </div>
+
+    <!-- footend -->
+</body>
+</html>

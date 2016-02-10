@@ -1,0 +1,7 @@
+- Agrege esto en la linea 108 de ajax.js
+- Esto fue para que se registren todos los cambio es la pagina
+- de una manera transparente para el que programa 
+navegacion(r.responseText);
+StopLoading();
+
+linea 114 - Loading()

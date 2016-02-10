@@ -1,0 +1,266 @@
+/*
+* Amazium V1.3
+* Copyright 2012, Mike Ballan
+* www.amazium.co.uk
+*/
+
+/***** Screen 960px *****/
+
+
+.top			 								{ margin:0 auto; margin-top:30px; }
+.base											{ margin:0 auto; margin-bottom:40px; }
+span.example									{ margin-bottom:5px; padding:5px 0 5px 0; background-color:#eee; text-align:center; width:100%; display:block; }
+/*=====================================================
+ Navigation (with dropdowns)
+ ======================================================*/
+.navbar { min-height: 30px; display: block; margin-bottom: 20px; }
+@media only screen and (max-width: 767px) { .navbar { position: relative; border: none; }
+  .navbar .column, .navbar .columns { min-height: 0; } }
+.navbar.fixed { top: 0; left: 0; z-index: 99999; }
+.navbar a.toggle { display: none; }
+@media only screen and (max-width: 767px) { .navbar a.toggle { top: 18%; right: 4%; width: 46px; position: absolute; text-align: center; display: inline-block; color: white; background: #4a4d50; height: 40px; line-height: 38px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -ms-border-radius: 4px; -o-border-radius: 4px; border-radius: 4px; font-size: 30px; font-size: 1.875rem; }
+  .navbar a.toggle:hover { background: url('../img/sombra.png') no-repeat bottom; }
+  .navbar a.toggle:active, .navbar a.toggle.active { background: url('../img/sombra.png') no-repeat bottom; } }
+.navbar .logo { display: inline-block; margin: 0 1.66667% 0 0; padding: 0; height: 60px; line-height: 58px; }
+.navbar .logo a { display: block; padding: 0 0 0 16px; overflow: hidden; height: 60px; line-height: 58px; }
+@media only screen and (max-width: 767px) { .navbar .logo { float: left; display: inline; }
+  .navbar .logo a { padding: 0; }
+  .navbar .logo a img { width: auto; height: auto; max-width: 100%; } }
+.navbar ul { display: table; vertical-align: middle; margin: 0; float: none; margin: 0 auto;}
+@media only screen and (max-width: 767px) { .navbar ul { position: absolute; display: block; width: 100% !important; height: 0; max-height: 0; top: 60px; left: 0; overflow: hidden; text-align: center; background: #3e4043; }
+  .navbar ul.active { height: auto; max-height: 600px; z-index: 999999; -webkit-transition-duration: 0.5s; -moz-transition-duration: 0.5s; -o-transition-duration: 0.5s; transition-duration: 0.5s; -webkit-box-shadow: 0 2px 2px #252728; -moz-box-shadow: 0 2px 2px #252728; box-shadow: 0 2px 2px #252728; } }
+.navbar ul li { display: table-cell; text-align: center; padding-bottom: 0; margin: 0; height: 30px; line-height: 28px; }
+@media only screen and (max-width: 767px) { .navbar ul li { display: block; position: relative; min-height: 50px; max-height: 320px; height: auto; width: 100%; border-right: 0 !important; -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none; -webkit-transition-duration: 0.5s; -moz-transition-duration: 0.5s; -o-transition-duration: 0.5s; transition-duration: 0.5s; } }
+.navbar ul li > a { display: block; padding: 0 16px; white-space: nowrap; color: white; height: 30px; line-height: 28px; font-size: 16px; font-size: 1rem; }
+.navbar ul li .btn { border-color: #000101 !important; }
+.navbar ul li.field { margin-bottom: 0 !important; margin-right: 0; }
+@media only screen and (max-width: 767px) { .navbar ul li.field { padding: 0 20px; } }
+.navbar ul li.field input.search { background: #191a1b; border: none; color: #f2f2f2; }
+.navbar ul li .dropdown { width: auto; min-width: 0px; max-width: 320px; height: 0; position: absolute; background: #fafafa; overflow: hidden; z-index: 999; }
+@media only screen and (max-width: 767px) { .navbar ul li .dropdown { width: 100%; max-width: 100%; position: relative; -webkit-box-shadow: none !important; -moz-box-shadow: none !important; box-shadow: none !important; }
+  .navbar ul li.active .dropdown { border-bottom: 1px solid #313436; }
+  .navbar ul li.active .dropdown ul { position: relative; top: 0; background: #36393b; min-height: 50px; max-height: 250px; height: auto; overflow: auto; -webkit-box-shadow: none !important; -moz-box-shadow: none !important; box-shadow: none !important; }
+  .navbar ul li.active .dropdown ul li { min-height: 50px; border-bottom: #3e4043; }
+  .navbar ul li.active .dropdown ul li a { color: white; border-bottom: 1px solid #313436; }
+  .navbar ul li.active .dropdown ul li a:hover { color: #d04526; } }
+@media only screen and (min-width: 768px) and (max-width: 1199px) { .navbar > ul > li > .btn a { padding: 0 10px 0 10px !important; }
+  .navbar ul > li .dropdown ul li.active .dropdown { left: -320px; } }
+
+/*Reveal
+----------------------------------------------------------------------------------------------------*/
+/* Reveal Modals ---------------------- */
+.reveal-modal-bg { position: fixed; height: 100%; width: 100%; background: #000; background: rgba(0, 0, 0, 0.45); z-index: 40; display: none; top: 0; left: 0; }
+
+.reveal-modal { background: #fff; visibility: hidden; display: none; top: 100px; left: 50%; margin-left: -260px; width: 520px; position: absolute; z-index: 41; padding: 30px; -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.4); -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.4); box-shadow: 0 0 10px rgba(0, 0, 0, 0.4); }
+.reveal-modal .close-reveal-modal { font-size: 22px; font-size: 2.2rem; line-height: .5; position: absolute; top: 8px; right: 11px; color: #aaa; text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.6); font-weight: bold; cursor: pointer; }
+.reveal-modal.small { width: 30%; margin-left: -15%; }
+.reveal-modal.medium { width: 40%; margin-left: -20%; }
+.reveal-modal.large { width: 60%; margin-left: -30%; }
+.reveal-modal.xlarge { width: 70%; margin-left: -35%; }
+.reveal-modal.expand { width: 90%; margin-left: -45%; }
+.reveal-modal .row { min-width: 0; margin-bottom: 10px; }
+.reveal-modal > :first-child { margin-top: 0; }
+.reveal-modal > :last-child { margin-bottom: 0; }
+
+@media print { div:not(.reveal-modal) { display: none; }
+  .reveal-modal { border: solid 1px #000; background: #fff; } }
+
+
+/*
+Estilos Home
+----------------------------------------------------------------------------------------------------*/
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+header {
+  /*background: #003965;*/
+  background-image: url("../images2/fondo-new.jpg");
+}
+header .row {
+  background: url('../images2/banner.png') no-repeat right;
+  height: 176px;
+}
+header .logo {
+  padding: 30px 0 0 30px;
+}
+header .formulario {
+  position: absolute;
+}
+header form {
+  padding-top: 10px;
+}
+header form p {
+  width: 25%;
+  float: left;
+}
+header label {
+  font-size: small;
+  color: #fff;
+  font-family: 'Abel', sans-serif;
+}
+header input[type="text"], header input[type="password"] {
+  background: #fff;
+  border: 1px solid #E7E7E7;
+  border-radius: 5px;
+  width: 90%;
+  height: 30px;
+  color: #4E4E4E;
+  padding-left: 5px;
+}
+header input[type="submit"] {
+  background: #00abd5;
+  border: 1px solid #00abd5;
+  border-radius: 5px;
+  height: 33px;
+  padding: 0 15px;
+  color: #fff;
+  margin-top: 22px;
+}
+nav {
+  background: #0097b6;
+  height: 30px;
+}
+nav select {
+  display: none;
+}
+nav ul li a {
+  text-decoration: none;
+}
+
+#slider {
+  background: #dadada url('../images2/slider.png') no-repeat center center;
+  width: 100%;
+}
+#content {
+  margin-top: 30px;
+}
+#content h2 {
+  color: #0097b6;
+  font-weight: 400;
+  padding: 20px 0 30px;
+}
+#content .box {
+  /*border: 2px solid #44B4CC;*/
+  margin: 0 auto;
+  border-radius: 5%;
+  margin-bottom: 10px;
+}
+#content .box center {
+  height: 180px;
+}
+#content .box img {
+  margin: 0 auto;
+}
+#content .box h3 {
+  color: #696969;
+  font-family: 'Abel', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 17px;
+}
+#content .box p {
+	color: #717171;
+  text-align: justify;
+  padding: 0 10px;
+}
+#content .box .textright {
+  padding: 10px 30px;
+  text-align: right;
+}
+#content .box .textright a {
+  color: #44B4CC;
+  font-size: small;
+  text-decoration: none;
+}
+.linefooter {
+  background: url('../images2/img_footer.png') repeat-x;
+  height: 12px;
+  width: 100%;
+  margin: 30px 0 0 0;
+}
+footer {
+  /*background: #001b32;*/
+  background-image: url("../images2/fondo-new-2.jpg");
+  padding-top: 50px;
+  color: #fff;
+}
+footer h3 {
+  color: #fff;
+  padding-bottom: 20px;
+}
+footer ul li a {
+  color: #57b5d7 !important;
+  padding: 0;
+  font-size: small;
+}
+footer ul li:before {
+  color: #57b5d7;
+  content: "+";
+  font-size: small;
+}
+footer .logosfooter {
+  padding: 30px 0;
+}
+footer p.peque {
+  font-size: small;
+}
+
+/***** Screen Bigger than 960px *****/
+@media only screen and (min-width:1200px) {
+
+.example										{ margin:0; padding:0; }
+
+}
+
+
+
+/***** Tablet (Smaller than 959px) *****/
+@media only screen and (min-width: 768px) and (max-width: 959px) {
+header label { display: none; }
+header input[type="text"], header input[type="password"] { margin-top:22px; }
+.reveal-modal-bg { position: absolute; }
+.reveal-modal, .reveal-modal.small, .reveal-modal.medium, .reveal-modal.large, .reveal-modal.xlarge { width: 80%; top: 15px; left: 50%; margin-left: -40%; padding: 20px; height: auto; }
+}
+
+
+
+/***** Phone (portrait 300px) *****/
+@media only screen and (max-width: 767px) {
+  header .logo { text-align: center;padding: 30px 0 0 0px;}
+  header .row { background: none; height: 250px; }
+  header .formulario { right: 10%; top: 150px;}
+  header label { display: none; }
+  header input[type="text"], header input[type="password"] { margin-top:22px; }
+  nav ul     { display: none; }
+  nav .seleccion {position: absolute; margin-left: 20%;}
+  nav select { display: inline-block; }
+
+}
+
+
+
+/***** Phone (landscape 420px) *****/
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+  header .logo { text-align: center;padding: 30px 0 0 0px;}
+  header .row { background: none; height: 250px; }
+  header .formulario { right: 10%; top: 150px;}
+	header label { display: none; }
+  header input[type="text"], header input[type="password"] { margin-top:22px; }
+  nav ul     { display: none; }
+  nav .seleccion {position: absolute;}
+  nav select { display: inline-block; }
+
+}
+
+
+
+/***** Retina *****/
+@media only screen and (-webkit-min-device-pixel-ratio:1.5) {
+  header .logo { text-align: center;padding: 30px 0 0 0px;}
+  header .row { background: none; height: 250px; }
+  header label { display: none; }
+  nav ul     { display: none; }
+  nav .seleccion {position: absolute;}
+  nav select { display: inline-block; }
+
+}

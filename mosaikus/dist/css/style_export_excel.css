@@ -1,0 +1,57 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 08-feb-2016, 22:05:18
+    Author     : Melvin
+*/
+
+.table-report {
+    border-color: #afbdc3;
+}
+.table-bordered, .table-report {
+    border: 1px solid #ddd;
+}
+.table {
+    margin-bottom: 20px;
+    max-width: 100%;
+    width: 100%;
+}
+table {
+    //background-color: #fafafa;
+}
+table {
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+    border-spacing: 0;
+}
+.table-report thead tr th {
+    background-color: #ced7db;
+}
+
+.table-bordered > thead > tr > th, .table-report > thead > tr > th, .table-bordered > thead > tr > td, .table-report > thead > tr > td, .table-bordered > tbody > tr > th, .table-report > tbody > tr > th, .table-bordered > tbody > tr > td, .table-report > tbody > tr > td, .table-bordered > tfoot > tr > th, .table-report > tfoot > tr > th, .table-bordered > tfoot > tr > td, .table-report > tfoot > tr > td {
+    border: 1px solid #ddd;
+}
+table > thead > tr > th, table > thead > tr > td, table > tbody > tr > th, table > tbody > tr > td, table > tfoot > tr > th, table > tfoot > tr > td {
+    border-top: 1px solid #ddd;
+    line-height: 1.42857;
+    padding: 8px;
+    vertical-align: top;
+}
+
+th{
+     background-color: #ced7db;
+     border-bottom-width: 2px;
+}
+td, th {
+    padding: 0;
+}
+
+td{
+      border: 1px solid #ddd;
+}
+* {
+    box-sizing: border-box;
+}
