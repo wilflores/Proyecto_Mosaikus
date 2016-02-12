@@ -220,7 +220,7 @@
                                     ,id_control_detalle
                                     ,id_detalle
                                     ,DATE_FORMAT(fecha_evi, '%d/%m/%Y') fecha_evi_a
-                                    ,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) cod_emp
+                                    ,CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno),' ', initcap(p.apellido_materno)) cod_emp
                                     ,nom_archivo
                                     ,1 archivo
                                     ,contenttype
@@ -232,17 +232,17 @@
                             WHERE cod_categoria = 8 AND id_acap = $_SESSION[id_acap] AND id_control_detalle = $_SESSION[id_control_detalle] ";
                     if (strlen($atr[valor])>0)
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
-                                 if (strlen($atr["b-cod_evidencia"])>0)
+                    if (strlen($atr["b-cod_evidencia"])>0)
                         $sql .= " AND cod_evidencia = '". $atr["b-cod_evidencia"] . "'";
-             if (strlen($atr["b-cod_categoria"])>0)
+                    if (strlen($atr["b-cod_categoria"])>0)
                         $sql .= " AND cod_categoria = '". $atr["b-cod_categoria"] . "'";
-             if (strlen($atr["b-id_acap"])>0)
+                    if (strlen($atr["b-id_acap"])>0)
                         $sql .= " AND id_acap = '". $atr["b-id_acap"] . "'";
-             if (strlen($atr["b-id_control_detalle"])>0)
+                    if (strlen($atr["b-id_control_detalle"])>0)
                         $sql .= " AND id_control_detalle = '". $atr["b-id_control_detalle"] . "'";
-             if (strlen($atr["b-id_detalle"])>0)
+                    if (strlen($atr["b-id_detalle"])>0)
                         $sql .= " AND id_detalle = '". $atr["b-id_detalle"] . "'";
-             if (strlen($atr['b-fecha_evi-desde'])>0)                        
+                    if (strlen($atr['b-fecha_evi-desde'])>0)                        
                     {
                         $atr['b-fecha_evi-desde'] = formatear_fecha($atr['b-fecha_evi-desde']);                        
                         $sql .= " AND fecha_evi >= '" . ($atr['b-fecha_evi-desde']) . "'";                        
@@ -252,15 +252,15 @@
                         $atr['b-fecha_evi-hasta'] = formatear_fecha($atr['b-fecha_evi-hasta']);                        
                         $sql .= " AND fecha_evi <= '" . ($atr['b-fecha_evi-hasta']) . "'";                        
                     }
-             if (strlen($atr["b-cod_emp"])>0)
+                    if (strlen($atr["b-cod_emp"])>0)
                         $sql .= " AND cod_emp = '". $atr["b-cod_emp"] . "'";
-            if (strlen($atr["b-nom_archivo"])>0)
+                    if (strlen($atr["b-nom_archivo"])>0)
                         $sql .= " AND upper(nom_archivo) like '%" . strtoupper($atr["b-nom_archivo"]) . "%'";
-             if (strlen($atr["b-archivo"])>0)
+                    if (strlen($atr["b-archivo"])>0)
                         $sql .= " AND archivo = '". $atr["b-archivo"] . "'";
-            if (strlen($atr["b-contenttype"])>0)
+                    if (strlen($atr["b-contenttype"])>0)
                         $sql .= " AND upper(contenttype) like '%" . strtoupper($atr["b-contenttype"]) . "%'";
-             if (strlen($atr["b-observacion"])>0)
+                    if (strlen($atr["b-observacion"])>0)
                         $sql .= " AND observacion = '". $atr["b-observacion"] . "'";
 
                     $sql .= " order by $atr[corder] $atr[sorder] ";

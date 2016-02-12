@@ -2,7 +2,7 @@
 <div class="tabs"> 
 <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">
         <li><a href="#hv-orange-2" data-toggle="tab">Listado de Evidencias</a></li>  
-        <li><a href="#hv-red-2" data-toggle="tab">Agregar/Modificar Evidencias</a></li>
+        <li><a href="#hv-red-2" data-toggle="tab">Agregar Evidencias</a></li>
               
     </ul>
 

@@ -56,47 +56,115 @@
                 <table class="table table-striped ">
                       <thead>
                           <tr style="border-top: 0px solid #cfd8dc;">
-                        <th colspan="2" align="left" style="border-top: 0px solid #cfd8dc;">Identificación</th>
+                        <th colspan="2" align="left" style="border-top: 0px solid #cfd8dc;">1. Identificación</th>
 
                       </tr>
                       </thead>
                       <tbody>
-                      <tr class="odd gradeX">
-                        <td>Trident</td>
-                        <td>Internet Explorer 4.0</td>
-
-                      </tr>
                       <tr class="even gradeC">
-                        <td>Trident</td>
-                        <td>Internet Explorer 5.0</td>
+                          <td style="width: 150px;">Estado</td>
+                        <td>{ESTADO}</td>
 
                       </tr>
-                      <tr class="odd gradeA">
-                        <td>Trident</td>
-                        <td>Internet Explorer 5.5</td>
+                        <tr class="odd gradeC">
+                        <td>{N_ID}</td>
+                        <td>{ID}</td>
+
+                      </tr>
+                      <tr class="even gradeX">
+                        <td>{N_ALTO_POTENCIAL}</td>
+                        <td><input type="checkbox" name="alto_potencial" id="alto_potencial" value="S" {CHECKED_ALTO_POTENCIAL}></td>
+
+                      </tr>
+                      <tr class="odd gradeC">
+                        <td>{N_ORIGEN_HALLAZGO}</td>
+                        <td>{ORIGEN_HALLAZGO}</td>
 
                       </tr>
                       <tr class="even gradeA">
-                        <td>Trident</td>
-                        <td>Internet Explorer 6</td>
+                        <td>{N_FECHA_GENERACION}</td>
+                        <td>{FECHA_GENERACION}</td>
 
                       </tr>
+                      <tr class="odd gradeA">
+                        <td>{N_DESCRIPCION}</td>
+                        <td>{DESCRIPCION}</td>
+
+                      </tr>
+                      <tr class="even gradeA">
+                        <td>{N_ANALISIS_CAUSAL}</td>
+                        <td>{ANALISIS_CAUSAL}</td>
+
+                      </tr>
+                      <tr class="odd gradeA">
+                        <td>{N_RESPONSABLE_ANALISIS}</td>
+                        <td>{RESPONSABLE_ANALISIS}</td>
+
+                      </tr>
+                       {CAMPOS_DINAMICOS}
+                        {ID_ORGANIZACIONES}
+                        {ID_PROCESOS}
+                        <tr class="{CLASES_A}">
+                                <td>{N_FECHA_ACORDADA}</td>
+                                <td>{FECHA_ACORDADA}&nbsp;</td>                                                          
+                        </tr>
+                        <tr class="{CLASES_B}">
+                                <td>{N_FECHA_REALIZADA}</td>
+                                <td>{FECHA_REALIZADA}&nbsp;</td>                 
+                        </tr>
+                        <tr class="{CLASES_A}">
+                                <td>{N_ID_RESPONSABLE_SEGUI}</td>
+                                <td>{ID_RESPONSABLE_SEGUI}&nbsp;</td>
+                        </tr>
+                        <tr class="{CLASES_B}">
+                                <td>{NA_TRAZABILIDAD}</td>
+                                <td>{TRAZABILIDAD}&nbsp;</td>                 
+                        </tr>
                       </tbody>
                     </table>
                 
                     <table class="table table-report  ">
+                        <thead>
+                          <tr style="border-top: 0px solid #cfd8dc;">
+                        <th colspan="2" align="left" style="border: 0px solid #cfd8dc;background-color: white;">2. Acciones Correctivas</th>
+
+                      </tr>
+                      </thead>
                       <thead>
                       <tr>
-                          <th style="width: 25%">GERENCIAS</th>
-                        <th style="width: 25%">ÁREAS</th>
-                        <th style="width: 25%">SUB - ÁREAS</th>
-                        <th style="width: 25%">SUB - ÁREAS</th>
+                          <th style="width: 12%;">{NA_TIPO}</th>
+                        <th style="width: 47%">{NA_ACCION}</th>
+                        <th style="width: 10%">{NA_FECHA_ACORDADA}</th>
+                        <th style="width: 10%">{NA_FECHA_REALIZADA}</th>
+                        <th style="width: 12%">{NA_ID_RESPONSABLE}</th>
+                        <th style="width: 9%">{NA_ESTADO_SEGUIMIENTO}</th>
 
 
                       </tr>
                       </thead>
                       <tbody>
-                      {TABLA}                                            
+                      {TABLA_ACCIONES}                                            
+
+                      </tbody>
+                    </table>
+                      
+                    <table class="table table-report  ">
+                        <thead>
+                          <tr style="border-top: 0px solid #cfd8dc;">
+                        <th colspan="2" align="left" style="border: 0px solid #cfd8dc;background-color: white;">3. Trazabilidad de Acciones Correctivas</th>
+
+                      </tr>
+                      </thead>
+                      <thead>
+                      <tr>
+                            <th style="width: 12%;">{NA_TIPO}</th>
+                            <th style="width: 44%">{NA_ACCION}</th>
+                            <th style="width: 44%">{NA_TRAZABILIDAD}</th>                        
+
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {TABLA_TRAZA}                                            
 
                       </tbody>
                     </table>

@@ -5,7 +5,7 @@
         private $bd;
         private $total_registros;
         private $parametros;
-        private $nombres_columnas;
+        public $nombres_columnas;
         private $placeholder;
             
             public function AccionesCorrectivas(){
@@ -21,12 +21,12 @@
                 $this->dbl->data = $this->dbl->query($sp, $param);
             }
             
-            private function cargar_parametros(){
+            public function cargar_parametros(){
                 $sql = "SELECT cod_parametro, espanol, tipo FROM mos_parametro WHERE cod_categoria = '8' AND vigencia = 'S' ORDER BY cod_parametro";
                 $this->parametros = $this->dbl->query($sql, array());
             }
             
-            private function cargar_nombres_columnas(){
+            public function cargar_nombres_columnas(){
                 $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 15";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
@@ -35,7 +35,7 @@
                 
             }
             
-            private function cargar_nombres_columnas_acciones(){
+            public function cargar_nombres_columnas_acciones(){
                 $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 16";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
@@ -59,20 +59,39 @@
              public function verAccionesCorrectivas($id){
                 $atr=array(id=>$id);
                 $atr = $this->dbl->corregir_parametros($atr);
-                $sql = "SELECT id
+                $sql = "SELECT ac.id
                             ,origen_hallazgo
                             ,DATE_FORMAT(fecha_generacion, '%d/%m/%Y') fecha_generacion
-                            ,descripcion
+                            ,ac.descripcion
                             ,analisis_causal
                             ,responsable_analisis
-                            ,id_organizacion
+                            ,ac.id_organizacion
                             ,id_proceso
                             ,DATE_FORMAT(fecha_acordada, '%d/%m/%Y') fecha_acordada
                             ,DATE_FORMAT(fecha_realizada, '%d/%m/%Y') fecha_realizada
                             ,id_responsable_segui
                             ,alto_potencial
-                         FROM mos_acciones_correctivas 
-                         WHERE id = $atr[id] "; 
+                            ,o.descripcion origen
+                            ,concat(initcap(p.nombres), ' ', initcap(p.apellido_paterno), ' ' , initcap(p.apellido_materno)) responsable_ana
+                            ,concat(initcap(per.nombres), ' ', initcap(per.apellido_paterno), ' ' , initcap(per.apellido_materno)) responsable_segui
+                            ,CASE WHEN NOT ac.fecha_acordada IS NULL THEN 
+                                            CASE WHEN NOT ac.fecha_realizada IS NULL THEN
+                                                CASE WHEN ac.fecha_realizada <= ac.fecha_acordada 
+                                                    THEN 'Realizado'
+                                                    ElSE 'Realizado con atraso'
+                                                END
+                                                WHEN CURRENT_DATE() > ac.fecha_acordada THEN 
+                                                    'Plazo vencido'
+                                                    ELSE 'En el plazo'
+                                                END 
+                                            ELSE ''
+                                        END sema_evi
+                         FROM mos_acciones_correctivas ac
+                         INNER JOIN mos_origen_ac o ON o.id = origen_hallazgo
+                         INNER JOIN mos_personal p ON p.cod_emp = responsable_analisis
+                         LEFT JOIN mos_personal per ON per.cod_emp = id_responsable_segui
+                         WHERE ac.id = $atr[id] "; 
+                //echo $sql;
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }
@@ -312,7 +331,7 @@
                                     ,DATE_FORMAT(fecha_generacion, '%d/%m/%Y') fecha_generacion_a
                                     ,ac.descripcion
                                     ,analisis_causal
-                                    ,CONCAT(CONCAT(UPPER(LEFT(per.nombres, 1)), LOWER(SUBSTRING(per.nombres, 2))),' ', CONCAT(UPPER(LEFT(per.apellido_paterno, 1)), LOWER(SUBSTRING(per.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(per.apellido_materno, 1)), LOWER(SUBSTRING(per.apellido_materno, 2)))) as responsable_analisis
+                                    ,concat(initcap(per.nombres), ' ', initcap(per.apellido_paterno), ' ' , initcap(per.apellido_materno)) as responsable_analisis
                                     $sql_col_left
                                     ,ac.id_organizacion
                                     ,ac.id_proceso
@@ -759,7 +778,7 @@
                     foreach($data as $fila ){               
                         if($fila[0]!=-1){
                             $col=0;                                                    
-                                                        $sql = "SELECT                                        
+                             $sql = "SELECT                                        
                                         aacco.id
                                         ,(select count(id) from mos_acciones_evidencia where id_accion=aacco.id) as cantidad 
                                         ,tac.descripcion tipo
@@ -1820,7 +1839,7 @@
                 return $objResponse;
             }
          
-            private function cargar_campos_activos(){
+            public function cargar_campos_activos(){
                 $sql = "SELECT campo, activo, orden FROM mos_campos_activos WHERE modulo = 15";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
@@ -1985,7 +2004,7 @@
                 return $objResponse;
             }
      
-        private function BuscaOrganizacional($tupla)
+        public function BuscaOrganizacional($tupla)
         {
             //$encryt = new EnDecryptText();
             //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
@@ -2013,7 +2032,7 @@
 
         }
         
-        private function BuscaProceso($tupla)
+        public function BuscaProceso($tupla)
         {
             //$encryt = new EnDecryptText();
             //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );

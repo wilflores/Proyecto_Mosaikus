@@ -907,6 +907,139 @@
                 return $array;
             }
             
+            /**
+             * Funcion para generar los paramtros en formato fila de tablas para los reportes PDF
+             * @param int $modulo identificador del modulo
+             * @param int $id_registro  identificador de registro           
+             * @param int $par para agregar estilo sombra a las filas
+             * @return string
+             */
+            public function crear_campos_dinamicos_td($modulo,$id_registro=null,$par=1){
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                
+                $ut_tool = new ut_Tool();
+                $html = '';
+                if (count($this->parametros) <= 0){
+                        $this->cargar_parametros($modulo);
+                }  
+                
+                $desc_valores_params = $valores_params = array();
+                if ($id_registro!= null){
+                    $sql = "SELECT cod_parametro, cod_parametro_det,descripcion FROM mos_parametro_modulos WHERE cod_categoria = $modulo and id_registro = $id_registro";
+
+                    $data_params = $this->dbl->query($sql, array());
+
+
+                    foreach ($data_params as $value_data_params) {
+                        $valores_params[$value_data_params[cod_parametro]]       = $value_data_params[cod_parametro_det];
+                        $desc_valores_params[$value_data_params[cod_parametro]]  = $value_data_params[descripcion];
+                    }                
+                }
+                
+                $k = $par;
+                $js = $html = "";
+                foreach ($this->parametros as $value) {    
+                    if ($k % 2 == 0)
+                        $clases = '';
+                    else
+                        $clases = 'even gradeA';
+                    $k++;
+                    switch ($value[tipo]) {
+                        case '1':
+                            $sql = "select cod_parametro_det,descripcion from  mos_parametro_det where cod_categoria='$modulo' and cod_parametro='".$value[cod_parametro]."' and vigencia='S'";
+                            $data = $this->dbl->query($sql, array());
+                            //$ids = array(''); 
+                            $desc = array('-- Seleccione --');
+                            $desc = array();
+                            foreach ($data as $value_combos) {
+                                //$ids[] = $value_combos[cod_parametro_det]; 
+                                $desc[$value_combos[cod_parametro_det]] = $value_combos[descripcion];                                                
+                            }
+                            //$combo_dinamico = $ut_tool->combo_array("campo_".$value[cod_parametro], $desc, $ids, 'data-validation="required"',$valores_params[$value[cod_parametro]]);
+                            $html .= '<tr class="'. $clases .'">
+                                          <td>' . $value[espanol] . '</td>
+                                          <td>      
+                                              '.$desc[$value[cod_parametro]].' 
+                                          </td>
+                                    </tr>';
+
+                            break;
+                        case '2':
+                            $html .= '<tr  class="'. $clases .'">'
+                                . '<td>' . $value[espanol] . '</td>'; 
+                            
+                            $html .= '<td>'.$desc_valores_params[$value[cod_parametro]].'</td>';                            
+                            $html .= '</tr>';
+                            break;
+                        case '3':
+                            $html .= '<tr class="'. $clases .'">'
+                                . '<td>' . $value[espanol] . '</td>'; 
+                            $html .= '<td>';
+                            $html .= ' '.$desc_valores_params[$value[cod_parametro]].'';
+                            $html .= '</td>';
+                            //$js .= "$('#campo_$value[cod_parametro]').datepicker();";
+                            $html .= '</tr>';
+                            break;
+                        case '4':
+                            $html .= '<tr class="'. $clases .'">'
+                                . '<td>' . $value[espanol] . '</td>'; 
+                            $html .= '<td>';
+                            $sql = "SELECT cod_emp, 
+                                                                    CONCAT( LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', initcap(p.nombres))  nombres
+                                                                        FROM mos_personal p WHERE interno = 1 AND cod_emp = " . $valores_params[$value[cod_parametro]] .""
+                                                                ;
+                            $data_aux = $this->dbl->query($sql, array());
+                            $html .= $data_aux[0][nombres];
+//                            $js .= '$( "#campo_' . $value[cod_parametro] . '" ).select2({
+//                                        placeholder: "Selecione",
+//                                        allowClear: true
+//                                      }); ';
+                            $html .= '</td>';
+                            $html .= '</tr>';
+                            break;
+                        case '5':
+                            $html .= '<tr class="'. $clases .'">'
+                                . '<td>' . $value[espanol] . '</td>'; 
+                            $html .= '<td>';
+                            if ((count($desc_valores_params)== 0) || ($desc_valores_params[$value[cod_parametro]] == '1')){
+                                $html .= '<img src="diseno/images/verde.png" />';
+                            }
+                            if ((count($desc_valores_params)== 0) || ($desc_valores_params[$value[cod_parametro]] == '2')){
+                                $html .= '<img src="diseno/images/atrasado.png" />';
+                            }                                                                                           
+                            $html .= '</td>';
+                            $html .= '</tr>';
+                            break;
+                        case '6':
+                            $html .= '<tr class="'. $clases .'">'
+                                . '<td>' . $value[espanol] . '</td>'; 
+                            $html .= '<td>';
+                            $html .= $desc_valores_params[$value[cod_parametro]];
+                            $html .= '</td>';
+                            $html .= '</tr>';
+                            break;
+                        case '7':
+                            $html .= '<tr class="'. $clases .'">'
+                                . '<td>' . $value[espanol] . '</td>'; 
+                            $html .= '<td>';
+                            $html .= $desc_valores_params[$value[cod_parametro]];
+                            $html .= '</td>';
+                            $html .= '</tr>';
+                            break;
+                        default:
+                            break;
+                    }
+                    
+                    
+                }
+                $array[contador] = count($this->parametros);
+                $array[html] = $html;
+                $array[js] = $js;
+                return $array;
+            }
+            
             public function crear_campos_dinamicos_form_h($modulo,$id_registro=null,$col_lab=24){
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");

@@ -13,6 +13,9 @@
                 $this->asigna_script('acciones_evidencia/acciones_evidencia.js');                                             
                 $this->dbl = new Mysql($this->encryt->Decrypt_Text($_SESSION[BaseDato]), $this->encryt->Decrypt_Text($_SESSION[LoginBD]), $this->encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $this->parametros = $this->nombres_columnas = $this->placeholder = array();
+                session_name("$GLOBALS[SESSION]");
+                session_start();
+                unset($_SESSION[id_accion]);
                 $this->contenido = array();
             }
 
@@ -146,9 +149,9 @@
                          WHERE 1 = 1 ";
                     if (strlen($atr[valor])>0)
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
-                                 if (strlen($atr["b-id_accion_correctiva"])>0)
+                    if (strlen($atr["b-id_accion_correctiva"])>0)
                         $sql .= " AND id_accion_correctiva = '". $atr["b-id_accion_correctiva"] . "'";
-             if (strlen($atr["b-id_accion"])>0)
+                    if (strlen($atr["b-id_accion"])>0)
                         $sql .= " AND id_accion = '". $atr["b-id_accion"] . "'";
              if (strlen($atr['b-fecha_evi-desde'])>0)                        
                     {
@@ -190,6 +193,10 @@
                             WHERE 1 = 1 ";
                     if (strlen($atr[valor])>0)
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
+                    if (strlen($atr["b-id_accion_correctiva"])>0)
+                        $sql .= " AND id_accion_correctiva = '". $atr["b-id_accion_correctiva"] . "'";
+                    if (strlen($atr["b-id_accion"])>0)
+                        $sql .= " AND id_accion = ". $atr["b-id_accion"] . "";
                     /*
                      $_SESSION[id_accion] = $parametros[id_accion];
                     unset ($_SESSION['id_correccion']);
@@ -211,15 +218,15 @@
                         $atr['b-fecha_evi-hasta'] = formatear_fecha($atr['b-fecha_evi-hasta']);                        
                         $sql .= " AND fecha_evi <= '" . ($atr['b-fecha_evi-hasta']) . "'";                        
                     }
-             if (strlen($atr["b-id_persona"])>0)
+                    if (strlen($atr["b-id_persona"])>0)
                         $sql .= " AND id_persona = '". $atr["b-id_persona"] . "'";
-            if (strlen($atr["b-nomb_archivo"])>0)
+                    if (strlen($atr["b-nomb_archivo"])>0)
                         $sql .= " AND upper(nomb_archivo) like '%" . strtoupper($atr["b-nomb_archivo"]) . "%'";
-            if (strlen($atr["b-archivo"])>0)
+                    if (strlen($atr["b-archivo"])>0)
                         $sql .= " AND upper(archivo) like '%" . strtoupper($atr["b-archivo"]) . "%'";
-            if (strlen($atr["b-contenttype"])>0)
+                    if (strlen($atr["b-contenttype"])>0)
                         $sql .= " AND upper(contenttype) like '%" . strtoupper($atr["b-contenttype"]) . "%'";
-            if (strlen($atr["b-observacion"])>0)
+                    if (strlen($atr["b-observacion"])>0)
                         $sql .= " AND upper(observacion) like '%" . strtoupper($atr["b-observacion"]) . "%'";
 
                     $sql .= " order by $atr[corder] $atr[sorder] ";
@@ -355,6 +362,17 @@
                 $html = "<a  title=\"Ver Trazabilidad\" target=\"_blank\" href=\"pages/acciones_evidencia/descargar_archivo.php?id=$tupla[id]&token=" . md5($tupla[id]) ."&des=1\">
                             <i class=\"icon icon-view-document\"></i>
                         </a>";
+            }
+            return $html;
+        }
+        
+        public function archivo_descarga_pdf($tupla,$key)
+        {
+            
+            if (strlen($tupla[nomb_archivo])>0){
+                $html = "<a target=\"_blank\" href=\"". APPLICATION_ROOT . "pages/acciones_evidencia/descargar_archivo.php?id=$tupla[id]&token=" . md5($tupla[id]) ."&des=1\">
+                            $tupla[nomb_archivo].$tupla[contenttype]
+                        </a><br/>";
             }
             return $html;
         }

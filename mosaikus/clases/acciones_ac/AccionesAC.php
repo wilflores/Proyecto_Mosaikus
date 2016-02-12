@@ -275,6 +275,10 @@
                     unset ($_SESSION['id_ac']);
                 }
                      */
+                    if (strlen($atr["b-id_ac"])>0)
+                        $sql .= " AND id_ac = '". $atr["b-id_ac"] . "'";
+                    if (strlen($atr["b-id_correcion"])>0)
+                        $sql .= " AND id_correcion = '". $atr["b-id_correcion"] . "'";
                     if (strlen($_SESSION[id_ac])>0)
                         $sql .= " AND id_ac = '". $_SESSION[id_ac] . "'";
                     if (strlen($_SESSION[id_correccion])>0)
@@ -282,6 +286,7 @@
 
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                    //echo $sql;
                     $this->operacion($sql, $atr);
              }
              public function eliminarAccionesAC($atr){

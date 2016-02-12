@@ -14,10 +14,11 @@ session_name('mosaikus');
             //import('clases.evidencia_acciones.EvidenciaAccionesCorrec');
             
             import('clases.acciones_evidencia.AccionesEvidencia');
-            $pagina = new AccionesEvidencia();
+            
 
             //$pagina = new EvidenciaAccionesCorrec();
             if ((isset($_SESSION[CookIdUsuario]) ) && (md5($_GET[id]) == $_GET[token])){
+                $pagina = new AccionesEvidencia();
             
                 $archivo_aux = $pagina->verDocumentoPDF($_GET[id]);
                 //print_r($archivo_aux);
@@ -45,5 +46,7 @@ session_name('mosaikus');
                 
                  
                 
+            }else {
+                echo "<h1>Acceso denegado</h1>";
             }
 ?>
