@@ -179,13 +179,15 @@ class Pagina{
         $this->asigna_script_vendor('perfect-scrollbar/js/perfect-scrollbar.jquery.js');  
         $this->asigna_script_vendor('alertifyjs/alertify.min.js');  //para alertas
         
+        
       
         $this->asigna_script('jquery/jquery-ui-1.10.3.custom.js');
         $this->asigna_script('jquery/jquery-ui-timepicker-addon.js');
         $this->asigna_script('jquery/jquery.form-validator.min.js'); 
         $this->asigna_script('jquery/jquery.Rut.js'); 
         $this->asigna_script('jquery/select2.min.js');
-        
+        $this->asigna_script('highcharts/highcharts.js');
+        $this->asigna_script('highcharts/exporting.js');
       
         //$this->asigna_script('jquery/jquery.multiselect.js');        temporal
         //$this->asigna_script('jquery/jquery.multiselect.filter.js');  temporal

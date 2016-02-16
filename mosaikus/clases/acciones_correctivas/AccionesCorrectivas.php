@@ -1838,6 +1838,257 @@
                 $objResponse->addScript('setTimeout(function(){ init_tabla(); }, 500);');
                 return $objResponse;
             }
+            
+            public function indexAccionesCorrectivasReporte($parametros)
+            {
+                $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                if ($parametros['corder'] == null) $parametros['corder']="id_2";
+                if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
+                if ($parametros['mostrar-col'] == null) 
+                    $parametros['mostrar-col']="1-2-3-4-5-6-7-8"; 
+                if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                }
+                $k = 9;
+                $contenido[PARAMETROS_OTROS] = "";
+                foreach ($this->parametros as $value) {                    
+                    $parametros['mostrar-col'] .= "-$k"; //checked="checked"
+                    $contenido[PARAMETROS_OTROS] .= '
+                                  <div class="checkbox">      
+                                      <label>
+                                          <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col">   &nbsp;
+                                      ' . $value[espanol] . '</label>
+                                  </div>
+                            ';
+                    $k++;
+                }
+                
+                if (count($this->campos_activos) <= 0){
+                        $this->cargar_campos_activos();
+                } 
+                $contenido[PARAMETROS_OTROS_AE_AO] = '';
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ($this->campos_activos as $key => $value) {
+                    if ($value[0] == '1'){                        
+                        if ($key == 'id_organizacion'){                            
+                            $parametros['mostrar-col'] .= "-$k"; //checked="checked"
+                            $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                    <div class="checkbox">      
+                                        <label >
+                                            <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col">   &nbsp;
+                                        ' . $this->nombres_columnas[id_organizacion] . '</label>
+                                    </div>
+                              ';
+                        }                    
+                        else{                                                
+                            //$parametros['mostrar-col'] .= "-$k"; checked="checked"
+                            $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col">   &nbsp;
+                                      ' . $this->nombres_columnas[id_proceso] . '</label>
+                                  </div>
+                            ';
+                        }
+                    }   
+                    $k++;
+                } 
+
+                if (count($this->nombres_columnas_ac) <= 0){
+                        $this->cargar_nombres_columnas_acciones();
+                }
+                $k++;                
+                $parametros['mostrar-col'] .= "-". ($k); //Columna Trazabilidad checked="checked"
+                $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col">   &nbsp;
+                                      ' . $this->nombres_columnas_ac[trazabilidad] . '</label>
+                                  </div>
+                           ';
+                $k++;                
+                //$parametros['mostrar-col'] .= "-". ($k); //Columna Tipo checked="checked"
+                $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col">   &nbsp;
+                                      ' . $this->nombres_columnas_ac[tipo] . '</label>
+                                  </div>
+                           ';
+                $k++;
+                $parametros['mostrar-col'] .= "-". ($k); //Columna Accion checked="checked"
+                $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col">   &nbsp;
+                                      ' . $this->nombres_columnas_ac[accion] . '</label>
+                                  </div>
+                           ';
+                $k++;
+                $parametros['mostrar-col'] .= "-". ($k); //Columna Fecha Acordada checked="checked"
+                $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col">   &nbsp;
+                                      ' . $this->nombres_columnas_ac[fecha_acordada] . '</label>
+                                  </div>
+                            ';
+                $k++;
+                $parametros['mostrar-col'] .= "-". ($k); //Columna Fecha Realizada checked="checked"
+                $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col">   &nbsp;
+                                      ' . $this->nombres_columnas_ac[fecha_realizada] . '</label>
+                                  </div>
+                            ';
+                $k++;
+                $parametros['mostrar-col'] .= "-". ($k); //Columna Responsable checked="checked"
+                $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col">   &nbsp;
+                                      ' . $this->nombres_columnas_ac[id_responsable] . '</label>
+                                  </div>
+                            ';
+                $k++;
+                $parametros['mostrar-col'] .= "-". ($k); //Columna Semaforo checked="checked"
+                $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col" >   &nbsp;
+                                      ' . $this->nombres_columnas_ac[estado_seguimiento] . '</label>
+                                  </div>
+                            ';
+                $k = $k + 2;                
+                $parametros['mostrar-col'] .= "-". ($k); //Columna Trazabilidad EVI
+                $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col" checked="checked" >   &nbsp;
+                                      ' . $this->nombres_columnas[trazabilidad] . '</label>
+                                  </div>
+                            ';
+                $k++;                
+                $parametros['mostrar-col'] .= "-". ($k); //Columna Fecha Acordada EVI checked="checked"
+                $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col" >   &nbsp;
+                                      ' . $this->nombres_columnas[fecha_acordada] . '</label>
+                                  </div>
+                            ';
+                $k++;
+                $parametros['mostrar-col'] .= "-". ($k); //Columna Fecha Realizada EVI checked="checked"
+                $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col" >   &nbsp;
+                                      ' . $this->nombres_columnas[fecha_realizada] . '</label>
+                                  </div>
+                            ';
+                $k++;
+                $parametros['mostrar-col'] .= "-". ($k); //Columna Responsable EVI checked="checked"
+                $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input type="checkbox" checked="checked" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col" >   &nbsp;
+                                      ' . $this->nombres_columnas[id_responsable_segui] . '</label>
+                                  </div>
+                            ';
+                $k++;
+                $parametros['mostrar-col'] .= "-". ($k); //Columna Semaforo EVI
+                $contenido[PARAMETROS_OTROS_AE_AO] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                      ' . $this->nombres_columnas[estado_seguimiento] . '</label>
+                                  </div>
+                            ';
+                //}
+                
+                $ut_tool = new ut_Tool();
+                $contenido[RESPONSABLE_ANALISIS] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
+                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
+                                                                            FROM mos_personal p WHERE interno = 1"
+                                                                    , 'cod_emp'
+                                                                    , 'nombres', $value[valor]);
+                $contenido[ORIGENES] .= $ut_tool->OptionsCombo("SELECT id, 
+                                                                        descripcion
+                                                                            FROM mos_origen_ac ORDER BY descripcion"
+                                                                    , 'id'
+                                                                    , 'descripcion', $value[valor]);
+                
+                $grid = $this->verListaAccionesCorrectivas($parametros);
+                $contenido['CORDER'] = $parametros['corder'];
+                $contenido['SORDER'] = $parametros['sorder'];
+                $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['OPCIONES_BUSQUEDA'] = " <option value='campo'>campo</option>";
+                $contenido['JS_NUEVO'] = 'nuevo_AccionesCorrectivas();';
+                $contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;AccionesCorrectivas';
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
+
+                import('clases.organizacion.ArbolOrganizacional');
+
+
+                $ao = new ArbolOrganizacional();
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao();
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'acciones_correctivas/';
+                
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }  
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                } 
+                $template->setTemplate("busqueda");
+                $template->setVars($contenido);
+                $contenido['CAMPOS_BUSCAR'] = $template->show();
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'acciones_correctivas/';
+
+                $template->setTemplate("mostrar_colums");
+                $template->setVars($contenido);
+                $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
+                
+                 $template->setTemplate("busqueda_reporte");
+                $template->setVars($contenido);
+                $contenido['CAMPOS_BUSCAR_FILTRO'] = $template->show();
+                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
+                //$template->PATH = PATH_TO_TEMPLATES.'acciones_correctivas/';
+                
+
+                $template->setTemplate("dashboard_1");
+                $template->setVars($contenido);
+                //$this->contenido['CONTENIDO']  = $template->show();
+                //$this->asigna_contenido($this->contenido);
+                //return $template->show();
+                if (isset($parametros['html']))
+                    return $template->show();
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('contenido',"innerHTML",$template->show());
+                $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
+                $objResponse->addAssign('modulo_actual',"value","acciones_correctivas");
+                $objResponse->addIncludeScript(PATH_TO_JS . 'acciones_correctivas/acciones_correctivas_report.js');
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
+                $objResponse->addScript('setTimeout(function(){ init_tabla(); }, 500);');
+                $objResponse->addScript('setTimeout(function(){ init_graficos(); }, 500);');
+                return $objResponse;
+            }
          
             public function cargar_campos_activos(){
                 $sql = "SELECT campo, activo, orden FROM mos_campos_activos WHERE modulo = 15";
