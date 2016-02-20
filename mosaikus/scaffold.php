@@ -51,24 +51,23 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 case 'text':                
                     $campos .="            \$contenido_1['".strtoupper($fila['Field'])."'] = (\$val[\"".$fila['Field']."\"]);\n";
                      $campos_form.= "<div class=\"form-group\">
-                                        <label for=\"".$fila['Field']."\" class=\"col-md-2 control-label\">{N_".strtoupper($fila['Field'])."}</label>
-                                        <div class=\"col-md-2\">                                          
+                                        <label for=\"".$fila['Field']."\" class=\"col-md-4 control-label\">{N_".strtoupper($fila['Field'])."}</label>
+                                        <div class=\"col-md-10\">                                          
                                           <textarea class=\"form-control\" rows=\"3\" id=\"".$fila['Field']."\" name=\"".$fila['Field']."\" data-validation=\"required\" placeholder=\"{N_".strtoupper($fila['Field'])."}\">{".strtoupper($fila['Field'])."}</textarea>
                                       </div>                                
                                   </div>\n";
                      $campos_form_busq .= "<div class=\"form-group\">
-                                  <label for=\"".$fila['Field']."\" class=\"col-md-2 control-label\">{N_".strtoupper($fila['Field'])."}</label>
-                                  <div class=\"col-md-2\">
+                                  <label for=\"".$fila['Field']."\" class=\"control-label\">{N_".strtoupper($fila['Field'])."}</label>
+                                  
                                     <input type=\"text\" class=\"form-control\" id=\"b-".$fila['Field']."\" name=\"b-".$fila['Field']."\" placeholder=\"{N_".strtoupper($fila['Field'])."}\" />
-                                </div>                                
+                                                             
                             </div>\n";
-                     $campos_form_colums .="<div class=\"form-group\">
-                                  <label for=\"SelectAcc\" class=\"col-md-9 control-label\">{N_".strtoupper($fila['Field'])."}</label>
-                                  <div class=\"col-md-3\">      
-                                      <label class=\"checkbox-inline\">
-                                          <input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
+                     $campos_form_colums .="<div class=\"checkbox\">                                  
+                                     
+                                      <label >
+                                          {N_".strtoupper($fila['Field'])."}<input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
                                       </label>
-                                  </div>
+                                  
                             </div>";
                      
                     $filtro_listar .= "            if (strlen(\$atr[\"b-".$fila['Field']."\"])>0)
@@ -82,24 +81,23 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 case 'nchar':
                     $campos .="            \$contenido_1['".strtoupper($fila['Field'])."'] = (\$val[\"".$fila['Field']."\"]);\n";
                      $campos_form.= "<div class=\"form-group\">
-                                        <label for=\"".$fila['Field']."\" class=\"col-md-2 control-label\">{N_".strtoupper($fila['Field'])."}</label>
-                                        <div class=\"col-md-2\">
+                                        <label for=\"".$fila['Field']."\" class=\"col-md-4 control-label\">{N_".strtoupper($fila['Field'])."}</label>
+                                        <div class=\"col-md-10\">
                                           <input type=\"text\" class=\"form-control\" value=\"{".strtoupper($fila['Field'])."}\" id=\"".$fila['Field']."\" name=\"".$fila['Field']."\" placeholder=\"{N_".strtoupper($fila['Field'])."}\" data-validation=\"required\"/>
                                       </div>                                
                                   </div>\n";
                      $campos_form_busq .= "<div class=\"form-group\">
-                                  <label for=\"".$fila['Field']."\" class=\"col-md-2 control-label\">{N_".strtoupper($fila['Field'])."}</label>
-                                  <div class=\"col-md-2\">
+                                  <label for=\"".$fila['Field']."\" class=\"control-label\">{N_".strtoupper($fila['Field'])."}</label>
+                                  
                                     <input type=\"text\" class=\"form-control\" id=\"b-".$fila['Field']."\" name=\"b-".$fila['Field']."\" placeholder=\"{N_".strtoupper($fila['Field'])."}\" />
-                                </div>                                
+                                                          
                             </div>\n";
-                     $campos_form_colums .="<div class=\"form-group\">
-                                  <label for=\"SelectAcc\" class=\"col-md-9 control-label\">{N_".strtoupper($fila['Field'])."}</label>
-                                  <div class=\"col-md-3\">      
-                                      <label class=\"checkbox-inline\">
-                                          <input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
+                     $campos_form_colums .="<div class=\"checkbox\">
+                                      
+                                      <label >
+                                          {N_".strtoupper($fila['Field'])."}<input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
                                       </label>
-                                  </div>
+                                  
                             </div>";
                      
                     $filtro_listar .= "            if (strlen(\$atr[\"b-".$fila['Field']."\"])>0)
@@ -108,27 +106,30 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 case 'date':
                     $campos .="            \$contenido_1['".strtoupper($fila['Field'])."'] = (\$val[\"".$fila['Field']."\"]);\n";
                     $campos_form.= "<div class=\"form-group\">
-                                        <label for=\"".$fila['Field']."\" class=\"col-md-2 control-label\">{N_".strtoupper($fila['Field'])."}</label>
-                                        <div class=\"col-md-2\">
-                                          <input type=\"text\" class=\"form-control\" value=\"{".strtoupper($fila['Field'])."}\" id=\"".$fila['Field']."\" name=\"".$fila['Field']."\" placeholder=\"{N_".strtoupper($fila['Field'])."}\"  data-validation=\"required\"/>
+                                        <label for=\"".$fila['Field']."\" class=\"col-md-4 control-label\">{N_".strtoupper($fila['Field'])."}</label>
+                                        <div class=\"col-md-10\">
+                                          <input type=\"text\" class=\"form-control\" style=\"width: 120px;\" value=\"{".strtoupper($fila['Field'])."}\" id=\"".$fila['Field']."\" name=\"".$fila['Field']."\" placeholder=\"dd/mm/yyyy\"  data-validation=\"required\"/>
                                       </div>                                
                                   </div>\n";
                      $campos_form_busq .= "<div class=\"form-group\">
-                                  <label for=\"".$fila['Field']."\" class=\"col-md-2 control-label\">{N_".strtoupper($fila['Field'])."}</label>
-                                  <div class=\"col-md-2\">
-                                    Desde: <input type=\"text\" class=\"form-control\" id=\"b-".$fila['Field']."-desde\" name=\"b-".$fila['Field']."-desde\" placeholder=\"{N_".strtoupper($fila['Field'])."}\"  />
-                                  </div>   
-                                  <div class=\"col-md-2\">
-                                    Hasta: <input type=\"text\" class=\"form-control\" id=\"b-".$fila['Field']."-hasta\" name=\"b-".$fila['Field']."-hasta\" placeholder=\"{N_".strtoupper($fila['Field'])."}\"  />
-                                </div>                                
-                            </div>\n";
-                     $campos_form_colums .="<div class=\"form-group\">
-                                  <label for=\"SelectAcc\" class=\"col-md-9 control-label\">{N_".strtoupper($fila['Field'])."}</label>
-                                  <div class=\"col-md-3\">      
-                                      <label class=\"checkbox-inline\">
-                                          <input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
-                                      </label>
+                                  <label for=\"".$fila['Field']."\" class=\"control-label\">{N_".strtoupper($fila['Field'])."}</label>
+                                  <div class=\"row\">
+                                        <div class=\"col-xs-12\">
+                                            <label>Desde</label>
+                                            <input type=\"text\" class=\"form-control\" id=\"b-".$fila['Field']."-desde\" name=\"b-".$fila['Field']."-desde\" placeholder=\"dd/mm/yyyy\"  />
+                                        </div>   
+                                        <div class=\"col-xs-12\">
+                                            <label>Hasta</label>
+                                          <input type=\"text\" class=\"form-control\" id=\"b-".$fila['Field']."-hasta\" name=\"b-".$fila['Field']."-hasta\" placeholder=\"dd/mm/yyyy\"  />
+                                        </div> 
                                   </div>
+                            </div>\n";
+                     $campos_form_colums .="<div class=\"checkbox\">
+                                  
+                                      <label >
+                                          {N_".strtoupper($fila['Field'])."}<input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
+                                      </label>
+                                  
                             </div>";
                     $filtro_listar .= "             if (strlen(\$atr['b-".$fila['Field']."-desde'])>0)                        
                     {
@@ -146,24 +147,23 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 default:
                     $campos .="            \$contenido_1['".strtoupper($fila['Field'])."'] = \$val[\"".$fila['Field']."\"];\n";
                     $campos_form.= "<div class=\"form-group\">
-                                        <label for=\"".$fila['Field']."\" class=\"col-md-2 control-label\">{N_".strtoupper($fila['Field'])."}</label>
-                                        <div class=\"col-md-2\">
+                                        <label for=\"".$fila['Field']."\" class=\"col-md-4 control-label\">{N_".strtoupper($fila['Field'])."}</label>
+                                        <div class=\"col-md-10\">
                                           <input type=\"text\" class=\"form-control\" value=\"{".strtoupper($fila['Field'])."}\" id=\"".$fila['Field']."\" name=\"".$fila['Field']."\" placeholder=\"{N_".strtoupper($fila['Field'])."}\"  data-validation=\"required\"/>
                                       </div>                                
                                   </div>\n";
                      $campos_form_busq .= "<div class=\"form-group\">
-                                  <label for=\"".$fila['Field']."\" class=\"col-md-2 control-label\">{N_".strtoupper($fila['Field'])."}</label>
-                                  <div class=\"col-md-2\">
+                                  <label for=\"".$fila['Field']."\" class=\"control-label\">{N_".strtoupper($fila['Field'])."}</label>
+                                  
                                     <input type=\"text\" class=\"form-control\" id=\"b-".$fila['Field']."\" name=\"b-".$fila['Field']."\" placeholder=\"{N_".strtoupper($fila['Field'])."}\"/>
-                                </div>                                
+                                                             
                             </div>\n";
-                     $campos_form_colums .="<div class=\"form-group\">
-                                  <label for=\"SelectAcc\" class=\"col-md-9 control-label\">{N_".strtoupper($fila['Field'])."}</label>
-                                  <div class=\"col-md-3\">      
-                                      <label class=\"checkbox-inline\">
-                                          <input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
+                     $campos_form_colums .="<div class=\"checkbox\">
+                                    
+                                      <label >
+                                          {N_".strtoupper($fila['Field'])."}<input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
                                       </label>
-                                  </div>
+                                  
                             </div>";
                      $filtro_listar .= "             if (strlen(\$atr[\"b-".$fila['Field']."\"])>0)
                         \$sql .= \" AND ".$fila['Field']. " = '\". \$atr[\"b-".$fila['Field']."\"] . \"'\";\n"; 
@@ -493,6 +493,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 \$objResponse->addAssign('modulo_actual',\"value\",\"$nombre_fisico\");
                 \$objResponse->addIncludeScript(PATH_TO_JS . '$nombre_fisico/$nombre_fisico.js');
                 \$objResponse->addScript(\"\$('#MustraCargando').hide();\");
+                \$objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
                 return \$objResponse;
             }
         ";
@@ -662,8 +663,8 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 }
                           
                 \$objResponse->addScript(\"\$('#MustraCargando').hide();\"); 
-                \$objResponse->addScript(\"$('#btn-guardar' ).val('Guardar');
-                                        $( '#btn-guardar' ).prop( 'disabled', false );\"
+                \$objResponse->addScript(\"$('#btn-guardar' ).html('Guardar');
+                                        $( '#btn-guardar' ).prop( 'disabled', false );\");
                         );
                 return \$objResponse;
             }
@@ -700,9 +701,8 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 }
                           
                 \$objResponse->addScript(\"\$('#MustraCargando').hide();\"); 
-                \$objResponse->addScript(\"$('#btn-guardar' ).val('Guardar');
-                                        $( '#btn-guardar' ).prop( 'disabled', false );\"
-                        );
+                \$objResponse->addScript(\"$('#btn-guardar' ).html('Guardar');
+                                        $( '#btn-guardar' ).prop( 'disabled', false );\");
                 return \$objResponse;
             }
     ";
@@ -734,6 +734,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 \$objResponse->addAssign('grid-paginado',\"innerHTML\",\$grid['paginado']);
                           
                 \$objResponse->addScript(\"\$('#MustraCargando').hide();\");
+                \$objResponse->addScript(\"PanelOperator.resize();\");
                 return \$objResponse;
             }
         ";
@@ -971,23 +972,30 @@ $pages_ver="<?php
 
     $nombre_temp = $nombre_clase;
     $archivo=$nombre_temp.".php";
+    /*
     $gestor = fopen("pages/".$nombre_fisico."/listar".$archivo, "w");
     fwrite($gestor, "<?php\n $pages_listar ?>");
     fclose($gestor);
-
+*/
     $gestor = fopen("pages/".$nombre_fisico."/exportarExcel.php", "w");
     fwrite($gestor, $pages_exportar_excel);
     fclose($gestor);
 
-    $gestor = fopen("pages/".$nombre_fisico."/ver".$archivo, "w");
-    fwrite($gestor, $pages_ver);
-    fclose($gestor);
+//    $gestor = fopen("pages/".$nombre_fisico."/ver".$archivo, "w");
+//    fwrite($gestor, $pages_ver);
+//    fclose($gestor);
     /*******************PARA JS******************/
     /*******************PARA JS******************/
     /*******************PARA JS******************/
     /*******************PARA JS******************/
     $texto_js="
     
+    function init_filtrar(){        
+            PanelOperator.initPanels('');
+            ScrollBar.initScroll();
+            init_filtro_rapido();
+    }
+
     function filtrar_mostrar_colums(){
         var colums = '1-2-3-4-';
          $('.checkbox-mos-col').each(function() {
@@ -1085,7 +1093,7 @@ $pages_ver="<?php
         mkdir("js/".$nombre_fisico, 0700);
 
     $archivo=$nombre_fisico.".js";
-    $gestor = fopen("js/".$nombre_fisico."/".$archivo, "w");
+    $gestor = fopen("dist/js/".$nombre_fisico."/".$archivo, "w");
     fwrite($gestor, $texto_js);
     fclose($gestor);
 
