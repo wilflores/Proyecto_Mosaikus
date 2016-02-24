@@ -1089,8 +1089,8 @@ $pages_ver="<?php
     }
     ";
 
-    if (!is_dir("js/".$nombre_fisico))
-        mkdir("js/".$nombre_fisico, 0700);
+    if (!is_dir("dist/js/".$nombre_fisico))
+        mkdir("dist/js/".$nombre_fisico, 0700);
 
     $archivo=$nombre_fisico.".js";
     $gestor = fopen("dist/js/".$nombre_fisico."/".$archivo, "w");
