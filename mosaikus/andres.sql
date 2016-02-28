@@ -30,3 +30,6 @@ INSERT INTO `mos_nombres_campos` VALUES ('239', 'id_personal_vaca', 'id_personal
 INSERT INTO `mos_nombres_campos` VALUES ('240', 'email_wf_vaca', 'email_wf_vaca', '30', 'email_wf_vaca');
 INSERT INTO `mos_nombres_campos` VALUES ('241', 'email_alerta', 'email_alerta', '30', 'email_alerta');
 
+/****************************************/
+/*cambio del domingo 28-02*/
+/****************************************/
