@@ -25,12 +25,12 @@ function init_filtrar(){
                                             placeholder: "Selecione el revisor",
                                             allowClear: true
                                           }); 
-        $('#b-fecha_generacion-desde').datepicker();
-        $('#b-fecha_acordada-desde').datepicker();;
-        $('#b-fecha_realizada-desde').datepicker();
-        $('#b-fecha_generacion-hasta').datepicker();
-        $('#b-fecha_acordada-hasta').datepicker();
-        $('#b-fecha_realizada-hasta').datepicker();
+        $("#b-fecha_generacion-desde").datepicker();
+        $("#b-fecha_acordada-desde").datepicker();;
+        $("#b-fecha_realizada-desde").datepicker();
+        $("#b-fecha_generacion-hasta").datepicker();
+        $("#b-fecha_acordada-hasta").datepicker();
+        $("#b-fecha_realizada-hasta").datepicker();
         
         PanelOperator.initPanels("");
         ScrollBar.initScroll();

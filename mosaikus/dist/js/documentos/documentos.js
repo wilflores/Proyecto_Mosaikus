@@ -9,6 +9,17 @@ function  activar_desactivar_pest(){
     }
 }
 
+function init_tabla(){
+        $('.ver-mas').on('click', function (event) {
+            event.preventDefault();
+            var id = $(this).attr('tok');
+            $('#myModal-Ventana-Cuerpo').html($('#ver-mas-'+id).val());
+            $('#myModal-Ventana-Titulo').html('');
+            $('#myModal-Ventana').modal('show');
+        });
+               
+}
+
 function init_filtrar(){
         $( "#b-reviso" ).select2({
             placeholder: "Selecione el revisor",
@@ -22,10 +33,10 @@ function init_filtrar(){
             placeholder: "Selecione el aprobador",
             allowClear: true
         }); 
-        $('#b-fecha-desde').datepicker();        
-        $('#b-fecha-hasta').datepicker();
-        $('#b-fecha_rev-desde').datepicker();
-        $('#b-fecha_rev-hasta').datepicker();
+        $("#b-fecha-desde").datepicker();        
+        $("#b-fecha-hasta").datepicker();
+        $("#b-fecha_rev-desde").datepicker();
+        $("#b-fecha_rev-hasta").datepicker();
         PanelOperator.initPanels("");
         ScrollBar.initScroll();
         init_filtro_rapido();

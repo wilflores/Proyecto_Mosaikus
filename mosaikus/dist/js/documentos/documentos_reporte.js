@@ -36,20 +36,14 @@ function init_documentos(){
         placeholder: "Selecione el aprobador",
         allowClear: true
       }); 
-    $('#b-fecha-desde').datepicker();
-    $('#b-fecha-hasta').datepicker();
-    $('#b-fecha_rev-desde').datepicker();
-    $('#b-fecha_rev-hasta').datepicker();
-    if(($("#b-formulario").is(':checked'))) {
+    $("#b-fecha-desde").datepicker();
+    $("#b-fecha-hasta").datepicker();
+    $("#b-fecha_rev-desde").datepicker();
+    $("#b-fecha_rev-hasta").datepicker();
+    if(($("#b-formulario").is(":checked"))) {
         $("#b-formulario").parent().parent().hide();
     }
-        
-    
-    
-        
-    
-    
-    
+                                    
     PanelOperator.initPanels("");
     ScrollBar.initScroll();
     PanelOperator.showSearch("");
@@ -97,6 +91,14 @@ function init_tabla_reporte(){
                 window.location = 'portal.php#detail-content';
             }
             xajax_Loading(array.getArray());
+        });
+        
+        $('.ver-mas').on('click', function (event) {
+            event.preventDefault();
+            var id = $(this).attr('tok');
+            $('#myModal-Ventana-Cuerpo').html($('#ver-mas-'+id).val());
+            $('#myModal-Ventana-Titulo').html('');
+            $('#myModal-Ventana').modal('show');
         });
 }
 

@@ -1835,9 +1835,919 @@
                 $objResponse->addIncludeScript(PATH_TO_JS . 'acciones_correctivas/acciones_correctivas.js');
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
-                $objResponse->addScript('setTimeout(function(){ init_tabla(); }, 500);');
+                //$objResponse->addScript('setTimeout(function(){ init_tabla(); }, 500);');
+                
+                /*JS init_Filtrar*/
+                $objResponse->addScript('$( "#b-responsable_analisis" ).select2({
+                                            placeholder: "Selecione el revisor",
+                                            allowClear: true
+                                          }); 
+                                            $( "#b-id_responsable_segui" ).select2({
+                                                                                placeholder: "Selecione el revisor",
+                                                                                allowClear: true
+                                                                              }); 
+                                            $("#b-fecha_generacion-desde").datepicker();
+                                            $("#b-fecha_acordada-desde").datepicker();;
+                                            $("#b-fecha_realizada-desde").datepicker();
+                                            $("#b-fecha_generacion-hasta").datepicker();
+                                            $("#b-fecha_acordada-hasta").datepicker();
+                                            $("#b-fecha_realizada-hasta").datepicker();
+
+                                            PanelOperator.initPanels("");
+                                            ScrollBar.initScroll();
+                                            init_filtro_rapido();
+                                            init_filtro_ao_simple();');
+                /*JS init_tabla*/
+                $objResponse->addScript("$('.ver-mas').on('click', function (event) {
+                                        event.preventDefault();
+                                        var id = $(this).attr('tok');
+                                        $('#myModal-Ventana-Cuerpo').html($('#ver-mas-'+id).val());
+                                        $('#myModal-Ventana-Titulo').html('');
+                                        $('#myModal-Ventana').modal('show');
+                                    });
+
+                                    $('.ver-reporte').on('click', function (event) {
+                                        event.preventDefault();
+                                        var id = $(this).attr('tok');
+                                        window.open('pages/acciones_correctivas/reporte_ac_pdf.php?id='+id,'_blank');
+                                    });");
+                
                 return $objResponse;
             }
+            
+            /**
+             * Calcula los datos para la generacion del grafico de linea por arbol organizacional
+             * @param array $parametros 
+             * @return array
+             */    
+            PUBLIC function dataGraficoLinea($parametros){
+                if(!class_exists('ArbolOrganizacional')){
+                    import('clases.organizacion.ArbolOrganizacional');
+                }
+                $ao = new ArbolOrganizacional();
+                switch ($parametros[tipo_data]) {
+                    case 'SEMANAL':
+                        $sql="Select * from mos_organizacion
+				Where parent_id = 2";
+                
+                        $data = $this->dbl->query($sql, $atr);
+                        foreach ($data as $value) {
+                            $ids_hija = $ao->BuscaOrgNivelHijos($value[id]);
+                            /*SE CONSULTAN LOS VALORES DE LOS HIJOS */
+                            $sql = "SELECT
+                                        $value[id] id_organizacion                                   
+                                        ,IFNULL(sum(total),0) total 
+                                        ,IFNULL(sum(atrasada),0)  atrasada
+                                        ,IFNULL(sum(en_plazo),0)  en_plazo
+                                        ,IFNULL(sum(realizada),0)  realizada
+                                        ,IFNULL(sum(realizada_atraso),0)  realizada_atraso
+                                        ,mes	
+                                        ,anio                                
+                                FROM
+                                mos_acciones_correctivas_foto_sem
+                                where id_org in ($ids_hija)
+                                and (sema >= ".date('Y')."01 AND sema < ".(date('YW')) ." )
+                                group by sema
+                               ";       
+                            //echo $sql;
+                            
+                            $data_org = $this->dbl->query($sql, $atr);
+                            $data_mes = array();
+                            /*Se inicializan valores en cero*/
+                            for($i=1;$i<=date('W')*1;$i++)
+                            //for($i=1;$i<=40;$i++)
+                            {
+                                
+                                $data_mes[date('Y').str_pad($i,2,'0',STR_PAD_LEFT)] = array('y'=>0,'valor'=> '0/0', 'total'=>0);
+                            }                            
+                            
+                            /*SE ASIGNAN VALORES REALES*/
+                            foreach ($data_org as $value_org) {
+                                if ($value_org[total] != '0'){
+                                    $data_mes[$value_org[sema]][y] = $value_org[atrasada] / $value_org[total] * 100;
+                                    $data_mes[$value_org[sema]][valor] = $value_org[atrasada] . '/'. $value_org[total];
+//                                    $data_mes[$value_org[mes]][total] = $value_org[total] ;
+//                                    $data_mes[$value_org[mes]][valor] = $value_org[atrasada] ;
+                                }
+                                else
+                                {
+                                    $data_mes[$value_org[sema]][y] = 0;
+                                    $data_mes[$value_org[sema]][valor] = '0/0';
+                                    //$data_mes[$value_org[mes]][total] = 0;
+                                }
+                            }
+                            /*OBTENEMOS SEMANA ACTUAL*/
+                            $sql = "SELECT
+                                        $value[id] id_organizacion                                   
+                                        ,count(id) total
+                                        ,IFNULL(sum(case when estado=1 then 1 else 0 end),0) as atrasada
+                                        ,IFNULL(sum(case when estado=2 then 1 else 0 end),0) as en_plazo
+                                        ,IFNULL(sum(case when estado=3 then 1 else 0 end),0) as realizada_atraso
+                                        ,IFNULL(sum(case when estado=4 then 1 else 0 end),0) as realizada
+                                        ,YEARWEEK(now()) sema                              
+                                FROM
+                                mos_acciones_correctivas
+                                where id_organizacion in ($ids_hija)
+                                and (fecha_generacion >= STR_TO_DATE('".date('YW')." Monday', '%X%V %W') or fecha_realizada is null)                               
+                               ";       
+                            //echo $sql;
+                            
+                            $data_org = $this->dbl->query($sql, $atr);
+                            foreach ($data_org as $value_org) {
+                                if ($value_org[total] != '0'){
+                                    $data_mes[$value_org[sema]][y] = $value_org[atrasada] / $value_org[total] * 100;
+                                    $data_mes[$value_org[sema]][valor] = $value_org[atrasada] . '/'. $value_org[total];
+                                    //$data_mes[$value_org[mes]][valor] = $value_org[atrasada] ;
+                                    //$data_mes[$value_org[mes]][total] = $value_org[total];
+                                }
+                                else
+                                {
+                                    $data_mes[$value_org[sema]][y] = 0;
+                                    $data_mes[$value_org[sema]][valor] = '0/0';
+                                    //$data_mes[$value_org[mes]][total] = 0;
+                                }
+                            }
+                            $serie .= "{name: '" . $value[title] . "',data:[ ";
+                            foreach ($data_mes as $value_mes) {
+                                //$serie .= json_encode($value_mes) .",";
+                                $serie .= "{y:$value_mes[y],valor:'$value_mes[valor]'},";
+                            }
+                            $serie = substr($serie, 0, strlen($serie) - 1) . " ] },"; 
+                                
+                            //print_r($data_mes);
+                        }
+                        $nombre_x = '';
+                        for($i=1;$i<=date('W')*1;$i++)
+                        //for($i=1;$i<=52*1;$i++)
+                        {
+                            $nombre_x .= "'" . $i . "',";
+                        }
+                        $serie = substr($serie, 0, strlen($serie) - 1);
+                        //echo $serie;
+                        
+                        $return = array();
+                        $return[serie] = str_replace('"', '', $serie);
+                        $return[nombre_x] = $serie = substr($nombre_x, 0, strlen($nombre_x) - 1);
+                        $return[subtitle] = 'Semanal - ' . date('Y');
+                        break;
+                    case 'YTD':
+                    case 'MES':
+                        $sql="Select * from mos_organizacion
+				Where parent_id = 2";
+                
+                        $data = $this->dbl->query($sql, $atr);
+                        $sql ='';
+                        $serie = '';
+                        foreach ($data as $value) {
+                            $ids_hija = $ao->BuscaOrgNivelHijos($value[id]);
+                            /*SE CONSULTAN LOS VALORES DE LOS HIJOS */
+                            $sql = "SELECT
+                                        $value[id] id_organizacion                                   
+                                        ,IFNULL(sum(total),0) total 
+                                        ,IFNULL(sum(atrasada),0)  atrasada
+                                        ,IFNULL(sum(en_plazo),0)  en_plazo
+                                        ,IFNULL(sum(realizada),0)  realizada
+                                        ,IFNULL(sum(realizada_atraso),0)  realizada_atraso
+                                        ,mes	
+                                        ,anio                                
+                                FROM
+                                mos_acciones_correctivas_foto_mes
+                                where id_org in ($ids_hija)
+                                and (anio >= ".date('Y')." AND mes < ".(date('m')*1) ." )
+                                group by mes, anio
+                               ";       
+                            //echo $sql;
+                            
+                            $data_org = $this->dbl->query($sql, $atr);
+                            $data_mes = array();
+                            /*Se inicializan valores en cero*/
+                            for($i=1;$i<=date('m')*1;$i++)
+                            {
+                                $data_mes[$i] = array('y'=>0,'valor'=> '0', 'total'=>0);
+                            }
+                            /*SE ASIGNAN VALORES REALES*/
+                            foreach ($data_org as $value_org) {
+                                if ($value_org[total] != '0'){
+                                    $data_mes[$value_org[mes]][y] = $value_org[atrasada] / $value_org[total] * 100;
+                                    $data_mes[$value_org[mes]][valor] = $value_org[atrasada] . '/'. $value_org[total];
+//                                    $data_mes[$value_org[mes]][total] = $value_org[total] ;
+//                                    $data_mes[$value_org[mes]][valor] = $value_org[atrasada] ;
+                                }
+                                else
+                                {
+                                    $data_mes[$value_org[mes]][y] = 0;
+                                    $data_mes[$value_org[mes]][valor] = '0/0';
+                                    //$data_mes[$value_org[mes]][total] = 0;
+                                }
+                            }
+                            $sql = "SELECT
+                                        $value[id] id_organizacion                                   
+                                        ,count(id) total
+                                        ,IFNULL(sum(case when estado=1 then 1 else 0 end),0) as atrasada
+                                        ,IFNULL(sum(case when estado=2 then 1 else 0 end),0) as en_plazo
+                                        ,IFNULL(sum(case when estado=3 then 1 else 0 end),0) as realizada_atraso
+                                        ,IFNULL(sum(case when estado=4 then 1 else 0 end),0) as realizada
+                                        ,".(date('m')*1) ." mes                              
+                                FROM
+                                mos_acciones_correctivas
+                                where id_organizacion in ($ids_hija)
+                                and (fecha_generacion >= '".date('Y')."-".(date('m')*1) ."-01' or fecha_realizada is null)                               
+                               ";       
+                            //echo $sql;
+                            
+                            $data_org = $this->dbl->query($sql, $atr);
+                            foreach ($data_org as $value_org) {
+                                if ($value_org[total] != '0'){
+                                    $data_mes[$value_org[mes]][y] = $value_org[atrasada] / $value_org[total] * 100;
+                                    $data_mes[$value_org[mes]][valor] = $value_org[atrasada] . '/'. $value_org[total];
+                                    //$data_mes[$value_org[mes]][valor] = $value_org[atrasada] ;
+                                    //$data_mes[$value_org[mes]][total] = $value_org[total];
+                                }
+                                else
+                                {
+                                    $data_mes[$value_org[mes]][y] = 0;
+                                    $data_mes[$value_org[mes]][valor] = '0/0';
+                                    //$data_mes[$value_org[mes]][total] = 0;
+                                }
+                            }
+                            $serie .= "{name: '" . $value[title] . "',data:[ ";
+                            foreach ($data_mes as $value_mes) {
+                                //$serie .= json_encode($value_mes) .",";
+                                $serie .= "{y:$value_mes[y],valor:'$value_mes[valor]'},";
+                            }
+                            $serie = substr($serie, 0, strlen($serie) - 1) . " ] },"; 
+                                
+                            //print_r($data_mes);
+                        }
+                        $nombre_x = '';
+                        for($i=1;$i<=date('m')*1;$i++)
+                        {
+                            $nombre_x .= "'" . descripcion_mes_corto($i) . "',";
+                        }
+                        $serie = substr($serie, 0, strlen($serie) - 1);
+                        //echo $serie;
+                        
+                        $return = array();
+                        $return[serie] = str_replace('"', '', $serie);
+                        $return[nombre_x] = $serie = substr($nombre_x, 0, strlen($nombre_x) - 1);
+                        $return[subtitle] = 'YTD - ' . date('Y');
+                        //echo $return[nombre_x];
+                        //return $return;
+                        break;
+
+                    case 'M12':
+                        $sql="Select * from mos_organizacion
+				Where parent_id = 2";
+                
+                        $data = $this->dbl->query($sql, $atr);
+                        $sql ='';
+                        $serie = '';
+                        foreach ($data as $value) {
+                            $ids_hija = $ao->BuscaOrgNivelHijos($value[id]);
+                            $sql = "SELECT
+                                        $value[id] id_organizacion                                   
+                                        ,IFNULL(sum(total),0) total 
+                                        ,IFNULL(sum(atrasada),0)  atrasada
+                                        ,IFNULL(sum(en_plazo),0)  en_plazo
+                                        ,IFNULL(sum(realizada),0)  realizada
+                                        ,IFNULL(sum(realizada_atraso),0)  realizada_atraso
+                                        ,mes	
+                                        ,anio                                
+                                FROM
+                                mos_acciones_correctivas_foto_mes
+                                where id_org in ($ids_hija)
+                                and (anio >= YEAR(DATE_SUB(now(),INTERVAL 1 YEAR)) and mes <= MONTH(DATE_SUB('2016-12-16',INTERVAL 1 YEAR)) and anio >= ".date('Y')." AND mes < ".(date('m')*1) ." )
+                                group by mes, anio
+                                order by anio asc, mes asc
+                               ";       
+                            //echo $sql;
+                            
+                            $data_org = $this->dbl->query($sql, $atr);
+                            $data_mes = array();
+                            /* Se setean todos los valores a cero */
+                            $fecha = date('Y-m-j');
+                            $nuevafecha = strtotime ( '-11 month' , strtotime ( $fecha ) ) ;
+                            for($i=1;$i<=12*1;$i++)
+                            {
+                                $data_mes[date ( 'm' , $nuevafecha )*1] = array('y'=>0,'valor'=> '0/0');
+//                                $nombre_x .= "'" . descripcion_mes_corto(date ( 'm' , $nuevafecha )*1) . "',";
+                                $nuevafecha = strtotime ( '+1 month' , strtotime ( date ( 'Y-m-j' , $nuevafecha ) ) ) ;
+
+                            }
+                            /* Se asignan valores reales */ 
+                            foreach ($data_org as $value_org) {
+                                if ($value_org[total] != '0'){
+                                    $data_mes[$value_org[mes]][y] = $value_org[atrasada] / $value_org[total] * 100;
+                                    $data_mes[$value_org[mes]][valor] = $value_org[atrasada] . '/'. $value_org[total];
+//                                    $data_mes[$value_org[mes]][valor] = $value_org[atrasada] ;
+//                                    $data_mes[$value_org[mes]][total] = $value_org[total];
+                                }
+                                else
+                                {
+                                    $data_mes[$value_org[mes]][y] = 0;
+                                    $data_mes[$value_org[mes]][valor] = '0/0';
+                                    $data_mes[$value_org[mes]][total] = 0;
+                                }
+                            }
+                            $sql = "SELECT
+                                        $value[id] id_organizacion                                   
+                                        ,count(id) total
+                                        ,IFNULL(sum(case when estado=1 then 1 else 0 end),0) as atrasada
+                                        ,IFNULL(sum(case when estado=2 then 1 else 0 end),0) as en_plazo
+                                        ,IFNULL(sum(case when estado=3 then 1 else 0 end),0) as realizada_atraso
+                                        ,IFNULL(sum(case when estado=4 then 1 else 0 end),0) as realizada
+                                        ,".(date('m')*1) ." mes                              
+                                FROM
+                                mos_acciones_correctivas
+                                where id_organizacion in ($ids_hija)
+                                and (fecha_generacion >= '".date('Y')."-".(date('m')*1) ."-01' or fecha_realizada is null)                               
+                               ";       
+                            //echo $sql;
+                            
+                            $data_org = $this->dbl->query($sql, $atr);
+                            foreach ($data_org as $value_org) {
+                                if ($value_org[total] != '0'){
+                                    $data_mes[$value_org[mes]][y] = $value_org[atrasada] / $value_org[total] * 100;
+                                    $data_mes[$value_org[mes]][valor] = $value_org[atrasada] . '/'. $value_org[total];
+                                }
+                                else
+                                {
+                                    $data_mes[$value_org[mes]][y] = 0;
+                                    $data_mes[$value_org[mes]][valor] = 0;
+                                }
+                            }
+                            $serie .= "{name: '" . $value[title] . "',data:[ ";
+                            foreach ($data_mes as $value_mes) {
+                                //$serie .= json_encode($value_mes) .",";
+                                $serie .= "{y:$value_mes[y],valor:'$value_mes[valor]'},";
+                            }
+                            $serie = substr($serie, 0, strlen($serie) - 1) . " ] },"; 
+                                
+                            //print_r($data_mes);
+                        }
+                        $nombre_x = '';
+                        /*Nombre de los meses*/
+                        $fecha = date('Y-m-j');
+                        $nuevafecha = strtotime ( '-11 month' , strtotime ( $fecha ) ) ;
+                        for($i=1;$i<=12*1;$i++)
+                        {
+                            $nombre_x .= "'" . descripcion_mes_corto(date ( 'm' , $nuevafecha )*1) . "',";
+                            $nuevafecha = strtotime ( '+1 month' , strtotime ( date ( 'Y-m-j' , $nuevafecha ) ) ) ;
+                            
+                        }
+                        $serie = substr($serie, 0, strlen($serie) - 1);
+                        //echo $serie;
+                        
+                        $return = array();
+                        $return[serie] = str_replace('"', '', $serie);
+                        $return[nombre_x] = $serie = substr($nombre_x, 0, strlen($nombre_x) - 1);
+                        $return[subtitle] = 'M12 - ' . date('Y');
+                        //echo $return[nombre_x];
+                        //return $return;
+                        break;
+                        
+                    default:
+                        break;
+                }
+                switch ($parametros[tipo_data]) {
+                    case 'MES':
+                        $return[subtitle] = 'Mensual - ' . date('Y');
+
+                        break;
+
+                    default:
+                        break;
+                }
+                
+                return $return;
+            }
+            
+            /**
+             * Calcula los datos para la generacion del grafico de linea curva S atrasadas vs Total
+             * @param array $parametros 
+             * @return array
+             */            
+            PUBLIC function dataGraficoLineaUnificada($parametros){
+                if(!class_exists('ArbolOrganizacional')){
+                    import('clases.organizacion.ArbolOrganizacional');
+                }
+                $ao = new ArbolOrganizacional();
+                switch ($parametros[tipo_data]) {
+                    case 'YTD':
+                    case 'MES':
+                        $sql="Select * from mos_organizacion
+				Where parent_id = 2";
+                
+                        $data = $this->dbl->query($sql, $atr);
+                        $sql ='';
+                        $serie = '';
+                        //foreach ($data as $value) 
+                        {
+                            $ids_hija = $ao->BuscaOrgNivelHijos(2);
+                            $sql = "SELECT
+                                        2 id_organizacion                                   
+                                        ,IFNULL(sum(total),0) total 
+                                        ,IFNULL(sum(atrasada),0)  atrasada
+                                        ,IFNULL(sum(en_plazo),0)  en_plazo
+                                        ,IFNULL(sum(realizada),0)  realizada
+                                        ,IFNULL(sum(realizada_atraso),0)  realizada_atraso
+                                        ,mes	
+                                        ,anio                                
+                                FROM
+                                mos_acciones_correctivas_foto_mes
+                                where tipo = 1 and id_org in ($ids_hija)
+                                and (anio >= ".date('Y')." AND mes < ".(date('m')*1) ." )
+                                group by mes, anio
+                               ";       
+                            //echo $sql;
+                            
+                            $data_org = $this->dbl->query($sql, $atr);
+                            $data_mes = array();
+                            for($i=1;$i<=date('m')*1;$i++)
+                            {
+                                $data_mes[$i] = array('y'=>0,'valor'=> '0/0','total'=> '0/0');
+                            }
+                            foreach ($data_org as $value_org) {
+                                if ($value_org[total] != '0'){
+                                    //$data_mes[$value_org[mes]][y] = $value_org[atrasada] / $value_org[total] * 100; Porcentual desactivado
+                                    $data_mes[$value_org[mes]][y] = $value_org[atrasada];
+                                    $data_mes[$value_org[mes]][valor] = $value_org[atrasada] . '/'. $value_org[total];
+                                    $data_mes[$value_org[mes]][total] = $value_org[total];
+                                }
+                                else
+                                {
+                                    $data_mes[$value_org[mes]][y] = 0;
+                                    $data_mes[$value_org[mes]][valor] = 0;
+                                    $data_mes[$value_org[mes]][total] = 0;
+                                }
+                            }
+                            $sql = "SELECT
+                                        2 id_organizacion                                   
+                                        ,count(id) total
+                                        ,IFNULL(sum(case when estado=1 then 1 else 0 end),0) as atrasada
+                                        ,IFNULL(sum(case when estado=2 then 1 else 0 end),0) as en_plazo
+                                        ,IFNULL(sum(case when estado=3 then 1 else 0 end),0) as realizada_atraso
+                                        ,IFNULL(sum(case when estado=4 then 1 else 0 end),0) as realizada
+                                        ,".(date('m')*1) ." mes                              
+                                FROM
+                                mos_acciones_correctivas
+                                where id_organizacion in ($ids_hija)
+                                and (fecha_generacion >= '".date('Y')."-".(date('m')*1) ."-01' or fecha_realizada is null)                               
+                               ";       
+                            //echo $sql;
+                            
+                            
+                            $data_org = $this->dbl->query($sql, $atr);
+                            foreach ($data_org as $value_org) {
+                                if ($value_org[total] != '0'){
+                                    //$data_mes[$value_org[mes]][y] = $value_org[atrasada] / $value_org[total] * 100; atrasada porcentualmente
+                                    $data_mes[$value_org[mes]][valor] = $value_org[atrasada] . '/'. $value_org[total];
+                                    $data_mes[$value_org[mes]][y] = $value_org[atrasada];
+                                    $data_mes[$value_org[mes]][total] = $value_org[total];
+                                }
+                                else
+                                {
+                                    $data_mes[$value_org[mes]][y] = 0;
+                                    $data_mes[$value_org[mes]][valor] = 0;
+                                    $data_mes[$value_org[mes]][total] = 0;
+                                }
+                            }
+                            /* SERIE PARA LAS ATRASADAS */
+                            $serie .= "{name: 'Atrasadas',color: '#ff7272',data:[ ";
+                            foreach ($data_mes as $value_mes) {
+                                //$serie .= json_encode($value_mes) .",";
+                                $serie .= "{y:$value_mes[y],valor:'$value_mes[valor]'},";
+                            }
+                            $serie = substr($serie, 0, strlen($serie) - 1) . " ] },"; 
+                                                       
+                            /* SERIE PARA EL TOTAL */
+                            $serie .= "{name: 'Total',color: '#00950e',data:[ ";
+                            foreach ($data_mes as $value_mes) {
+                                //$serie .= json_encode($value_mes) .",";
+                                $serie .= "{y:$value_mes[total],valor:'$value_mes[valor]'},";
+                            }
+                            $serie = substr($serie, 0, strlen($serie) - 1) . " ] },"; 
+                                
+                            //print_r($data_mes);
+                        }
+                        $nombre_x = '';
+                        for($i=1;$i<=date('m')*1;$i++)
+                        {
+                            $nombre_x .= "'" . descripcion_mes_corto($i) . "',";
+                        }
+                        $serie = substr($serie, 0, strlen($serie) - 1);
+                        //echo $serie;
+                        
+                        $return = array();
+                        $return[serie] = str_replace('"', '', $serie);
+                        $return[nombre_x] = $serie = substr($nombre_x, 0, strlen($nombre_x) - 1);
+                        $return[subtitle] = 'YTD - ' . date('Y');
+                        //echo $return[nombre_x];
+                        //return $return;
+                        break;
+                    case 'SEMANAL':
+                        $sql="Select * from mos_organizacion
+				Where parent_id = 2";
+                
+                        $data = $this->dbl->query($sql, $atr);
+                        //foreach ($data as $value) 
+                        {
+                            $ids_hija = $ao->BuscaOrgNivelHijos(2);
+                            /*SE CONSULTAN LOS VALORES DE LOS HIJOS */
+                            $sql = "SELECT
+                                        2 id_organizacion                                   
+                                        ,IFNULL(sum(total),0) total 
+                                        ,IFNULL(sum(atrasada),0)  atrasada
+                                        ,IFNULL(sum(en_plazo),0)  en_plazo
+                                        ,IFNULL(sum(realizada),0)  realizada
+                                        ,IFNULL(sum(realizada_atraso),0)  realizada_atraso
+                                        ,mes	
+                                        ,anio                                
+                                FROM
+                                mos_acciones_correctivas_foto_sem
+                                where id_org in ($ids_hija)
+                                and (sema >= ".date('Y')."01 AND sema < ".(date('YW')) ." )
+                                group by sema
+                               ";       
+                            //echo $sql;
+                            
+                            $data_org = $this->dbl->query($sql, $atr);
+                            $data_mes = array();
+                            /*Se inicializan valores en cero*/
+                            for($i=1;$i<=date('W')*1;$i++)
+                            //for($i=1;$i<=40;$i++)
+                            {
+                                
+                                $data_mes[date('Y').str_pad($i,2,'0',STR_PAD_LEFT)] = array('y'=>0,'valor'=> '0/0', 'total'=>0);
+                            }                            
+                            
+                            /*SE ASIGNAN VALORES REALES*/
+                            foreach ($data_org as $value_org) {
+                                if ($value_org[total] != '0'){
+                                    $data_mes[$value_org[sema]][y] = $value_org[atrasada] / $value_org[total] * 100;
+                                    $data_mes[$value_org[sema]][valor] = $value_org[atrasada] . '/'. $value_org[total];
+//                                    $data_mes[$value_org[mes]][total] = $value_org[total] ;
+//                                    $data_mes[$value_org[mes]][valor] = $value_org[atrasada] ;
+                                }
+                                else
+                                {
+                                    $data_mes[$value_org[sema]][y] = 0;
+                                    $data_mes[$value_org[sema]][valor] = '0/0';
+                                    //$data_mes[$value_org[mes]][total] = 0;
+                                }
+                            }
+                            /*OBTENEMOS SEMANA ACTUAL*/
+                            $sql = "SELECT
+                                        2 id_organizacion                                   
+                                        ,count(id) total
+                                        ,IFNULL(sum(case when estado=1 then 1 else 0 end),0) as atrasada
+                                        ,IFNULL(sum(case when estado=2 then 1 else 0 end),0) as en_plazo
+                                        ,IFNULL(sum(case when estado=3 then 1 else 0 end),0) as realizada_atraso
+                                        ,IFNULL(sum(case when estado=4 then 1 else 0 end),0) as realizada
+                                        ,YEARWEEK(now()) sema                              
+                                FROM
+                                mos_acciones_correctivas
+                                where id_organizacion in ($ids_hija)
+                                and (fecha_generacion >= STR_TO_DATE('".date('YW')." Monday', '%X%V %W') or fecha_realizada is null)                               
+                               ";       
+                            //echo $sql;
+                            
+                            $data_org = $this->dbl->query($sql, $atr);
+                            foreach ($data_org as $value_org) {
+                                if ($value_org[total] != '0'){
+                                    $data_mes[$value_org[sema]][y] = $value_org[atrasada] / $value_org[total] * 100;
+                                    $data_mes[$value_org[sema]][valor] = $value_org[atrasada] . '/'. $value_org[total];
+                                    //$data_mes[$value_org[mes]][valor] = $value_org[atrasada] ;
+                                    //$data_mes[$value_org[mes]][total] = $value_org[total];
+                                }
+                                else
+                                {
+                                    $data_mes[$value_org[sema]][y] = 0;
+                                    $data_mes[$value_org[sema]][valor] = '0/0';
+                                    //$data_mes[$value_org[mes]][total] = 0;
+                                }
+                            }
+                                                        
+                                                          
+                            /* SERIE PARA LAS ATRASADAS */
+                            $serie .= "{name: 'Atrasadas',color: '#ff7272',data:[ ";
+                            foreach ($data_mes as $value_mes) {
+                                //$serie .= json_encode($value_mes) .",";
+                                $serie .= "{y:$value_mes[y],valor:'$value_mes[valor]'},";
+                            }
+                            $serie = substr($serie, 0, strlen($serie) - 1) . " ] },"; 
+                                                       
+                            /* SERIE PARA EL TOTAL */
+                            $serie .= "{name: 'Total',color: '#00950e',data:[ ";
+                            foreach ($data_mes as $value_mes) {
+                                //$serie .= json_encode($value_mes) .",";
+                                $serie .= "{y:$value_mes[total],valor:'$value_mes[valor]'},";
+                            }
+                            $serie = substr($serie, 0, strlen($serie) - 1) . " ] },"; 
+                            //print_r($data_mes);
+                        }
+                        $nombre_x = '';
+                        for($i=1;$i<=date('W')*1;$i++)
+                        //for($i=1;$i<=52*1;$i++)
+                        {
+                            $nombre_x .= "'" . $i . "',";
+                        }
+                        $serie = substr($serie, 0, strlen($serie) - 1);
+                        //echo $serie;
+                        
+                        $return = array();
+                        $return[serie] = str_replace('"', '', $serie);
+                        $return[nombre_x] = $serie = substr($nombre_x, 0, strlen($nombre_x) - 1);
+                        $return[subtitle] = 'Semanal - ' . date('Y');
+                        break;
+                    case 'M12':
+                        
+                        $sql="Select * from mos_organizacion
+				Where parent_id = 2";
+                
+                        $data = $this->dbl->query($sql, $atr);
+                        $sql ='';
+                        $serie = '';
+                        //foreach ($data as $value) 
+                        {
+                            $ids_hija = $ao->BuscaOrgNivelHijos(2);
+                            $sql = "SELECT
+                                        2 id_organizacion                                   
+                                        ,IFNULL(sum(total),0) total 
+                                        ,IFNULL(sum(atrasada),0)  atrasada
+                                        ,IFNULL(sum(en_plazo),0)  en_plazo
+                                        ,IFNULL(sum(realizada),0)  realizada
+                                        ,IFNULL(sum(realizada_atraso),0)  realizada_atraso
+                                        ,mes	
+                                        ,anio                                
+                                FROM
+                                mos_acciones_correctivas_foto_mes
+                                where id_org in ($ids_hija)
+                                and (anio >= YEAR(DATE_SUB(now(),INTERVAL 1 YEAR)) and mes <= MONTH(DATE_SUB('2016-12-16',INTERVAL 1 YEAR)) and anio >= ".date('Y')." AND mes < ".(date('m')*1) ." )
+                                group by mes, anio
+                                order by anio asc, mes asc
+                               ";       
+                            
+                            
+                            $data_org = $this->dbl->query($sql, $atr);
+                            $data_mes = array();                            
+//                            for($i=1;$i<=12*1;$i++)
+//                            {
+//                                $data_mes[$i] = array('y'=>0,'valor'=> '0/0');
+//                            }
+                            $fecha = date('Y-m-j');
+                            $nuevafecha = strtotime ( '-11 month' , strtotime ( $fecha ) ) ;
+                            for($i=1;$i<=12*1;$i++)
+                            {
+                                $data_mes[date ( 'm' , $nuevafecha )*1] = array('y'=>0,'valor'=> '0/0', 'total'=>0);
+//                                $nombre_x .= "'" . descripcion_mes_corto(date ( 'm' , $nuevafecha )*1) . "',";
+                                $nuevafecha = strtotime ( '+1 month' , strtotime ( date ( 'Y-m-j' , $nuevafecha ) ) ) ;
+
+                            }
+                            foreach ($data_org as $value_org) {
+                                if ($value_org[total] != '0'){
+                                    //$data_mes[$value_org[mes]][y] = $value_org[atrasada] / $value_org[total] * 100;
+                                    $data_mes[$value_org[mes]][y] = $value_org[atrasada];
+                                    $data_mes[$value_org[mes]][total] = $value_org[total];
+                                    $data_mes[$value_org[mes]][valor] = $value_org[atrasada] . '/'. $value_org[total];
+                                }
+                                else
+                                {
+                                    $data_mes[$value_org[mes]][y] = 0;
+                                    $data_mes[$value_org[mes]][valor] = 0;
+                                    $data_mes[$value_org[mes]][total] = 0;
+                                }
+                            }
+                            $sql = "SELECT
+                                        2 id_organizacion                                   
+                                        ,count(id) total
+                                        ,IFNULL(sum(case when estado=1 then 1 else 0 end),0) as atrasada
+                                        ,IFNULL(sum(case when estado=2 then 1 else 0 end),0) as en_plazo
+                                        ,IFNULL(sum(case when estado=3 then 1 else 0 end),0) as realizada_atraso
+                                        ,IFNULL(sum(case when estado=4 then 1 else 0 end),0) as realizada
+                                        ,".(date('m')*1) ." mes                              
+                                FROM
+                                mos_acciones_correctivas
+                                where id_organizacion in ($ids_hija)
+                                and (fecha_generacion >= '".date('Y')."-".(date('m')*1) ."-01' or fecha_realizada is null)  
+                                order by anio asc, mes asc
+                               ";       
+                            //echo $sql;
+                            
+                            $data_org = $this->dbl->query($sql, $atr);
+                            foreach ($data_org as $value_org) {
+                                if ($value_org[total] != '0'){
+                                    //$data_mes[$value_org[mes]][y] = $value_org[atrasada] / $value_org[total] * 100;
+                                    $data_mes[$value_org[mes]][y] = $value_org[atrasada];
+                                    $data_mes[$value_org[mes]][valor] = $value_org[atrasada] . '/'. $value_org[total];
+                                    $data_mes[$value_org[mes]][total] = $value_org[total];
+                                }
+                                else
+                                {
+                                    $data_mes[$value_org[mes]][y] = 0;
+                                    $data_mes[$value_org[mes]][valor] = 0;
+                                    $data_mes[$value_org[mes]][total] = 0;
+                                }
+                            }
+//                            $serie .= "{name: 'Porcentaje de Atraso',data:[ ";
+//                            foreach ($data_mes as $value_mes) {
+//                                //$serie .= json_encode($value_mes) .",";
+//                                $serie .= "{y:$value_mes[y],valor:'$value_mes[valor]'},";
+//                            }
+//                            $serie = substr($serie, 0, strlen($serie) - 1) . " ] },"; 
+                            /* SERIE PARA LAS ATRASADAS */
+                            $serie .= "{name: 'Atrasadas',color: '#ff7272',data:[ ";
+                            foreach ($data_mes as $value_mes) {
+                                //$serie .= json_encode($value_mes) .",";
+                                $serie .= "{y:$value_mes[y],valor:'$value_mes[valor]'},";
+                            }
+                            $serie = substr($serie, 0, strlen($serie) - 1) . " ] },"; 
+                                                       
+                            /* SERIE PARA EL TOTAL */
+                            $serie .= "{name: 'Total',color: '#00950e',data:[ ";
+                            foreach ($data_mes as $value_mes) {
+                                //$serie .= json_encode($value_mes) .",";
+                                $serie .= "{y:$value_mes[total],valor:'$value_mes[valor]'},";
+                            }
+                            $serie = substr($serie, 0, strlen($serie) - 1) . " ] },"; 
+                                
+                            //print_r($data_mes);
+                        }
+                        $nombre_x = '';
+                        /*Nombre de los meses*/
+                        $fecha = date('Y-m-j');
+                        $nuevafecha = strtotime ( '-11 month' , strtotime ( $fecha ) ) ;
+                        for($i=1;$i<=12*1;$i++)
+                        {
+                            $nombre_x .= "'" . descripcion_mes_corto(date ( 'm' , $nuevafecha )*1) . "',";
+                            $nuevafecha = strtotime ( '+1 month' , strtotime ( date ( 'Y-m-j' , $nuevafecha ) ) ) ;
+                            
+                        }
+                        $serie = substr($serie, 0, strlen($serie) - 1);
+                        //echo $serie;
+                        
+                        $return = array();
+                        $return[serie] = str_replace('"', '', $serie);
+                        
+                        $return[nombre_x] = $serie = substr($nombre_x, 0, strlen($nombre_x) - 1);
+                        
+                        $return[subtitle] = 'M12 - ' . date('Y');
+                        //return $return;
+                        break;
+                    default:
+                        break;
+                }
+                switch ($parametros[tipo_data]) {
+                    case 'MES':
+                        $return[subtitle] = 'Mensual - ' . date('Y');
+
+                        break;
+
+                    default:
+                        break;
+                }
+                return $return;
+            }
+            
+            /**
+             * Calcula los datos para la generacion del grafico de barra
+             * @param array $parametros 
+             * @return array
+             */
+            
+            PUBLIC function dataGraficoBarra($parametros){
+                if(!class_exists('ArbolOrganizacional')){
+                    import('clases.organizacion.ArbolOrganizacional');
+                }
+                $ao = new ArbolOrganizacional();
+                switch ($parametros[tipo_data]) {
+                    case 'YTD':
+                    case 'MES':
+                    case 'QUARTIL':
+                    case 'SEM':
+                    case 'SEMANAL':
+                        $sql="Select * from mos_organizacion
+				Where parent_id = 2";
+                
+                        $data = $this->dbl->query($sql, $atr);
+                        $sql ='';
+                        foreach ($data as $value) {
+                            $ids_hija = $ao->BuscaOrgNivelHijos($value[id]);
+                            $sql .= "SELECT
+                                        $value[id] id_organizacion                                   
+                                        ,count(id) total
+                                        ,IFNULL(sum(case when estado=1 then 1 else 0 end),0) as atrasadas
+                                        ,IFNULL(sum(case when estado=2 then 1 else 0 end),0) as en_plazo
+                                        ,IFNULL(sum(case when estado=3 then 1 else 0 end),0) as realizada_atraso
+                                        ,IFNULL(sum(case when estado=4 then 1 else 0 end),0) as realizada                                  
+                                FROM
+                                mos_acciones_correctivas
+                                where id_organizacion in ($ids_hija)
+                                and (fecha_generacion >= '".date('Y')."-01-01' or fecha_realizada is null) -- or fecha_realizada >= '2016-01-01'
+                                -- group by id_organizacion
+                                UNION ALL ";                                                                                    
+                        }
+                        $sql = substr($sql, 0, strlen($sql) - 10);
+                        $sql = "SELECT temp.*,IFNULL(atrasadas/total*100,0) por_atrasadas,IFNULL(en_plazo/total*100,0) por_en_plazo,IFNULL(realizada_atraso/total*100,0) por_realizada_atraso,IFNULL(realizada/total*100,0) por_realizada, title from ( $sql )"
+                                . " as temp
+                                    inner JOIN mos_organizacion on id = id_organizacion
+                                     ORDER BY por_atrasadas,total";
+                        //echo $sql;
+                        $data = $this->dbl->query($sql, $atr);
+                        $return = array();
+                        foreach ($data as $value) {
+                            $return[gerencia] .= "'".$value[title]."',";
+//                            $return[atrasada] .= "{y:". $value[por_atrasadas].",valor:'$value[atrasadas]/$value[total]'},";
+//                            $return[plazo] .= "{y:". $value[por_en_plazo].",valor:'$value[en_plazo]/$value[total]'},";
+//                            $return[realizada_atraso] .= "{y:". $value[por_realizada_atraso].",valor:'$value[realizada_atraso]/$value[total]'},";
+//                            $return[realizada] .= "{y:". $value[por_realizada].",valor:'$value[realizada]/$value[total]'},";
+                            
+                            $return[atrasada] .= "{y:". $value[por_atrasadas].",valor:'$value[atrasadas]',total_ac:'$value[total]'},";
+                            $return[plazo] .= "{y:". $value[por_en_plazo].",valor:'$value[en_plazo]',total_ac:'$value[total]'},";
+                            $return[realizada_atraso] .= "{y:". $value[por_realizada_atraso].",valor:'$value[realizada_atraso]',total_ac:'$value[total]'},";
+                            $return[realizada] .= "{y:". $value[por_realizada].",valor:'$value[realizada]',total_ac:'$value[total]'},";
+                        }
+                        $return[gerencia] = substr($return[gerencia], 0, strlen($return[gerencia]) - 1);
+                        $return[atrasada] = substr($return[atrasada], 0, strlen($return[atrasada]) - 1);
+                        $return[plazo] = substr($return[plazo], 0, strlen($return[plazo]) - 1);
+                        $return[realizada_atraso] = substr($return[realizada_atraso], 0, strlen($return[realizada_atraso]) - 1);
+                        $return[realizada] = substr($return[realizada], 0, strlen($return[realizada]) - 1);
+                        $return[subtitle] = 'YTD - ' . date('Y');
+                        //return $return;
+                        break;
+                    
+                    case 'M12':        
+                        $sql="Select * from mos_organizacion
+				Where parent_id = 2";
+                
+                        $data = $this->dbl->query($sql, $atr);
+                        $sql ='';
+                        foreach ($data as $value) {
+                            $ids_hija = $ao->BuscaOrgNivelHijos($value[id]);
+                            $sql .= "SELECT
+                                        $value[id] id_organizacion                                   
+                                        ,count(id) total
+                                        ,IFNULL(sum(case when estado=1 then 1 else 0 end),0) as atrasadas
+                                        ,IFNULL(sum(case when estado=2 then 1 else 0 end),0) as en_plazo
+                                        ,IFNULL(sum(case when estado=3 then 1 else 0 end),0) as realizada_atraso
+                                        ,IFNULL(sum(case when estado=4 then 1 else 0 end),0) as realizada                                  
+                                FROM
+                                mos_acciones_correctivas
+                                where id_organizacion in ($ids_hija)
+                                and (fecha_generacion >= DATE_ADD(DATE_SUB(NOW(),INTERVAL 1 YEAR),INTERVAL 1 DAY)  or fecha_realizada is null) -- or fecha_realizada >= '2016-01-01'
+                                -- group by id_organizacion
+                                UNION ALL ";                                                                                    
+                        }
+                        $sql = substr($sql, 0, strlen($sql) - 10);
+                        $sql = "SELECT temp.*,IFNULL(atrasadas/total*100,0) por_atrasadas,IFNULL(en_plazo/total*100,0) por_en_plazo,IFNULL(realizada_atraso/total*100,0) por_realizada_atraso,IFNULL(realizada/total*100,0) por_realizada, title from ( $sql )"
+                                . " as temp
+                                    inner JOIN mos_organizacion on id = id_organizacion
+                                     ORDER BY por_atrasadas,total";
+                        //echo $sql;
+                        $data = $this->dbl->query($sql, $atr);
+                        $return = array();
+                        foreach ($data as $value) {
+                            $return[gerencia] .= "'".$value[title]."',";
+//                            $return[atrasada] .= "{y:". $value[por_atrasadas].",valor:'$value[atrasadas]/$value[total]'},";
+//                            $return[plazo] .= "{y:". $value[por_en_plazo].",valor:'$value[en_plazo]/$value[total]'},";
+//                            $return[realizada_atraso] .= "{y:". $value[por_realizada_atraso].",valor:'$value[realizada_atraso]/$value[total]'},";
+//                            $return[realizada] .= "{y:". $value[por_realizada].",valor:'$value[realizada]/$value[total]'},";
+                            
+                            $return[atrasada] .= "{y:". $value[por_atrasadas].",valor:'$value[atrasadas]',total_ac:'$value[total]'},";
+                            $return[plazo] .= "{y:". $value[por_en_plazo].",valor:'$value[en_plazo]',total_ac:'$value[total]'},";
+                            $return[realizada_atraso] .= "{y:". $value[por_realizada_atraso].",valor:'$value[realizada_atraso]',total_ac:'$value[total]'},";
+                            $return[realizada] .= "{y:". $value[por_realizada].",valor:'$value[realizada]',total_ac:'$value[total]'},";
+                        }
+                        $return[gerencia] = substr($return[gerencia], 0, strlen($return[gerencia]) - 1);
+                        $return[atrasada] = substr($return[atrasada], 0, strlen($return[atrasada]) - 1);
+                        $return[plazo] = substr($return[plazo], 0, strlen($return[plazo]) - 1);
+                        $return[realizada_atraso] = substr($return[realizada_atraso], 0, strlen($return[realizada_atraso]) - 1);
+                        $return[realizada] = substr($return[realizada], 0, strlen($return[realizada]) - 1);
+                        //$return[subtitle] = 'M12 - ' . date('Y');
+                        return $return;
+                    default:
+                        break;
+                }
+                switch ($parametros[tipo_data]) {
+                    case 'MES':
+                        $return[subtitle] = 'Mensual - ' . date('Y');
+                        break;
+                    case 'QUARTIL':
+                        $return[subtitle] = 'Cuartil - ' . date('Y');
+                        break;
+                    case 'SEM':
+                        $return[subtitle] = 'Semestre - ' . date('Y');
+                        break;
+                    case 'SEMANAL':
+                        $return[subtitle] = 'Semanal - ' . date('Y');
+                        break;
+
+                    default:
+                        break;
+                }
+                return $return;
+            }
+            
             
             public function indexAccionesCorrectivasReporte($parametros)
             {
@@ -2036,12 +2946,13 @@
                 $contenido['TABLA'] = $grid['tabla'];
                 $contenido['PAGINADO'] = $grid['paginado'];
                 $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
-
-                import('clases.organizacion.ArbolOrganizacional');
-
-
+                
+                if(!class_exists('ArbolOrganizacional')){
+                    import('clases.organizacion.ArbolOrganizacional');
+                }
+                $parametros[tipo_data] = 'YTD';
                 $ao = new ArbolOrganizacional();
-                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao();
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(3,$parametros);
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'acciones_correctivas/';
                 
@@ -2070,7 +2981,21 @@
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
                 //$template->PATH = PATH_TO_TEMPLATES.'acciones_correctivas/';
                 
-
+                $result = $this->dataGraficoBarra($parametros);                
+                $contenido[DATA_GRAFICO_BAR] = $result[atrasada].";".$result[plazo].";".$result[realizada_atraso].";".$result[realizada];
+                $contenido[NOMBRE_COLUM_GRAFICO_BAR] = $result[gerencia];
+                $contenido[SUBTITLE_GRAFICO_BAR] = $result[subtitle];//'YTD - ' . date('Y');
+                
+                $result = $this->dataGraficoLinea($parametros);
+                $contenido[DATA_GRAFICO_LINEA] = $result[serie];
+                $contenido[NOMBRE_COLUM_GRAFICO_LINEA] = $result[nombre_x];
+                $contenido[SUBTITLE_GRAFICO_LINEA] = $result[subtitle];//'YTD - ' . date('Y');
+                //
+                $result = $this->dataGraficoLineaUnificada($parametros);
+                $contenido[DATA_GRAFICO_LINEA_UNI] = $result[serie];
+                $contenido[NOMBRE_COLUM_GRAFICO_LINEA_UNI] = $result[nombre_x];
+                $contenido[SUBTITLE_GRAFICO_LINEA_UNI] = $result[subtitle];
+                //echo $result[serie];
                 $template->setTemplate("dashboard_1");
                 $template->setVars($contenido);
                 //$this->contenido['CONTENIDO']  = $template->show();
@@ -2086,7 +3011,9 @@
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
                 $objResponse->addScript('setTimeout(function(){ init_tabla(); }, 500);');
-                $objResponse->addScript('setTimeout(function(){ init_graficos(); }, 500);');
+                $objResponse->addScript('setTimeout(function(){ init_graficos(); }, 550);');
+                $objResponse->addScript('setTimeout(function(){ init_graficos_atrasos(); }, 550);');
+                
                 return $objResponse;
             }
          
@@ -2498,13 +3425,53 @@
             }
      
  
-                public function buscar($parametros)
+            public function buscar($parametros)
             {
                 $grid = $this->verListaAccionesCorrectivas($parametros);                
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
                 $objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
                 $objResponse->addScript("init_tabla();");
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("PanelOperator.resize();");
+                return $objResponse;
+            }
+            
+            /**
+             * Actualiza la informacion del dashboard de las acciones correctivas
+             * @param array $parametros
+             * @return \xajaxResponse
+             */
+            public function buscarReporte($parametros)
+            {
+                $objResponse = new xajaxResponse();
+                
+                $result = $this->dataGraficoBarra($parametros);         
+                $objResponse->addAssign('data-grafico-bar',"value",$result[atrasada].";".$result[plazo].";".$result[realizada_atraso].";".$result[realizada]);
+                $objResponse->addAssign('nombre-colum-grafico-bar',"value",$result[gerencia]);
+                $objResponse->addAssign('subtitle-grafico-bar',"value",$result[subtitle]);
+                //print_r($result);
+//                $contenido[DATA_GRAFICO_BAR] = $result[atrasada].";".$result[plazo].";".$result[realizada_atraso].";".$result[realizada];
+//                $contenido[NOMBRE_COLUM_GRAFICO_BAR] = $result[gerencia];
+//                $contenido[SUBTITLE_GRAFICO_BAR] = $result[subtitle];//'YTD - ' . date('Y');
+                
+                $result = $this->dataGraficoLinea($parametros);
+                //print_r($result);
+                $objResponse->addAssign('data-grafico-linea',"value",$result[serie]);
+                $objResponse->addAssign('nombre-colum-grafico-linea',"value",$result[nombre_x]);
+                $objResponse->addAssign('subtitle-grafico-linea',"value",$result[subtitle]);
+                //
+                $result = $this->dataGraficoLineaUnificada($parametros);
+                //print_r($result);
+                $objResponse->addAssign('data-grafico-linea-uni',"value",$result[serie]);
+                $objResponse->addAssign('nombre-colum-grafico-linea-uni',"value",$result[nombre_x]);
+                $objResponse->addAssign('subtitle-grafico-linea-uni',"value",$result[subtitle]);
+                
+                //$grid = $this->verListaAccionesCorrectivas($parametros);                
+                
+                
+                //$objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
+                $objResponse->addScript("init_graficos();");
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("PanelOperator.resize();");
                 return $objResponse;

@@ -46,6 +46,10 @@
             return $html;
         }
         
+        /*
+         * 
+         */
+        
         function BuscaOrganizacionalTodos($tupla)
         {
             $encryt = new EnDecryptText();
@@ -64,6 +68,53 @@
                     else
                             $Nivls='-- Sin información --';
             }
+            
+            return $Nivls;
+
+        }
+        
+        function BuscaOrganizacionalTodosVerMas($tupla)
+        {
+            $encryt = new EnDecryptText();
+            $dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            $Nivls = "";
+            {                                           
+                    //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                    $Consulta3="select * from mos_documentos_estrorg_arbolproc where IDDoc='".$tupla[IDDoc]."' and tipo='EO'";                    
+                    $Resp3 = $dbl->query($Consulta3,array());                    
+                    foreach ($Resp3 as $Fila3) 
+                    {                                                        
+                        $Nivls .= BuscaOrganizacional(array('id_organizacion' => $Fila3[id_organizacion_proceso]))."<br /><br />";
+                    }
+                    if($Nivls!='')
+                            $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+                    else
+                            $Nivls='-- Sin información --';
+            }
+                        
+            if (strlen($Nivls)>200){
+                $string = explode($Nivls, '<br /><br />');
+                $valor_final = '';
+                foreach ($string as $value) {
+                    $valor_final .= $value;
+                    if (strlen($valor_final)>200){
+                        return substr($valor_final, 0, 200) . '.. <br/>
+                        <a href="#" tok="' .$tupla[IDDoc]. '-doc" class="ver-mas">
+                            <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
+                            <input type="hidden" id="ver-mas-' .$tupla[IDDoc]. '-doc" value="'.$Nivls.'"/>
+                        </a>';
+                    }
+                    $valor_final .= "<br /><br />";
+                    
+                }
+                
+                return substr($Nivls, 0, 200) . '.. <br/>
+                    <a href="#" tok="' .$tupla[IDDoc]. '-doc" class="ver-mas">
+                        <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
+                        <input type="hidden" id="ver-mas-' .$tupla[IDDoc]. '-doc" value="'.$Nivls.'"/>
+                    </a>';
+            }
+            //return $tupla[analisis_causal];
             
             return $Nivls;
 
@@ -415,6 +466,53 @@
                     else
                             $Nivls='-- Sin información --';
             }
+            
+            return $Nivls;
+
+        }
+        
+        public function BuscaOrganizacionalTodosVerMas($tupla)
+        {
+            $encryt = new EnDecryptText();
+            $dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            $Nivls = "";
+            {                                           
+                    //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                    $Consulta3="select * from mos_documentos_estrorg_arbolproc where IDDoc='".$tupla[IDDoc]."' and tipo='EO'";                    
+                    $Resp3 = $dbl->query($Consulta3,array());                    
+                    foreach ($Resp3 as $Fila3) 
+                    {                                                        
+                        $Nivls .= BuscaOrganizacional(array('id_organizacion' => $Fila3[id_organizacion_proceso]))."<br /><br />";
+                    }
+                    if($Nivls!='')
+                            $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+                    else
+                            $Nivls='-- Sin información --';
+            }
+                        
+            if (strlen($Nivls)>200){
+                $string = explode($Nivls, '<br /><br />');
+                $valor_final = '';
+                foreach ($string as $value) {
+                    $valor_final .= $value;
+                    if (strlen($valor_final)>200){
+                        return substr($valor_final, 0, 200) . '.. <br/>
+                        <a href="#" tok="' .$tupla[IDDoc]. '-doc" class="ver-mas">
+                            <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
+                            <input type="hidden" id="ver-mas-' .$tupla[IDDoc]. '-doc" value="'.$Nivls.'"/>
+                        </a>';
+                    }
+                    $valor_final .= "<br /><br />";
+                    
+                }
+                
+                return substr($Nivls, 0, 200) . '.. <br/>
+                    <a href="#" tok="' .$tupla[IDDoc]. '-doc" class="ver-mas">
+                        <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
+                        <input type="hidden" id="ver-mas-' .$tupla[IDDoc]. '-doc" value="'.$Nivls.'"/>
+                    </a>';
+            }
+            //return $tupla[analisis_causal];
             
             return $Nivls;
 
@@ -1282,7 +1380,7 @@
                 $grid->setFuncion("Codigo_doc", "codigo_doc");
                 $grid->setFuncion("formulario", "BuscaRegistros");
                 $grid->setFuncion("version", "version");
-                $grid->setFuncion("arbol_organizacional", "BuscaOrganizacionalTodos");
+                $grid->setFuncion("arbol_organizacional", "BuscaOrganizacionalTodosVerMas");
                 $grid->setAligns(1,"center");
                 $grid->setAligns(6,"center");
                 $grid->setAligns(7,"center");
@@ -1422,7 +1520,7 @@
                 $grid->setFuncion("Codigo_doc", "codigo_doc");
                 $grid->setFuncion("formulario", "BuscaRegistros");
                 $grid->setFuncion("version", "version");
-                $grid->setFuncion("arbol_organizacional", "BuscaOrganizacionalTodos");
+                $grid->setFuncion("arbol_organizacional", "BuscaOrganizacionalTodosVerMas");
                 $grid->setAligns(1,"center");
                 $grid->setAligns(6,"center");
                 $grid->setAligns(7,"center");
@@ -1625,7 +1723,38 @@
                 $objResponse->addAssign('modulo_actual',"value","documentos");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'documentos/documentos.js?'.  rand());
                 $objResponse->addScript("$('#MustraCargando').hide();");                                
-                $objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
+                //$objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
+                //$objResponse->addScript('setTimeout(function(){ init_tabla(); }, 500);');
+                /*JS init_filtrar*/
+                $objResponse->addScript('$( "#b-reviso" ).select2({
+                                            placeholder: "Selecione el revisor",
+                                            allowClear: true
+                                        }); 
+                                        $( "#b-elaboro" ).select2({
+                                            placeholder: "Selecione el elaborador",
+                                            allowClear: true
+                                        }); 
+                                        $( "#b-aprobo" ).select2({
+                                            placeholder: "Selecione el aprobador",
+                                            allowClear: true
+                                        }); 
+                                        $("#b-fecha-desde").datepicker();        
+                                        $("#b-fecha-hasta").datepicker();
+                                        $("#b-fecha_rev-desde").datepicker();
+                                        $("#b-fecha_rev-hasta").datepicker();
+                                        PanelOperator.initPanels("");
+                                        ScrollBar.initScroll();
+                                        init_filtro_rapido();
+                                        init_filtro_ao_simple();');
+                
+                /*Js init_tabla*/
+                $objResponse->addScript("$('.ver-mas').on('click', function (event) {
+                                    event.preventDefault();
+                                    var id = $(this).attr('tok');
+                                    $('#myModal-Ventana-Cuerpo').html($('#ver-mas-'+id).val());
+                                    $('#myModal-Ventana-Titulo').html('');
+                                    $('#myModal-Ventana').modal('show');
+                                });");
                 
                 return $objResponse;
             }
@@ -1742,8 +1871,76 @@
                 if (($parametros['b-formulario'])=='S'){
                     $objResponse->addScript("$('#b-formulario').prop('checked',true);");
                 }
-                $objResponse->addScript('setTimeout(function(){ init_documentos(); }, 500);');
-                $objResponse->addScript('setTimeout(function(){ init_tabla_reporte(); }, 500);');
+                //$objResponse->addScript('setTimeout(function(){ init_documentos(); }, 500);');
+                //$objResponse->addScript('setTimeout(function(){ init_tabla_reporte(); }, 500);');
+                /* JS init_documentos()*/
+                $objResponse->addScript('$( "#b-reviso" ).select2({
+                                            placeholder: "Selecione el revisor",
+                                            allowClear: true
+                                          }); 
+                                        $( "#b-elaboro" ).select2({
+                                            placeholder: "Selecione el elaborador",
+                                            allowClear: true
+                                          }); 
+                                        $( "#b-aprobo" ).select2({
+                                            placeholder: "Selecione el aprobador",
+                                            allowClear: true
+                                          }); 
+                                        $("#b-fecha-desde").datepicker();
+                                        $("#b-fecha-hasta").datepicker();
+                                        $("#b-fecha_rev-desde").datepicker();
+                                        $("#b-fecha_rev-hasta").datepicker();
+                                        if(($("#b-formulario").is(":checked"))) {
+                                            $("#b-formulario").parent().parent().hide();
+                                        }
+
+                                        PanelOperator.initPanels("");
+                                        ScrollBar.initScroll();
+                                        PanelOperator.showSearch("");
+
+                                        init_filtro_rapido();
+                                        init_filtro_ao_simple();
+                                        PanelOperator.resize();');
+                /* JS init_tabla_reporte*/
+                $objResponse->addScript("$('.ver-documento').on('click', function (event) {
+                                        event.preventDefault();
+                                        var id = $(this).attr('tok');
+                                        array = new XArray();
+                                        array.setObjeto('Documentos','ver_visualiza');
+                                        array.addParametro('id',id);
+                                        array.addParametro('import','clases.documentos.Documentos');
+                                        var cadena = window.location + '';
+                                        if (cadena.indexOf('index.php')!=-1) {
+                                            window.location = 'index.php#detail-content';
+                                        }
+                                        else{
+                                            window.location = 'portal.php#detail-content';
+                                        }
+                                        xajax_Loading(array.getArray());
+                                    });
+
+                                    $('.ver-registros').on('click', function (event) {
+                                        event.preventDefault();
+
+                                        var id = $(this).attr('tok');
+                                        array = new XArray();
+                                        array.setObjeto('Registros','indexRegistrosListado');
+                                        array.addParametro('titulo',$('#desc-mod-act').html());
+
+                                        array.addParametro('id',id);
+                                        array.addParametro('import','clases.registros.Registros');
+                                        xajax_Loading(array.getArray());                                
+                                        //window.location = 'index.php#detail-content';
+
+                                    });
+
+                                    $('.ver-mas').on('click', function (event) {
+                                        event.preventDefault();
+                                        var id = $(this).attr('tok');
+                                        $('#myModal-Ventana-Cuerpo').html($('#ver-mas-'+id).val());
+                                        $('#myModal-Ventana-Titulo').html('');
+                                        $('#myModal-Ventana').modal('show');
+                                    });");
                 
                 return $objResponse;
             }
@@ -1859,8 +2056,61 @@
                 if (($parametros['b-formulario'])=='S'){
                     $objResponse->addScript("$('#b-formulario').prop('checked',true);");
                 }
-                $objResponse->addScript('setTimeout(function(){ init_documentos(); }, 500);');
-                $objResponse->addScript('setTimeout(function(){ init_tabla_reporte(); }, 500);');
+                /* JS init_documentos() */
+                $objResponse->addScript('$( "#b-reviso" ).select2({
+                                                placeholder: "Selecione el revisor",
+                                                allowClear: true
+                                              }); 
+                                            $( "#b-elaboro" ).select2({
+                                                placeholder: "Selecione el elaborador",
+                                                allowClear: true
+                                              }); 
+                                            $( "#b-aprobo" ).select2({
+                                                placeholder: "Selecione el aprobador",
+                                                allowClear: true
+                                              }); 
+                                            $("#b-fecha-desde").datepicker();
+                                            $("#b-fecha-hasta").datepicker();
+                                            $("#b-fecha_rev-desde").datepicker();
+                                            $("#b-fecha_rev-hasta").datepicker();
+                                            if(($("#b-formulario").is(":checked"))) {
+                                                $("#b-formulario").parent().parent().hide();
+                                            }
+
+                                            PanelOperator.initPanels("");
+                                            ScrollBar.initScroll();
+                                            PanelOperator.showSearch("");
+
+                                            init_filtro_rapido();
+                                            init_filtro_ao_simple();
+                                            PanelOperator.resize();');
+                $objResponse->addScript("$('#tblDocumentos > tbody > tr').addClass('cursor-pointer');
+                                        $('#tblDocumentos > tbody > tr').on('click', function (event) {
+                                                event.preventDefault();
+                                                var id = $(this).attr('tok');
+                                                array = new XArray();
+                                                array.setObjeto('Documentos','ver_visualiza');
+                                                array.addParametro('id',id);
+                                                array.addParametro('import','clases.documentos.Documentos');
+                                                var cadena = window.location + '';
+                                                if (cadena.indexOf('index.php')!=-1) {
+                                                    window.location = 'index.php#detail-content';
+                                                }
+                                                else{
+                                                    window.location = 'portal.php#detail-content';
+                                                }
+                                                xajax_Loading(array.getArray());
+                                            });
+
+                                            $('.ver-mas').on('click', function (event) {
+                                                event.preventDefault();
+                                                var id = $(this).attr('tok');
+                                                $('#myModal-Ventana-Cuerpo').html($('#ver-mas-'+id).val());
+                                                $('#myModal-Ventana-Titulo').html('');
+                                                $('#myModal-Ventana').modal('show');
+                                            });");
+                //$objResponse->addScript('setTimeout(function(){ init_documentos(); }, 500);');
+                //$objResponse->addScript('setTimeout(function(){ init_tabla_reporte(); }, 500);');
                 
                 return $objResponse;
             }
@@ -2565,8 +2815,8 @@
                 $ids = array('7','8','9','1','2','3','5','6','10','11','12');
                 $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo', 'Árbol Organizacional', 'Árbol Procesos');
                 
-                $ids = array('7','8','9','1','2','3','5','6','10');
-                $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo');
+                //$ids = array('7','8','9','1','2','3','5','6','10');
+                //$desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo');
                 foreach ($data as $value) {                          
                     $i++;
                     //echo $i;
@@ -2806,6 +3056,7 @@
                           
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("PanelOperator.resize();");
+                $objResponse->addScript("init_tabla();");
                 return $objResponse;
             }
             

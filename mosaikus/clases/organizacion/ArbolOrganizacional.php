@@ -816,13 +816,13 @@
         /**
          *  Devuelve la estructura HTML para el arbol jtree 
          * 
-         * @param int $contar Plus para informacion adicional 1=> Documentos
+         * @param int $contar Plus para informacion adicional 1=> Documentos, 2 => Registro, 3 => Acciones Correctivas
          */
-        public function jstree_ao($contar=0){
+        public function jstree_ao($contar=0,$parametros=array()){
             if(!class_exists('Template')){
                 import("clases.interfaz.Template");
             }
-            $contenido_1[AO] = $this->MuestraPadre($contar);
+            $contenido_1[AO] = $this->MuestraPadre($contar,$parametros);
             $template = new Template();
             $template->PATH = PATH_TO_TEMPLATES.'organizacion/';
             $template->setTemplate("jstree_ao");
@@ -834,7 +834,7 @@
         /**
          * Devuelve la estructura HTML del primer nivel para el jtree 
          */
-        public function MuestraPadre($contar){
+        public function MuestraPadre($contar,$parametros=array()){
 		$sql="Select * from mos_organizacion
 				Where parent_id = 2";
                 
@@ -845,7 +845,7 @@
 		//while($arrP=mysql_fetch_assoc($resp)){
                 foreach ($data as $arrP) {//data-jstree='{ \"type\" : \"verde\" }'
                         
-                        $data_hijo = $this->MuestraHijos($arrP[id],$contar);
+                        $data_hijo = $this->MuestraHijos($arrP[id],$contar,$parametros);
                         $cuerpo .= "<li  id=\"phtml_".$arrP[id]."\">";
                         switch ($contar) {
                             case 1:
@@ -870,6 +870,34 @@
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
                                 $cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador). ")</a>";
                                 break;
+                            case 3:
+                                switch ($parametros[tipo_data]) {
+                                    case 'YTD':
+                                        $sql = "SELECT                                            
+                                            count(id_organizacion) total,
+                                            sum(case when estado=1 then 1 else 0 end) as atrasadas,
+                                            sum(case when estado=2 then 1 else 0 end) as en_plazo,
+                                            sum(case when estado=3 then 1 else 0 end) as realizada_atraso,
+                                            sum(case when estado=4 then 1 else 0 end) as realizada
+                                        FROM
+                                        mos_acciones_correctivas
+                                        where id_organizacion in ($arrP[id]) and (fecha_generacion >= '".date('Y')."-01-01' or fecha_realizada is null)";                                
+                                        $data_aux = $this->dbl->query($sql, $atr);
+
+                                        break;
+
+                                    default:
+                                        break;
+                                }                                
+                                $return[total] = $data_aux[0][total] + (isset($data_hijo[total])?$data_hijo[total]:0) ;
+                                $return[atrasadas] = $data_aux[0][atrasadas] + (isset($data_hijo[atrasadas])?$data_hijo[atrasadas]:0) ;
+                                $return[en_plazo] = $data_aux[0][en_plazo] + (isset($data_hijo[en_plazo])?$data_hijo[en_plazo]:0) ;
+                                $return[realizada_atraso] = $data_aux[0][realizada_atraso] + (isset($data_hijo[realizada_atraso])?$data_hijo[realizada_atraso]:0) ;
+                                $return[realizada] = $data_aux[0][realizada] + (isset($data_hijo[realizada])?$data_hijo[realizada]:0) ;
+
+                                //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
+                                $cuerpo .= "<a href=\"#\">".($arrP[title])." ($return[total];$return[atrasadas];$return[en_plazo];$return[realizada_atraso];$return[realizada] )</a>";
+                                break;
 
                             default:
                                 $cuerpo .= "<a href=\"#\">".($arrP[title])." </a>";
@@ -890,16 +918,19 @@
          * 
          * @param int $contar Plus para contar el numero de registros hijos en el arbol
          */
-	public function MuestraHijos($id,$contar){
+	public function MuestraHijos($id,$contar,$parametros=array()){
 		$sql="select * from mos_organizacion
 				Where parent_id = $id";
+                //echo $sql;
 		//$resp = mysql_query($sql);
                 $data = $this->dbl->query($sql, $atr);
+                //print_r($data);
                 $contador = 0;
-                $data_hijo[contador] = 0;
+                $data_hijo= array();
 		$cabecera = "<ul>";
                 foreach ($data as $arr) {//data-jstree='{ \"type\" : \"rojo\" }' 
-                    $data_hijo = $this->MuestraHijos($arr[id],$contar);
+                    $contador = array();
+                    $data_hijo = $this->MuestraHijos($arr[id],$contar,$parametros);
                     $extra .= "<li id=\"phtml_".$arr[id]."\">";
                     switch ($contar) {
                             case 1:
@@ -920,7 +951,43 @@
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
-                                $cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador). ")</a>";
+                                $extra .= "<a href=\"#\">".($arr[title])." (". ($contador). ")</a>";
+                                break;
+                            case 3:
+                                //print_r($arr);
+                                switch ($parametros[tipo_data]) {
+                                    case 'YTD':
+                                        $sql = "SELECT                                            
+                                            count(id_organizacion) total,
+                                            sum(case when estado=1 then 1 else 0 end) as atrasadas,
+                                            sum(case when estado=2 then 1 else 0 end) as en_plazo,
+                                            sum(case when estado=3 then 1 else 0 end) as realizada_atraso,
+                                            sum(case when estado=4 then 1 else 0 end) as realizada
+                                        FROM
+                                        mos_acciones_correctivas
+                                        where id_organizacion in ($arr[id]) and (fecha_generacion >= '".date('Y')."-01-01' or fecha_realizada is null)";                                
+                                        $data_aux = $this->dbl->query($sql, $atr);
+
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+                                
+                                $contador[total] = $data_aux[0][total] + (isset($data_hijo[total])?$data_hijo[total]:0) ;
+                                $contador[atrasadas] = $data_aux[0][atrasadas] + (isset($data_hijo[atrasadas])?$data_hijo[atrasadas]:0) ;
+                                $contador[en_plazo] = $data_aux[0][en_plazo] + (isset($data_hijo[en_plazo])?$data_hijo[en_plazo]:0) ;
+                                $contador[realizada_atraso] = $data_aux[0][realizada_atraso] + (isset($data_hijo[realizada_atraso])?$data_hijo[realizada_atraso]:0) ;
+                                $contador[realizada] = $data_aux[0][realizada] + (isset($data_hijo[realizada])?$data_hijo[realizada]:0) ;
+
+                                        
+                                $return[total] += $data_aux[0][total] + (isset($data_hijo[total])?$data_hijo[total]:0) ;
+                                $return[atrasadas] += $data_aux[0][atrasadas] + (isset($data_hijo[atrasadas])?$data_hijo[atrasadas]:0) ;
+                                $return[en_plazo] += $data_aux[0][en_plazo] + (isset($data_hijo[en_plazo])?$data_hijo[en_plazo]:0) ;
+                                $return[realizada_atraso] += $data_aux[0][realizada_atraso] + (isset($data_hijo[realizada_atraso])?$data_hijo[realizada_atraso]:0) ;
+                                $return[realizada] += $data_aux[0][realizada] + (isset($data_hijo[realizada])?$data_hijo[realizada]:0) ;
+                                //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
+                                $extra .= "<a href=\"#\">".($arr[title])." ($contador[total];$contador[atrasadas];$contador[en_plazo];$contador[realizada_atraso];$contador[realizada] )</a>";
                                 break;
                             default:
                                 
@@ -932,7 +999,7 @@
                         
                 }
 		$pie = "</ul>";
-                $return[contador] = $contador+$data_hijo[contador];
+                //$return[contador] = $contador+$data_hijo[contador];
                 $return[html] = $cabecera.$extra.$pie;
 		return $return;
 	}

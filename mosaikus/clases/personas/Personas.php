@@ -805,7 +805,12 @@
 //
 //                        console.log ( $(e.target).attr('id') );
 //                }); ");
-                $objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
+                //$objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
+                /*JS init_filtrar()*/
+                $objResponse->addScript('PanelOperator.initPanels("");
+                        ScrollBar.initScroll();
+                        init_filtro_rapido();
+                        init_filtro_ao_simple();');
                 //$objResponse->addScript('PanelOperator.initPanels("");ScrollBar.initScroll();');
                 return $objResponse;
             }

@@ -1,22 +1,163 @@
+function init_graficos_atrasos(){
+    var serie_plazo = $('#data-grafico-bar-2').val().split(";");
+    grafico_barra = "$('#container-grafico-bar-2').highcharts({"+
+        "chart: {"+
+            "type: 'bar'"+
+        "},"+
+        "title: {"+
+            "text: 'Acciones Correctivas'"+
+        "},"+        
+        "subtitle: {"+
+            "text: '"+ $('#subtitle-grafico-bar-2').val()+"'"+
+        "},"+
+        "tooltip: {"+
+//            "formatter: function () {"+
+//                "var s = '<b>' + this.x + ' - Total AC ' + '';"+
+//                "var i = 0;"+
+//                "$.each(this.points, function () {"+
+//                    "if (i == 0){"+
+//                       "s += this.point.total_ac + '</b>';"+
+//                       "i = i + 1;"+
+//                     "}"+
+//                    "s += '<br/><span style=\"color:'+ this.series.color +'\">\u25CF</span> ' + this.series.name + ': ' +"+
+//                     "   this.point.valor + ' - ' + this.y + '%  <b>' +  '</b>';"+
+//                "});"+
+//
+//                "return s;"+
+//            "},"+
+            "shared: true"+
+        "},"+
+        "xAxis: {"+
+            "categories: ["+$('#nombre-colum-grafico-bar-2').val()+"]"+
+        "},"+
+        "yAxis: {"+
+            "min: 0,"+
+            "title: {"+
+                "text: 'N° de Verificaciones Atrasadas'"+
+            "}"+
+           
+        "},"+
+        "legend: {"+
+            "reversed: true"+
+        "},"+
+        "plotOptions: {"+
+            "series: {"+
+                "stacking: 'normal'"+
+            "}"+
+        "},"+
+        "series: [{"+            
+            "name: 'Atrasados',"+
+            "color: '#ff7272',"+
+            "data: ["+serie_plazo[0]+"]"+
+        "}]"+
+    "});" ;
+    eval(grafico_barra); 
+    
+    var serie_plazo = $('#data-grafico-bar-3').val().split(";");
+    grafico_barra = "$('#container-grafico-bar-3').highcharts({"+
+        "chart: {"+
+            "type: 'bar'"+
+        "},"+
+        "title: {"+
+            "text: 'Acciones Correctivas'"+
+        "},"+        
+        "subtitle: {"+
+            "text: '"+ $('#subtitle-grafico-bar-3').val()+"'"+
+        "},"+
+        "tooltip: {"+
+//            "formatter: function () {"+
+//                "var s = '<b>' + this.x + ' - Total AC ' + '';"+
+//                "var i = 0;"+
+//                "$.each(this.points, function () {"+
+//                    "if (i == 0){"+
+//                       "s += this.point.total_ac + '</b>';"+
+//                       "i = i + 1;"+
+//                     "}"+
+//                    "s += '<br/><span style=\"color:'+ this.series.color +'\">\u25CF</span> ' + this.series.name + ': ' +"+
+//                     "   this.point.valor + ' - ' + this.y + '%  <b>' +  '</b>';"+
+//                "});"+
+//
+//                "return s;"+
+//            "},"+
+            "shared: true"+
+        "},"+
+        "xAxis: {"+
+            "categories: ["+$('#nombre-colum-grafico-bar-3').val()+"]"+
+        "},"+
+        "yAxis: {"+
+            "min: 0,"+
+            "title: {"+
+                "text: 'N° de Verificaciones Atrasadas'"+
+            "}"+
+           
+        "},"+
+        "legend: {"+
+            "reversed: true"+
+        "},"+
+        "plotOptions: {"+
+            "series: {"+
+                "stacking: 'normal'"+
+            "}"+
+        "},"+
+        "series: [{"+            
+            "name: 'Atrasados',"+
+            "color: '#ff7272',"+
+            "data: ["+serie_plazo[0]+"]"+
+        "}]"+
+    "});" ;
+    eval(grafico_barra); 
+}
+
 function init_graficos(){
     //alert('Entrro');
     var serie_plazo = $('#data-grafico-bar').val().split(";");
     //alert(serie_plazo[2]);
+    /*
+     ,"+
+                "dataLabels:{"+
+                "enabled:true,"+
+                "formatter:function() {"+
+                    "var pcnt = (this.y / 200) * 100;"+
+                    "return Highcharts.numberFormat(pcnt) + '%';"+
+                "}"+
+            "}"+
+     */
     grafico_barra = "$('#container-grafico-bar').highcharts({"+
         "chart: {"+
             "type: 'bar'"+
         "},"+
         "title: {"+
             "text: 'Acciones Correctivas'"+
+        "},"+        
+        "subtitle: {"+
+            "text: '"+ $('#subtitle-grafico-bar').val()+"'"+
+        "},"+
+        "tooltip: {"+
+            "formatter: function () {"+
+                "var s = '<b>' + this.x + ' - Total AC ' + '';"+
+                "var i = 0;"+
+                "$.each(this.points, function () {"+
+                    "if (i == 0){"+
+                       "s += this.point.total_ac + '</b>';"+
+                       "i = i + 1;"+
+                     "}"+
+                    "s += '<br/><span style=\"color:'+ this.series.color +'\">\u25CF</span> ' + this.series.name + ': ' +"+
+                     "   this.point.valor + ' - ' + this.y + '%  <b>' +  '</b>';"+
+                "});"+
+
+                "return s;"+
+            "},"+
+            "shared: true"+
         "},"+
         "xAxis: {"+
-            "categories: ['Gerencia 1', 'Gerencia 2', 'Gerencia 3', 'Gerencia 4', 'Gerencia 5']"+
+            "categories: ["+$('#nombre-colum-grafico-bar').val()+"]"+
         "},"+
         "yAxis: {"+
             "min: 0,"+
             "title: {"+
                 "text: 'Porcentaje de Acciones Correctivas'"+
             "}"+
+           
         "},"+
         "legend: {"+
             "reversed: true"+
@@ -27,14 +168,115 @@ function init_graficos(){
             "}"+
         "},"+
         "series: [{"+
+            "name: 'Realizado',"+
+            "color: '#00950e',"+
+            "data: ["+serie_plazo[3]+"]"+
+        "}, {"+
+            "name: 'Realizado con atraso',"+
+            "color: '#00d714',"+
+            "data: ["+serie_plazo[2]+"]"+
+        "},{"+
             "name: 'En Plazo',"+
-            "data: ["+serie_plazo[0]+"]"+
+            "color: '#63e46f',"+
+            "data: ["+serie_plazo[1]+"]"+
         "}, {"+
             "name: 'Atrasados',"+
-            "data: ["+serie_plazo[1]+"]"+
+            "color: '#ff7272',"+
+            "data: ["+serie_plazo[0]+"]"+
         "}]"+
     "});" ;
-    eval(grafico_barra);    
+    eval(grafico_barra); 
+    var grafico_linea ='';
+    grafico_linea = "$('#container-grafico-linea').highcharts({"+
+        "title: {"+
+            "text: 'Acciones Correctivas',"+
+            "x: -20 "+
+        "},"+
+        "subtitle: {"+
+            "text: '"+ $('#subtitle-grafico-linea').val()+"',"+
+            "x: -20"+
+        "},"+
+        "xAxis: {"+
+            "categories: ["+$('#nombre-colum-grafico-linea').val()+"]"+
+        "},"+
+        "yAxis: {"+
+            "title: {"+
+                "text: 'Cumplimiento (%)'"+
+            "},"+
+            "plotLines: [{"+
+                "value: 0,"+
+                "width: 1,"+
+                "color: '#808080'"+
+            "}]"+
+        "},       "+ 
+        "tooltip: {"+
+            "valueSuffix: '°C',"+
+            "formatter: function () {"+
+                "var s = '<b>' + this.x  + '</b>';"+
+
+                "$.each(this.points, function () {"+
+                    "s += '<br/><span style=\"color:'+ this.series.color +'\">\u25CF</span> ' + this.series.name + ': ' +"+
+                     "   this.point.valor + ' - ' + this.y + '%  <b>' +  '</b>';"+
+                "});"+
+
+                "return s;"+
+            "},"+
+            "shared: true"+
+        "},"+
+        "legend: {"+
+            "layout: 'vertical',"+
+            "align: 'center',"+
+            "verticalAlign: 'bottom',"+
+            "borderWidth: 0"+
+        "},"+
+        "series: [" + $('#data-grafico-linea').val()+ "]"+
+    "});";   
+    eval(grafico_linea);
+    var grafico_linea_uni = "$('#container-grafico-linea-uni').highcharts({"+
+        "title: {"+
+            "text: 'Acciones Correctivas',"+
+            "x: -20 "+
+        "},"+
+        "subtitle: {"+
+            "text: '"+ $('#subtitle-grafico-linea-uni').val()+"',"+
+            "x: -20"+
+        "},"+
+        "xAxis: {"+
+            "categories: ["+$('#nombre-colum-grafico-linea-uni').val()+"]"+
+        "},"+
+        "yAxis: {"+
+            "title: {"+
+                "text: 'N° Acciones Correctivas'"+
+            "},min: 0,"+
+            "plotLines: [{"+
+                "value: 0,"+
+                "width: 1,"+
+                "color: '#808080'"+
+            "}]"+
+        "},       "+ 
+        "tooltip: {"+
+            "valueSuffix: '',"+
+//            "formatter: function () {"+
+//                "var s = '<b>' + this.x + '</b>';"+
+//
+//                "$.each(this.points, function () {"+
+//                    "s += '<br/><span style=\"color:'+ this.series.color +'\">\u25CF</span> ' + this.series.name + ': ' +"+
+//                        "   this.point.valor + ' - ' + this.y + '%  <b>' +  '</b>';"+
+//                "});"+
+//
+//                "return s;"+
+//            "},"+
+            "shared: true"+
+        "},"+
+        "legend: {"+
+            "layout: 'vertical',"+
+            "align: 'center',"+
+            "verticalAlign: 'bottom',"+
+            "borderWidth: 0"+
+        "},"+
+        "series: [" + $('#data-grafico-linea-uni').val()+ "]"+
+    "});";   
+    eval(grafico_linea_uni);
 }
 
 function init_tabla(){
@@ -69,6 +311,9 @@ function init_filtrar(){
         $('#b-fecha_generacion-hasta').datepicker();
         $('#b-fecha_acordada-hasta').datepicker();
         $('#b-fecha_realizada-hasta').datepicker();
+        
+        $('#tabs-hv').tab();
+        $('#tabs-hv a:first').tab('show'); 
         
         PanelOperator.initPanels("");
         ScrollBar.initScroll();
@@ -109,6 +354,21 @@ function init_filtrar(){
           xajax_Loading(array.getArray());
     }
     
+    function filtrar_grafico(){
+        array = new XArray();
+//        if (doc== null)
+//        {
+//             $('form')[0].reset();             
+//        }
+        array.getForm('busquedaFrm-Filtro'); 
+        
+        //array.addParametro('pag',pag);
+        array.setObjeto('AccionesCorrectivas','buscarReporte');
+        array.addParametro('import','clases.acciones_correctivas.AccionesCorrectivas');
+        $('#MustraCargando').show();
+        xajax_Loading(array.getArray());
+    }
+    
     function filtrar_proceso(){
           array = new XArray();
           array.setObjeto('ArbolProcesos','buscar_hijos');
@@ -116,58 +376,7 @@ function init_filtrar(){
           array.addParametro('b-id_proceso',$('#b-id_proceso_aux').val());
           xajax_Loading(array.getArray());
     }
-
-    function nuevo_AccionesCorrectivas(){
-            array = new XArray();
-            array.setObjeto('AccionesCorrectivas','crear');
-            array.addParametro('import','clases.acciones_correctivas.AccionesCorrectivas');
-            xajax_Loading(array.getArray());
-    }
-
-    function validar(doc){    
-        if ($('#fecha_acordada').val() != ''){ 
-            $('#id_responsable_segui').attr('data-validation',"required");
-        }
-        else {
-            $('#id_responsable_segui').removeAttr('data-validation');
-        }  
-        
-        if($('#idFormulario').isValid()) {
-            $( "#btn-guardar" ).html('Procesando..');
-            $( "#btn-guardar" ).prop( "disabled", true );
-            array = new XArray();
-            if (doc.getElementById("opc").value == "new")
-                array.setObjeto('AccionesCorrectivas','guardar');
-            else
-                array.setObjeto('AccionesCorrectivas','actualizar');
-            array.addParametro('permiso',document.getElementById('permiso_modulo').value);
-            array.getForm('idFormulario');
-            array.addParametro('import','clases.acciones_correctivas.AccionesCorrectivas');
-            xajax_Loading(array.getArray());
-        }else{
-        
-        }
-    }
-
-    function editarAccionesCorrectivas(id){
-        array = new XArray();
-        array.setObjeto('AccionesCorrectivas','editar');
-        array.addParametro('id',id);
-        array.addParametro('import','clases.acciones_correctivas.AccionesCorrectivas');
-        xajax_Loading(array.getArray());
-    }
-
-
-    function eliminarAccionesCorrectivas(id){
-        if(confirm("¿Desea Eliminar el AccionesCorrectivas Seleccionado?")){
-            array = new XArray();
-            array.setObjeto('AccionesCorrectivas','eliminar');
-            array.addParametro('id',id);
-            array.addParametro('permiso',document.getElementById('permiso_modulo').value);
-            array.addParametro('import','clases.acciones_correctivas.AccionesCorrectivas');
-            xajax_Loading(array.getArray());
-        }
-    }
+    
     function verPagina(pag,doc){
         array = new XArray();
         if (doc== null)

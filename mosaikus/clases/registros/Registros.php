@@ -1638,7 +1638,7 @@
                     $html .= '</div>';
                     $i++;
                 }
-                $html .= '</table>';
+                //$html .= '</table>';
                 $contenido_1[CAMPOS_DINAMICOS] = $html;
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'registros/';

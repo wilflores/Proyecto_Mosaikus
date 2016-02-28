@@ -4,7 +4,7 @@
 
 <!-- .panel Panel Busqueda  -->
 <div class="row">
-    <div id="search-dashboard" class="  panel-container col-md-offset-1  col-xs-8 ">
+    <div id="search-dashboard" class="  panel-container col-md-offset-1  col-xs-7 ">
         <div class="content-panel panel">
             <div class="content">
                 <div id="search-bar-dashboard" class="search-items">                        
@@ -52,26 +52,52 @@
             </div>
         </div>
     </div>  
-    <div id="main-content-grafico" class=" panel-container col-xs-15 ">              
+    <div id="main-content-grafico" class=" panel-container col-xs-16 ">              
         <div class="content-panel panel">
             <div class="content">
                 <div class="tabs"> 
                     <ul id="tabs-hv" class="nav nav-tabs" data-tabs="tabs">
-                        <li><a href="#gf-barra" data-toggle="tab">Barras</a></li>  
-                        <li><a href="#gf-linea" data-toggle="tab">Líneas</a></li>
-                        <li><a href="#gf-pareto" data-toggle="tab">Pareto</a></li>
+                        <li><a href="#gf-barra" data-toggle="tab" style="padding-right: 20px;padding-left: 20px;">Barras</a></li>  
+                        <li><a href="#gf-linea" data-toggle="tab" style="padding-right: 20px;padding-left: 20px;">Líneas</a></li>
+                        <li><a href="#gf-pareto" data-toggle="tab" style="padding-right: 20px;padding-left: 20px;">Línea Unificada</a></li>
+                        <li><a href="#gf-barra-2" data-toggle="tab" style="padding-right: 20px;padding-left: 20px;">Atrasos de Verificación</a></li>
+                        <li><a href="#gf-barra-3" data-toggle="tab" style="padding-right: 20px;padding-left: 20px;">Atrasos de Acciones</a></li>
 
                     </ul>
-                    <div id="my-tab-content" class="tab-content"  style="padding: 45px 3%;">
+                    <div id="my-tab-content" class="tab-content"  style="padding: 45px 2%;">
                         <div class="tab-pane active" id="gf-barra">
-                            <div id="container-grafico-bar" style="min-width: 310px; max-width: 800px; height: 400px; margin: 0 auto"></div>
-                            <input type="hidden" id="data-grafico-bar" value="80,67.7,51.8,48.5,40;20,32.3,48.5,51.5,60"/>
+                            <div id="container-grafico-bar" style="min-width: 310px; max-width: 800px; height: 500px; margin: 0 auto"></div>
+                            <input type="hidden" id="data-grafico-bar" value="{DATA_GRAFICO_BAR}"/>
+                            <input type="hidden" id="nombre-colum-grafico-bar" value="{NOMBRE_COLUM_GRAFICO_BAR}"/>
+                            <input type="hidden" id="subtitle-grafico-bar" value="{SUBTITLE_GRAFICO_BAR}"/>
                         </div>
                         <div class="tab-pane " id="gf-linea">
-
+                            <div class="row">
+                                <div id="container-grafico-linea" class="col-xs-14" style=" min-width: 610px;height: 500px; margin: 0 auto"></div>
+                            <input type="hidden" id="data-grafico-linea" value="{DATA_GRAFICO_LINEA}"/>
+                            <input type="hidden" id="nombre-colum-grafico-linea" value="{NOMBRE_COLUM_GRAFICO_LINEA}"/>
+                            <input type="hidden" id="subtitle-grafico-linea" value="{SUBTITLE_GRAFICO_LINEA}"/>
+                            </div>
                         </div>
                         <div class="tab-pane " id="gf-pareto">
-
+                            <div class="row">
+                                <div id="container-grafico-linea-uni" class="col-xs-14" style=" min-width: 610px;height: 500px; margin: 0 auto"></div>
+                            <input type="hidden" id="data-grafico-linea-uni" value="{DATA_GRAFICO_LINEA_UNI}"/>
+                            <input type="hidden" id="nombre-colum-grafico-linea-uni" value="{NOMBRE_COLUM_GRAFICO_LINEA_UNI}"/>
+                            <input type="hidden" id="subtitle-grafico-linea-uni" value="{SUBTITLE_GRAFICO_LINEA_UNI}"/>
+                            </div>
+                        </div>
+                        <div class="tab-pane " id="gf-barra-2">
+                            <div id="container-grafico-bar-2" style="min-width: 310px; max-width: 800px; height: 500px; margin: 0 auto"></div>
+                            <input type="hidden" id="data-grafico-bar-2" value="{DATA_GRAFICO_BAR_2}"/>
+                            <input type="hidden" id="nombre-colum-grafico-bar-2" value="{NOMBRE_COLUM_GRAFICO_BAR_2}"/>
+                            <input type="hidden" id="subtitle-grafico-bar-2" value="{SUBTITLE_GRAFICO_BAR_2}"/>
+                        </div>
+                        <div class="tab-pane " id="gf-barra-3">
+                            <div id="container-grafico-bar-3" style="min-width: 310px; max-width: 800px; height: 500px; margin: 0 auto"></div>
+                            <input type="hidden" id="data-grafico-bar-3" value="{DATA_GRAFICO_BAR_3}"/>
+                            <input type="hidden" id="nombre-colum-grafico-bar-3" value="{NOMBRE_COLUM_GRAFICO_BAR_3}"/>
+                            <input type="hidden" id="subtitle-grafico-bar-3" value="{SUBTITLE_GRAFICO_BAR_3}"/>
                         </div>
                     </div>                                
                 </div>                        

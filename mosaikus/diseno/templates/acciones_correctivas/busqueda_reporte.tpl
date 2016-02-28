@@ -7,11 +7,13 @@
             </label>                               
         </div>
         <div class="col-xs-16">
-            <select id="b-origen_hallazgo" name="b-origen_hallazgo" class="form-control" >                                        
-                                        <option selected="">Q1</option>
-                                        <option value="">Q2</option>
-                                        <option value="">Q3</option>
-                                        <option value="">Q4</option>
+            <select id="tipo_data" name="tipo_data" class="form-control" >                                        
+                                        <option value="SEMANAL">Semanal</option>
+                                        <option value="MES">Mensual</option>
+                                        <option value="QUARTIL">Cuartil</option>
+                                        <option value="SEM">Semestre</option>
+                                        <option value="M12">Movil 12</option>
+                                        <option selected="" value="YTD">YTD</option>
                                     </select> 
         </div>
         </div>
