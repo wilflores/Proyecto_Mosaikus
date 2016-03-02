@@ -122,7 +122,6 @@
                             ,IDDoc
                             ,identificacion
                             ,version
-                            ,correlativo
                             ,id_usuario
                             ,descripcion
                             ,1 doc_fisico
@@ -148,7 +147,24 @@
                 $this->operacion($sql, $atr);
                 return $this->dbl->data;
             }
-            
+             public function verArbol($id){
+                $atr=array();
+                $sql = "SELECT replace(Nombre,'<br>',',') id
+                         FROM mos_registro_formulario 
+                         WHERE idRegistro = $id and tipo='11';"; 
+                $this->operacion($sql, $atr);
+                //echo $this->dbl->data[0][id];
+                return $this->dbl->data[0][id];
+            }           
+             public function verArbolP($id){
+                $atr=array();
+                $sql = "SELECT replace(Nombre,'<br>',',') id
+                         FROM mos_registro_formulario 
+                         WHERE idRegistro = $id and tipo='12';"; 
+                $this->operacion($sql, $atr);
+                //echo $this->dbl->data[0][id];
+                return $this->dbl->data[0][id];
+            }           
             public function verValoresCamposDinamicos($id){
                 $atr=array();
                 $sql = "SELECT 
@@ -163,6 +179,7 @@
                             inner join mos_registro_formulario rf on rf.id_unico = df.id_unico
                          WHERE df.IDDoc = $_SESSION[IDDoc] AND rf.idRegistro = $id ORDER BY df.orden "; 
                 $this->operacion($sql, $atr);
+                //echo $sql;
                 return $this->dbl->data;
             }
             
@@ -180,6 +197,7 @@
             }
             
             public function ingresarRegistros($atr,$archivo){
+               // print_r($atr);
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);//,version,correlativo,id_procesos,id_organizacion
                     $atr[doc_fisico] = $archivo;
@@ -208,12 +226,13 @@
             }
             
             public function ingresarRegistrosCampoDinamico($atr){
+                //print_r($atr);
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);//,version,correlativo,id_procesos,id_organizacion                    
                     $sql = "INSERT INTO mos_registro_formulario(IDDoc,idRegistro,Nombre,tipo,id_unico)
                             VALUES(
                                 $_SESSION[IDDoc],$atr[idRegistro],'$atr[Nombre]','$atr[tipo]',$atr[id_unico]
-                                )";//,$atr[version],$atr[correlativo],$atr[id_procesos],$atr[id_organizacion]
+                                );";//,$atr[version],$atr[correlativo],$atr[id_procesos],$atr[id_organizacion]
                     //echo $sql;
                     $this->dbl->insert_update($sql);
 
@@ -738,6 +757,12 @@
                             break;
                         case '10':
                                 $ancho = 2;
+                                break;
+                        case '11':
+                                $ancho = 5;
+                                break;
+                        case '12':
+                                $ancho = 5;
                                 break;
                         default:
                             break;
@@ -1628,6 +1653,21 @@
                                           </label>';
                             $html .= '</div>';
                             break;
+                        case '11':
+                                $html .= '<div class="col-md-11">';
+                                $html .= '<input type="hidden" value="" name="nodos_'.$i.'" id="nodos_'.$i.'"/>
+                                        <iframe id="iframearbol_'.$i.'" src="pages/cargo/prueba_arbolV4.php?funcion=MarcarNodos('.$i.')&IDReg=" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
+                                $html .= '</div>';
+                                $campos_arbol_o .=$i.',';
+                            break;
+                        case '12':
+                                $html .= '<div class="col-md-12">';
+                                $html .= '<input type="hidden" value="" name="nodosp_'.$i.'" id="nodosp_'.$i.'"/>
+                                        <iframe id="iframearbolp_'.$i.'" src="pages/cargo/arbol_procesoV4.php?funcion=MarcarNodosP('.$i.')&IDReg=" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
+                                $html .= '</div>';  
+                                $campos_arbol_p .=$i.',';
+                            break;
+                        
                         default:
                             break;
                     }
@@ -1638,6 +1678,13 @@
                     $html .= '</div>';
                     $i++;
                 }
+                    if($campos_arbol_o != '')
+                       $campos_arbol_o = substr($campos_arbol_o, 0, strlen($campos_arbol_o)-1);
+                    if($campos_arbol_p != '')
+                        $campos_arbol_p = substr($campos_arbol_p, 0, strlen($campos_arbol_p)-1);
+                    $html .= '<input type="hidden" value="'.$campos_arbol_o.'" name="arbolesO" id="arbolesO"/>';
+                    $html .= '<input type="hidden" value="'.$campos_arbol_p.'" name="arbolesP" id="arbolesP"/>';    
+                
                 //$html .= '</table>';
                 $contenido_1[CAMPOS_DINAMICOS] = $html;
                 $template = new Template();
@@ -1671,14 +1718,14 @@
      
  
             public function guardar($parametros)
-            {
+            {   //print_r($parametros);
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $objResponse = new xajaxResponse();
                 unset ($parametros['opc']);
                 unset ($parametros['id']);
                 $parametros['id_usuario']= $_SESSION['CookIdUsuario'];
-
+               // print_r($parametros);
                 $validator = new FormValidator();
                 
                 if(!$validator->ValidateForm($parametros)){
@@ -1704,8 +1751,9 @@
                             $parametros[descripcion] = $parametros['filename'];
                            
                     }
+                     
                     $respuesta = $this->ingresarRegistros($parametros,$archivo);
-
+                  
                     //if (preg_match("/ha sido ingresado con exito/",$respuesta ) == true) {
                     if (strlen($respuesta ) < 10 ) {
                         for ($i = 1; $i <= 20; $i++) {
@@ -1720,12 +1768,11 @@
                                     $valor_actual_aux = substr($valor_actual_aux, 0, strlen($valor_actual_aux) - 5);                                    
                                     //$params[nombre] = $parametros["nombre_$i"];
                                     $params[tipo] = $parametros["tipo_dato_$i"];
-                                    //$params[validacion] = $parametros["validacion_$i"];
-                                    //$params[valores] = $parametros["valores_$i"];
                                     $params[Nombre] = $valor_actual_aux;
                                     //$params['id_usuario']= $_SESSION['USERID'];
                                     $params[idRegistro] = $respuesta;
                                     $params[id_unico] = $parametros["id_atributo_$i"];
+                                    
                                     $this->ingresarRegistrosCampoDinamico($params);
                                     
                                 }
@@ -1735,11 +1782,18 @@
                                     //$params[nombre] = $parametros["nombre_$i"];
                                     $params[tipo] = $parametros["tipo_dato_$i"];
                                     //$params[validacion] = $parametros["validacion_$i"];
-                                    //$params[valores] = $parametros["valores_$i"];                                    
-                                    $params[Nombre] = $parametros["campo_". $i];
+                                    //$params[valores] = $parametros["valores_$i"];   
+                                    if($params[tipo]=='11')
+                                        $params[Nombre] = str_replace(",", "<br>", $parametros["nodos_".$i]);
+                                    elseif($params[tipo]=='12')
+                                        $params[Nombre] = str_replace(",", "<br>", $parametros["nodosp_".$i]);
+                                    else
+                                        $params[Nombre] = $parametros["campo_". $i];
+                                    
                                     $params['id_usuario']= $_SESSION['USERID'];
                                     $params[idRegistro] = $respuesta;
                                     $params[id_unico] = $parametros["id_atributo_$i"];
+                                    //print_r($params);
                                     $this->ingresarRegistrosCampoDinamico($params);
                                 }
                             }
@@ -1801,6 +1855,8 @@
                 $html = '';
                 $js='';
                 $i = 1;
+                $campos_arbol_o='';
+                $campos_arbol_p='';
                 foreach ($campos_din as $value) {//Nombre,tipo,valores
                     $html .= '<div class="form-group">
                                         <label for="idRegistro" class="col-md-4 control-label">' . $value[Nombre] . '</label>';
@@ -1809,6 +1865,7 @@
                       $ids = array('7','8','9','1','2','3','5','6');
                 $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona');
                      */
+                    //print_r($campos_din);
                     switch ($value[tipo]) {
                         case 'Seleccion Simple':
                         case '7':
@@ -1910,9 +1967,26 @@
                                           </label>';
                             $html .= '</div>';
                             break;
+                        case '11':
+                                $html .= '<div class="col-md-11">';
+                                $html .= '<input type="hidden" value="'.$this->verArbol($val["idRegistro"]).'" name="nodos_'.$i.'" id="nodos_'.$i.'"/>
+                                        <iframe id="iframearbol_'.$i.'" src="pages/cargo/prueba_arbolV4.php?funcion=MarcarNodos('.$i.')&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
+                                $html .= '</div>';  
+                                $campos_arbol_o .=$i.',';
+                            break;
+                        case '12':
+                                $html .= '<div class="col-md-12">';
+                                $html .= '<input type="hidden" value="'.$this->verArbolP($val["idRegistro"]).'" name="nodosp_'.$i.'" id="nodosp_'.$i.'"/>
+                                        <iframe id="iframearbolp_'.$i.'" src="pages/cargo/arbol_procesoV4.php?funcion=MarcarNodosP('.$i.')&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
+                                $html .= '</div>';   
+                                $campos_arbol_p .=$i.',';
+                            break;
+                        
                         default:
                             break;
                     }
+                    //CON ESTO CONTROLO CUANTOS ARBOLES HAY PARA EL VALIDAR QUE TENGAN SELECCIONADOS
+                    //FIN VALIDACION DE ARBOLES
                     $html .= '<input id="tipo_dato_' . $i . '" type="hidden" value="' . $value[tipo] . '" name="tipo_dato_' . $i . '">';
                     $html .= '<input id="nombre_' . $i . '" type="hidden" value="' . $value[Nombre] . '" name="nombre_' . $i . '">';
                     //$html .= '<input id="validacion_' . $i . '" type="hidden" value="' . $value[validacion] . '" name="validacion_' . $i . '">';
@@ -1921,6 +1995,13 @@
                     $html .= '</div>';
                     $i++;
                 }
+                    if($campos_arbol_o != '')
+                       $campos_arbol_o = substr($campos_arbol_o, 0, strlen($campos_arbol_o)-1);
+                    if($campos_arbol_p != '')
+                        $campos_arbol_p = substr($campos_arbol_p, 0, strlen($campos_arbol_p)-1);
+                    $html .= '<input type="hidden" value="'.$campos_arbol_o.'" name="arbolesO" id="arbolesO"/>';
+                    $html .= '<input type="hidden" value="'.$campos_arbol_p.'" name="arbolesP" id="arbolesP"/>';    
+                
                 $html .= '</table>';
                 $contenido_1[CAMPOS_DINAMICOS] = $html;
 
@@ -2008,8 +2089,14 @@
                                     //$params[nombre] = $parametros["nombre_$i"];
                                     $params[tipo] = $parametros["tipo_dato_$i"];
                                     //$params[validacion] = $parametros["validacion_$i"];
-                                    //$params[valores] = $parametros["valores_$i"];                                    
-                                    $params[Nombre] = $parametros["campo_". $i];
+                                    //$params[valores] = $parametros["valores_$i"];    
+                                    if($params[tipo]=='11')
+                                        $params[Nombre] = str_replace(",", "<br>", $parametros["nodos_".$i]);
+                                    elseif($params[tipo]=='12')
+                                        $params[Nombre] = str_replace(",", "<br>", $parametros["nodosp_".$i]);
+                                    else
+                                        $params[Nombre] = $parametros["campo_". $i];
+                                    
                                     $params['id_usuario']= $_SESSION['USERID'];
                                     $params[idRegistro] = $parametros[id];
                                     $params[id_unico] = $parametros["id_atributo_$i"];
