@@ -104,19 +104,23 @@ function r_marcar_desmarcar_checked_columns(checked){
     function r_validar(doc){
         var arbolsel='1';
         cad=document.getElementById('arbolesO').value;
-        var arbolO = cad.split(",");
-        for (var i=0; i<arbolO.length; i++) 
-            { if (document.getElementById('nodos_'+arbolO[i]).value=='') 
-                arbolsel='';
-               // alert('Or'+arbolO[i]+document.getElementById('nodos_'+arbolO[i]).value)
-            }
+        if(cad!=''){
+            var arbolO = cad.split(",");
+            for (var i=0; i<arbolO.length; i++) 
+                { if (document.getElementById('nodos_'+arbolO[i]).value=='') 
+                    arbolsel='';
+                   // alert('Or'+arbolO[i]+document.getElementById('nodos_'+arbolO[i]).value)
+                }
+        }
         cad=document.getElementById('arbolesP').value;
-        var arbolP = cad.split(",");
-        for (var i=0; i<arbolP.length; i++) 
-            { if(document.getElementById('nodosp_'+arbolP[i]).value=='')
-                arbolsel='';
-                //alert('Pr'+arbolP[i]+document.getElementById('nodosp_'+arbolP[i]).value)
-            }
+        if(cad!=''){
+            var arbolP = cad.split(",");
+            for (var i=0; i<arbolP.length; i++) 
+                { if(document.getElementById('nodosp_'+arbolP[i]).value=='')
+                    arbolsel='';
+                    //alert('Pr'+arbolP[i]+document.getElementById('nodosp_'+arbolP[i]).value)
+                }
+        }
             
         if(arbolsel=='1'){    
             if($('#r-idFormulario').isValid()) {
