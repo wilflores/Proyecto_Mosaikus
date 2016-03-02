@@ -102,21 +102,41 @@ function r_marcar_desmarcar_checked_columns(checked){
     }
 
     function r_validar(doc){
-        if($('#r-idFormulario').isValid()) {
-            $( "#btn-guardar" ).html('Procesando..');
-            $( "#btn-guardar" ).prop( "disabled", true );
-            array = new XArray();
-            if (doc.getElementById("r-opc").value == "new")
-                array.setObjeto('Registros','guardar');
-            else
-                array.setObjeto('Registros','actualizar');
-            array.addParametro('permiso',document.getElementById('permiso_modulo').value);
-            array.getForm('r-idFormulario');
-            array.addParametro('import','clases.registros.Registros');
-            xajax_Loading(array.getArray());
-        }else{
-        
+        var arbolsel='1';
+        cad=document.getElementById('arbolesO').value;
+        var arbolO = cad.split(",");
+        for (var i=0; i<arbolO.length; i++) 
+            { if (document.getElementById('nodos_'+arbolO[i]).value=='') 
+                arbolsel='';
+               // alert('Or'+arbolO[i]+document.getElementById('nodos_'+arbolO[i]).value)
+            }
+        cad=document.getElementById('arbolesP').value;
+        var arbolP = cad.split(",");
+        for (var i=0; i<arbolP.length; i++) 
+            { if(document.getElementById('nodosp_'+arbolP[i]).value=='')
+                arbolsel='';
+                //alert('Pr'+arbolP[i]+document.getElementById('nodosp_'+arbolP[i]).value)
+            }
+            
+        if(arbolsel=='1'){    
+            if($('#r-idFormulario').isValid()) {
+                $( "#btn-guardar" ).html('Procesando..');
+                $( "#btn-guardar" ).prop( "disabled", true );
+                array = new XArray();
+                if (doc.getElementById("r-opc").value == "new")
+                    array.setObjeto('Registros','guardar');
+                else
+                    array.setObjeto('Registros','actualizar');
+                array.addParametro('permiso',document.getElementById('permiso_modulo').value);
+                array.getForm('r-idFormulario');
+                array.addParametro('import','clases.registros.Registros');
+                xajax_Loading(array.getArray());
+            }else{
+
+            }
         }
+    else
+        VerMensaje('error','Debe marcar al menos una opcion del arbol');
     }
 
     function editarRegistros(id){
