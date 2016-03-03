@@ -26,7 +26,7 @@
                     if($bds[db]!='' && $bds[loginDB]!='' && $bds[passwordDB]!=''){
                         $pagina2 = new Mysql($bds["db"],$bds["loginDB"],$bds["passwordDB"]);
                         //PRIMERO OBTENEMOS LOS ID DE LAS ACCIONES CORRECTIVAS QUE NO TIENEN VERIFICACION ACTIVADA
-                        $Consulta ="select id from mos_acciones_correctivas where fecha_realizada is null;";
+                        $Consulta ="select id from mos_acciones_correctivas where fecha_acordada is null;";
                         $data2 = $pagina2->query($Consulta, array());        
                         foreach( $data2 as $fila){
                             $id_ac .=$fila['id'].','; 
@@ -41,7 +41,7 @@
                                             where 
                                             id_ac is not null and
                                             /*APLICA PARA LAS ACCIONES CORRECTIVAS*/
-                                            mos_acciones_ac_co.fecha_realizada is NULL and 
+                                            mos_acciones_ac_co.fecha_acordada is NULL and 
                                             /*NO HAN SIDO CERRADAS*/
                                             DATEDIFF(mos_acciones_ac_co.fecha_acordada,NOW())<0 AND
                                             /*LA FECHA ACORDADA ES MENOR A LA FECHA ACTUAL*/
