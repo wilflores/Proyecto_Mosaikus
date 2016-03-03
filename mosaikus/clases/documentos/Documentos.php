@@ -637,6 +637,7 @@
             }
             
             public function ingresarArbol($atr){
+               // print_r($atr);
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);                    
                     $sql = "INSERT INTO mos_documentos_estrorg_arbolproc(IDDoc,id_organizacion_proceso,tipo,aplica_subnivel)
@@ -752,7 +753,7 @@
             }
             
             public function ingresarDocumentosVersion($atr,$archivo,$doc_ver){
-                try {
+                try {print_r($atr);
                     $atr = $this->dbl->corregir_parametros($atr);
                     $atr[IDDoc] = $this->codigo_siguiente();
                     
@@ -1029,9 +1030,9 @@
                                     ,contentType                                    
                                     ,nom_visualiza                                    
                                     ,contentType_visualiza                                    
-                                    ,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) elaboro
-                                    ,CONCAT(CONCAT(UPPER(LEFT(re.nombres, 1)), LOWER(SUBSTRING(re.nombres, 2))),' ', CONCAT(UPPER(LEFT(re.apellido_paterno, 1)), LOWER(SUBSTRING(re.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(re.apellido_materno, 1)), LOWER(SUBSTRING(re.apellido_materno, 2)))) reviso                                    
-                                    ,CONCAT(CONCAT(UPPER(LEFT(ap.nombres, 1)), LOWER(SUBSTRING(ap.nombres, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_paterno, 1)), LOWER(SUBSTRING(ap.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_materno, 1)), LOWER(SUBSTRING(ap.apellido_materno, 2)))) aprobo
+                                    ,CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno), ' ', initcap(p.apellido_materno))  elaboro
+                                    ,CONCAT(initcap(re.nombres), ' ', initcap(re.apellido_paterno), ' ', initcap(re.apellido_materno)) reviso                                    
+                                    ,CONCAT(initcap(ap.nombres), ' ', initcap(ap.apellido_paterno), ' ', initcap(ap.apellido_materno)) aprobo
                                     ,formulario
                                     ,v_meses                                    
                                     ,version
@@ -2497,7 +2498,9 @@
                         }
                         $campos_dinamicos = new Parametros();
                         $campos_dinamicos->guardar_parametros_dinamicos($parametros, 1);
+                        
                         $arr = explode(",", $parametros[nodos]);
+
                         $params[IDDoc] = $respuesta;
                         foreach($arr as $temp){
                                 $params[id] = $temp;
@@ -2963,10 +2966,13 @@
                     
                     $respuesta = $this->modificarDocumentos($parametros,$doc_vis);
 
-                    if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {                        
+                    if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {  
+                        //print_r($parametros);
+                        //print_r($parametros[nodos]);
                         $arr = explode(",", $parametros[nodos]);
                         $params[IDDoc] = $parametros[id];
                         $this->eliminarCargosArbol($parametros);
+                        //print_r($params);
                         foreach($arr as $temp){
                                 $params[id] = $temp;
                                 $params[tipo] = 'EO';
