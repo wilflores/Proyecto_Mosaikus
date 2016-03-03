@@ -51,6 +51,7 @@
                                             /*SI YA ESTA ATRASADA, NO LA ACTUALIZO OTRA VEZ */";
                                 $data2 = $pagina2->insert_update($Consulta, array());
                                 echo $bds[db].":'ACCIONES DE AC' Ejecutado el dia ". date('Y/m/d h:m')."\n";
+                                $id_ac='';
                             }
                         }
                             //APLICA PARA LAS CORRECIONES*/
