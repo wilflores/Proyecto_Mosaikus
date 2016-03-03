@@ -200,23 +200,25 @@
  function BuscaProcesoExcel($tupla,$key)
         {   //print_r($tupla);
             //echo $tupla[id_unico]
-            $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
-            $encryt = new EnDecryptText();
-            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
-            $Nivls = "";
-            //print_r($reg_arbol);
-            {                                           
-                    //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
-                    foreach ($reg_arbol as $value) 
-                    {                                                        
-                        $Nivls .= BuscaProceso(array('id_organizacion' => $value))."<br />";
-                    }
-                    if($Nivls!='')
-                            $Nivls=substr($Nivls,0,strlen($Nivls)-6);
-                    else
-                            $Nivls='-- Sin información --';
+            if($tupla[$key]!=''){     
+                $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
+                $encryt = new EnDecryptText();
+                //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+                $Nivls = "";
+                //print_r($reg_arbol);
+                {                                           
+                        //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                        foreach ($reg_arbol as $value) 
+                        {                                                        
+                            $Nivls .= BuscaProceso(array('id_organizacion' => $value))."<br />";
+                        }
+                        if($Nivls!='')
+                                $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+                        else
+                                $Nivls='-- Sin información --';
+                }
             }
-                        
+                $Nivls='-- Sin información --';        
             //return $tupla[analisis_causal];           
             return $Nivls;
 
@@ -225,71 +227,78 @@
  function BuscaOrganizacionalExcel($tupla,$key)
         {   //print_r($tupla);
             //echo $tupla[id_unico]
-            $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
-            $encryt = new EnDecryptText();
-            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
-            $Nivls = "";
-            //print_r($reg_arbol);
-            {                                           
-                    //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
-                    foreach ($reg_arbol as $value) 
-                    {                                                        
-                        $Nivls .= BuscaOrganizacional(array('id_organizacion' => $value))."<br />";
-                    }
-                    if($Nivls!='')
-                            $Nivls=substr($Nivls,0,strlen($Nivls)-6);
-                    else
-                            $Nivls='-- Sin información --';
+            if($tupla[$key]!=''){
+                $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
+                $encryt = new EnDecryptText();
+                //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+                $Nivls = "";
+                //print_r($reg_arbol);
+                {                                           
+                        //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                        foreach ($reg_arbol as $value) 
+                        {                                                        
+                            $Nivls .= BuscaOrganizacional(array('id_organizacion' => $value))."<br />";
+                        }
+                        if($Nivls!='')
+                                $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+                        else
+                                $Nivls='-- Sin información --';
+                }
             }
-                        
+            else
+                $Nivls='-- Sin información --';
             //return $tupla[analisis_causal];           
             return $Nivls;
 
-        }                    
+        } 
+        
         function BuscaOrganizacionalTodosVerMas($tupla,$key)
         {   //print_r($tupla);
             //echo $tupla[id_unico]
-            $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
-            $encryt = new EnDecryptText();
-            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
-            $Nivls = "";
-            //print_r($reg_arbol);
-            {                                           
-                    //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
-                    foreach ($reg_arbol as $value) 
-                    {                                                        
-                        $Nivls .= BuscaOrganizacional(array('id_organizacion' => $value))."<br /><br />";
+            if($tupla[$key]!=''){
+                $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
+                $encryt = new EnDecryptText();
+                //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+                $Nivls = "";
+                //print_r($reg_arbol);
+                {                                           
+                        //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                        foreach ($reg_arbol as $value) 
+                        {                                                        
+                            $Nivls .= BuscaOrganizacional(array('id_organizacion' => $value))."<br /><br />";
+                        }
+                        if($Nivls!='')
+                                $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+                        else
+                                $Nivls='-- Sin información --';
+                }
+
+                if (strlen($Nivls)>200){
+                    $string = explode($Nivls, '<br /><br />');
+                    $valor_final = '';
+                    foreach ($string as $value) {
+                        $valor_final .= $value;
+                        if (strlen($valor_final)>200){
+                            return substr($valor_final, 0, 200) . '.. <br/>
+                            <a href="#" tok="' .$key.$tupla[idRegistro]. '-doc" class="ver-mas">
+                                <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
+                                <input type="hidden" id="ver-mas-' .$key.$tupla[idRegistro]. '-doc" value="'.$Nivls.'"/>
+                            </a>';
+                        }
+                        $valor_final .= "<br /><br />";
+
                     }
-                    if($Nivls!='')
-                            $Nivls=substr($Nivls,0,strlen($Nivls)-6);
-                    else
-                            $Nivls='-- Sin información --';
-            }
-                        
-            if (strlen($Nivls)>200){
-                $string = explode($Nivls, '<br /><br />');
-                $valor_final = '';
-                foreach ($string as $value) {
-                    $valor_final .= $value;
-                    if (strlen($valor_final)>200){
-                        return substr($valor_final, 0, 200) . '.. <br/>
+
+                    return substr($Nivls, 0, 200) . '.. <br/>
                         <a href="#" tok="' .$key.$tupla[idRegistro]. '-doc" class="ver-mas">
                             <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
                             <input type="hidden" id="ver-mas-' .$key.$tupla[idRegistro]. '-doc" value="'.$Nivls.'"/>
                         </a>';
-                    }
-                    $valor_final .= "<br /><br />";
-                    
                 }
-                
-                return substr($Nivls, 0, 200) . '.. <br/>
-                    <a href="#" tok="' .$key.$tupla[idRegistro]. '-doc" class="ver-mas">
-                        <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
-                        <input type="hidden" id="ver-mas-' .$key.$tupla[idRegistro]. '-doc" value="'.$Nivls.'"/>
-                    </a>';
-            }
-            //return $tupla[analisis_causal];
-            
+                //return $tupla[analisis_causal];
+                }
+            else
+                $Nivls='-- Sin información --';
             return $Nivls;
 
         }
@@ -324,45 +333,49 @@ function BuscaOrganizacional($tupla)
         function BuscaProcesoTodosVerMas($tupla,$key)
         {   //print_r($tupla);
             //echo $tupla[id_unico]
-            $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
-            $encryt = new EnDecryptText();
-            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
-            $Nivls = "";
-            //print_r($reg_arbol);
-            {                                           
-                    //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
-                    foreach ($reg_arbol as $value) 
-                    {                                                        
-                        $Nivls .= BuscaProceso(array('id_organizacion' => $value))."<br /><br />";
+             if($tupla[$key]!=''){
+                $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
+                $encryt = new EnDecryptText();
+                //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+                $Nivls = "";
+                //print_r($reg_arbol);
+                {                                           
+                        //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                        foreach ($reg_arbol as $value) 
+                        {                                                        
+                            $Nivls .= BuscaProceso(array('id_organizacion' => $value))."<br /><br />";
+                        }
+                        if($Nivls!='')
+                                $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+                        else
+                                $Nivls='-- Sin información --';
+                }
+
+                if (strlen($Nivls)>200){
+                    $string = explode($Nivls, '<br /><br />');
+                    $valor_final = '';
+                    foreach ($string as $value) {
+                        $valor_final .= $value;
+                        if (strlen($valor_final)>200){
+                            return substr($valor_final, 0, 200) . '.. <br/>
+                            <a href="#" tok="' .$key.$tupla[idRegistro]. '-doc" class="ver-mas">
+                                <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
+                                <input type="hidden" id="ver-mas-' .$key.$tupla[idRegistro]. '-doc" value="'.$Nivls.'"/>
+                            </a>';
+                        }
+                        $valor_final .= "<br /><br />";
+
                     }
-                    if($Nivls!='')
-                            $Nivls=substr($Nivls,0,strlen($Nivls)-6);
-                    else
-                            $Nivls='-- Sin información --';
-            }
-                        
-            if (strlen($Nivls)>200){
-                $string = explode($Nivls, '<br /><br />');
-                $valor_final = '';
-                foreach ($string as $value) {
-                    $valor_final .= $value;
-                    if (strlen($valor_final)>200){
-                        return substr($valor_final, 0, 200) . '.. <br/>
+
+                    return substr($Nivls, 0, 200) . '.. <br/>
                         <a href="#" tok="' .$key.$tupla[idRegistro]. '-doc" class="ver-mas">
                             <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
                             <input type="hidden" id="ver-mas-' .$key.$tupla[idRegistro]. '-doc" value="'.$Nivls.'"/>
                         </a>';
-                    }
-                    $valor_final .= "<br /><br />";
-                    
-                }
-                
-                return substr($Nivls, 0, 200) . '.. <br/>
-                    <a href="#" tok="' .$key.$tupla[idRegistro]. '-doc" class="ver-mas">
-                        <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
-                        <input type="hidden" id="ver-mas-' .$key.$tupla[idRegistro]. '-doc" value="'.$Nivls.'"/>
-                    </a>';
-            }
+                }        
+             }
+            else
+                $Nivls='-- Sin información --';
             //return $tupla[analisis_causal];
             
             return $Nivls;
