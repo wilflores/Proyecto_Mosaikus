@@ -2358,6 +2358,13 @@ function BuscaOrganizacional($tupla)
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('r-grid',"innerHTML",$grid[tabla]);
                 $objResponse->addAssign('r-grid-paginado',"innerHTML",$grid['paginado']);
+                $objResponse->addScript("$('.ver-mas').on('click', function (event) {
+                                    event.preventDefault();
+                                    var id = $(this).attr('tok');
+                                    $('#myModal-Ventana-Cuerpo').html($('#ver-mas-'+id).val());
+                                    $('#myModal-Ventana-Titulo').html('');
+                                    $('#myModal-Ventana').modal('show');
+                                });");                
                           
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("PanelOperator.resize();");
