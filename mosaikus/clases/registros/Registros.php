@@ -9,7 +9,8 @@
             //<img class=\"SinBorde\"  src=\"diseno/images/pdf.png\">
             return $html;
         }
-        
+
+     
         
 ?>
 <?php
@@ -195,6 +196,178 @@
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }
+
+ function BuscaProcesoExcel($tupla,$key)
+        {   //print_r($tupla);
+            //echo $tupla[id_unico]
+            $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
+            $encryt = new EnDecryptText();
+            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            $Nivls = "";
+            //print_r($reg_arbol);
+            {                                           
+                    //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                    foreach ($reg_arbol as $value) 
+                    {                                                        
+                        $Nivls .= BuscaProceso(array('id_organizacion' => $value))."<br />";
+                    }
+                    if($Nivls!='')
+                            $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+                    else
+                            $Nivls='-- Sin información --';
+            }
+                        
+            //return $tupla[analisis_causal];           
+            return $Nivls;
+
+        } 
+        
+ function BuscaOrganizacionalExcel($tupla,$key)
+        {   //print_r($tupla);
+            //echo $tupla[id_unico]
+            $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
+            $encryt = new EnDecryptText();
+            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            $Nivls = "";
+            //print_r($reg_arbol);
+            {                                           
+                    //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                    foreach ($reg_arbol as $value) 
+                    {                                                        
+                        $Nivls .= BuscaOrganizacional(array('id_organizacion' => $value))."<br />";
+                    }
+                    if($Nivls!='')
+                            $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+                    else
+                            $Nivls='-- Sin información --';
+            }
+                        
+            //return $tupla[analisis_causal];           
+            return $Nivls;
+
+        }                    
+        function BuscaOrganizacionalTodosVerMas($tupla,$key)
+        {   //print_r($tupla);
+            //echo $tupla[id_unico]
+            $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
+            $encryt = new EnDecryptText();
+            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            $Nivls = "";
+            //print_r($reg_arbol);
+            {                                           
+                    //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                    foreach ($reg_arbol as $value) 
+                    {                                                        
+                        $Nivls .= BuscaOrganizacional(array('id_organizacion' => $value))."<br /><br />";
+                    }
+                    if($Nivls!='')
+                            $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+                    else
+                            $Nivls='-- Sin información --';
+            }
+                        
+            if (strlen($Nivls)>200){
+                $string = explode($Nivls, '<br /><br />');
+                $valor_final = '';
+                foreach ($string as $value) {
+                    $valor_final .= $value;
+                    if (strlen($valor_final)>200){
+                        return substr($valor_final, 0, 200) . '.. <br/>
+                        <a href="#" tok="' .$key.$tupla[idRegistro]. '-doc" class="ver-mas">
+                            <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
+                            <input type="hidden" id="ver-mas-' .$key.$tupla[idRegistro]. '-doc" value="'.$Nivls.'"/>
+                        </a>';
+                    }
+                    $valor_final .= "<br /><br />";
+                    
+                }
+                
+                return substr($Nivls, 0, 200) . '.. <br/>
+                    <a href="#" tok="' .$key.$tupla[idRegistro]. '-doc" class="ver-mas">
+                        <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
+                        <input type="hidden" id="ver-mas-' .$key.$tupla[idRegistro]. '-doc" value="'.$Nivls.'"/>
+                    </a>';
+            }
+            //return $tupla[analisis_causal];
+            
+            return $Nivls;
+
+        }
+function BuscaOrganizacional($tupla)
+        {
+            $encryt = new EnDecryptText();
+            $dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            $OrgNom = "";
+                if (strlen($tupla[id_organizacion]) > 0) {                                           
+                        $Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                        $Resp3 = $dbl->query($Consulta3,array());
+
+                        foreach ($Resp3 as $Fila3) 
+                        {
+                                if($Fila3[organizacion_padre]==1)
+                                {
+                                        $OrgNom.=($Fila3[identificacion]);
+                                        return($OrgNom);                                        
+                                }
+                                else
+                                {
+                                        $OrgNom .= BuscaOrganizacional(array('id_organizacion' => $Fila3[organizacion_padre])) . ' -> ' . ($Fila3[identificacion]);
+                                }
+                        }
+                }
+                else
+                    $OrgNom .= $_SESSION[CookNomEmpresa];
+                return $OrgNom;
+
+        }
+                
+        function BuscaProcesoTodosVerMas($tupla,$key)
+        {   //print_r($tupla);
+            //echo $tupla[id_unico]
+            $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
+            $encryt = new EnDecryptText();
+            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            $Nivls = "";
+            //print_r($reg_arbol);
+            {                                           
+                    //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                    foreach ($reg_arbol as $value) 
+                    {                                                        
+                        $Nivls .= BuscaProceso(array('id_organizacion' => $value))."<br /><br />";
+                    }
+                    if($Nivls!='')
+                            $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+                    else
+                            $Nivls='-- Sin información --';
+            }
+                        
+            if (strlen($Nivls)>200){
+                $string = explode($Nivls, '<br /><br />');
+                $valor_final = '';
+                foreach ($string as $value) {
+                    $valor_final .= $value;
+                    if (strlen($valor_final)>200){
+                        return substr($valor_final, 0, 200) . '.. <br/>
+                        <a href="#" tok="' .$key.$tupla[idRegistro]. '-doc" class="ver-mas">
+                            <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
+                            <input type="hidden" id="ver-mas-' .$key.$tupla[idRegistro]. '-doc" value="'.$Nivls.'"/>
+                        </a>';
+                    }
+                    $valor_final .= "<br /><br />";
+                    
+                }
+                
+                return substr($Nivls, 0, 200) . '.. <br/>
+                    <a href="#" tok="' .$key.$tupla[idRegistro]. '-doc" class="ver-mas">
+                        <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
+                        <input type="hidden" id="ver-mas-' .$key.$tupla[idRegistro]. '-doc" value="'.$Nivls.'"/>
+                    </a>';
+            }
+            //return $tupla[analisis_causal];
+            
+            return $Nivls;
+
+        }
             
             public function ingresarRegistros($atr,$archivo){
                // print_r($atr);
@@ -376,6 +549,26 @@
                             where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
                             if ($registros_x_pagina != 100000)
                                 $this->funciones["p$k"] = 'estado_columna';  
+                            $sql_col_left .= ",p$k.nom_detalle p$k ";
+                        }
+                      // $grid->setFuncion($value[Nombre], "BuscaOrganizacionalTodosVerMas");
+
+                        else if ($value[tipo]== '11'){
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, t1.Nombre as nom_detalle from mos_registro_formulario t1
+                            where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                            if ($registros_x_pagina != 100000)
+                                $this->funciones["p$k"] = 'BuscaOrganizacionalTodosVerMas';  
+                            else
+                                $this->funciones["p$k"] = 'BuscaOrganizacionalExcel';                                 
+                            $sql_col_left .= ",p$k.nom_detalle p$k ";
+                        }
+                        else if ($value[tipo]== '12'){
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, t1.Nombre as nom_detalle from mos_registro_formulario t1
+                            where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                            if ($registros_x_pagina != 100000)
+                                $this->funciones["p$k"] = 'BuscaProcesoTodosVerMas'; 
+                            else
+                                $this->funciones["p$k"] = 'BuscaProcesoExcel'; 
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
                         }
                         else if ($value[tipo]== '8'){
@@ -696,7 +889,7 @@
                 if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
                 $this->listarRegistros($parametros, $parametros['pag'], $reg_por_pagina);
                 $data=$this->dbl->data;
-                
+                //print_r($data);
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
                 }
@@ -720,6 +913,7 @@
                         $this->cargar_parametros();
                 }
                 $k = 1;
+                //print_r($this->parametros);
                 foreach ($this->parametros as $value) {   
                     switch ($value[tipo]) {
                         case 'Seleccion Simple':
@@ -767,7 +961,8 @@
                         default:
                             break;
                     }
-                    array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
+                        array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                    
                     $k++;
                 }
 
@@ -813,6 +1008,7 @@
                 $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
                 $grid->setFuncion("contentType", "archivo_reg");
                 $grid->setAligns(4,"center");
+                //print_r($this->funciones);
                 foreach ($this->funciones as $key => $value) {
                     $grid->setFuncion($key, $value);
                 }
@@ -968,6 +1164,7 @@
 
             $grid= new DataGrid();
             $this->listarRegistros($parametros, 1, 100000);
+
             $data=$this->dbl->data;
 
             if (count($this->nombres_columnas) <= 0){
@@ -1080,6 +1277,14 @@
                             break;
                     }
                 }
+               ///aquiiiiiiiiiiii
+            
+                $grid->setParent($this);
+                foreach ($this->funciones as $key => $value) {
+                   $grid->setFuncion($key, $value);
+               }
+
+          
             $grid->SetTitulosTabla("td-titulo-tabla-row", $config);
             $grid->setData2("td-table-data", $data);
 
@@ -1307,6 +1512,14 @@
                 $objResponse->addIncludeScript(PATH_TO_JS . 'registros/registros.js');
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript($js);
+                /*Js init_tabla*/
+                $objResponse->addScript("$('.ver-mas').on('click', function (event) {
+                                    event.preventDefault();
+                                    var id = $(this).attr('tok');
+                                    $('#myModal-Ventana-Cuerpo').html($('#ver-mas-'+id).val());
+                                    $('#myModal-Ventana-Titulo').html('');
+                                    $('#myModal-Ventana').modal('show');
+                                });");                
                 //$objResponse->addScript('r_init_filtrar();');
                 $objResponse->addScript('setTimeout(function(){ r_init_filtrar(); }, 500);');
                 //$objResponse->addScriptCall("MostrarContenidoAux"); 
