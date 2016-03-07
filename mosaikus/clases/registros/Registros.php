@@ -226,18 +226,18 @@
 function semaforo($tupla,$key)
 { 
   // print_r($tupla);
-   $vig =  explode(',',$tupla['edo'.$key]);
+   $vig =  explode(',',$tupla[$key]);
    
    $edo =  $vig[0];
    $dias = $vig[1];
  //   echo $key;
    if ($edo=='V'){
        $html = "<img class=\"SinBorde\" title=\"Vencida y tiene ".($dias*-1)." dia(s) vencida\" src=\"diseno/images/rojo.png\">";                                                                    
-       return $html.$dias*-1;
+       return $html.'&nbsp;'.$dias*-1;
    }
    if ($edo=='P'){
        $html = "<img class=\"SinBorde\" title=\"Vigente pero le quedan $dias dia(s) de vigencia\" src=\"diseno/images/amarillo.png\">";                                                                    
-       return $html.$dias;
+       return $html.'&nbsp;'.$dias;
    }
    return "<img class=\"SinBorde\" title=\"Vigente y le quedan $dias dias\" src=\"diseno/images/verde.png\">".$dias;
 }       
@@ -245,7 +245,7 @@ function semaforo($tupla,$key)
 function semaforoExcel($tupla,$key)
 { 
   // print_r($tupla);
-   $vig =  explode(',',$tupla['edo'.$key]);
+   $vig =  explode(',',$tupla[$key]);
    
    $edo =  $vig[0];
    $dias = $vig[1];
@@ -515,6 +515,7 @@ function BuscaOrganizacional($tupla)
                     }
             }
              public function listarRegistros($atr, $pag, $registros_x_pagina){
+                // print_r($atr);
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
                      if (count($this->parametros) <= 0){
@@ -610,16 +611,15 @@ function BuscaOrganizacional($tupla)
                                                 ELSE
                                                         CONCAT('A,',DATEDIFF(str_to_date((STR_TO_DATE(t1.Nombre,'%d/%m/%Y')),'%Y-%m-%d'),CURRENT_DATE()))
                                                 end
-                                end as edo,
-                                t1.Nombre as nom_detalle_aux
+                                end as edo
                                 from mos_registro_formulario t1 inner 
                                 join mos_documentos_datos_formulario f on t1.id_unico  = f.id_unico
                             where t1.id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
                             if ($registros_x_pagina != 100000)
-                                $this->funciones["p$k"] = 'semaforo';  
+                                $this->funciones["edop$k"] = 'semaforo';  
                             else
-                                $this->funciones["p$k"] = 'semaforoExcel';                                 
-                            $sql_col_left .= ",p$k.nom_detalle p$k,p$k.edo edop$k ";
+                                $this->funciones["edop$k"] = 'semaforoExcel';                                 
+                            $sql_col_left .= ",p$k.edo edop$k,p$k.nom_detalle p$k ";
                         }
 
                         else if ($value[tipo]== '11'){
@@ -910,7 +910,31 @@ function BuscaOrganizacional($tupla)
                                     $sql .= " AND p$k.nom_detalle_aux = '". $atr["p$k"] . "'";
                                 } 
                                 break;
-                            case '1':
+
+                            case '13':
+                                if (sizeof($atr["p$k"])>0){
+                                   // $semaforovigencia = implode(",", $atr["p$k"]);
+                                    foreach ($atr["p$k"] as $value) {
+                                        $semaforovigencia .= "'".$value."',";
+                                    }
+                                    $semaforovigencia.="'X'";
+                                    $sql .= " AND SUBSTRING(p$k.edo,1,1)  in (". $semaforovigencia . ")"; 
+       
+                                   // $semaforovigencia = implode(",", $atr["p$k"]);
+                                    //$sql .= " AND p$k.nom_detalle LIKE '%". $atr["p$k"] . "%'";
+                                } 
+                                if (strlen($atr["pdesde$k"])>0)                        
+                                {
+                                    $atr["pdesde$k"] = formatear_fecha($atr["pdesde$k"]);                        
+                                    $sql .= " AND STR_TO_DATE(p$k.nom_detalle,'%d/%m/%Y')  >= '" . ($atr["pdesde$k"]) . "'";                        
+                                }                                
+                                if (strlen($atr["phasta$k"])>0)                        
+                                {
+                                    $atr["phasta$k"] = formatear_fecha($atr["phasta$k"]);                        
+                                    $sql .= " AND STR_TO_DATE(p$k.nom_detalle,'%d/%m/%Y')  <= '" . ($atr["phasta$k"]) . "'";                        
+                                }                                
+                                break;
+                             
                             case '5':
                                 if (strlen($atr["p$k"])>0){
                                     $sql .= " AND p$k.nom_detalle LIKE '%". $atr["p$k"] . "%'";
@@ -929,6 +953,7 @@ function BuscaOrganizacional($tupla)
         
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                   //print_r($atr);
                    // echo $sql;
                     $this->operacion($sql, $atr);
              }
@@ -975,7 +1000,7 @@ function BuscaOrganizacional($tupla)
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[descripcion], "descripcion", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[doc_fisico], "doc_fisico", $parametros,'r_link_titulos')),
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[contentType], "contentType", $parametros,'r_link_titulos')),
-               array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro('Estado', "contentType", $parametros,'r_link_titulos')),
+               
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_procesos], "id_procesos", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_organizacion], "id_organizacion", $parametros))
                 );
@@ -1028,6 +1053,13 @@ function BuscaOrganizacional($tupla)
                         case '12':
                                 $ancho = 5;
                                 break;
+                        case '13':
+                                $ancho = 5;                                                            
+                                array_push($config_col,array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro('Estado', "contentType", $parametros,'r_link_titulos')));            
+                                $k++;
+                                break;
+                            
+
                         default:
                             break;
                     }
@@ -1165,6 +1197,7 @@ function BuscaOrganizacional($tupla)
                         case '10':
                                 $ancho = 2;
                                 break;
+                            
                         default:
                             break;
                     }
@@ -1383,7 +1416,18 @@ function BuscaOrganizacional($tupla)
                 } 
                 $k = 5;
                 $contenido[PARAMETROS_OTROS] = "";
-                foreach ($this->parametros as $value) {                    
+                foreach ($this->parametros as $value) {  
+                    if ($value[tipo] == 13){
+                        $parametros['mostrar-col'] .= "-$k";
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" checked="checked">   &nbsp;
+                                          Estado </label>
+
+                                </div>';
+                        $k++;
+                    }
                     $parametros['mostrar-col'] .= "-$k";
                     $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
                                        
@@ -1400,6 +1444,7 @@ function BuscaOrganizacional($tupla)
                 $html = '';
                 $js='';
                 $i = 1;
+                //aquiiiiiiiiiiiiii
                 foreach ($campos_din as $value) {//Nombre,tipo,valores col-md-24
                     $html .= '<div class="form-group"><label>' . $value[Nombre] . '</label>';                                       
                     switch ($value[tipo]) {
@@ -1487,6 +1532,29 @@ function BuscaOrganizacional($tupla)
                                 $html .= '<input type="text" style=""  data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="p' . $i . '" id="p' . $i . '">';
                                 $html .= '';
                                 $js .= "$('#p$i').datepicker();";
+                            break;
+                        case '13':
+                        case 'Vigencia':
+                                $html .= '';
+                                $html = substr($html, 0, strlen($html)-39-strlen($value[Nombre]));
+                                $html .= '<div class="form-group" style="margin-bottom: 0px;"><label>' . $value[Nombre] . '</label>';  
+                                $html .= '</div><div class="form-group">'
+                                    . '<label for="campo-'.$value[cod_parametro].'" class="col-md-'.$col_lab.' control-label">' . $value[espanol] . '</label>'; 
+                                $html .= '<label class="radio-inline" style="color:white;">
+                                                <input  type="checkbox" value="A" name="p' . $i . '[]" id="p' . $i . '"> <img style="margin-top: -6px;" src="diseno/images/verde.png" /> 
+                                              </label>';
+                                $html .= '<label class="radio-inline" style="color:white;">
+                                                <input  type="checkbox" value="P" name="p' . $i . '[]" id="p' . $i . '"> <img style="margin-top: -6px;" src="diseno/images/amarillo.png" /> 
+                                              </label>';
+                                $html .= '<label class="radio-inline" style="color:white;">
+                                                <input type="checkbox" value="V" name="p' . $i . '[]" id="p' . $i . '"> <img style="margin-top: -6px;" src="diseno/images/atrasado.png" /> 
+                                              </label>';
+                            
+                                $html .= '<br>Desde:<input type="text" style=""  data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="pdesde' . $i . '" id="pdesde' . $i . '">';
+                                $html .= 'Hasta:<input type="text" style=""  data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="phasta' . $i . '" id="phasta' . $i . '">';
+                                $html .= '';
+                                $js .= "$('#pdesde$i').datepicker();";
+                                $js .= "$('#phasta$i').datepicker();";
                             break;
                         case '5':
                         case 'Rut':
