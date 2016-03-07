@@ -2516,7 +2516,7 @@
                                 $params[nombre] = $parametros["nombre_din_$i"];
                                 $params[tipo] = $parametros["tipo_din_$i"];                                
                                 $params[orden] = $parametros["orden_din_$i"];  
-                                if (($params[tipo] == "7")||($params[tipo] == "8")||($params[tipo] == "9")){
+                                if (($params[tipo] == "7")||($params[tipo] == "8")||($params[tipo] == "9" )||($params[tipo] == "13" )){
                                     $params[valores] = str_replace("\n", "<br />", $parametros["valores_din_$i"]); 
                                 }
                                 else $params[valores] = '';
@@ -2815,8 +2815,8 @@
                 $item = "";
                 $js = "";
                 $i = 0;
-                $ids = array('7','8','9','1','2','3','5','6','10','11','12');
-                $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo', 'Árbol Organizacional', 'Árbol Procesos');
+                $ids = array('7','8','9','1','2','3','5','6','10','11','12','13');
+                $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo', 'Árbol Organizacional', 'Árbol Procesos','Vigencia');
                 
                 //$ids = array('7','8','9','1','2','3','5','6','10');
                 //$desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo');
@@ -3006,7 +3006,7 @@
                                 $params[nombre] = $parametros["nombre_din_$i"];
                                 $params[tipo] = $parametros["tipo_din_$i"];                                
                                 $params[orden] = $parametros["orden_din_$i"];  
-                                if (($params[tipo] == "7")||($params[tipo] == "8")||($params[tipo] == "9")){
+                                if (($params[tipo] == "7")||($params[tipo] == "8")||($params[tipo] == "9")||($params[tipo] == "13" )){
                                     $params[valores] = str_replace("\n", "<br />", $parametros["valores_din_$i"]); 
                                 }
                                 else $params[valores] = '';
