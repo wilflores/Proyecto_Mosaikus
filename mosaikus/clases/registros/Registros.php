@@ -223,7 +223,41 @@
             return $Nivls;
 
         } 
-        
+function semaforo($tupla,$key)
+{ 
+  // print_r($tupla);
+   $vig =  explode(',',$tupla['edo'.$key]);
+   
+   $edo =  $vig[0];
+   $dias = $vig[1];
+ //   echo $key;
+   if ($edo=='V'){
+       $html = "<img class=\"SinBorde\" title=\"Vencida y tiene ".($dias*-1)." dia(s) vencida\" src=\"diseno/images/rojo.png\">";                                                                    
+       return $html.$dias*-1;
+   }
+   if ($edo=='P'){
+       $html = "<img class=\"SinBorde\" title=\"Vigente pero le quedan $dias dia(s) de vigencia\" src=\"diseno/images/amarillo.png\">";                                                                    
+       return $html.$dias;
+   }
+   return "<img class=\"SinBorde\" title=\"Vigente y le quedan $dias dias\" src=\"diseno/images/verde.png\">".$dias;
+}       
+
+function semaforoExcel($tupla,$key)
+{ 
+  // print_r($tupla);
+   $vig =  explode(',',$tupla['edo'.$key]);
+   
+   $edo =  $vig[0];
+   $dias = $vig[1];
+ //   echo $key;
+   if ($edo=='V'){
+       return 'Vencida';
+   }
+   if ($edo=='P'){
+       return 'Vigente';
+   }
+   return 'Vigente';
+}  
  function BuscaOrganizacionalExcel($tupla,$key)
         {   //print_r($tupla);
             //echo $tupla[id_unico]
@@ -565,6 +599,28 @@ function BuscaOrganizacional($tupla)
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
                         }
                       // $grid->setFuncion($value[Nombre], "BuscaOrganizacionalTodosVerMas");
+                        else if ($value[tipo]== '13'){
+                            $sql_left .= " LEFT JOIN                                
+                                (select t1.idRegistro, 
+                                t1.Nombre as nom_detalle, 
+                                case when DATEDIFF(str_to_date((STR_TO_DATE(t1.Nombre,'%d/%m/%Y')),'%Y-%m-%d'),CURRENT_DATE()) < 0 THEN
+                                        CONCAT('V,',DATEDIFF(str_to_date((STR_TO_DATE(t1.Nombre,'%d/%m/%Y')),'%Y-%m-%d'),CURRENT_DATE()))
+                                else case when DATEDIFF(str_to_date((STR_TO_DATE(t1.Nombre,'%d/%m/%Y')),'%Y-%m-%d'),CURRENT_DATE()) <= f.valores THEN
+                                                CONCAT('P,',f.valores - DATEDIFF(str_to_date((STR_TO_DATE(t1.Nombre,'%d/%m/%Y')),'%Y-%m-%d'),CURRENT_DATE()))
+                                                ELSE
+                                                        CONCAT('A,',DATEDIFF(str_to_date((STR_TO_DATE(t1.Nombre,'%d/%m/%Y')),'%Y-%m-%d'),CURRENT_DATE()))
+                                                end
+                                end as edo,
+                                t1.Nombre as nom_detalle_aux
+                                from mos_registro_formulario t1 inner 
+                                join mos_documentos_datos_formulario f on t1.id_unico  = f.id_unico
+                            where t1.id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                            if ($registros_x_pagina != 100000)
+                                $this->funciones["p$k"] = 'semaforo';  
+                            else
+                                $this->funciones["p$k"] = 'semaforoExcel';                                 
+                            $sql_col_left .= ",p$k.nom_detalle p$k,p$k.edo edop$k ";
+                        }
 
                         else if ($value[tipo]== '11'){
                             $sql_left .= " LEFT JOIN(select t1.idRegistro, t1.Nombre as nom_detalle from mos_registro_formulario t1
@@ -870,10 +926,10 @@ function BuscaOrganizacional($tupla)
                         $k++;
                     }
                     
-
+        
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
-                    //echo $sql;
+                   // echo $sql;
                     $this->operacion($sql, $atr);
              }
              public function eliminarRegistros($atr){
@@ -919,6 +975,7 @@ function BuscaOrganizacional($tupla)
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[descripcion], "descripcion", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[doc_fisico], "doc_fisico", $parametros,'r_link_titulos')),
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[contentType], "contentType", $parametros,'r_link_titulos')),
+               array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro('Estado', "contentType", $parametros,'r_link_titulos')),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_procesos], "id_procesos", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_organizacion], "id_organizacion", $parametros))
                 );
@@ -975,7 +1032,7 @@ function BuscaOrganizacional($tupla)
                             break;
                     }
                         array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
-                    
+                   // print_r($value);
                     $k++;
                 }
 
@@ -1893,7 +1950,16 @@ function BuscaOrganizacional($tupla)
                                 $html .= '</div>';  
                                 $campos_arbol_p .=$i.',';
                             break;
-                        
+                        case '13':
+                                $html .= '<div class="col-md-13">';
+                                $html .= '<input type="text" style="width: 120px;" placeholder="dd/mm/yyyy" data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
+                                $html .= '</div>';
+                                $js .= "$('#campo_$i').datepicker({
+                        changeMonth: true,
+                        yearRange: '-50:+20',
+                        changeYear: true
+                      });";
+                            break;                        
                         default:
                             break;
                     }
@@ -2207,6 +2273,17 @@ function BuscaOrganizacional($tupla)
                                 $html .= '</div>';   
                                 $campos_arbol_p .=$i.',';
                             break;
+                        case '13':
+                                $html .= '<div class="col-md-13">';
+                                $html .= '<input type="text" style="width: 120px;" placeholder="dd/mm/yyyy"  data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
+                                $html .= '</div>';
+                                $js .= "$('#campo_$i').datepicker({
+                        changeMonth: true,
+                        yearRange: '-50:+20',
+                        changeYear: true
+                      });";
+                            break;                        
+                        
                         
                         default:
                             break;
