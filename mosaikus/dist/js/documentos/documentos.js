@@ -56,7 +56,7 @@ function MuestraFormulario(id){
 function actualizar_atributo_dinamico(id){        
     
         var valor = $('#tipo_din_' + id).val();           
-        if ((valor == '7') || (valor == '8') || (valor == '9')){
+        if ((valor == '7') || (valor == '8') || (valor == '9')|| (valor == '13')){
            // $("#valores_din_" + id).css("display", "");
             
             $('#valores_din_' + id).val($('#valores_din_' + id).val().replace(/<br>/gi, '\n'));
@@ -65,7 +65,7 @@ function actualizar_atributo_dinamico(id){
             $('#valores_din_' + id).removeAttr('readonly');
             $('#valores_din_' + id).attr('data-validation','required');                     
         }
-        else if ((valor == 'Seleccion Simple') || (valor == 'Seleccion Multiple') || (valor == 'Combo')){
+        else if ((valor == 'Seleccion Simple') || (valor == 'Seleccion Multiple') || (valor == 'Combo')|| (valor == 'Vigencia')){
             $('#valores_din_' + id).val($('#valores_din_' + id).val().replace(/<br>/gi, '\n'));
             $('#valores_din_' + id).val($('#valores_din_' + id).val().replace(/<br>/gi, ''));
         }
@@ -104,6 +104,7 @@ function actualizar_atributo_dinamico(id){
                                 '<option value="10">Semáforo</option>'+ 
                                 '<option value="11">Árbol Organizacional</option>'+ 
                                 '<option value="12">Árbol Procesos</option>'+ 
+                                '<option value="13">Vigencia</option>'+ 
                             '</select>' +
                         '</td>';
         html = html + '<td>' +
