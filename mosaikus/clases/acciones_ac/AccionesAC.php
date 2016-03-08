@@ -365,12 +365,19 @@
                 if ($parametros['permiso'][1] == "1")
                     array_push($func,array('nombre'=> 'verAccionesAC','imagen'=> "<img style='cursor:pointer' src='diseno/images/find.png' title='Ver AccionesAC'>"));
                 */
-                if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
-                    array_push($func,array('nombre'=> 'editarAccionesAC','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-edit\"  title='Editar AccionesAC'></i>"));
-                if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
-                    array_push($func,array('nombre'=> 'eliminarAccionesAC','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\" title='Eliminar AccionesAC'></i>"));
-               
-                $config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
+                if (isset($parametros[reporte_ac])){
+                    $config=array(array("width"=>"1%", "ValorEtiqueta"=>"&nbsp;"));
+                }
+                else{
+                    
+                
+                    if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
+                        array_push($func,array('nombre'=> 'editarAccionesAC','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-edit\"  title='Editar AccionesAC'></i>"));
+                    if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
+                        array_push($func,array('nombre'=> 'eliminarAccionesAC','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\" title='Eliminar AccionesAC'></i>"));
+
+                    $config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
+                }
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
                 $array_columns =  explode('-', $parametros['mostrar-col']);
                 $grid->setParent($this);
@@ -400,7 +407,13 @@
                 }
                 //print_r($grid->hidden);
                 $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
-                $grid->setFuncion("cantidad", "cantidad_evidencia");
+                
+                if (isset($parametros[reporte_ac])){
+                    $grid->setFuncion("cantidad", "cantidad_evidencia_ver");
+                }  else {
+                    $grid->setFuncion("cantidad", "cantidad_evidencia");
+                }
+                
                 $grid->setFuncion("sema", "semaforo_estado");
                 $grid->setParent($this);
                 //$grid->setAligns(1,"center");
@@ -418,6 +431,13 @@
                 //,cantidad_evidencia    
             //return $tupla[$key];
             $html = str_pad($tupla[$key],3,0,STR_PAD_LEFT) . ' <a onclick="adminEvidencias('.$tupla[id].')" href="#"><i style="cursor:pointer"  class="icon icon-view-document" title="Evidencias"></i> </a>';
+            return $html;
+        }
+        
+        public function cantidad_evidencia_ver($tupla, $key){
+                //,cantidad_evidencia    
+            //return $tupla[$key];
+            $html = str_pad($tupla[$key],3,0,STR_PAD_LEFT) . ' <a onclick="EvidenciasVerReporte('.$tupla[id].')" href="#"><i style="cursor:pointer"  class="icon icon-view-document" title="Evidencias"></i> </a>';
             return $html;
         }
         
@@ -594,6 +614,8 @@
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                 
+                if (isset($parametros[reporte_ac]))
+                    $contenido[DISPLAY_AM] = 'display:none;';
                 $template->setTemplate("busqueda");
                 $template->setVars($contenido);
                 $contenido['CAMPOS_BUSCAR'] = $template->show();
@@ -620,7 +642,9 @@
                 $objResponse->addIncludeScript(PATH_TO_JS . 'acciones_ac/acciones_ac.js');
                 $objResponse->addScript("$('#myModal-Ventana').modal('show');");
                 $objResponse->addScript("$('#myModal-Ventana-Titulo').html('Acciones ID: " . (isset($_SESSION[id_ac]) ? $_SESSION[id_ac] : $_SESSION[id_correccion]) . "');");
-                
+                $objResponse->addScript("$('#myModal-Ventana').on('hidden.bs.modal', function () {                                                 
+                                                 $('body').css({'padding-right':'0px'});
+                                            })");
                 
                 //$objResponse->addScript("$('#hv-fecha').datepicker();");
                 $objResponse->addScript("$('#tabs-hv').tab();"

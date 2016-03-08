@@ -102,6 +102,17 @@
         xajax_Loading(array.getArray());
     }
     
+    function EvidenciasVerReporte(id){
+        $('#myModal-Ventana').modal('hide');
+        //$('#myModal-Evidencias').modal('show');
+        array = new XArray();
+        array.setObjeto('AccionesEvidencia','indexAccionesEvidencia');
+        array.addParametro('id_accion',id);
+        array.addParametro('reporte_ac','S');
+        array.addParametro('import','clases.acciones_evidencia.AccionesEvidencia');
+        xajax_Loading(array.getArray());
+    }
+    
     function link_titulos_hv(valor){
         if (valor == $('#corder-hv').val()){
             if ($('#sorder-hv').val()== 'asc')

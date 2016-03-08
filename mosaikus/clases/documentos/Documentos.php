@@ -450,13 +450,13 @@
         
         public function BuscaOrganizacionalTodos($tupla)
         {
-            $encryt = new EnDecryptText();
-            $dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            //$encryt = new EnDecryptText();
+            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
             $Nivls = "";
             {                                           
                     //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
                     $Consulta3="select * from mos_documentos_estrorg_arbolproc where IDDoc='".$tupla[IDDoc]."' and tipo='EO'";                    
-                    $Resp3 = $dbl->query($Consulta3,array());                    
+                    $Resp3 = $this->dbl->query($Consulta3,array());                    
                     foreach ($Resp3 as $Fila3) 
                     {                                                        
                         $Nivls .= BuscaOrganizacional(array('id_organizacion' => $Fila3[id_organizacion_proceso]))."<br /><br />";
@@ -473,13 +473,13 @@
         
         public function BuscaOrganizacionalTodosVerMas($tupla)
         {
-            $encryt = new EnDecryptText();
-            $dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            //$encryt = new EnDecryptText();
+            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
             $Nivls = "";
             {                                           
                     //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
                     $Consulta3="select * from mos_documentos_estrorg_arbolproc where IDDoc='".$tupla[IDDoc]."' and tipo='EO'";                    
-                    $Resp3 = $dbl->query($Consulta3,array());                    
+                    $Resp3 = $this->dbl->query($Consulta3,array());                    
                     foreach ($Resp3 as $Fila3) 
                     {                                                        
                         $Nivls .= BuscaOrganizacional(array('id_organizacion' => $Fila3[id_organizacion_proceso]))."<br /><br />";
@@ -601,6 +601,19 @@
                 return $html;
             }
             return "<img class=\"SinBorde\" title=\"Revisión ok\" src=\"diseno/images/verde.png\"> $tupla[dias_vig]";
+        }
+        
+        public  function semaforo_excel($tupla)
+        {
+            if (($tupla[dias_vig])<0){
+                $html = "Vencido";                                                                    
+                return $html;
+            }
+            if ($tupla[dias_vig]<$tupla[semaforo]){
+                $html = "Vigente";                                                                    
+                return $html;
+            }
+            return "Vigente";
         }
         
                         
@@ -1550,37 +1563,50 @@
                         $this->cargar_nombres_columnas();
                 }
 
-             $grid->SetConfiguracion("tblDocumentos", "width='100%' align ='center' border='1' cellspacing='0' cellpadding='0'");
-                $config_col=array(
+             $grid->SetConfiguracion("tblDocumentos", "width='100%' align ='center' border='1' cellspacing='0' cellpadding='0'");                
                  
-         //array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[IDDoc], ENT_QUOTES, "UTF-8")),
-                    array( "width"=>"1%","ValorEtiqueta"=>"ID"),     
+          $config_col=array(
+               array( "width"=>"1%","ValorEtiqueta"=>"ID"),     
                array( "width"=>"2%","ValorEtiqueta"=>"Estado"),
-               array( "width"=>"3%","ValorEtiqueta"=>htmlentities("Días", ENT_QUOTES, "UTF-8")),
+               array( "width"=>"3%","ValorEtiqueta"=>link_titulos("Días", "dias_vig", $parametros)),
                array( "width"=>"8%","ValorEtiqueta"=>"&nbsp;"),
-               array( "width"=>"5%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[contentType], ENT_QUOTES, "UTF-8")),
-                    array( "width"=>"3%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[Codigo_doc], ENT_QUOTES, "UTF-8")), 
-               array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[nombre_doc], ENT_QUOTES, "UTF-8")),
-               array( "width"=>"5%","ValorEtiqueta"=>"Archivos"),  
-               array( "width"=>"8%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[contentType_visualiza], ENT_QUOTES, "UTF-8")),
+               array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[Codigo_doc], "Codigo_doc", $parametros)), 
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[nombre_doc], "nombre_doc", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[contentType], "contentType", $parametros)),               
+               array( "width"=>"2%","ValorEtiqueta"=>"Visor de Google"),  
+               array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[contentType_visualiza], "contentType_visualiza", $parametros)),
                
-               array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[elaboro], ENT_QUOTES, "UTF-8")),
-               array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[reviso], ENT_QUOTES, "UTF-8")),               
-               array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[aprobo], ENT_QUOTES, "UTF-8")),
-               array( "width"=>"4%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[formulario], ENT_QUOTES, "UTF-8")),
-               array( "width"=>"5%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[v_meses], ENT_QUOTES, "UTF-8")),                    
-               array( "width"=>"2%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[version], ENT_QUOTES, "UTF-8")),
-               array( "width"=>"5%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[fecha], ENT_QUOTES, "UTF-8")),                    
-               array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[descripcion], ENT_QUOTES, "UTF-8")),                  
-               array( "width"=>"5%","ValorEtiqueta"=>htmlentities("Revisión", ENT_QUOTES, "UTF-8")),     
-               array( "width"=>"5%","ValorEtiqueta"=>htmlentities("Fecha de Revisión", ENT_QUOTES, "UTF-8")),                 
-               array( "width"=>"2%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[vigencia], ENT_QUOTES, "UTF-8")),
-               array( "width"=>"15%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[arbproc], ENT_QUOTES, "UTF-8")),     
-               array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[observacion], ENT_QUOTES, "UTF-8")),
-                array( "width"=>"23%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[workflow], ENT_QUOTES, "UTF-8")),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[elaboro], "elaboro", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[reviso], "reviso", $parametros)),               
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[aprobo], "aprobo", $parametros)),
+               array( "width"=>"4%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[formulario], "formulario", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[v_meses], "v_meses", $parametros)),                    
+               array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha], "fecha", $parametros)),                    
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[descripcion], "descripcion", $parametros)),                  
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos("Revisión", "fecha_revision", $parametros)),     
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos("Fecha de Revisión", "fecha_revision", $parametros)),  
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[palabras_claves], "palabras_claves", $parametros)),               
+               array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),
+               array( "width"=>"15%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[arbproc], "arbproc", $parametros)),     
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[observacion], "observacion", $parametros)),
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[doc_fisico], "doc_fisico", $parametros)),               
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_filial], "id_filial", $parametros)),               
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[doc_visualiza], "doc_visualiza", $parametros)),
+               
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_usuario], "id_usuario", $parametros)),
+               
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[muestra_doc], "muestra_doc", $parametros)),
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[estrucorg], "estrucorg", $parametros)),
+               
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apli_reg_estrorg], "apli_reg_estrorg", $parametros)),
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apli_reg_arbproc], "apli_reg_arbproc", $parametros)),
+               array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+               
+               
+               
+                );
 
-         
-              );
                 $columna_funcion =10;
            // $grid->hidden = array(0 => true);
            if (count($this->parametros) <= 0){
@@ -1594,27 +1620,42 @@
                 $columna_funcion =10;
                 $config = array();            
                 $array_columns =  explode('-', $parametros['mostrar-col']);            
+                
                 for($i=0;$i<count($config_col);$i++){
                     switch ($i) {                                             
                         case 1:
 //                        case 2:
-                        case 3:
-                        case 5:
-                            $grid->hidden[$i] = true;  
-//                        case 4:
-//                            array_push($config,$config_col[$i]);
+//                          case 20:
+//                              
+//                              if ((in_array($i, $array_columns))&&(strlen($parametros['b-id_organizacion'])<=0))
+                                  array_push($config,$config_col[$i]);
+//                              else                                
+//                                $grid->hidden[$i] = true;
+//                              break;
+//                        case 7:
+//                            if($_SESSION[CookM] == 'S')
+//                                array_push($config,$config_col[$i]);
                             break;
-                        default:                            
+                        case 3:
+                        case 6:
+                        case 7:
+                        case 8:
+                            $grid->hidden[$i] = true;
+                            break;
+                        default:
+                            
                             if (in_array($i, $array_columns)) {
                                 array_push($config,$config_col[$i]);
                             }
                             else                                
-                               $grid->hidden[$i] = true;                       
+                                $grid->hidden[$i] = true;
+                            
                             break;
                     }
                 }
-                
+                $grid->setParent($this);
                 //$grid->setFuncion("nom_visualiza", "archivo");
+                $grid->setFuncion("semaforo", "semaforo_excel");
                 $grid->setFuncion("Codigo_doc", "codigo_doc");
                 $grid->setFuncion("version", "version");
                 $grid->setFuncion("arbol_organizacional", "BuscaOrganizacionalTodos");
@@ -2528,7 +2569,7 @@
                         }
                         try{
                             unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($parametros['filename']));
-                            if (file_exists(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($parametros['filename_vis']))) {
+                            if (((isset($parametros[filename_vis]))&& ($parametros[filename_vis] !=''))&&(file_exists(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($parametros['filename_vis'])))) {
                                 unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($parametros['filename_vis']));
                             }
                         } catch (Exception $ex) {

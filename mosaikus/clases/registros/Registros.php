@@ -196,6 +196,7 @@
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }
+            
 
  function BuscaProcesoExcel($tupla,$key)
         {   //print_r($tupla);
@@ -1197,7 +1198,17 @@ function BuscaOrganizacional($tupla)
                         case '10':
                                 $ancho = 2;
                                 break;
-                            
+                        case '11':
+                                $ancho = 5;
+                                break;
+                        case '12':
+                                $ancho = 5;
+                                break;    
+                        case '13':
+                                $ancho = 5;                                                            
+                                array_push($config_col,array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro('Estado', "contentType", $parametros,'r_link_titulos')));            
+                                $k++;
+                                break;
                         default:
                             break;
                     }
@@ -1347,6 +1358,10 @@ function BuscaOrganizacional($tupla)
 //                            if ($personal->campos_activos[fecha_egreso][0] == '1')
 //                                array_push($config_col, array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[fecha_egreso], ENT_QUOTES, "UTF-8"))));
                             $grid->setFuncion("id_organizacion", "BuscaOrganizacional");
+                            break;
+                        case 13:
+                            array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=> 'Estado'));
+                            array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>  htmlentities($value[Nombre], ENT_QUOTES, "UTF-8")));
                             break;
                         default :
                             array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>  htmlentities($value[Nombre], ENT_QUOTES, "UTF-8")));
@@ -1685,7 +1700,18 @@ function BuscaOrganizacional($tupla)
                 } 
                 $k = 5;
                 $contenido[PARAMETROS_OTROS] = "";
-                foreach ($this->parametros as $value) {                    
+                foreach ($this->parametros as $value) { 
+                    if ($value[tipo] == 13){
+                        $parametros['mostrar-col'] .= "-$k";
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" checked="checked">   &nbsp;
+                                          Estado </label>
+
+                                </div>';
+                        $k++;
+                    }
                     $parametros['mostrar-col'] .= "-$k";
                     $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
                                        
@@ -1773,6 +1799,29 @@ function BuscaOrganizacional($tupla)
                                 $html .= '<input type="text" style=""  data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="p' . $i . '" id="p' . $i . '">';
                                 $html .= '';
                                 $js .= "$('#p$i').datepicker();";
+                            break;
+                        case '13':
+                        case 'Vigencia':
+                                $html .= '';
+                                $html = substr($html, 0, strlen($html)-39-strlen($value[Nombre]));
+                                $html .= '<div class="form-group" style="margin-bottom: 0px;"><label>' . $value[Nombre] . '</label>';  
+                                $html .= '</div><div class="form-group">'
+                                    . '<label for="campo-'.$value[cod_parametro].'" class="col-md-'.$col_lab.' control-label">' . $value[espanol] . '</label>'; 
+                                $html .= '<label class="radio-inline" style="color:white;">
+                                                <input  type="checkbox" value="A" name="p' . $i . '[]" id="p' . $i . '"> <img style="margin-top: -6px;" src="diseno/images/verde.png" /> 
+                                              </label>';
+                                $html .= '<label class="radio-inline" style="color:white;">
+                                                <input  type="checkbox" value="P" name="p' . $i . '[]" id="p' . $i . '"> <img style="margin-top: -6px;" src="diseno/images/amarillo.png" /> 
+                                              </label>';
+                                $html .= '<label class="radio-inline" style="color:white;">
+                                                <input type="checkbox" value="V" name="p' . $i . '[]" id="p' . $i . '"> <img style="margin-top: -6px;" src="diseno/images/atrasado.png" /> 
+                                              </label>';
+                            
+                                $html .= '<br>Desde:<input type="text" style=""  data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="pdesde' . $i . '" id="pdesde' . $i . '">';
+                                $html .= 'Hasta:<input type="text" style=""  data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="phasta' . $i . '" id="phasta' . $i . '">';
+                                $html .= '';
+                                $js .= "$('#pdesde$i').datepicker();";
+                                $js .= "$('#phasta$i').datepicker();";
                             break;
                         case '5':
                         case 'Rut':
