@@ -148,20 +148,23 @@
                 $this->operacion($sql, $atr);
                 return $this->dbl->data;
             }
-             public function verArbol($id){
+             public function verArbol($id_unico,$idRegistro){
+                 //print_r($atr);
                 $atr=array();
-                $sql = "SELECT replace(Nombre,'<br>',',') id
-                         FROM mos_registro_formulario 
-                         WHERE idRegistro = $id and tipo='11';"; 
+                $sql = "SELECT idRegistro,GROUP_CONCAT(valor) id
+                         FROM mos_registro_item 
+                         WHERE id_unico = ". $id_unico." and idRegistro =". $idRegistro." and tipo='11'
+                         group by idRegistro;"; 
                 $this->operacion($sql, $atr);
-                //echo $this->dbl->data[0][id];
+               //echo $sql;
                 return $this->dbl->data[0][id];
             }           
-             public function verArbolP($id){
+             public function verArbolP($id_unico,$idRegistro){
                 $atr=array();
-                $sql = "SELECT replace(Nombre,'<br>',',') id
-                         FROM mos_registro_formulario 
-                         WHERE idRegistro = $id and tipo='12';"; 
+                $sql = "SELECT idRegistro,GROUP_CONCAT(valor) id
+                         FROM mos_registro_item 
+                         WHERE id_unico = ". $id_unico." and idRegistro =". $idRegistro." and tipo='12'
+                         group by idRegistro;;"; 
                 $this->operacion($sql, $atr);
                 //echo $this->dbl->data[0][id];
                 return $this->dbl->data[0][id];
@@ -176,9 +179,32 @@
                                 ,valores
 				,rf.Nombre valor
 				,rf.idRegistro
+                                ,df.orden
                          FROM mos_documentos_datos_formulario df
                             inner join mos_registro_formulario rf on rf.id_unico = df.id_unico
-                         WHERE df.IDDoc = $_SESSION[IDDoc] AND rf.idRegistro = $id ORDER BY df.orden "; 
+                         WHERE df.IDDoc = $_SESSION[IDDoc] AND rf.idRegistro = $id 
+                         union all    
+                        SELECT 
+                            df.id_unico
+                            ,df.IDDoc
+                            ,df.Nombre
+                            ,df.tipo
+                            ,valores
+                            ,GROUP_CONCAT(rf.valor) valor
+                            ,rf.idRegistro
+                             ,df.orden
+                        FROM mos_documentos_datos_formulario df
+                        inner join mos_registro_item rf on rf.id_unico = df.id_unico 
+                        WHERE df.IDDoc = $_SESSION[IDDoc] AND rf.idRegistro = $id
+                        group by
+                            df.id_unico
+                            ,df.IDDoc
+                            ,df.Nombre
+                            ,df.tipo
+                            ,valores
+                            ,rf.idRegistro
+                             ,df.orden
+                        ORDER BY 8; "; 
                 $this->operacion($sql, $atr);
                 //echo $sql;
                 return $this->dbl->data;
@@ -202,11 +228,11 @@
         {   //print_r($tupla);
             //echo $tupla[id_unico]
             if($tupla[$key]!=''){     
-                $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
+                $reg_arbol =  explode(',',$tupla[$key]);
                 $encryt = new EnDecryptText();
                 //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $Nivls = "";
-                //print_r($reg_arbol);
+               // print_r($reg_arbol);
                 {                                           
                         //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
                         foreach ($reg_arbol as $value) 
@@ -219,6 +245,7 @@
                                 $Nivls='-- Sin información --';
                 }
             }
+            else
                 $Nivls='-- Sin información --';        
             //return $tupla[analisis_causal];           
             return $Nivls;
@@ -263,7 +290,7 @@ function semaforoExcel($tupla,$key)
         {   //print_r($tupla);
             //echo $tupla[id_unico]
             if($tupla[$key]!=''){
-                $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
+                $reg_arbol =  explode(',',$tupla[$key]);
                 $encryt = new EnDecryptText();
                 //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $Nivls = "";
@@ -291,7 +318,7 @@ function semaforoExcel($tupla,$key)
         {   //print_r($tupla);
             //echo $tupla[id_unico]
             if($tupla[$key]!=''){
-                $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
+                $reg_arbol =  explode(',',$tupla[$key]);
                 $encryt = new EnDecryptText();
                 //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $Nivls = "";
@@ -369,7 +396,7 @@ function BuscaOrganizacional($tupla)
         {   //print_r($tupla);
             //echo $tupla[id_unico]
              if($tupla[$key]!=''){
-                $reg_arbol =  explode(',',str_replace("<br>", ",", $tupla[$key]));
+                $reg_arbol =  explode(',',$tupla[$key]);
                 $encryt = new EnDecryptText();
                 //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $Nivls = "";
@@ -449,13 +476,34 @@ function BuscaOrganizacional($tupla)
             public function ingresarRegistrosCampoDinamico($atr){
                 //print_r($atr);
                 try {
+                    //s1<br/>s2<br/>s3
                     $atr = $this->dbl->corregir_parametros($atr);//,version,correlativo,id_procesos,id_organizacion                    
-                    $sql = "INSERT INTO mos_registro_formulario(IDDoc,idRegistro,Nombre,tipo,id_unico)
+                    if($atr[tipo]=='11' ||  $atr[tipo]=='12' || $atr[tipo]=='7' || $atr[tipo]=='8' || $atr[tipo]=='9')
+                    {   if (strpos($atr[Nombre],"<br>")||strpos($atr[Nombre],"<br/>")) {
+                            if (strpos($atr[Nombre],"<br>")) 
+                                $reg =  explode(',',str_replace("<br>", ",", $atr[Nombre]));                    
+                            if (strpos($atr[Nombre],"<br/>")) 
+                                $reg =  explode(',',str_replace("<br/>", ",", $atr[Nombre]));
+                        }
+                        else
+                           $reg[]=$atr[Nombre]; 
+                        foreach ($reg as $value){
+                        $sql = "INSERT INTO mos_registro_item(IDDoc,idRegistro,valor,tipo,id_unico)
+                            VALUES(
+                                $_SESSION[IDDoc],$atr[idRegistro],'$value','$atr[tipo]',$atr[id_unico]
+                                );";//,$atr[version],$atr[correlativo],$atr[id_procesos],$atr[id_organizacion]
+                        $this->dbl->insert_update($sql);
+                        }        
+                    }
+                    else{
+                        $sql = "INSERT INTO mos_registro_formulario(IDDoc,idRegistro,Nombre,tipo,id_unico)
                             VALUES(
                                 $_SESSION[IDDoc],$atr[idRegistro],'$atr[Nombre]','$atr[tipo]',$atr[id_unico]
                                 );";//,$atr[version],$atr[correlativo],$atr[id_procesos],$atr[id_organizacion]
+                        $this->dbl->insert_update($sql);
+                    }
                     //echo $sql;
-                    $this->dbl->insert_update($sql);
+                    
 
                     return "El mos_registro '$atr[descripcion_ano]' ha sido ingresado con exito";
                 } catch(Exception $e) {
@@ -467,13 +515,27 @@ function BuscaOrganizacional($tupla)
             }
             
              public function modificarRegistrosCampoDinamico($atr){
+                 //print_r($atr);
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);//,version,correlativo,id_procesos,id_organizacion                    
+                    if($atr[tipo]=='11' ||  $atr[tipo]=='12' || $atr[tipo]=='7' || $atr[tipo]=='8' || $atr[tipo]=='9')
+                    {$reg =  explode(',',str_replace("<br>", ",", $atr[Nombre]));
+                    $respuesta = $this->dbl->delete("mos_registro_item", "idRegistro = " . $atr[idRegistro]. " and id_unico = " . $atr[id_unico]. " AND tipo ='".$atr[tipo]."'");  
+                        foreach ($reg as $value){
+                        $sql = "INSERT INTO mos_registro_item(IDDoc,idRegistro,valor,tipo,id_unico)
+                            VALUES(
+                                $_SESSION[IDDoc],$atr[idRegistro],'$value','$atr[tipo]',$atr[id_unico]
+                                );";//,$atr[version],$atr[correlativo],$atr[id_procesos],$atr[id_organizacion]
+                        $this->dbl->insert_update($sql);
+                        }        
+                    }  
+                    else{
                     $sql = "UPDATE mos_registro_formulario SET Nombre = '$atr[Nombre]'
                             WHERE idRegistro = $atr[idRegistro] AND id_unico = $atr[id_unico]
                             ";//,$atr[version],$atr[correlativo],$atr[id_procesos],$atr[id_organizacion]
                     //echo $sql;
-                    $this->dbl->insert_update($sql);
+                        $this->dbl->insert_update($sql);
+                    }
 
                     return "El mos_registro '$atr[descripcion_ano]' ha sido ingresado con exito";
                 } catch(Exception $e) {
@@ -624,8 +686,8 @@ function BuscaOrganizacional($tupla)
                         }
 
                         else if ($value[tipo]== '11'){
-                            $sql_left .= " LEFT JOIN(select t1.idRegistro, t1.Nombre as nom_detalle from mos_registro_formulario t1
-                            where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, GROUP_CONCAT(t1.valor) as nom_detalle from mos_registro_item t1
+                            where id_unico= $value[id_unico] group by t1.idRegistro) AS p$k ON p$k.idRegistro = r.idRegistro "; 
                             if ($registros_x_pagina != 100000)
                                 $this->funciones["p$k"] = 'BuscaOrganizacionalTodosVerMas';  
                             else
@@ -633,17 +695,17 @@ function BuscaOrganizacional($tupla)
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
                         }
                         else if ($value[tipo]== '12'){
-                            $sql_left .= " LEFT JOIN(select t1.idRegistro, t1.Nombre as nom_detalle from mos_registro_formulario t1
-                            where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, GROUP_CONCAT(t1.valor) as nom_detalle from mos_registro_item t1
+                            where id_unico= $value[id_unico] group by t1.idRegistro ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
                             if ($registros_x_pagina != 100000)
                                 $this->funciones["p$k"] = 'BuscaProcesoTodosVerMas'; 
                             else
                                 $this->funciones["p$k"] = 'BuscaProcesoExcel'; 
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
                         }
-                        else if ($value[tipo]== '8'){
-                            $sql_left .= " LEFT JOIN(select t1.idRegistro, replace(t1.Nombre,'<br/>',' ; ') as nom_detalle from mos_registro_formulario t1
-                            where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                        else if ($value[tipo]== '8'||$value[tipo]== '7'||$value[tipo]== '9'){
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, GROUP_CONCAT(t1.valor) as nom_detalle from mos_registro_item t1
+                            where id_unico= $value[id_unico] group by t1.idRegistro ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
                         }
                         else{
@@ -802,7 +864,7 @@ function BuscaOrganizacional($tupla)
                                     ,1 doc_fisico
                                     ,r.contentType
                                     -- ,r.id_procesos
-                                    -- ,r.id_organizacion
+                                    -- ,r.id_organizacion AQUI
 
                                      $sql_col_left
                             FROM mos_registro r
@@ -955,7 +1017,7 @@ function BuscaOrganizacional($tupla)
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                    //print_r($atr);
-                   // echo $sql;
+                   //echo $sql;
                     $this->operacion($sql, $atr);
              }
              public function eliminarRegistros($atr){
@@ -963,6 +1025,7 @@ function BuscaOrganizacional($tupla)
                         $atr = $this->dbl->corregir_parametros($atr);
                         $respuesta = $this->dbl->delete("mos_registro", "idRegistro = " . $atr[id]);
                         $respuesta = $this->dbl->delete("mos_registro_formulario", "idRegistro = " . $atr[id]);
+                        $respuesta = $this->dbl->delete("mos_registro_item", "idRegistro = " . $atr[id]);
                         $nuevo = "idRegistro: \'$atr[id]\'";
                         $this->registraTransaccionLog(9,$nuevo,'', '');
                         return "ha sido eliminada con exito";
@@ -2157,7 +2220,8 @@ function BuscaOrganizacional($tupla)
                             //identificacion,id_usuario,descripcion,doc_fisico,
                             $parametros[identificacion] = $parametros[nombre_doc];
                             $parametros[contentType] = $parametros[tipo_doc];//'application/pdf';                                    
-                            $parametros[descripcion] = $parametros['filename'];
+                            $parametros[descripcion] = "$parametros[Codigo_doc]-$parametros[nombre_doc].$parametros[tipo_doc]";
+                            //$parametros['filename'];
                            
                     }
                      
@@ -2274,12 +2338,12 @@ function BuscaOrganizacional($tupla)
                       $ids = array('7','8','9','1','2','3','5','6');
                 $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona');
                      */
-                    //print_r($campos_din);
+                    //print_r($value);
                     switch ($value[tipo]) {
                         case 'Seleccion Simple':
                         case '7':
                             $cadenas = split("<br />", $value[valores]) ;
-                            $valores_actuales = split("<br/>", $value[valor]) ;
+                            $valores_actuales = split(",", $value[valor]) ;
                             foreach ($cadenas as $valores) {
                                
                                 $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="radio-inline">
@@ -2292,7 +2356,7 @@ function BuscaOrganizacional($tupla)
                         case 'Seleccion Multiple':
                         case '8':
                             $cadenas = split("<br />", $value[valores]) ;
-                            $valores_actuales = split("<br/>", $value[valor]) ;
+                            $valores_actuales = split(",", $value[valor]) ;
                             $j = 1;
                             foreach ($cadenas as $valores) {
                                 
@@ -2378,15 +2442,15 @@ function BuscaOrganizacional($tupla)
                             break;
                         case '11':
                                 $html .= '<div class="col-md-11">';
-                                $html .= '<input type="hidden" value="'.$this->verArbol($val["idRegistro"]).'" name="nodos_'.$i.'" id="nodos_'.$i.'"/>
-                                        <iframe id="iframearbol_'.$i.'" src="pages/cargo/prueba_arbolV4.php?funcion=MarcarNodos('.$i.')&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
+                                $html .= '<input type="hidden" value="'.$this->verArbol($value[id_unico],$value[idRegistro]).'" name="nodos_'.$i.'" id="nodos_'.$i.'"/>
+                                        <iframe id="iframearbol_'.$i.'" src="pages/cargo/prueba_arbolV4.php?funcion=MarcarNodos('.$i.')&IDUnico='.$value[id_unico].'&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
                                 $html .= '</div>';  
                                 $campos_arbol_o .=$i.',';
                             break;
                         case '12':
                                 $html .= '<div class="col-md-12">';
-                                $html .= '<input type="hidden" value="'.$this->verArbolP($val["idRegistro"]).'" name="nodosp_'.$i.'" id="nodosp_'.$i.'"/>
-                                        <iframe id="iframearbolp_'.$i.'" src="pages/cargo/arbol_procesoV4.php?funcion=MarcarNodosP('.$i.')&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
+                                $html .= '<input type="hidden" value="'.$this->verArbolP($value[id_unico],$value[idRegistro]).'" name="nodosp_'.$i.'" id="nodosp_'.$i.'"/>
+                                        <iframe id="iframearbolp_'.$i.'" src="pages/cargo/arbol_procesoV4.php?funcion=MarcarNodosP('.$i.')&IDUnico='.$value[id_unico].'&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
                                 $html .= '</div>';   
                                 $campos_arbol_p .=$i.',';
                             break;
@@ -2488,10 +2552,10 @@ function BuscaOrganizacional($tupla)
                                     $valor_actual_aux = '';
                                     for($j = 1; $j <= $parametros["num_campo_$i"]; $j++){
                                         if (isset($parametros["campo_" . $i . "_" . $j]) == true){
-                                            $valor_actual_aux .= $parametros["campo_" . $i . "_" . $j] . '<br/>';
+                                            $valor_actual_aux .= $parametros["campo_" . $i . "_" . $j] . ',';
                                         }
                                     }
-                                    $valor_actual_aux = substr($valor_actual_aux, 0, strlen($valor_actual_aux) - 5);                                    
+                                    $valor_actual_aux = substr($valor_actual_aux, 0, strlen($valor_actual_aux) - 1);                                    
                                     //$params[nombre] = $parametros["nombre_$i"];
                                     $params[tipo] = $parametros["tipo_dato_$i"];
                                     //$params[validacion] = $parametros["validacion_$i"];
@@ -2511,9 +2575,9 @@ function BuscaOrganizacional($tupla)
                                     //$params[validacion] = $parametros["validacion_$i"];
                                     //$params[valores] = $parametros["valores_$i"];    
                                     if($params[tipo]=='11')
-                                        $params[Nombre] = str_replace(",", "<br>", $parametros["nodos_".$i]);
+                                        $params[Nombre] = $parametros["nodos_".$i];
                                     elseif($params[tipo]=='12')
-                                        $params[Nombre] = str_replace(",", "<br>", $parametros["nodosp_".$i]);
+                                        $params[Nombre] = $parametros["nodosp_".$i];
                                     else
                                         $params[Nombre] = $parametros["campo_". $i];
                                     
