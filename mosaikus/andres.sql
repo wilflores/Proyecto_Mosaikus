@@ -7,7 +7,9 @@
  * Author:  Andres Zambrano
  * Created: Feb 26, 2016
  */
-
+/****************************************/
+/*cambio del domingo 28-02*/
+/****************************************/
 DROP TABLE IF EXISTS `mos_workflow_acciones`;
 CREATE TABLE `mos_workflow_acciones` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -31,5 +33,15 @@ INSERT INTO `mos_nombres_campos` VALUES ('240', 'email_wf_vaca', 'email_wf_vaca'
 INSERT INTO `mos_nombres_campos` VALUES ('241', 'email_alerta', 'email_alerta', '30', 'email_alerta');
 
 /****************************************/
-/*cambio del domingo 28-02*/
+/*cambio del 09-04*/
 /****************************************/
+
+DROP TABLE IF EXISTS `mos_registro_item`;
+CREATE TABLE `mos_registro_item` (
+  `IDDoc` int(9) NOT NULL,
+  `idRegistro` int(9) NOT NULL,
+  `valor` varchar(250) NOT NULL,
+  `tipo` char(2) NOT NULL,
+  `id_unico` int(11) NOT NULL,
+  PRIMARY KEY (`idRegistro`,`id_unico`,`valor`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
