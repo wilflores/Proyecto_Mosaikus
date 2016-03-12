@@ -795,6 +795,7 @@
 		$pie_padre = "</ul>";
 		return $cabecera_padre.$cuerpo.$pie_padre;
 	}
+ 
 
 	public function MuestraHijos($id){
 		$sql="select * from mos_arbol_procesos
@@ -806,6 +807,66 @@
                 foreach ($data as $arr) {
 			$extra .= "<li id=\"phtml_".$arr[id]."\">
 							<a href=\"#\">".($arr[title])."</a>
+							".$this->MuestraHijos($arr[id])."
+						</li>";		}
+		$pie = "</ul>";
+		return $cabecera.$extra.$pie;
+	}
+        
+           public function MuestraPadreReg(){
+		$sql="Select * from mos_arbol_procesos
+				Where parent_id = 2";
+                
+                $data = $this->dbl->query($sql, $atr);
+                
+		//$resp = mysql_query($sql);
+		$cabecera_padre = "<ul>";
+		$padre_final = "";
+		//while($arrP=mysql_fetch_assoc($resp)){
+                foreach ($data as $arrP) {
+                         $id_org = $this->BuscaOrgNivelHijos($arrP[id]);
+                         //echo 'Idorg='.$id_org;
+                        $sql="SELECT
+                            IFNULL(count(mos_registro_item.idRegistro),0) cant
+                            FROM
+                            mos_registro_item
+                            WHERE
+                            valor in (".$id_org.")
+                            and tipo = 12;";  
+                        $cuenta = $this->dbl->query($sql, $atr);
+                        $registros='';
+                        if($cuenta[0][cant]>0) $registros='('.$cuenta[0][cant].')';
+			$cuerpo .= "<li id=\"phtml_".$arrP[id]."\">
+							<a href=\"#\">".($arrP[title]).$registros."</a>
+							".$this->MuestraHijosReg($arrP[id])."
+						</li>";
+		}
+		$pie_padre = "</ul>";
+		return $cabecera_padre.$cuerpo.$pie_padre;
+	}        
+	public function MuestraHijosReg($id){
+		$sql="select * from mos_arbol_procesos
+				Where parent_id = $id";
+		//$resp = mysql_query($sql);
+                $data = $this->dbl->query($sql, $atr);
+		$cabecera = "<ul>";
+		//while($arr=mysql_fetch_assoc($resp)){
+                foreach ($data as $arr) {
+                         $id_org = $this->BuscaOrgNivelHijos($arr[id]);
+                         //echo 'Idorg='.$id_org;
+                        $sql="SELECT
+                            IFNULL(count(mos_registro_item.idRegistro),0) cant
+                            FROM
+                            mos_registro_item
+                            WHERE
+                            valor in (".$id_org.")
+                            and tipo = 12;";  
+                        $cuenta = $this->dbl->query($sql, $atr);
+                        $registros='';
+                        if($cuenta[0][cant]>0) $registros='('.$cuenta[0][cant].')';
+                    
+			$extra .= "<li id=\"phtml_".$arr[id]."\">
+							<a href=\"#\">".($arr[title]).$registros."</a>
 							".$this->MuestraHijos($arr[id])."
 						</li>";		}
 		$pie = "</ul>";
