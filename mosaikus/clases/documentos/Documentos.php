@@ -1030,14 +1030,6 @@
                                $sql .= " AND elaboro = '". $atr["b-elaboro"] . "'";
                     if (strlen($atr["b-aprobo"])>0)
                         $sql .= " AND aprobo = '". $atr["b-aprobo"] . "'";
-                    if (strlen($atr["nodos"])>0)
-                        $sql .= " AND d.IDDoc in (SELECT DISTINCT IDDoc
-                                                    FROM mos_registro_item 
-                                                    where valor in (".$atr["nodos"].") and tipo='11')";
-                    if (strlen($atr["nodosp"])>0)
-                        $sql .= " AND d.IDDoc in (SELECT DISTINCT IDDoc
-                                                    FROM mos_registro_item 
-                                                    where valor in (".$atr["nodosp"].") and tipo='12')";
 
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
@@ -1891,7 +1883,7 @@
                         <iframe id="iframearbolP" src="pages/cargo/arbol_proceso_registros.php" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
                 
                 $ao = new ArbolOrganizacional();
-                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(2);
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] = $ao->jstree_ao(2);
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'documentos/';
