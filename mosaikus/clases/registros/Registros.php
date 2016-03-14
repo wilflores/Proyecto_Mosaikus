@@ -222,7 +222,19 @@
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }
-            
+              public function DocTieneArbolRegistros($tipo){
+                $atr=array();
+                $sql = "SELECT
+                        IFNULL(count(mos_registro_item.idRegistro),0) cant
+                        FROM
+                        mos_registro_item
+                        WHERE
+                        IDDoc= ".$_SESSION[IDDoc]." and 
+                         tipo = '".$tipo."';";                 
+              //  echo $sql;
+                $this->operacion($sql, $atr);
+                return $this->dbl->data[0]['cant'];
+            }          
 
  function BuscaProcesoExcel($tupla,$key)
         {   //print_r($tupla);
@@ -973,6 +985,16 @@ function BuscaOrganizacional($tupla)
                                     $sql .= " AND p$k.nom_detalle_aux = '". $atr["p$k"] . "'";
                                 } 
                                 break;
+                            case '11':
+                                if (strlen($atr["b-id_organizacion-reg"])>0){
+                                    $sql .= " AND p$k.nom_detalle like '%". $atr["b-id_organizacion-reg"] . "%'";
+                                } 
+                                break;
+                            case '12':
+                                if (strlen($atr["b-id_proceso-reg"])>0){
+                                    $sql .= " AND p$k.nom_detalle like '%". $atr["b-id_proceso-reg"] . "%'";
+                                } 
+                                break;
 
                             case '13':
                                 if (sizeof($atr["p$k"])>0){
@@ -1017,7 +1039,7 @@ function BuscaOrganizacional($tupla)
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                    //print_r($atr);
-                   //echo $sql;
+                  // echo $sql;
                     $this->operacion($sql, $atr);
              }
              public function eliminarRegistros($atr){
@@ -1966,6 +1988,18 @@ function BuscaOrganizacional($tupla)
                 $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
 
+                if ($this->DocTieneArbolRegistros('11')>0){
+                    import('clases.organizacion.ArbolOrganizacional');
+                    $ao = new ArbolOrganizacional();
+                    $paramreg['opcion']='reg';
+                    $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(4,$paramreg);
+                }
+                if ($this->DocTieneArbolRegistros('12')>0){
+                    import('clases.arbol_procesos.ArbolProcesos');
+                    $ap = new ArbolProcesos();
+                    $paramreg['opcion']='reg';
+                    $contenido[DIV_ARBOL_PROCESO] =  $ap->jstree_ap(4,$paramreg);
+                }
                 $template->setTemplate("listar_volver");
                 $template->setVars($contenido);
                 //$this->contenido['CONTENIDO']  = $template->show();
@@ -1982,6 +2016,8 @@ function BuscaOrganizacional($tupla)
                 //$objResponse->addAssign('modulo_actual',"value","registros");
                 
                 $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("init_filtro_ao_simple_reg();");
+                $objResponse->addScript("init_filtro_ap_simple_reg();");
                 $objResponse->addScript($js);
                 
                 $objResponse->addScript('setTimeout(function(){ r_init_filtrar_reporte(); }, 500);');
@@ -2643,7 +2679,7 @@ function BuscaOrganizacional($tupla)
             }
             
              public function buscar_reporte($parametros)
-            {
+            {  //print_r($parametros);
                 $grid = $this->verListaRegistrosReporte($parametros);                
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('r-grid',"innerHTML",$grid[tabla]);
