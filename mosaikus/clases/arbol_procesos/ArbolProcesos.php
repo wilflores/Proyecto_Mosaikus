@@ -773,6 +773,233 @@
 
                 return $template->show();
             }
+         /**
+         *  Devuelve la estructura HTML para el arbol jtree 
+         * 
+         * @param int $contar Plus para informacion adicional 1=> Documentos, 2 => Registro, 3 => Acciones Correctivas
+         */           
+        public function jstree_ap($contar=0,$parametros=array()){
+            if(!class_exists('Template')){
+                import("clases.interfaz.Template");
+            }
+            $contenido_1[AP] = $this->MuestraPadreP($contar,$parametros);
+            $template = new Template();
+            $template->PATH = PATH_TO_TEMPLATES.'arbol_procesos/';
+            if($parametros['opcion']=='reg')
+                $template->setTemplate("jstree_ap_reg");
+            else
+                $template->setTemplate("jstree_ap");
+            $template->setVars($contenido_1);            
+
+            return $template->show();
+        }
+
+        /**
+         * Devuelve la estructura HTML del primer nivel para el jtree 
+         */
+        public function MuestraPadreP($contar,$parametros=array()){
+		$sql="Select * from mos_arbol_procesos
+				Where parent_id = 2";
+                
+                $data = $this->dbl->query($sql, $atr);
+
+		$padre_final = "";
+                
+		//while($arrP=mysql_fetch_assoc($resp)){
+                foreach ($data as $arrP) {//data-jstree='{ \"type\" : \"verde\" }'
+                        
+                        $data_hijo = $this->MuestraHijosP($arrP[id],$contar,$parametros);
+                        $cuerpo .= "<li  id=\"phtml_".$arrP[id]."\">";
+                        switch ($contar) {
+                            case 1:
+                                $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
+                                    . "FROM mos_documentos_estrorg_arbolproc eao "
+                                    . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
+                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arrP[id]) . ")  AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' "
+                                    . " ";                                
+                                $data_aux = $this->dbl->query($sql, $atr);
+                                $contador = $data_aux[0][total] + 0;
+                                //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
+                                $cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador). ")</a>";
+                                break;
+                            case 2:
+                                $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
+                                    . "FROM mos_documentos_estrorg_arbolproc eao "
+                                    . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
+                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arrP[id]) . ")  AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' AND formulario = 'S' "
+                                    . " ";                                
+                                $data_aux = $this->dbl->query($sql, $atr);
+                                $contador = $data_aux[0][total] + 0;
+                                //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
+                                $cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador). ")</a>";
+                                break;
+                            case 3:
+                                switch ($parametros[tipo_data]) {
+                                    case 'YTD':
+                                        $sql = "SELECT                                            
+                                            count(id_organizacion) total,
+                                            sum(case when estado=1 then 1 else 0 end) as atrasadas,
+                                            sum(case when estado=2 then 1 else 0 end) as en_plazo,
+                                            sum(case when estado=3 then 1 else 0 end) as realizada_atraso,
+                                            sum(case when estado=4 then 1 else 0 end) as realizada
+                                        FROM
+                                        mos_acciones_correctivas
+                                        where id_organizacion in ($arrP[id]) and (fecha_generacion >= '".date('Y')."-01-01' or fecha_realizada is null)";                                
+                                        $data_aux = $this->dbl->query($sql, $atr);
+
+                                        break;
+
+                                    default:
+                                        break;
+                                }                                
+                                $return[total] = $data_aux[0][total] + (isset($data_hijo[total])?$data_hijo[total]:0) ;
+                                $return[atrasadas] = $data_aux[0][atrasadas] + (isset($data_hijo[atrasadas])?$data_hijo[atrasadas]:0) ;
+                                $return[en_plazo] = $data_aux[0][en_plazo] + (isset($data_hijo[en_plazo])?$data_hijo[en_plazo]:0) ;
+                                $return[realizada_atraso] = $data_aux[0][realizada_atraso] + (isset($data_hijo[realizada_atraso])?$data_hijo[realizada_atraso]:0) ;
+                                $return[realizada] = $data_aux[0][realizada] + (isset($data_hijo[realizada])?$data_hijo[realizada]:0) ;
+
+                                //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
+                                $cuerpo .= "<a href=\"#\">".($arrP[title])." ($return[total];$return[atrasadas];$return[en_plazo];$return[realizada_atraso];$return[realizada] )</a>";
+                                break;
+                            //cuenta los registros de un documento
+                            case 4:
+                                $sql = "SELECT
+                                        IFNULL(count(mos_registro_item.idRegistro),0) cant
+                                        FROM
+                                        mos_registro_item
+                                        WHERE
+                                        IDDoc= ".$_SESSION[IDDoc]." and 
+                                        valor in (".$this->BuscaOrgNivelHijos($arrP[id]).")
+                                        and tipo = 12;";
+                                $data_aux = $this->dbl->query($sql, $atr);
+                                $contador='';
+                                if($data_aux[0][cant]>0) $contador=$data_aux[0][cant];
+                                //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
+                                $cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador). ")</a>";
+                                break;
+
+                            default:
+                                $cuerpo .= "<a href=\"#\">".($arrP[title])." </a>";
+                                break;
+                        }
+                        $cuerpo .= "$data_hijo[html]";
+                        $cuerpo .= "</li>";
+		}
+		//$pie_padre = "</ul>";
+                return $cuerpo;
+		return $cabecera_padre.$cuerpo.$pie_padre;
+	}
+
+        /**
+         *  Devuelve el HTML para el jtree incluyendo los hijos 
+         * 
+         * @param int $id Id del arbol organizacional
+         * 
+         * @param int $contar Plus para contar el numero de registros hijos en el arbol
+         */
+	public function MuestraHijosP($id,$contar,$parametros=array()){
+		$sql="select * from mos_arbol_procesos
+				Where parent_id = $id";
+                //echo $sql;
+		//$resp = mysql_query($sql);
+                $data = $this->dbl->query($sql, $atr);
+                //print_r($data);
+                $contador = 0;
+                $data_hijo= array();
+		$cabecera = "<ul>";
+                foreach ($data as $arr) {//data-jstree='{ \"type\" : \"rojo\" }' 
+                    $contador = array();
+                    $data_hijo = $this->MuestraHijosP($arr[id],$contar,$parametros);
+                    $extra .= "<li id=\"phtml_".$arr[id]."\">";
+                    switch ($contar) {
+                            case 1:
+                                $sql = "SELECT COUNT(*) total "
+                                    . "FROM mos_documentos_estrorg_arbolproc eao "
+                                    . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
+                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arr[id]) . ")   AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S'";
+                                $data_aux = $this->dbl->query($sql, $atr);
+                                $contador = $data_aux[0][total] + 0;
+                                $extra .= "<a href=\"#\">".($arr[title])." (". ($contador) .")</a>";
+                                break;
+                            case 2:
+                                $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
+                                    . "FROM mos_documentos_estrorg_arbolproc eao "
+                                    . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
+                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arr[id]) . ")  AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' AND formulario = 'S' "
+                                    . " ";                                
+                                $data_aux = $this->dbl->query($sql, $atr);
+                                $contador = $data_aux[0][total] + 0;
+                                //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
+                                $extra .= "<a href=\"#\">".($arr[title])." (". ($contador). ")</a>";
+                                break;
+                            case 3:
+                                //print_r($arr);
+                                switch ($parametros[tipo_data]) {
+                                    case 'YTD':
+                                        $sql = "SELECT                                            
+                                            count(id_organizacion) total,
+                                            sum(case when estado=1 then 1 else 0 end) as atrasadas,
+                                            sum(case when estado=2 then 1 else 0 end) as en_plazo,
+                                            sum(case when estado=3 then 1 else 0 end) as realizada_atraso,
+                                            sum(case when estado=4 then 1 else 0 end) as realizada
+                                        FROM
+                                        mos_acciones_correctivas
+                                        where id_organizacion in ($arr[id]) and (fecha_generacion >= '".date('Y')."-01-01' or fecha_realizada is null)";                                
+                                        $data_aux = $this->dbl->query($sql, $atr);
+
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+                                
+                                $contador[total] = $data_aux[0][total] + (isset($data_hijo[total])?$data_hijo[total]:0) ;
+                                $contador[atrasadas] = $data_aux[0][atrasadas] + (isset($data_hijo[atrasadas])?$data_hijo[atrasadas]:0) ;
+                                $contador[en_plazo] = $data_aux[0][en_plazo] + (isset($data_hijo[en_plazo])?$data_hijo[en_plazo]:0) ;
+                                $contador[realizada_atraso] = $data_aux[0][realizada_atraso] + (isset($data_hijo[realizada_atraso])?$data_hijo[realizada_atraso]:0) ;
+                                $contador[realizada] = $data_aux[0][realizada] + (isset($data_hijo[realizada])?$data_hijo[realizada]:0) ;
+
+                                        
+                                $return[total] += $data_aux[0][total] + (isset($data_hijo[total])?$data_hijo[total]:0) ;
+                                $return[atrasadas] += $data_aux[0][atrasadas] + (isset($data_hijo[atrasadas])?$data_hijo[atrasadas]:0) ;
+                                $return[en_plazo] += $data_aux[0][en_plazo] + (isset($data_hijo[en_plazo])?$data_hijo[en_plazo]:0) ;
+                                $return[realizada_atraso] += $data_aux[0][realizada_atraso] + (isset($data_hijo[realizada_atraso])?$data_hijo[realizada_atraso]:0) ;
+                                $return[realizada] += $data_aux[0][realizada] + (isset($data_hijo[realizada])?$data_hijo[realizada]:0) ;
+                                //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
+                                $extra .= "<a href=\"#\">".($arr[title])." ($contador[total];$contador[atrasadas];$contador[en_plazo];$contador[realizada_atraso];$contador[realizada] )</a>";
+                                break;
+                            case 4:
+                                $sql="SELECT
+                                    IFNULL(count(mos_registro_item.idRegistro),0) cant
+                                    FROM
+                                    mos_registro_item
+                                    WHERE
+                                    IDDoc= ".$_SESSION[IDDoc]." and
+                                    valor in (".$this->BuscaOrgNivelHijos($arr[id]).")
+                                    and tipo = 12;";  
+
+                                $data_aux = $this->dbl->query($sql, $atr);
+                                $contador='';
+                                if($data_aux[0][cant]>0) $contador=$data_aux[0][cant];
+                                //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
+                                $extra .= "<a href=\"#\">".($arr[title])." (". ($contador). ")</a>";
+                                break;
+                            
+                            default:
+                                
+                                $extra .= "<a href=\"#\">".($arr[title])."</a>";
+                                break;
+                        }
+			$extra .= $data_hijo[html]."
+						</li>";		
+                        
+                }
+		$pie = "</ul>";
+                //$return[contador] = $contador+$data_hijo[contador];
+                $return[html] = $cabecera.$extra.$pie;
+		return $return;
+	}
+            
             
             public function MuestraPadre(){
 		$sql="Select * from mos_arbol_procesos
