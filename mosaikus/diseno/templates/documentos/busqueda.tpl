@@ -207,14 +207,6 @@
                                              </select>
                                              <input type="hidden" id="b-id_organizacion" name="b-id_organizacion"/>                                                                        
                                         </div>
-                                        <div class="form-group">
-                                            <label for="aprobo" class="control-label">Arbol Organizacional</label>  
-                                            {ARBOLORGANIZACIONAL}
-                                        </div>    
-                                        <div class="form-group">
-                                            <label for="aprobo" class="control-label">Arbol Proceso</label>  
-                                            {ARBOLPROCESO}
-                                        </div>    
                                              <!--
 </div>
     <div class="tab-pane active" id="orange">
