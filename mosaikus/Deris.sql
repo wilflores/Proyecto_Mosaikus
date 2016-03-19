@@ -1,3 +1,4 @@
+//cambios sql
 ALTER TABLE `mos_perfil`
 ADD COLUMN `modificar_terceros`  char(2) NULL AFTER `recordatorio`,
 ADD COLUMN `visualizar_terceros`  char(2) NULL AFTER `modificar_terceros`;
