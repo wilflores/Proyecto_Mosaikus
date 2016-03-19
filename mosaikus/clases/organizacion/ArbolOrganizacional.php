@@ -825,7 +825,10 @@
             $contenido_1[AO] = $this->MuestraPadre($contar,$parametros);
             $template = new Template();
             $template->PATH = PATH_TO_TEMPLATES.'organizacion/';
-            $template->setTemplate("jstree_ao");
+            if($parametros['opcion']=='reg')
+                $template->setTemplate("jstree_ao_reg");
+            else
+                $template->setTemplate("jstree_ao");
             $template->setVars($contenido_1);            
 
             return $template->show();
@@ -897,6 +900,22 @@
 
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
                                 $cuerpo .= "<a href=\"#\">".($arrP[title])." ($return[total];$return[atrasadas];$return[en_plazo];$return[realizada_atraso];$return[realizada] )</a>";
+                                break;
+                            //cuenta los registros de un documento
+                            case 4:
+                                $sql = "SELECT
+                                        IFNULL(count(mos_registro_item.idRegistro),0) cant
+                                        FROM
+                                        mos_registro_item
+                                        WHERE
+                                        IDDoc= ".$_SESSION[IDDoc]." and 
+                                        valor in (".$this->BuscaOrgNivelHijos($arrP[id]).")
+                                        and tipo = 11;";
+                                $data_aux = $this->dbl->query($sql, $atr);
+                                $contador='';
+                                if($data_aux[0][cant]>0) $contador=$data_aux[0][cant];
+                                //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
+                                $cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador). ")</a>";
                                 break;
 
                             default:
@@ -989,6 +1008,23 @@
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
                                 $extra .= "<a href=\"#\">".($arr[title])." ($contador[total];$contador[atrasadas];$contador[en_plazo];$contador[realizada_atraso];$contador[realizada] )</a>";
                                 break;
+                            case 4:
+                                $sql="SELECT
+                                    IFNULL(count(mos_registro_item.idRegistro),0) cant
+                                    FROM
+                                    mos_registro_item
+                                    WHERE
+                                    IDDoc= ".$_SESSION[IDDoc]." and
+                                    valor in (".$this->BuscaOrgNivelHijos($arr[id]).")
+                                    and tipo = 11;";  
+
+                                $data_aux = $this->dbl->query($sql, $atr);
+                                $contador='';
+                                if($data_aux[0][cant]>0) $contador=$data_aux[0][cant];
+                                //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
+                                $extra .= "<a href=\"#\">".($arr[title])." (". ($contador). ")</a>";
+                                break;
+                            
                             default:
                                 
                                 $extra .= "<a href=\"#\">".($arr[title])."</a>";

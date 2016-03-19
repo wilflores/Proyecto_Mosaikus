@@ -166,6 +166,7 @@ function cargar_autocompletado(){
       
     function filtrar_mostrar_colums(){
         var colums = '2-';
+        //alert(0000000000);
          $('.checkbox-mos-col').each(function() {
                 if (this.checked){
                     colums = colums + this.value + '-';
@@ -179,6 +180,15 @@ function cargar_autocompletado(){
     }
 
     function verPagina(pag,doc){
+            var iframe = document.getElementById("iframearbol");
+            iframe.contentWindow.submitMe();
+            document.getElementById("nodos").value = iframe.contentWindow.document.getElementById('jsfields').value;
+            
+            iframe = document.getElementById("iframearbolP");
+            iframe.contentWindow.submitMe();
+            document.getElementById("nodosp").value = iframe.contentWindow.document.getElementById('jsfields').value;
+
+
         array = new XArray();
         if (doc== null)
         {

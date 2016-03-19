@@ -51,6 +51,7 @@ function init_filtro_ao_simple(){
             var arr = data.selected[0].split("_");
             id = arr[1];
             $('#b-id_organizacion').val(id);
+            //alert($('#b-id_organizacion-reg'));
         }
         else
             $('#b-id_organizacion').val('');
@@ -59,7 +60,40 @@ function init_filtro_ao_simple(){
         //console.log(data.selected);
     });
 }
-
+function init_filtro_ao_simple_reg(){
+    $('#div-ao-reg').jstree();
+    $('#div-ao-reg').on("changed.jstree", function (e, data) {
+        if (data.selected.length > 0){
+            //console.log($("#divtree").jstree("get_selected").text());
+            var arr = data.selected[0].split("_");
+            id = arr[1];
+            $('#b-id_organizacion-reg').val(id);
+            //alert($('#b-id_organizacion-reg'));
+        }
+        else
+            $('#b-id_organizacion-reg').val('');
+    
+        verPagina(1,document);
+        //console.log(data.selected);
+    });
+}
+function init_filtro_ap_simple_reg(){
+    $('#div-ap-reg').jstree();
+    $('#div-ap-reg').on("changed.jstree", function (e, data) {
+        if (data.selected.length > 0){
+            //console.log($("#divtree").jstree("get_selected").text());
+            var arr = data.selected[0].split("_");
+            id = arr[1];
+            $('#b-id_proceso-reg').val(id);
+            //alert($('#b-id_organizacion-reg'));
+        }
+        else
+            $('#b-id_proceso-reg').val('');
+    
+        verPagina(1,document);
+        //console.log(data.selected);
+    });
+}
 function r_init_filtro_rapido(){
     $('#r-btn-filtro').on('click', function (event) {
             event.preventDefault();

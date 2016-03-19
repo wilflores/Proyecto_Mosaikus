@@ -1155,6 +1155,14 @@
                                $sql .= " AND elaboro = '". $atr["b-elaboro"] . "'";
                     if (strlen($atr["b-aprobo"])>0)
                         $sql .= " AND aprobo = '". $atr["b-aprobo"] . "'";
+                    if (strlen($atr["nodos"])>0)
+                        $sql .= " AND d.IDDoc in (SELECT DISTINCT IDDoc
+                                                    FROM mos_registro_item 
+                                                    where valor in (".$atr["nodos"].") and tipo='11')";
+                    if (strlen($atr["nodosp"])>0)
+                        $sql .= " AND d.IDDoc in (SELECT DISTINCT IDDoc
+                                                    FROM mos_registro_item 
+                                                    where valor in (".$atr["nodosp"].") and tipo='12')";
 
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
@@ -1868,9 +1876,14 @@
                                                                     , 'nombres', $val['cod_emp_relator']);
                 import('clases.organizacion.ArbolOrganizacional');
 
-
+                //AQUI EL ARBOL
+                $contenido['ARBOLORGANIZACIONAL'] = '<input type="hidden" value="" name="nodos" id="nodos"/>
+                        <iframe id="iframearbol" src="pages/cargo/arbol_organizacion_registros.php" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
+                $contenido['ARBOLPROCESO'] = '<input type="hidden" value="" name="nodosp" id="nodosp"/>
+                        <iframe id="iframearbolP" src="pages/cargo/arbol_proceso_registros.php" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
+                
                 $ao = new ArbolOrganizacional();
-                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(2);
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] = $ao->jstree_ao(2);
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'documentos/';
@@ -3282,7 +3295,7 @@
             }
             
             public function buscar_reporte($parametros)
-            {
+            {   ///print_r($parametros);
                 $grid = $this->verListaDocumentosReporte($parametros);
                 $objResponse = new xajaxResponse();
                 
