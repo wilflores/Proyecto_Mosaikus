@@ -69,10 +69,6 @@ UPDATE `mos_usuario` SET `id_usuario`='3' WHERE (`id_usuario`='13029681');
 UPDATE `mos_usuario` SET `id_usuario`='4' WHERE (`id_usuario`='13064872');
 UPDATE `mos_usuario` SET `id_usuario`='5' WHERE (`id_usuario`='13315840');
 
-
-
-
-
 UPDATE `mos_usuario_filial` SET `id_usuario`='1' WHERE (`id_usuario`='10107598') AND (`id_filial`='1');
 UPDATE `mos_usuario_filial` SET `id_usuario`='2' WHERE (`id_usuario`='10712831') AND (`id_filial`='1');
 UPDATE `mos_usuario_filial` SET `id_usuario`='3' WHERE (`id_usuario`='13029681') AND (`id_filial`='1');
@@ -80,4 +76,33 @@ UPDATE `mos_usuario_filial` SET `id_usuario`='4' WHERE (`id_usuario`='13064872')
 UPDATE `mos_usuario_filial` SET `id_usuario`='5' WHERE (`id_usuario`='13315840') AND (`id_filial`='1');
 
 
--- fin primera actualizacion 
+-- fin primera actualizacion
+
+-- inicio segunda actualizacion 
+--punto 1
+    INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('visualizar_terceros', 'Visualizar de Terceros', '21', 'visualizar_terceros');
+    INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('id_usuario', 'id_usuario', '21', 'id_usuario');
+    INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('nombres', 'Nombres', '21', 'nombres');
+    INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('apellido_paterno', 'Apellido Paterno', '21', 'apellido_paterno');
+    INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('apellido_materno', 'Apellido Materno', '21', 'apellido_materno');
+    INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('telefono', 'Telefono', '21', 'telefono');
+    INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('fecha_expi', 'Fecha de Expiracion', '21', 'fecha_expi');
+    INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('vigencia', 'Vigencia', '21', 'vigencia');
+    INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('super_usuario', 'Super Usuario', '21', 'super_usuario');
+    INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('email', 'email', '21', 'email');
+    INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('password_1', 'Password', '21', 'password_1');
+    INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('cedula', 'Cedula', '21', 'cedula');
+-- fin punto 1
+--inicio punto 2
+    INSERT INTO `mos_link` VALUES ('80', 'Perfiles-indexPerfiles-clases.perfiles.Perfiles', 'Administrador de Perfiles', '66', '2', 'mos_perfil.php', '74', 'configuracion.png');
+    INSERT INTO `mos_link` VALUES ('81', 'Perfiles_portal-indexPerfiles-clases.perfiles_portal.Perfiles_portal', 'Administrador de Perfiles Portal', '66', '2', 'mos_perfil_portal.php', '75', 'configuracion.png');
+-- fin punto 2
+
+
+-- inicio punto 3
+    ALTER TABLE `mos_usuario_filial`
+    ADD COLUMN `id`  int NULL AUTO_INCREMENT FIRST,
+    ADD PRIMARY KEY (`id`);
+    ALTER TABLE `mos_usuario_filial` AUTO_INCREMENT=8
+-- fin punto 3
+-- fin segunda actualizacion
