@@ -1,4 +1,4 @@
-//cambios sql
+-- cambios sql
 ALTER TABLE `mos_perfil`
 ADD COLUMN `modificar_terceros`  char(2) NULL AFTER `recordatorio`,
 ADD COLUMN `visualizar_terceros`  char(2) NULL AFTER `modificar_terceros`;
@@ -26,30 +26,20 @@ insert into mos_nombres_campos(nombre_campo, texto, modulo, placeholder) values 
 ALTER TABLE `mos_usuario`
 ADD COLUMN `cedula`  varchar(10) NULL AFTER `password_1`;
 
-UPDATE `mos_usuario` SET `cedula`= `id_usuario;
+UPDATE `mos_usuario` SET `cedula`= id_usuario;
 
-ALTER TABLE `mos_usuario`
-MODIFY COLUMN `id_usuario`  int(11) NOT NULL AUTO_INCREMENT FIRST ;
+-- primera ejecucion
 
-UPDATE `mos_usuario` SET `id_usuario`='1' WHERE (`id_usuario`='10107598')
-UPDATE `mos_usuario` SET `id_usuario`='2' WHERE (`id_usuario`='10712831')
-UPDATE `mos_usuario` SET `id_usuario`='3' WHERE (`id_usuario`='13029681')
-UPDATE `mos_usuario` SET `id_usuario`='4' WHERE (`id_usuario`='13064872')
-UPDATE `mos_usuario` SET `id_usuario`='5' WHERE (`id_usuario`='13315840')
+UPDATE `mos_nombres_campos` SET `texto`='Nombres' WHERE (`id`='248');
+UPDATE `mos_link` SET `descripcion`='mos_usuario-indexMos_usuario-clases.mos_usuario.mos_usuario' WHERE (`cod_link`='64');
+
+-- segundo corte
 
 
-UPDATE `mos_nombres_campos` SET `texto`='Nombres' WHERE (`id`='248')
-UPDATE `mos_link` SET `descripcion`='mos_usuario-indexMos_usuario-clases.mos_usuario.mos_usuario' WHERE (`cod_link`='64')
+-- tercer corte
 
 
-UPDATE `mos_usuario_filial` SET `id_usuario`='1' WHERE (`id_usuario`='10107598') AND (`id_filial`='1')
-UPDATE `mos_usuario_filial` SET `id_usuario`='2' WHERE (`id_usuario`='10712831') AND (`id_filial`='1')
-UPDATE `mos_usuario_filial` SET `id_usuario`='3' WHERE (`id_usuario`='13029681') AND (`id_filial`='1')
-UPDATE `mos_usuario_filial` SET `id_usuario`='4' WHERE (`id_usuario`='13064872') AND (`id_filial`='1')
-UPDATE `mos_usuario_filial` SET `id_usuario`='5' WHERE (`id_usuario`='13315840') AND (`id_filial`='1')
-
-
-ALTER TABLE `mos_usuario_filial` AUTO_INCREMENT=8
+ALTER TABLE `mos_usuario_filial` AUTO_INCREMENT=8:
 
 
 ALTER TABLE `mos_usuario_filial`
@@ -67,3 +57,27 @@ CREATE TABLE `mos_usuario_estructura` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
 
+
+-- cuarto corte 
+
+ALTER TABLE `mos_usuario`
+MODIFY COLUMN `id_usuario`  int(11) NOT NULL AUTO_INCREMENT FIRST ;
+
+UPDATE `mos_usuario` SET `id_usuario`='1' WHERE (`id_usuario`='10107598');
+UPDATE `mos_usuario` SET `id_usuario`='2' WHERE (`id_usuario`='10712831');
+UPDATE `mos_usuario` SET `id_usuario`='3' WHERE (`id_usuario`='13029681');
+UPDATE `mos_usuario` SET `id_usuario`='4' WHERE (`id_usuario`='13064872');
+UPDATE `mos_usuario` SET `id_usuario`='5' WHERE (`id_usuario`='13315840');
+
+
+
+
+
+UPDATE `mos_usuario_filial` SET `id_usuario`='1' WHERE (`id_usuario`='10107598') AND (`id_filial`='1');
+UPDATE `mos_usuario_filial` SET `id_usuario`='2' WHERE (`id_usuario`='10712831') AND (`id_filial`='1');
+UPDATE `mos_usuario_filial` SET `id_usuario`='3' WHERE (`id_usuario`='13029681') AND (`id_filial`='1');
+UPDATE `mos_usuario_filial` SET `id_usuario`='4' WHERE (`id_usuario`='13064872') AND (`id_filial`='1');
+UPDATE `mos_usuario_filial` SET `id_usuario`='5' WHERE (`id_usuario`='13315840') AND (`id_filial`='1');
+
+
+-- fin primera actualizacion 
