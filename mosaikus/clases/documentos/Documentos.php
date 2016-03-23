@@ -766,7 +766,7 @@
             }
             
             public function ingresarDocumentosVersion($atr,$archivo,$doc_ver){
-                try {print_r($atr);
+                try {
                     $atr = $this->dbl->corregir_parametros($atr);
                     $atr[IDDoc] = $this->codigo_siguiente();
                     
@@ -2777,7 +2777,7 @@
                 $contenido_1['IDDOC'] = $val["IDDoc"];
                 $contenido_1['CODIGO_DOC'] = ($val["Codigo_doc"]);
                 $contenido_1['NOMBRE_DOC'] = ($val["nombre_doc"]);
-                $contenido_1[NOMBRE_DOC] = $val["Codigo_doc"].'-'.$val["nombre_doc"].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                $contenido_1[NOMBRE_DOC_AUX] = $val["Codigo_doc"].'-'.$val["nombre_doc"].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
                 $contenido_1['VERSION'] = $val["version"];
                 $contenido_1['FECHA'] = ($val["fecha"]);
                 $contenido_1['DESCRIPCION'] = ($val["descripcion"]);
