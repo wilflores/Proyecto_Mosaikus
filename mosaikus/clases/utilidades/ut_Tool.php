@@ -120,6 +120,39 @@ function OptionsCombo($strSQL,$ids,$descs,$seleccionado=null,$parametros=array()
 	}
 	return $strBuf;
 }
+function OptionsComboMultiple($strSQL,$ids,$descs,$seleccionado=null,$parametros=array())
+{
+        include_once(dirname(dirname(dirname(__FILE__))).'/clases/bd/SQLServer.php');
+        $encryt = new EnDecryptText();
+        $bd = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );       
+        //$bd->conectar();
+	$i = 0;
+	//$bd->exe($strSQL,$parametros);
+        //echo $strSQL;
+        $resultado = $bd->query($strSQL);
+        //print_r($resultado);
+        $datos2 = split("-",$descs);
+        $descripcion = "";
+        if (count($datos2)>0){
+            $descripcion = ' . ($resultado[$i]["' . $datos2[0] . '"]) ';
+            for($j=1;$j<count($datos2);$j++){
+                $descripcion .= '. " - " . ($resultado[$i]["' . $datos2[$j] . '"]) ';
+            }
+            $descripcion = '$strBuf .= ">" ' . $descripcion . ' . "</OPTION>";';
+        }
+        else
+            $descripcion = '$strBuf .= ">" ($resultado[$i]["' . $descs  . '"]) . "</OPTION>";';
+	while ($i < count($resultado)) {
+		$strBuf .= "	<OPTION value='" . utf8_encode($resultado[$i][$ids]) . "'";
+		if ($resultado[$i][$ids] == $resultado[$i][$seleccionado])
+                    $strBuf .= " SELECTED ";
+                //echo $descripcion;
+                eval($descripcion);
+		$i = $i + 1;
+	}
+       // echo $strBuf;
+	return $strBuf;
+}
 
 function checkboxlist($strSQL,$nombre, $ids,$descs,$seleccionado=array(),$parametros=array(),$separador="&nbsp;")
 {

@@ -26,7 +26,47 @@ function BuscaOrganizacional($tupla)
                 return $OrgNom;
 
         }
-        
+function BuscaOrganizacionalRegistros($tupla)
+        {
+            $encryt = new EnDecryptText();
+            $dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            $OrgNom = "";
+                if (strlen($tupla[id_organizacion]) > 0) {                                           
+                        $Consulta3="select 
+                                    id as id_organizacion,
+                                    parent_id as organizacion_padre, 
+                                    title as identificacion,
+                                    registros
+                                    from mos_organizacion left join 
+                                            (SELECT
+                                            count(mos_registro_item.idRegistro) registros,
+                                            mos_registro_item.valor id_organizacion
+                                            FROM
+                                            mos_registro_item
+                                            WHERE
+                                            mos_registro_item.tipo = 11
+                                            GROUP BY mos_registro_item.valor) registros
+                                    on id = id_organizacion where id in ($tupla[id_organizacion])";
+                        $Resp3 = $dbl->query($Consulta3,array());
+
+                        foreach ($Resp3 as $Fila3) 
+                        {
+                                if($Fila3[organizacion_padre]==1)
+                                {
+                                        $OrgNom.=($Fila3[identificacion]);
+                                        return($OrgNom);                                        
+                                }
+                                else
+                                {
+                                        $OrgNom .= BuscaOrganizacionalRegistros(array('id_organizacion' => $Fila3[organizacion_padre])) . ' -> ' . ($Fila3[identificacion]);
+                                }
+                        }
+                }
+                else
+                    $OrgNom .= $_SESSION[CookNomEmpresa];
+                return $OrgNom;
+
+        }        
         function BuscaProceso($tupla)
         {
             $encryt = new EnDecryptText();
