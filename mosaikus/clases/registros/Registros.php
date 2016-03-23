@@ -231,11 +231,23 @@
                         WHERE
                         IDDoc= ".$_SESSION[IDDoc]." and 
                          tipo = '".$tipo."';";                 
-              //  echo $sql;
+                //echo $sql;
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0]['cant'];
             }          
-
+              public function DocTieneCampo($tipo){
+                $atr=array();
+                $sql = "SELECT
+                        IFNULL(count(idRegistro),0) cant
+                        FROM
+                        mos_registro_formulario
+                        WHERE
+                        IDDoc= ".$_SESSION[IDDoc]." and 
+                         tipo = '".$tipo."';";                 
+                //echo $sql;
+                $this->operacion($sql, $atr);
+                return $this->dbl->data[0]['cant'];
+            }
  function BuscaProcesoExcel($tupla,$key)
         {   //print_r($tupla);
             //echo $tupla[id_unico]
@@ -486,24 +498,32 @@ function BuscaOrganizacional($tupla)
             }
             
             public function ingresarRegistrosCampoDinamico($atr){
-                //print_r($atr);
+               // print_r($atr);
                 try {
                     //s1<br/>s2<br/>s3
                     $atr = $this->dbl->corregir_parametros($atr);//,version,correlativo,id_procesos,id_organizacion                    
-                    if($atr[tipo]=='11' ||  $atr[tipo]=='12' || $atr[tipo]=='7' || $atr[tipo]=='8' || $atr[tipo]=='9')
-                    {   if (strpos($atr[Nombre],"<br>")||strpos($atr[Nombre],"<br/>")) {
-                            if (strpos($atr[Nombre],"<br>")) 
-                                $reg =  explode(',',str_replace("<br>", ",", $atr[Nombre]));                    
-                            if (strpos($atr[Nombre],"<br/>")) 
-                                $reg =  explode(',',str_replace("<br/>", ",", $atr[Nombre]));
+                    if($atr[tipo]=='11' ||  $atr[tipo]=='12' || $atr[tipo]=='7' || $atr[tipo]=='8' || $atr[tipo]=='9' || $atr[tipo]=='14')
+                    {   if($atr[tipo]!='14' ){
+                            if (strpos($atr[Nombre],"<br>")||strpos($atr[Nombre],"<br/>")) {
+                                if (strpos($atr[Nombre],"<br>")) 
+                                    $reg =  explode(',',str_replace("<br>", ",", $atr[Nombre]));                    
+                                if (strpos($atr[Nombre],"<br/>")) 
+                                    $reg =  explode(',',str_replace("<br/>", ",", $atr[Nombre]));
+                            }
+                            else
+                                $reg =  explode(',',$atr[Nombre]);
                         }
                         else
-                           $reg[]=$atr[Nombre]; 
+                           if($atr[tipo]=='14') 
+                               $reg=$atr[Nombre]; 
+                           else
+                               $reg[]=$atr[Nombre]; 
                         foreach ($reg as $value){
                         $sql = "INSERT INTO mos_registro_item(IDDoc,idRegistro,valor,tipo,id_unico)
                             VALUES(
                                 $_SESSION[IDDoc],$atr[idRegistro],'$value','$atr[tipo]',$atr[id_unico]
                                 );";//,$atr[version],$atr[correlativo],$atr[id_procesos],$atr[id_organizacion]
+                        // echo $sql;
                         $this->dbl->insert_update($sql);
                         }        
                     }
@@ -527,17 +547,32 @@ function BuscaOrganizacional($tupla)
             }
             
              public function modificarRegistrosCampoDinamico($atr){
-                 //print_r($atr);
+                // print_r($atr);
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);//,version,correlativo,id_procesos,id_organizacion                    
-                    if($atr[tipo]=='11' ||  $atr[tipo]=='12' || $atr[tipo]=='7' || $atr[tipo]=='8' || $atr[tipo]=='9')
-                    {$reg =  explode(',',str_replace("<br>", ",", $atr[Nombre]));
-                    $respuesta = $this->dbl->delete("mos_registro_item", "idRegistro = " . $atr[idRegistro]. " and id_unico = " . $atr[id_unico]. " AND tipo ='".$atr[tipo]."'");  
+                    if($atr[tipo]=='11' ||  $atr[tipo]=='12' || $atr[tipo]=='7' || $atr[tipo]=='8' || $atr[tipo]=='9' || $atr[tipo]=='14')
+                    {   if($atr[tipo]!='14'){
+                            if (strpos($atr[Nombre],"<br>")||strpos($atr[Nombre],"<br/>")) {
+                                if (strpos($atr[Nombre],"<br>")) 
+                                    $reg =  explode(',',str_replace("<br>", ",", $atr[Nombre]));                    
+                                if (strpos($atr[Nombre],"<br/>")) 
+                                    $reg =  explode(',',str_replace("<br/>", ",", $atr[Nombre]));
+                            }
+                            else
+                                $reg =  explode(',',$atr[Nombre]);
+                        }
+                        else
+                           if($atr[tipo]=='14') 
+                               $reg=$atr[Nombre]; 
+                           else
+                               $reg[]=$atr[Nombre];                         
+                        $respuesta = $this->dbl->delete("mos_registro_item", "idRegistro = " . $atr[idRegistro]. " and id_unico = " . $atr[id_unico]. " AND tipo ='".$atr[tipo]."'");  
                         foreach ($reg as $value){
                         $sql = "INSERT INTO mos_registro_item(IDDoc,idRegistro,valor,tipo,id_unico)
                             VALUES(
                                 $_SESSION[IDDoc],$atr[idRegistro],'$value','$atr[tipo]',$atr[id_unico]
                                 );";//,$atr[version],$atr[correlativo],$atr[id_procesos],$atr[id_organizacion]
+                        //echo $sql;
                         $this->dbl->insert_update($sql);
                         }        
                     }  
@@ -658,6 +693,7 @@ function BuscaOrganizacional($tupla)
                             else{
                                 $sql_left .= " LEFT JOIN(select t1.idRegistro
                                 , t1.Nombre as nom_detalle_aux
+                                , p.id_organizacion
                                 ,CONCAT(initcap(p.nombres), ' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle
                                 -- ,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle 
                                 from mos_registro_formulario t1
@@ -695,8 +731,21 @@ function BuscaOrganizacional($tupla)
                             else
                                 $this->funciones["edop$k"] = 'semaforoExcel';                                 
                             $sql_col_left .= ",p$k.edo edop$k,p$k.nom_detalle p$k ";
+                           // echo $atr[corder].'-'. "p$k";
+                            if ($atr[corder] == "p$k"){
+                                $atr[corder] = "STR_TO_DATE(p$k.nom_detalle, '%d/%m/%Y')";
+                            }
+                            if ($atr[corder] == "edop$k"){
+                                $atr[corder] = " cast(SUBSTRING(p$k.edo,3)AS SIGNED) ";
+                            }                            
                         }
 
+                        else if ($value[tipo]== '14'){
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, GROUP_CONCAT(cargo.descripcion) as nom_detalle 
+                            from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
+                            where id_unico= $value[id_unico] group by t1.idRegistro) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                            $sql_col_left .= ",p$k.nom_detalle p$k ";
+                        }
                         else if ($value[tipo]== '11'){
                             $sql_left .= " LEFT JOIN(select t1.idRegistro, GROUP_CONCAT(t1.valor) as nom_detalle from mos_registro_item t1
                             where id_unico= $value[id_unico] group by t1.idRegistro) AS p$k ON p$k.idRegistro = r.idRegistro "; 
@@ -724,6 +773,11 @@ function BuscaOrganizacional($tupla)
                             $sql_left .= " LEFT JOIN(select t1.idRegistro, t1.Nombre as nom_detalle from mos_registro_formulario t1
                             where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
+                            if ($value[tipo]== '3'){
+                                if ($atr[corder] == "p$k"){
+                                    $atr[corder] = "STR_TO_DATE(p$k.nom_detalle, '%d/%m/%Y')";
+                                }
+                            }
                         }
                         
                         $k++;
@@ -853,6 +907,11 @@ function BuscaOrganizacional($tupla)
                                     $sql .= " AND p$k.nom_detalle LIKE '%". $atr["p$k"] . "%'";
                                 }                                
                                 break;
+                            case '14':
+                                if (strlen($atr["p$k"])>0){
+                                    $sql .= " AND p$k.nom_detalle LIKE '%". $atr["p$k"] . "%'";
+                                }                                
+                                break;                            
                             default:
                                 break;
                         }
@@ -898,6 +957,7 @@ function BuscaOrganizacional($tupla)
                                         $sql .= " OR upper(p$k.nom_detalle) LIKE '%". strtoupper($atr["b-filtro-sencillo"]) . "%'";
                                     }                                
                                     break;
+                                
                                 default:
                                     break;
                             }
@@ -930,13 +990,13 @@ function BuscaOrganizacional($tupla)
                         $sql .= " AND id_procesos = '". $atr["b-id_procesos"] . "'";
                     if (strlen($atr["b-id_organizacion"])>0)
                         $sql .= " AND id_organizacion = '". $atr["b-id_organizacion"] . "'";
-                    $k = 1;   
                     //id_unico,IDDoc,Nombre,tipo,valores
                     /*
                       $ids = array('7','8','9','1','2','3','5','6');
                 $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona');
                      */
-                    $k = 1;   
+                    $k = 1;  
+                    //print_r($this->parametros);
                     foreach ($this->parametros as $value) {
                         switch ($value[tipo]) {
                             //case '8':
@@ -981,12 +1041,12 @@ function BuscaOrganizacional($tupla)
                                 }                                
                                 break;
                             case '6':
-                                if (strlen($atr["p$k"])>0){
-                                    $sql .= " AND p$k.nom_detalle_aux = '". $atr["p$k"] . "'";
+                                if (strlen($atr["b-id_organizacion-reg"])>0 && $atr["b-arbol-filtro"]=='persona'){
+                                    $sql .= " AND p$k.id_organizacion like '%". $atr["b-id_organizacion-reg"] . "%'";
                                 } 
                                 break;
                             case '11':
-                                if (strlen($atr["b-id_organizacion-reg"])>0){
+                                if (strlen($atr["b-id_organizacion-reg"])>0 && $atr["b-arbol-filtro"]=='organizacional'){
                                     $sql .= " AND p$k.nom_detalle like '%". $atr["b-id_organizacion-reg"] . "%'";
                                 } 
                                 break;
@@ -1025,6 +1085,13 @@ function BuscaOrganizacional($tupla)
                                     $sql .= " AND p$k.nom_detalle LIKE '%". $atr["p$k"] . "%'";
                                 }                                
                                 break;
+                            case '14':
+                                //print_r($atr);
+                                //echo ("p$k:".$atr["p$k"]);
+                                if (strlen($atr["p$k"])>0){
+                                    $sql .= " AND p$k.nom_detalle LIKE '%". $atr["p$k"] . "%'";
+                                }                                
+                                break;
                             default:
                                 break;
                         }
@@ -1039,7 +1106,7 @@ function BuscaOrganizacional($tupla)
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                    //print_r($atr);
-                  // echo $sql;
+                 // echo $sql;
                     $this->operacion($sql, $atr);
              }
              public function eliminarRegistros($atr){
@@ -1061,6 +1128,7 @@ function BuscaOrganizacional($tupla)
      
  
      public function verListaRegistros($parametros){
+                //print_r($parametros);
                 $grid= "";
                 $grid= new DataGrid();
                 if ($parametros['pag'] == null) 
@@ -1141,8 +1209,8 @@ function BuscaOrganizacional($tupla)
                                 break;
                         case '13':
                                 $ancho = 5;                                                            
-                                array_push($config_col,array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro('Estado', "contentType", $parametros,'r_link_titulos')));            
-                                $k++;
+                                array_push($config_col,array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro('Vigencia', "edop$k", $parametros,'r_link_titulos')));            
+                                //$k++;
                                 break;
                             
 
@@ -1291,8 +1359,8 @@ function BuscaOrganizacional($tupla)
                                 break;    
                         case '13':
                                 $ancho = 5;                                                            
-                                array_push($config_col,array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro('Estado', "contentType", $parametros,'r_link_titulos')));            
-                                $k++;
+                                array_push($config_col,array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro('Vigencia', "edop$k", $parametros,'r_link_titulos')));            
+                                //$k++;
                                 break;
                         default:
                             break;
@@ -1445,7 +1513,7 @@ function BuscaOrganizacional($tupla)
                             $grid->setFuncion("id_organizacion", "BuscaOrganizacional");
                             break;
                         case 13:
-                            array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=> 'Estado'));
+                            array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=> 'Vigencia'));
                             array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>  htmlentities($value[Nombre], ENT_QUOTES, "UTF-8")));
                             break;
                         default :
@@ -1494,9 +1562,9 @@ function BuscaOrganizacional($tupla)
             return $grid->armarTabla();
         }
  
- 
+        //ADMINISTRAR DOCUMENTOS->VER REGISTROS
             public function indexRegistros($parametros)
-            {
+            {   //print_r($parametros);
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
@@ -1523,20 +1591,30 @@ function BuscaOrganizacional($tupla)
 
                                           <label >
                                               <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" checked="checked">   &nbsp;
-                                          Estado </label>
+                                          Vigencia </label>
+
+                                </div>';
+                        $k++;
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+                                       
+                                      <label >
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                      ' . $value[Nombre] . '</label>
+                                  
+                            </div>';
+                        $k++;
+                    }
+                    else{
+                        $parametros['mostrar-col'] .= "-$k";
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" checked="checked">   &nbsp;
+                                          ' . $value[Nombre] . '</label>
 
                                 </div>';
                         $k++;
                     }
-                    $parametros['mostrar-col'] .= "-$k";
-                    $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
-                                       
-                                      <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" checked="checked">   &nbsp;
-                                      ' . $value[Nombre] . '</label>
-                                  
-                            </div>';
-                    $k++;
                 }
                 
                 $campos_din = $this->verCamposDinamicos();
@@ -1546,7 +1624,9 @@ function BuscaOrganizacional($tupla)
                 $i = 1;
                 //aquiiiiiiiiiiiiii
                 foreach ($campos_din as $value) {//Nombre,tipo,valores col-md-24
-                    $html .= '<div class="form-group"><label>' . $value[Nombre] . '</label>';                                       
+                //echo $value[tipo];
+                    if ($value[tipo]!='11' && $value[tipo]!='12')
+                        $html .= '<div class="form-group"><label>' . $value[Nombre] . '</label>';                                       
                     switch ($value[tipo]) {
                         case 'Seleccion Simple':
                         case '7':
@@ -1677,6 +1757,18 @@ function BuscaOrganizacional($tupla)
                                             allowClear: true
                                           }); ';
                                 $html .= '</select>';
+                            break;
+                        case 'Cargo':
+                        case '14':
+                                $html .= '';
+                                $html .= '<input type="text"  class="col-xs-24 form-control" value="'. $value[valor] .'" name="p' . $i . '" id="p' . $i . '">';
+                                $html .= '';
+                            break;
+                        case '12':
+                            break;
+                        case '11':
+                            break;
+                                
                         default:
                             break;
                     }
@@ -1685,9 +1777,11 @@ function BuscaOrganizacional($tupla)
 //                    //$html .= '<input id="validacion_' . $i . '" type="hidden" value="' . $value[validacion] . '" name="validacion_' . $i . '">';
 //                    $html .= '<input id="valores_' . $i . '" type="hidden" value="' . $value[valores] . '" name="valores_' . $i . '">';
 //                    $html .= '<input id="id_atributo_' . $i . '" type="hidden" value="' . $value[id_unico] . '" name="id_atributo_' . $i . '">';
-                    $html .= '</div>';
+                    if ($value[tipo]!='11' && $value[tipo]!='12')
+                        $html .= '</div>';
                     $i++;
                 }
+
                 $html .= '</table>';
                 $contenido[CAMPOS_DINAMICOS] = $html;
                 $grid = $this->verListaRegistros($parametros);
@@ -1734,7 +1828,22 @@ function BuscaOrganizacional($tupla)
                 $template->setVars($contenido);
                 $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
-
+                if ($this->DocTieneArbolRegistros('11')>0){
+                    import('clases.organizacion.ArbolOrganizacional');
+                    $ao = new ArbolOrganizacional();
+                    $paramreg['opcion']='reg';
+                    $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(4,$paramreg);
+                    $contenido[ARBOLFILTRO]='organizacional';
+                }else
+                {
+                    if ($this->DocTieneCampo('6')>0){
+                        import('clases.organizacion.ArbolOrganizacional');
+                        $ao = new ArbolOrganizacional();
+                        $paramreg['opcion']='reg';
+                        $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(6,$paramreg);
+                        $contenido[ARBOLFILTRO]='persona';
+                    }
+                }
                 $template->setTemplate("listar_volver");
                 $template->setVars($contenido);
                 //$this->contenido['CONTENIDO']  = $template->show();
@@ -1749,6 +1858,8 @@ function BuscaOrganizacional($tupla)
                 //$objResponse->addAssign('modulo_actual',"value","registros");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'registros/registros.js');
                 $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("init_filtro_ao_simple_reg();");
+                
                 $objResponse->addScript($js);
                 /*Js init_tabla*/
                 $objResponse->addScript("$('.ver-mas').on('click', function (event) {
@@ -1763,7 +1874,7 @@ function BuscaOrganizacional($tupla)
                 //$objResponse->addScriptCall("MostrarContenidoAux"); 
                 return $objResponse;
             }
-            
+            //MAESTRO REGISTROS->VER REGISTROS
             public function indexRegistrosListado($parametros)
             {
                 if(!class_exists('Template')){
@@ -1785,27 +1896,38 @@ function BuscaOrganizacional($tupla)
                 } 
                 $k = 5;
                 $contenido[PARAMETROS_OTROS] = "";
-                foreach ($this->parametros as $value) { 
+                foreach ($this->parametros as $value) {
                     if ($value[tipo] == 13){
                         $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
                                           <label >
                                               <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" checked="checked">   &nbsp;
-                                          Estado </label>
+                                          Vigencia </label>
+
+                                </div>';
+                        $k++;
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+                                       
+                                      <label >
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                      ' . $value[Nombre] . '</label>
+                                  
+                            </div>';
+                        $k++;
+                    }
+                    else{
+                        $parametros['mostrar-col'] .= "-$k";
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" checked="checked">   &nbsp;
+                                          ' . $value[Nombre] . '</label>
 
                                 </div>';
                         $k++;
                     }
-                    $parametros['mostrar-col'] .= "-$k";
-                    $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
-                                       
-                                      <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" checked="checked">   &nbsp;
-                                      ' . $value[Nombre] . '</label>
-                                  
-                            </div>';
-                    $k++;
+
                 }
                 
                 $campos_din = $this->verCamposDinamicos();
@@ -1814,7 +1936,8 @@ function BuscaOrganizacional($tupla)
                 $js='';
                 $i = 1;
                 foreach ($campos_din as $value) {//Nombre,tipo,valores col-md-24
-                    $html .= '<div class="form-group"><label>' . $value[Nombre] . '</label>';                                       
+                    if ($value[tipo]!='11' && $value[tipo]!='12')
+                        $html .= '<div class="form-group"><label>' . $value[Nombre] . '</label>';                                       
                     switch ($value[tipo]) {
                         case 'Seleccion Simple':
                         case '7':
@@ -1929,6 +2052,19 @@ function BuscaOrganizacional($tupla)
                                             allowClear: true
                                           }); ';
                                 $html .= '</select>';
+                            break;
+                        case 'Cargo':
+                        case '14':
+                                $html .= '';
+                                $html .= '<input type="text"  class="col-xs-24 form-control" value="'. $value[valor] .'" name="p' . $i . '" id="p' . $i . '">';
+                                $html .= '';
+                            break;
+                        case '12':
+                            break;
+                        case '11':
+                            break;
+                                
+                                
                         default:
                             break;
                     }
@@ -1937,7 +2073,8 @@ function BuscaOrganizacional($tupla)
 //                    //$html .= '<input id="validacion_' . $i . '" type="hidden" value="' . $value[validacion] . '" name="validacion_' . $i . '">';
 //                    $html .= '<input id="valores_' . $i . '" type="hidden" value="' . $value[valores] . '" name="valores_' . $i . '">';
 //                    $html .= '<input id="id_atributo_' . $i . '" type="hidden" value="' . $value[id_unico] . '" name="id_atributo_' . $i . '">';
-                    $html .= '</div>';
+                    if ($value[tipo]!='11' && $value[tipo]!='12')
+                        $html .= '</div>';
                     $i++;
                 }
                 $html .= '</table>';
@@ -1993,6 +2130,16 @@ function BuscaOrganizacional($tupla)
                     $ao = new ArbolOrganizacional();
                     $paramreg['opcion']='reg';
                     $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(4,$paramreg);
+                    $contenido[ARBOLFILTRO]='organizacional';
+                }else
+                {
+                    if ($this->DocTieneCampo('6')>0){
+                        import('clases.organizacion.ArbolOrganizacional');
+                        $ao = new ArbolOrganizacional();
+                        $paramreg['opcion']='reg';
+                        $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(6,$paramreg);
+                        $contenido[ARBOLFILTRO]='persona';
+                    }
                 }
                 if ($this->DocTieneArbolRegistros('12')>0){
                     import('clases.arbol_procesos.ArbolProcesos');
@@ -2154,11 +2301,12 @@ function BuscaOrganizacional($tupla)
                             break;
                         case '11':
                                 $html .= '<div class="col-md-11">';
-                                $html .= '<input type="hidden" value="" name="nodos_'.$i.'" id="nodos_'.$i.'"/>
+                                //$html .= '<input type="hidden" value="" name="nodos_'.$i.'" id="nodos_'.$i.'"/>
+                                $html .= '<input type="hidden" value="" name="nodosreg" id="nodosreg"/>
                                         <iframe id="iframearbol_'.$i.'" src="pages/cargo/prueba_arbolV4.php?funcion=MarcarNodos('.$i.')&IDReg=" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
                                 $html .= '</div>';
                                 $campos_arbol_o .=$i.',';
-                            break;
+                                break;
                         case '12':
                                 $html .= '<div class="col-md-12">';
                                 $html .= '<input type="hidden" value="" name="nodosp_'.$i.'" id="nodosp_'.$i.'"/>
@@ -2175,7 +2323,17 @@ function BuscaOrganizacional($tupla)
                         yearRange: '-50:+20',
                         changeYear: true
                       });";
-                            break;                        
+                            break;  
+                        case '14':
+                            $cadenas = split("<br />", $value[valores]) ;
+                            $html .= '<input type="hidden" name="campo_cargo_' . $i . '" id="campo_cargo_' . $i . '" value="' . $i . '" />';    
+                            $html .= '<div class="col-md-10" id="col-md-10-'.$i.'">                                              
+                                                      <select class="form-control" name="campo_' . $i . '[]" id="campo_' . $i . '" data-validation="required" multiple>
+                                                        <option selected="" value="">-- Marque en el arbol y Seleccione --</option>';
+                            $html .= '</select></div>';
+
+                            break;
+                            
                         default:
                             break;
                     }
@@ -2217,6 +2375,7 @@ function BuscaOrganizacional($tupla)
                 $objResponse->addScriptCall("MostrarContenido2Aux"); 
                 $objResponse->addScriptCall("r_cargar_autocompletado");
                 $objResponse->addScript("$('#MustraCargando').hide();"); 
+               // $objResponse->addScript($jquerynodoarbol);
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");   
@@ -2293,9 +2452,9 @@ function BuscaOrganizacional($tupla)
                                     //$params[validacion] = $parametros["validacion_$i"];
                                     //$params[valores] = $parametros["valores_$i"];   
                                     if($params[tipo]=='11')
-                                        $params[Nombre] = str_replace(",", "<br>", $parametros["nodos_".$i]);
+                                        $params[Nombre] = $parametros["nodosreg"];//str_replace(",", "<br>", $parametros["nodos_".$i]);
                                     elseif($params[tipo]=='12')
-                                        $params[Nombre] = str_replace(",", "<br>", $parametros["nodosp_".$i]);
+                                        $params[Nombre] = $parametros["nodosp_".$i];
                                     else
                                         $params[Nombre] = $parametros["campo_". $i];
                                     
@@ -2476,10 +2635,12 @@ function BuscaOrganizacional($tupla)
                                           </label>';
                             $html .= '</div>';
                             break;
+                        
                         case '11':
                                 $html .= '<div class="col-md-11">';
-                                $html .= '<input type="hidden" value="'.$this->verArbol($value[id_unico],$value[idRegistro]).'" name="nodos_'.$i.'" id="nodos_'.$i.'"/>
-                                        <iframe id="iframearbol_'.$i.'" src="pages/cargo/prueba_arbolV4.php?funcion=MarcarNodos('.$i.')&IDUnico='.$value[id_unico].'&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
+                                //$html .= '<input type="hidden" value="'.$this->verArbol($value[id_unico],$value[idRegistro]).'" name="nodos_'.$i.'" id="nodos_'.$i.'"/>
+                                $html .= '<input type="hidden" value="'.$this->verArbol($value[id_unico],$value[idRegistro]).'" name="nodosreg" id="nodosreg"/>
+                                        <iframe id="iframearbol_'.$i.'" src="pages/cargo/prueba_arbolV4.php?IDUnico='.$value[id_unico].'&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
                                 $html .= '</div>';  
                                 $campos_arbol_o .=$i.',';
                             break;
@@ -2501,7 +2662,39 @@ function BuscaOrganizacional($tupla)
                       });";
                             break;                        
                         
-                        
+                        case '14':
+                                $sql = 'select GROUP_CONCAT(valor) valor 
+                                                from mos_registro_item t1 
+                                                where id_unico='.$value[id_unico].' and idRegistro ='.$value[idRegistro];
+                                $this->operacion($sql, $atr);
+                                $seleccionados = $this->dbl->data[0][valor];                                
+                                $html .= '<div class="col-md-10" id="col-md-10-'.$i.'">  ';                                            
+                                $sql = 'SELECT DISTINCT
+                                        mos_cargo.cod_cargo id,
+                                        mos_cargo.descripcion,
+                                        cargos_reg.valor
+                                        FROM
+                                        mos_cargo_estrorg_arbolproc
+                                        INNER JOIN mos_cargo ON mos_cargo.cod_cargo = mos_cargo_estrorg_arbolproc.cod_cargo
+                                        left join (select valor 
+                                                from mos_registro_item t1 
+                                                where id_unico='.$value[id_unico].' and idRegistro ='.$value[idRegistro].') cargos_reg
+                                        on mos_cargo.cod_cargo = cargos_reg.valor
+                                        where mos_cargo_estrorg_arbolproc.id in (select valor
+                                                                                from mos_registro_item 
+                                                                                where tipo=11 and idRegistro ='.$value[idRegistro].')
+                                                                            order by mos_cargo.descripcion';
+                               // echo $sql;
+                                $combosemp .= $ut_tool->OptionsComboMultiple($sql, 'id', 'descripcion','valor');      
+                                $html .= '<input type="hidden" name="campo_cargo_' . $i . '" id="campo_cargo_' . $i . '" value="' . $i . '" />';    
+                                $html .= '<input type="hidden" name="sel_cargo_' . $i . '" id="sel_cargo_' . $i . '" value="' .$seleccionados. '" />';
+                                $html .="<select class='form-control' id=\"campo_".$i."\" name=\"campo_".$i."[]\"  data-validation=\"required\" multiple>
+                                            <option value=''>-- Marque en el arbol y Seleccione --</option>
+                                            ".$combosemp."
+                                        </select>    ";
+                                $html .= '</select></div>';
+                                
+                                break;
                         default:
                             break;
                     }
@@ -2611,7 +2804,7 @@ function BuscaOrganizacional($tupla)
                                     //$params[validacion] = $parametros["validacion_$i"];
                                     //$params[valores] = $parametros["valores_$i"];    
                                     if($params[tipo]=='11')
-                                        $params[Nombre] = $parametros["nodos_".$i];
+                                        $params[Nombre] = $parametros["nodosreg"];//$parametros["nodos_".$i];
                                     elseif($params[tipo]=='12')
                                         $params[Nombre] = $parametros["nodosp_".$i];
                                     else
@@ -2660,7 +2853,7 @@ function BuscaOrganizacional($tupla)
      
  
             public function buscar($parametros)
-            {
+            {   //print_r($parametros);
                 $grid = $this->verListaRegistros($parametros);                
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('r-grid',"innerHTML",$grid[tabla]);
@@ -2807,9 +3000,62 @@ function BuscaOrganizacional($tupla)
                     });");
                 $objResponse->addScript("PanelOperator.showDetail('-aux');");  
                 $objResponse->addScript("PanelOperator.resize();");
-                //$objResponse->addScript("init_ver_registros();");
+                $objResponse->addScript("init_ver_registros();");
                 
                 return $objResponse;
             }
-     
+         public function ComboCargoOrg($parametros){
+            $ut_tool = new ut_Tool(); 
+            $sql = 'SELECT DISTINCT
+                    mos_cargo.cod_cargo id,
+                    mos_cargo.descripcion
+                    FROM
+                    mos_cargo_estrorg_arbolproc
+                    INNER JOIN mos_cargo ON mos_cargo.cod_cargo = mos_cargo_estrorg_arbolproc.cod_cargo
+                     where mos_cargo_estrorg_arbolproc.id in ('.$parametros['nodos'].')
+                                                        order by mos_cargo.descripcion';
+            //echo $sql;
+            $combosemp .= $ut_tool->OptionsComboMultiple($sql, 'id', 'descripcion','valor');      
+            $combo .= '<input type="hidden" name="campo_cargo_' . $parametros['i'] . '" id="campo_cargo_' . $parametros['i'] . '" value="' . $parametros['i'] . '" />';    
+            $combo .="<select onchange='ValidarSeleccion(this);' class='form-control' id=\"campo_".$parametros['i']."\" name=\"campo_".$parametros['i']."[]\"  data-validation=\"required\" multiple>
+                        <option value=''>-- Marque en el arbol y Seleccione --</option>
+                        ".$combosemp."
+                    </select>    ";
+            
+            $objResponse = new xajaxResponse();            
+            
+            $objResponse->addAssign('col-md-10-' . $parametros['i'] . '',"innerHTML",$combo);
+            return $objResponse;
+            }             
+
+         public function ComboCargoOrgEdit($parametros){
+            // print_r($parametros);
+            $ut_tool = new ut_Tool(); 
+            $sql = 'SELECT DISTINCT
+                    mos_cargo.cod_cargo id,
+                    mos_cargo.descripcion,
+                    cargos_reg.valor
+                    FROM
+                    mos_cargo_estrorg_arbolproc
+                    INNER JOIN mos_cargo ON mos_cargo.cod_cargo = mos_cargo_estrorg_arbolproc.cod_cargo
+                    left join (select DISTINCT valor 
+                            from mos_registro_item t1 
+                            where tipo=14 and idRegistro =\''.$parametros[idRegistro].'\' and valor in('.$parametros[sel_cargo].') ) cargos_reg
+                    on mos_cargo.cod_cargo = cargos_reg.valor
+                    where mos_cargo_estrorg_arbolproc.id in ('.$parametros['nodos'].')
+                                                        order by mos_cargo.descripcion';
+            //echo $sql;
+            $combosemp .= $ut_tool->OptionsComboMultiple($sql, 'id', 'descripcion','valor');      
+            $combo .= '<input type="hidden" name="campo_cargo_' . $parametros['i'] . '" id="campo_cargo_' . $parametros['i'] . '" value="' . $parametros['i'] . '" />';    
+            $combo .="<select onchange='ValidarSeleccion(this);' class='form-control' id=\"campo_".$parametros['i']."\" name=\"campo_".$parametros['i']."[]\"  data-validation=\"required\" multiple>
+                        <option value=''>-- Marque en el arbol y Seleccione --</option>
+                        ".$combosemp."
+                    </select>    ";
+            
+            $objResponse = new xajaxResponse();            
+            
+            $objResponse->addAssign('col-md-10-' . $parametros['i'] . '',"innerHTML",$combo);
+            return $objResponse;
+            }             
+            
  }?>
