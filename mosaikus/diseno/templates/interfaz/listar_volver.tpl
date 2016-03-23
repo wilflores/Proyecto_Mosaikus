@@ -39,7 +39,9 @@
 
                                           <button type="button" class="btn btn-default" onClick="r_filtrar_listado();">Filtrar</button>
                                         </div>
-                                          
+                                        <input type="hidden" id="b-id_organizacion-reg" name="b-id_organizacion-reg" />
+                                        <input type="hidden" id="b-id_proceso-reg" name="b-id_proceso-reg" />
+                                        <input type="hidden" id="b-arbol-filtro" name="b-arbol-filtro" value="{ARBOLFILTRO}"/>
                                         <input type="hidden" name="mostrar-col" id="r-mostrar-col" value="{MOSTRAR_COL}" />
                                         <input type="hidden" id="r-b-filtro-sencillo" name="b-filtro-sencillo"/>
                                         <!--<input type="hidden" name="reg_por_pag" id="reg_por_pag" value="12"/>-->
