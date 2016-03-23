@@ -2872,9 +2872,12 @@
 						obj.removeClass("jstree-unchecked").addClass("jstree-checked");
 						if(rc) { obj.children(":checkbox").prop("checked", true); }
 					}
+                                        
+                                      
 				}
 				else {
 					//alert("change_state555");
+                                        
 					if(state) {
 						//alert("IF_state");
 						//coll = obj.find("li").addBack();
@@ -2882,6 +2885,7 @@
 						if(!coll.filter(".jstree-checked, .jstree-undetermined").length) { return false; }
 						coll.removeClass("jstree-checked jstree-undetermined").addClass("jstree-unchecked");
 						if(rc) { coll.children(":checkbox").prop("checked", false); }
+                                                SelectNodo(); //DESMARCO
 					}
 					else {
 						//alert("else_state")
@@ -2922,7 +2926,9 @@
 						if(rc) { coll.children(":checkbox").prop("checked", true); }
 						if(this.data.ui) { this.data.ui.last_selected = obj; }
 						this.data.checkbox.last_selected = obj;
+                                                SelectNodo();//MARCO
 						//alert("fin");
+                                                //MarcoNodo('marco');
 					}
 					//obj.parentsUntil(".jstree", "li").each(function () {
 					//	var $this = $(this);
@@ -2949,6 +2955,7 @@
 					//		}
 					//	}
 					//});
+                                        
 				}
 				if(this.data.ui && this.data.checkbox.noui) { this.data.ui.selected = this.get_checked(); }
 				this.__callback(obj);
@@ -2965,6 +2972,7 @@
 					//}
 					//this.__callback({ "obj" : obj });
 				}
+                                
 			},
 			uncheck_node : function (obj) {
 				if(this.change_state(obj, true)) { this.__callback({ "obj" : this._get_node(obj) }); }
@@ -2993,6 +3001,7 @@
 			get_checked : function (obj, get_all) {
 				obj = !obj || obj === -1 ? this.get_container() : this._get_node(obj);
 				return get_all || this._get_settings().checkbox.two_state ? obj.find(".jstree-checked") : obj.find("> ul > .jstree-checked, .jstree-undetermined > ul > .jstree-checked");
+                                
 			},
 			get_unchecked : function (obj, get_all) {
 				obj = !obj || obj === -1 ? this.get_container() : this._get_node(obj);
@@ -3033,6 +3042,7 @@
 				else {
 					this.__call_old();
 				}
+                                
 			},
 			save_loaded : function () {
 				var _this = this;
@@ -3040,6 +3050,7 @@
 				this.get_container_ul().find("li.jstree-closed.jstree-undetermined").each(function () {
 					if(this.id) { _this.data.core.to_load.push("#" + this.id); }
 				});
+                                
 			}
 		}
 	});
@@ -3726,6 +3737,7 @@
 						e.stopImmediatePropagation();
 						e.preventDefault();
 					}
+                                        
 				})
 				.bind("keydown", "right", function (e) {
 					if($.vakata.context.vis) {
