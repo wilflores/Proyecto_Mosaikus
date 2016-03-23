@@ -61,6 +61,7 @@ function init_filtro_ao_simple(){
     });
 }
 function init_filtro_ao_simple_reg(){
+    //alert(111);
     $('#div-ao-reg').jstree();
     $('#div-ao-reg').on("changed.jstree", function (e, data) {
         if (data.selected.length > 0){
@@ -68,7 +69,7 @@ function init_filtro_ao_simple_reg(){
             var arr = data.selected[0].split("_");
             id = arr[1];
             $('#b-id_organizacion-reg').val(id);
-            //alert($('#b-id_organizacion-reg'));
+            //alert($('#b-id_organizacion-reg').val());
         }
         else
             $('#b-id_organizacion-reg').val('');
