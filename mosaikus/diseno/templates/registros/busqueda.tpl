@@ -66,7 +66,5 @@
                                 </div>                                
                             </div>
 -->
-                     <input type="text" class="form-control" id="b-id_organizacion-reg" name="b-id_organizacion-reg" placeholder="{N_ID_ORGANIZACION}"/>
-                     <input type="text" class="form-control" id="b-id_proceso-reg" name="b-id_proceso-reg" placeholder="{N_ID_ORGANIZACION}"/>
                     {CAMPOS_DINAMICOS}
                     

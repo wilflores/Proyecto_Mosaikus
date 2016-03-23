@@ -65,6 +65,7 @@
                                 </div>                                
                             </div>
 -->
+
 <div class="form-group">
     <label for="idRegistro" class="col-md-2 control-label">Registro</label>
                     <div class="col-md-6">                                              

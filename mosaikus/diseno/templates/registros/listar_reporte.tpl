@@ -1,5 +1,4 @@
 {HTML_INICIO_PAG}
-
 <div  class="col-md-12" style=" background-image: url('diseno/images/FondoDIVPrin.png');padding-left: 0px; padding-right: 0px;">
     <div  class="content-wrapper clear-block">
         <table width="100%" cellspacing="0" cellpadding="0" border="0">
