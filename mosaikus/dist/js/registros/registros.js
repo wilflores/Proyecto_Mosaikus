@@ -107,7 +107,7 @@ function r_marcar_desmarcar_checked_columns(checked){
         if(cad!=''){
             var arbolO = cad.split(",");
             for (var i=0; i<arbolO.length; i++) 
-                { if (document.getElementById('nodos_'+arbolO[i]).value=='') 
+                { if (document.getElementById('nodosreg').value=='') 
                     arbolsel='';
                    // alert('Or'+arbolO[i]+document.getElementById('nodos_'+arbolO[i]).value)
                 }
@@ -197,6 +197,9 @@ function r_marcar_desmarcar_checked_columns(checked){
         {
             array.addParametro('reg_por_pagina', document.getElementById("r-reg_por_pag").value);
         }
+        //array.addParametro('corder',document.getElementById('r-corder').value);
+        //array.addParametro('sorder',document.getElementById('r-sorder').value);
+        //array.addParametro('mostrar-col',document.getElementById('r-mostrar-col').value);
         array.addParametro('permiso',document.getElementById('permiso_modulo').value);
         array.addParametro('pag',pag);
         array.setObjeto('Registros','buscar');
@@ -262,4 +265,79 @@ function r_marcar_desmarcar_checked_columns(checked){
                    }
                    $('#r-estado').hide();
                 });
+    }
+    function VerificarCargo(nodos,idRegistro, id_unico){
+        var i=0;
+        a=document.getElementsByTagName("INPUT");
+        var obj = new Array;
+        for(b=0;b<a.length;b++){
+            if(a[b].type=="hidden"){
+                if (a[b].name.substring(0, 12) == 'campo_cargo_'){
+                    obj[i]=a[b].value;
+                   // alert('valor='+a[b].value);
+                    i++;
+                }
+            }
+        }        
+        var combo, newOption;
+        if(obj.length>0){
+            for(b=0;b<obj.length;b++){
+            CargaComboCargo(nodos,obj[b]);
+        }
+        }
+    }
+    function CargaComboCargo(nodos,i){
+        array = new XArray();
+        array.setObjeto('Registros','ComboCargoOrg');
+        array.addParametro('nodos',nodos);
+        array.addParametro('i',i);
+        array.addParametro('import','clases.registros.Registros');
+        xajax_Loading(array.getArray());
+        //alert('paso');
+    }    
+    function VerificarCargoEdit(idRegistro){
+        var i=0;
+        a=document.getElementsByTagName("INPUT");
+        var obj = new Array;
+        for(b=0;b<a.length;b++){
+            if(a[b].type=="hidden"){
+                if (a[b].name.substring(0, 12) == 'campo_cargo_'){
+                    obj[i]=a[b].value;
+                   // alert('valor='+a[b].value);
+                    i++;
+                }
+            }
+        }        
+        var combo, newOption;
+        if(obj.length>0){
+            for(b=0;b<obj.length;b++){
+            CargaComboCargoEdit(document.getElementById("nodosreg").value,obj[b],idRegistro, document.getElementById("sel_cargo_"+obj[b]).value);
+        }
+        }
+    }    
+
+    function CargaComboCargoEdit(nodos,i,idRegistro, sel_cargo){
+        array = new XArray();
+        array.setObjeto('Registros','ComboCargoOrgEdit');
+        array.addParametro('nodos',nodos);
+        array.addParametro('i',i);
+        array.addParametro('idRegistro',idRegistro);
+        array.addParametro('sel_cargo',sel_cargo);
+        array.addParametro('import','clases.registros.Registros');
+        xajax_Loading(array.getArray());
+
+    }   
+    function ValidarSeleccion(obj){
+        //alert(obj.length);
+        var j=0;
+        for(i=0;b<obj.length;i++){
+            opt = obj.options[i];
+            if (opt.selected){
+                j++;
+            } 
+            if(j>300){
+                VerMensaje('error','No puede seleccionar mas de 300 cargos');
+                opt.selected=false;
+            }
+        }
     }
