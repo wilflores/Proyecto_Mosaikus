@@ -2480,9 +2480,38 @@
                 unset ($parametros['opc']);
                 unset ($parametros['id']);
                 $parametros['id_usuario']= $_SESSION['CookIdUsuario'];
-
+                //NUEVA VALIDACION DE ARBOL Y CARGO
                 $validator = new FormValidator();
-                
+                $tiene_arbol=0;
+                $tiene_cargo=0;
+                for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
+                    if (isset($parametros["nombre_din_$i"])){                                
+                        if (($parametros["tipo_din_$i"] == "11")){//cuento cuantos arboles organizacionales hay
+                            $tiene_arbol++; 
+                        }
+                        if (($parametros["tipo_din_$i"] == "14")){//verifico si hay 
+                            $tiene_cargo++; 
+                        }
+                    }
+                }  
+                //validamos 1 solo arbol Org y si hay campo Cargo
+                if($tiene_cargo>=1){
+                    if($tiene_arbol<1){
+                        $objResponse->addScriptCall('VerMensaje','error','Debe agregar un campo "Arbol Organizacional" si define un campo "Cargo"');
+                        $objResponse->addScript("$('#MustraCargando').hide();"); 
+                        $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                        $( '#btn-guardar' ).prop( 'disabled', false );");                        
+                        return $objResponse;
+                    }
+                }
+                if($tiene_arbol>1){
+                    $objResponse->addScriptCall('VerMensaje','error','No puede definir mas de un campo "Arbol Organizacional"');
+                    $objResponse->addScript("$('#MustraCargando').hide();"); 
+                    $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                    $( '#btn-guardar' ).prop( 'disabled', false );");                     
+                    return $objResponse;
+                }  
+                //FIN DE NUEVA VALIDACION DE ARBOL Y CARGO
                 if(!$validator->ValidateForm($parametros)){
                         $error_hash = $validator->GetErrors();
                         $mensaje="";
@@ -2564,7 +2593,7 @@
                         $params = array();
                         $params[IDDoc] = $respuesta;
                         for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
-                            //echo $parametros["nro_pts_$i"];
+                            echo $parametros["nro_pts_$i"];
                             if (isset($parametros["nombre_din_$i"])){                                
                                 //$atr[IDDoc],'$atr[nombre]','$atr[tipo]','$atr[valores]'
                                 $params[nombre] = $parametros["nombre_din_$i"];
@@ -2869,8 +2898,8 @@
                 $item = "";
                 $js = "";
                 $i = 0;
-                $ids = array('7','8','9','1','2','3','5','6','10','11','12','13');
-                $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo', 'Árbol Organizacional', 'Árbol Procesos','Vigencia');
+                $ids = array('7','8','9','1','2','3','5','6','10','11','12','13','14');
+                $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo', 'Árbol Organizacional', 'Árbol Procesos','Vigencia','Cargo');
                 
                 //$ids = array('7','8','9','1','2','3','5','6','10');
                 //$desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo');
@@ -2983,7 +3012,38 @@
                 $parametros['id_usuario']= $_SESSION['CookIdUsuario'];
 
                 $validator = new FormValidator();
-                
+                //NUEVA VALIDACION DE ARBOL Y CARGO
+                $validator = new FormValidator();
+                $tiene_arbol=0;
+                $tiene_cargo=0;
+                for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
+                    if (isset($parametros["nombre_din_$i"])){                                
+                        if (($parametros["tipo_din_$i"] == "11")){//cuento cuantos arboles organizacionales hay
+                            $tiene_arbol++; 
+                        }
+                        if (($parametros["tipo_din_$i"] == "14")){//verifico si hay 
+                            $tiene_cargo++; 
+                        }
+                    }
+                }  
+                //validamos 1 solo arbol Org y si hay campo Cargo
+                if($tiene_cargo>=1){
+                    if($tiene_arbol<1){
+                        $objResponse->addScriptCall('VerMensaje','error','Debe agregar un campo "Arbol Organizacional" si define un campo "Cargo"');
+                        $objResponse->addScript("$('#MustraCargando').hide();"); 
+                        $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                        $( '#btn-guardar' ).prop( 'disabled', false );");                        
+                        return $objResponse;
+                    }
+                }
+                if($tiene_arbol>1){
+                    $objResponse->addScriptCall('VerMensaje','error','No puede definir mas de un campo "Arbol Organizacional"');
+                    $objResponse->addScript("$('#MustraCargando').hide();"); 
+                    $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                    $( '#btn-guardar' ).prop( 'disabled', false );");                     
+                    return $objResponse;
+                }  
+                //FIN DE NUEVA VALIDACION DE ARBOL Y CARGO                
                 if(!$validator->ValidateForm($parametros)){
                         $error_hash = $validator->GetErrors();
                         $mensaje="";
