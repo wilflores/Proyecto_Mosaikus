@@ -23,7 +23,7 @@ function limpiar_titulo(){
 }
 
 function init_documentos(){
-    
+    alert('init_documentos');
     $( "#b-reviso" ).select2({
         placeholder: "Selecione el revisor",
         allowClear: true
@@ -57,7 +57,7 @@ function init_documentos(){
 
 
 function init_ver_registros()
-{
+{alert('init_ver_registros');
     $('#a-ver-registros').on('click', function (event) {
             event.preventDefault();
             
@@ -180,15 +180,7 @@ function cargar_autocompletado(){
     }
 
     function verPagina(pag,doc){
-            var iframe = document.getElementById("iframearbol");
-            iframe.contentWindow.submitMe();
-            document.getElementById("nodos").value = iframe.contentWindow.document.getElementById('jsfields').value;
-            
-            iframe = document.getElementById("iframearbolP");
-            iframe.contentWindow.submitMe();
-            document.getElementById("nodosp").value = iframe.contentWindow.document.getElementById('jsfields').value;
-
-
+        //alert('buscar');
         array = new XArray();
         if (doc== null)
         {

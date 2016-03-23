@@ -105,6 +105,7 @@ function actualizar_atributo_dinamico(id){
                                 '<option value="11">Árbol Organizacional</option>'+ 
                                 '<option value="12">Árbol Procesos</option>'+ 
                                 '<option value="13">Vigencia</option>'+ 
+                                '<option value="14">Cargo</option>'+ 
                             '</select>' +
                         '</td>';
         html = html + '<td>' +
