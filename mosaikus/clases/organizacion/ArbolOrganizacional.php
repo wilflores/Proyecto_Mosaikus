@@ -847,7 +847,7 @@
                 
 		//while($arrP=mysql_fetch_assoc($resp)){
                 foreach ($data as $arrP) {//data-jstree='{ \"type\" : \"verde\" }'
-                        
+                       // $arrP[id];
                         $data_hijo = $this->MuestraHijos($arrP[id],$contar,$parametros);
                         $cuerpo .= "<li  id=\"phtml_".$arrP[id]."\">";
                         switch ($contar) {
@@ -904,7 +904,7 @@
                             //cuenta los registros de un documento
                             case 4:
                                 $sql = "SELECT
-                                        IFNULL(count(mos_registro_item.idRegistro),0) cant
+                                        IFNULL(count(mos_registro_item.idRegistro),0) cant  
                                         FROM
                                         mos_registro_item
                                         WHERE
@@ -913,9 +913,42 @@
                                         and tipo = 11;";
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador='';
-                                if($data_aux[0][cant]>0) $contador=$data_aux[0][cant];
+                                $contador=$data_aux[0][cant];
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
                                 $cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador). ")</a>";
+                                break;
+                            case 6:
+                                $sql = "select IFNULL(COUNT(cod_emp),0) cant 
+                                        from mos_personal
+                                        where cod_emp in 
+                                        (SELECT 
+                                        nombre
+                                        FROM
+                                        mos_registro_formulario
+                                        WHERE
+                                        mos_registro_formulario.IDDoc = ".$_SESSION[IDDoc]." and tipo=6)
+                                        and id_organizacion in (".$this->BuscaOrgNivelHijos($arrP[id]).");";
+                                $data_aux = $this->dbl->query($sql, $atr);
+                                $contador='';
+                                $contador=$data_aux[0][cant];
+                                $sql = "select IFNULL(COUNT(cod_emp),0) cant 
+                                        from mos_personal
+                                        where cod_emp in 
+                                        (SELECT 
+                                        nombre
+                                        FROM
+                                        mos_registro_formulario
+                                        WHERE
+                                        mos_registro_formulario.IDDoc = ".$_SESSION[IDDoc]." and tipo=6)
+                                        and id_organizacion in (".$arrP[id].");";
+                                $data_aux = $this->dbl->query($sql, $atr);
+                                $contador_uni='';
+                                $contador_uni=$data_aux[0][cant];
+                                //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
+                               // if($contador_uni==0 && $contador==0)
+                                 //   $cuerpo .= "<a href=\"#\">".($arrP[title])." ()</a>";
+                                //else
+                                    $cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador_uni.';'.$contador). ")</a>";
                                 break;
 
                             default:
@@ -1020,9 +1053,42 @@
 
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador='';
-                                if($data_aux[0][cant]>0) $contador=$data_aux[0][cant];
+                                $contador=$data_aux[0][cant];
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
                                 $extra .= "<a href=\"#\">".($arr[title])." (". ($contador). ")</a>";
+                                break;
+                            case 6:
+                                $sql="select IFNULL(COUNT(cod_emp),0) cant 
+                                        from mos_personal
+                                        where cod_emp in 
+                                        (SELECT 
+                                        nombre
+                                        FROM
+                                        mos_registro_formulario
+                                        WHERE
+                                        mos_registro_formulario.IDDoc = ".$_SESSION[IDDoc]." and tipo=6)
+                                        and id_organizacion in (".$this->BuscaOrgNivelHijos($arr[id]).");";  
+                                $data_aux = $this->dbl->query($sql, $atr);
+                                $contador='';
+                                $contador=$data_aux[0][cant];
+                                $sql="select IFNULL(COUNT(cod_emp),0) cant 
+                                        from mos_personal
+                                        where cod_emp in 
+                                        (SELECT 
+                                        nombre
+                                        FROM
+                                        mos_registro_formulario
+                                        WHERE
+                                        mos_registro_formulario.IDDoc = ".$_SESSION[IDDoc]." and tipo=6)
+                                        and id_organizacion in (".$arr[id].");";  
+                                $data_aux = $this->dbl->query($sql, $atr);
+                                $contador_uni='';
+                                 $contador_uni=$data_aux[0][cant];
+                                //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
+                                 //if($contador_uni==0 && $contador==0)
+                                  //   $extra .= "<a href=\"#\">".($arr[title])." ()</a>";
+                                 //else
+                                     $extra .= "<a href=\"#\">".($arr[title])." (". ($contador_uni.';'.$contador). ")</a>";
                                 break;
                             
                             default:
