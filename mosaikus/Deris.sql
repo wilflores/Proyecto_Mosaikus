@@ -106,3 +106,9 @@ UPDATE `mos_usuario_filial` SET `id_usuario`='5' WHERE (`id_usuario`='13315840')
     ALTER TABLE `mos_usuario_filial` AUTO_INCREMENT=8
 -- fin punto 3
 -- fin segunda actualizacion
+
+
+-- tercera actualizacion
+ALTER TABLE `mos_usuario_estructura`
+ADD COLUMN `portal`  char(1) NULL AFTER `cod_perfil`;
+-- fin tercera actualizacion
