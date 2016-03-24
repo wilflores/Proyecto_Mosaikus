@@ -91,6 +91,18 @@
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }
+
+             public function verPerfilesPortal($id){                 
+                $atr=array();
+                $sql = "SELECT cod_perfil
+                            ,descripcion_perfil,nuevo,modificar,eliminar,recordatorio,modificar_terceros, visualizar_terceros
+                         FROM mos_perfil_portal 
+                         WHERE cod_perfil = $id "; 
+                $this->operacion($sql, $atr);
+                return $this->dbl->data[0];
+            }
+
+            
             public function ingresarPerfiles($atr){
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
