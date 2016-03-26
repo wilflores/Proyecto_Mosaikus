@@ -8659,20 +8659,24 @@ body {
     #page-wrapper #page .header-wrap {
       float: left;
       width: 100%;
-      height: 110px; }
+      height: 60px; }
       #page-wrapper #page .header-wrap .header {
         float: left;
         width: 100%;
         height: 100%;
-        padding: 12px 0;
+        padding: 6px 0;
         background-color: #eeeeee; }
+        #page-wrapper #page .header-wrap .header .client-info img {
+          height: 50px; }
         #page-wrapper #page .header-wrap .header .branding {
           width: 5.8%;
           margin: 0 auto;
-          height: 110px; }
+          height: 60px; }
           #page-wrapper #page .header-wrap .header .branding a {
             float: left;
             width: 100%; }
+            #page-wrapper #page .header-wrap .header .branding a img {
+              height: 50px; }
     #page-wrapper #page .content-wrap {
       float: left;
       width: 100%;
@@ -8717,7 +8721,7 @@ body {
 
 #nav {
   position: absolute;
-  top: 110px;
+  top: 60px;
   bottom: 0;
   z-index: 1089;
   width: 56px;
@@ -8864,12 +8868,12 @@ body {
 .client-info {
   position: absolute;
   left: 1%;
-  top: 12px; }
+  top: 6px; }
 
 .status-bar {
   position: absolute;
   right: 1%;
-  top: 38px; }
+  top: 10px; }
   .status-bar > div {
     float: left;
     padding: 0 28px; }
@@ -8960,3 +8964,124 @@ body {
 
 .report-controls {
   position: absolute; }
+
+.page-sesion-caducada {
+  background: url("../images/bg-wrapper.png") 0 250px no-repeat transparent !important; }
+  .page-sesion-caducada #page .content-wrap .panels .row #sesion-caducada {
+    float: none;
+    width: 700px;
+    margin: auto;
+    padding: 0; }
+    .page-sesion-caducada #page .content-wrap .panels .row #sesion-caducada .caducada {
+      float: left;
+      width: 100%; }
+      .page-sesion-caducada #page .content-wrap .panels .row #sesion-caducada .caducada .head {
+        float: left;
+        width: 100%;
+        padding: 10px 0 25px 0;
+        border-bottom: 2px solid #cfd8dc;
+        margin-bottom: 31px; }
+        .page-sesion-caducada #page .content-wrap .panels .row #sesion-caducada .caducada .head h4 {
+          color: #455a64;
+          width: 100%;
+          float: left;
+          font-weight: bold;
+          font-size: 16px;
+          text-align: center; }
+      .page-sesion-caducada #page .content-wrap .panels .row #sesion-caducada .caducada .body {
+        float: left;
+        width: 100%;
+        margin: 35px 0;
+        text-align: center; }
+        .page-sesion-caducada #page .content-wrap .panels .row #sesion-caducada .caducada .body a {
+          background-color: #263238;
+          color: #ffffff;
+          padding: 10px 30px;
+          border-radius: 20px;
+          font-size: 15px;
+          opacity: 0.9; }
+        .page-sesion-caducada #page .content-wrap .panels .row #sesion-caducada .caducada .body a:hover {
+          opacity: 1; }
+
+.page-login {
+  background: url("../images/bg-wrapper.png") 0 250px no-repeat transparent !important; }
+  .page-login #page .content-wrap .panels .row #login-form {
+    float: none;
+    width: 700px;
+    margin: auto;
+    padding: 0; }
+    .page-login #page .content-wrap .panels .row #login-form .login-t {
+      float: left;
+      width: 100%; }
+      .page-login #page .content-wrap .panels .row #login-form .login-t .head {
+        float: left;
+        width: 100%;
+        padding: 10px 0 25px 0;
+        border-bottom: 2px solid #cfd8dc;
+        margin-bottom: 31px; }
+        .page-login #page .content-wrap .panels .row #login-form .login-t .head h4 {
+          text-transform: uppercase;
+          color: #455a64;
+          width: 100%;
+          float: left;
+          font-weight: bold;
+          font-size: 16px;
+          text-align: center; }
+      .page-login #page .content-wrap .panels .row #login-form .login-t .body {
+        float: left;
+        width: 100%;
+        margin: 10px 0 35px; }
+        .page-login #page .content-wrap .panels .row #login-form .login-t .body h4 {
+          width: 100%;
+          margin-top: 0;
+          margin-bottom: 25px;
+          font-size: 15px;
+          text-align: center;
+          font-weight: bold; }
+        .page-login #page .content-wrap .panels .row #login-form .login-t .body .login-form {
+          float: left;
+          width: 55%;
+          margin-left: 22%; }
+          .page-login #page .content-wrap .panels .row #login-form .login-t .body .login-form form {
+            float: left;
+            width: 90%;
+            margin-left: 5%; }
+            .page-login #page .content-wrap .panels .row #login-form .login-t .body .login-form form .form-item {
+              float: left;
+              width: 95%;
+              margin-left: 3%;
+              margin-top: 10px;
+              margin-bottom: 5px; }
+              .page-login #page .content-wrap .panels .row #login-form .login-t .body .login-form form .form-item label {
+                float: left;
+                width: 100%;
+                text-align: center;
+                color: #455a64;
+                font-size: 1.1em;
+                font-weight: bold; }
+              .page-login #page .content-wrap .panels .row #login-form .login-t .body .login-form form .form-item input {
+                float: left;
+                width: 90%;
+                margin-left: 5%;
+                height: 40px;
+                font-size: 1.2em;
+                text-align: center;
+                color: #455a64;
+                border: 2px solid #cfd8dc; }
+            .page-login #page .content-wrap .panels .row #login-form .login-t .body .login-form form button {
+              background-color: #263238;
+              color: #ffffff;
+              width: 40%;
+              margin-top: 30px;
+              margin-left: 30%;
+              float: left;
+              padding: 8px 0;
+              border-radius: 20px;
+              font-size: 17px;
+              opacity: 0.9;
+              border: none;
+              font-weight: bold; }
+              .page-login #page .content-wrap .panels .row #login-form .login-t .body .login-form form button a {
+                color: #ffffff; }
+            .page-login #page .content-wrap .panels .row #login-form .login-t .body .login-form form button:hover {
+              opacity: 1; }
