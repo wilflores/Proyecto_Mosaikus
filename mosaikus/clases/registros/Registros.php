@@ -911,7 +911,31 @@ function BuscaOrganizacional($tupla)
                                 if (strlen($atr["p$k"])>0){
                                     $sql .= " AND p$k.nom_detalle LIKE '%". $atr["p$k"] . "%'";
                                 }                                
-                                break;                            
+                                break; 
+                            case '13':
+                                if (sizeof($atr["p$k"])>0){
+                                   // $semaforovigencia = implode(",", $atr["p$k"]);
+                                    foreach ($atr["p$k"] as $value) {
+                                        $semaforovigencia .= "'".$value."',";
+                                    }
+                                    $semaforovigencia.="'X'";
+                                    $sql .= " AND SUBSTRING(p$k.edo,1,1)  in (". $semaforovigencia . ")"; 
+       
+                                   // $semaforovigencia = implode(",", $atr["p$k"]);
+                                    //$sql .= " AND p$k.nom_detalle LIKE '%". $atr["p$k"] . "%'";
+                                } 
+                                if (strlen($atr["pdesde$k"])>0)                        
+                                {
+                                    $atr["pdesde$k"] = formatear_fecha($atr["pdesde$k"]);                        
+                                    $sql .= " AND STR_TO_DATE(p$k.nom_detalle,'%d/%m/%Y')  >= '" . ($atr["pdesde$k"]) . "'";                        
+                                }                                
+                                if (strlen($atr["phasta$k"])>0)                        
+                                {
+                                    $atr["phasta$k"] = formatear_fecha($atr["phasta$k"]);                        
+                                    $sql .= " AND STR_TO_DATE(p$k.nom_detalle,'%d/%m/%Y')  <= '" . ($atr["phasta$k"]) . "'";                        
+                                }                                
+                                break;
+                                
                             default:
                                 break;
                         }
