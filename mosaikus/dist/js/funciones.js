@@ -74,7 +74,7 @@ function init_filtro_ao_simple_reg(){
         else
             $('#b-id_organizacion-reg').val('');
     
-        verPagina(1,document);
+        verPagina_aux(1,document); 
         //console.log(data.selected);
     });
 }
@@ -91,7 +91,7 @@ function init_filtro_ap_simple_reg(){
         else
             $('#b-id_proceso-reg').val('');
     
-        verPagina(1,document);
+        verPagina_aux(1,document);
         //console.log(data.selected);
     });
 }
@@ -307,7 +307,7 @@ function ver_ficha_trabajador(id){
 
 function VerMensaje(tipo,mensaje){
     if(tipo=='error'){        
-     alertify.error(mensaje,0); 
+     alertify.error(mensaje,15); 
      //document.getElementById("mensaje_error").innerHTML='<div class="alert alert-warning alert-dismissible"><button type="button" class="close" data-dismiss="alert">&times;</button>' + mensaje + '</div>';
      //$("#mensaje_error").fadeIn(800);
      //setTimeout(function(){ $(".mensajeserror").fadeOut(800);}, 5000);

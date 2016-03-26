@@ -231,11 +231,19 @@ function r_marcar_desmarcar_checked_columns(checked){
         var formData = new FormData(document.getElementById("formuploadajax"));
             //formData.append("dato", "valor"); 
             var fileInput = document.getElementById('r-fileUpload2');
+            if(fileInput.files[0].size>1024*1024*3){
+                VerMensaje('error','El archivo excede el tamaño permitido en este sitio, Tamaño máximo del archivo a subir: 3MB');
+                $('#fileUpload2_vis').val('');
+                return;
+            }
             formData.append('fileUpload',fileInput.files[0]);
             //formData.append("nombre_doc", $('#nombre_doc').val());
             formData.append("codigo_doc", $('#r-Codigo_doc').val());
             //formData.append("version", $('#version').val());
             $('#r-estado').show();
+            var $bar = $('#estado-progress-bar');
+            $bar.width(0);
+            $bar.text("0%");
             $.ajax({
                 url: "pages/registros/uploadFileOtro2_vis.php",
                 type: "post",
@@ -243,7 +251,19 @@ function r_marcar_desmarcar_checked_columns(checked){
                 data: formData,
                 cache: false,
                 contentType: false,
-	     processData: false
+	     processData: false,
+             xhr: function() {
+                    myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        myXhr.upload.addEventListener('progress', function(prog) {
+                            var value = ~~((prog.loaded / prog.total) * 100);
+                            var $bar = $('#estado-progress-bar');
+                            $bar.width(value*250/100);
+                            $bar.text(value+ "%");
+                        }, false);
+                    }
+                    return myXhr;
+                }
             })
                 .done(function(res){
                    respuesta = $.parseJSON(res);
@@ -262,6 +282,7 @@ function r_marcar_desmarcar_checked_columns(checked){
                    }
                    else{
                        VerMensaje('error',respuesta[0].msj);
+                       $('#r-fileUpload2').val('');
                    }
                    $('#r-estado').hide();
                 });

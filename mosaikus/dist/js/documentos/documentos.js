@@ -56,24 +56,34 @@ function MuestraFormulario(id){
 function actualizar_atributo_dinamico(id){        
     
         var valor = $('#tipo_din_' + id).val();           
-        if ((valor == '7') || (valor == '8') || (valor == '9')|| (valor == '13')){
+        if ((valor == '7') || (valor == '8') || (valor == '9')|| (valor == 'Seleccion Simple') || (valor == 'Seleccion Multiple') || (valor == 'Combo')){
            // $("#valores_din_" + id).css("display", "");
             
             $('#valores_din_' + id).val($('#valores_din_' + id).val().replace(/<br>/gi, '\n'));
             $('#valores_din_' + id).val($('#valores_din_' + id).val().replace(/<br>/gi, ''));
             //$('#valores_din_' + id).attr('readonly','');
-            $('#valores_din_' + id).removeAttr('readonly');
+            //$('#valores_din_' + id).removeAttr('readonly');
+            $('#ico_cmb_din_' + id).show();
             $('#valores_din_' + id).attr('data-validation','required');                     
         }
-        else if ((valor == 'Seleccion Simple') || (valor == 'Seleccion Multiple') || (valor == 'Combo')|| (valor == 'Vigencia')){
+        else if ((valor == '13')|| (valor == 'Vigencia')){
             $('#valores_din_' + id).val($('#valores_din_' + id).val().replace(/<br>/gi, '\n'));
             $('#valores_din_' + id).val($('#valores_din_' + id).val().replace(/<br>/gi, ''));
+            $('#ico_cmb_din_' + id).hide();
+            $('#valores_din_' + id).removeAttr('readonly');
+            $('#valores_din_' + id).attr('data-validation','required');  
         }
         else{
             $('#valores_din_' + id).attr('readonly','true');
             $('#valores_din_' + id).removeAttr('data-validation');   
+            $('#ico_cmb_din_' + id).hide();
         }
 
+    }
+    
+    function ajustar_valor_atributo_dinamico(id){          
+         $('#valores_din_' + id).val($('#valores_din_' + id).val().replace(/<br>/gi, '\n'));
+         $('#valores_din_' + id).val($('#valores_din_' + id).val().replace(/<br>/gi, ''));
     }
     
     function agregar_esp(){
@@ -83,6 +93,7 @@ function actualizar_atributo_dinamico(id){
         html = html + '<td align="center">'+
                            ' <i class="subir glyphicon glyphicon-arrow-up cursor-pointer"></i><i class="bajar glyphicon glyphicon-arrow-down cursor-pointer"></i>'+
                            '<input id="orden_din_'+ i + '" type="hidden" name="orden_din_'+ i + '" value="'+ i + '">'+
+                           '<input id="cmb_din_'+ i + '" type="hidden" name="cmb_din_'+ i + '" tok="' + i + '" value="'+ i + '">'+
                            ' <a href="' + i + '"  title="Eliminar " id="eliminar_esp_' + i + '"> ' + 
                            //' <imgsrc="diseno/images/ico_eliminar.png" style="cursor:pointer">' + 
                             '<i class="icon icon-remove"></i>' +
@@ -109,7 +120,17 @@ function actualizar_atributo_dinamico(id){
                             '</select>' +
                         '</td>';
         html = html + '<td>' +
-                           ' <textarea id="valores_din_'+ i + '" cols="30" rows="2" name="valores_din_'+ i + '" readonly=""></textarea>'+
+                            //' <input type="text" id="valores_din_'+ i + '" name="valores_din_'+ i + '" size="15"  readonly="readonly"/>'+
+                           
+                           ' <textarea id="valores_din_'+ i + '" cols="30" rows="2" name="valores_din_'+ i + '"class="form-control" readonly=""></textarea>'+
+                           //'<i class="icon icon-more cursor-pointer" id="ico_cmb_din_'+ i + '" tok="'+i+'"></i>'+
+//                            '<div class="input-group">'+
+//                                  ' <input type="text" id="add_item_din_'+ i + '" size="15" class="form-control"/>'+
+//                                  '<span class="input-group-addon cursor-pointer" id=""><span class="glyphicon glyphicon glyphicon-plus"></span></span>'
+//                           + '</div>'+
+                        '</td>';
+        html = html + '<td>' +
+                           '<i class="icon icon-more cursor-pointer" style="display:none;" id="ico_cmb_din_'+ i + '" tok="'+i+'"></i>'+
                         '</td>';
         html = html + '</tr>' ;       
         $("#table-items-esp tbody").append(html);          
@@ -120,7 +141,19 @@ function actualizar_atributo_dinamico(id){
             $('tr-esp-' + id).remove();
             var parent = $(this).parents().parents().get(0);
 		$(parent).remove();
-        });        
+        });     
+        $("#ico_cmb_din_" + i).click(function(e){ 
+            e.preventDefault();
+            var id = $(this).attr('tok');            
+            array = new XArray();
+            array.setObjeto('ItemsFormulario','indexItemsFormulario');
+            array.addParametro('tok',id);
+            array.addParametro('id',$('#cmb_din_'+id).val());
+            array.addParametro('titulo',$('#nombre_din_'+id).val());
+            array.addParametro('token', $('#tok_new_edit').val());
+            array.addParametro('import','clases.items_formulario.ItemsFormulario');
+            xajax_Loading(array.getArray());
+        }); 
         $(".subir").click(function(){
             var row = $(this).parents("tr:first");               
             row.insertBefore(row.prev());
@@ -222,6 +255,19 @@ function cargar_autocompletado(){
                 VerMensaje('error','Debe Ingresar el Arbol Organizacional');
                 return;
             }
+            if (($('#nombre_doc_vis').val().length > 0)){                
+                /*VALIDAR QUE EL NOMBRE DEL DOC VIS SEA EL MISMO QUE EL DOC FUENTE*/
+                var nombre_doc = $('#Codigo_doc').val() + '-' + $('#nombre_doc').val() + '-V' + $('#version').val();                
+                if ($('#nombre_doc_vis').val() != nombre_doc){
+                    if(!confirm("El nombre del documento de visualización, no corresponde con el nombre del documento fuente, este sera renombrado con \""+nombre_doc + "\"\n¿Desea Continuar?")){
+                        return;
+                    }
+                    else{
+                        $('#nombre_doc_vis').val(nombre_doc);
+                    }
+                }
+            }
+            
             $( "#btn-guardar" ).html('Procesando..');
             $( "#btn-guardar" ).prop( "disabled", true );
             array = new XArray();
@@ -256,6 +302,18 @@ function cargar_autocompletado(){
     
     function validar_ver(doc){
         if($('#idFormulario').isValid()) {
+            if (($('#nombre_doc_vis').val().length > 0)){                
+                /*VALIDAR QUE EL NOMBRE DEL DOC VIS SEA EL MISMO QUE EL DOC FUENTE*/
+                var nombre_doc = $('#Codigo_doc').val() + '-' + $('#nombre_doc').val() + '-V' + $('#version').val();                
+                if ($('#nombre_doc_vis').val() != nombre_doc){
+                    if(!confirm("El nombre del documento de visualización, no corresponde con el nombre del documento fuente, este sera renombrado con \""+nombre_doc + "\"\n¿Desea Continuar?")){
+                        return;
+                    }
+                    else{
+                        $('#nombre_doc_vis').val(nombre_doc);
+                    }
+                }
+            }
             $( "#btn-guardar" ).html('Procesando..');
             $( "#btn-guardar" ).prop( "disabled", true );
             array = new XArray();
@@ -336,7 +394,15 @@ function cargar_autocompletado(){
         var formData = new FormData(document.getElementById("formuploadajax"));
             //formData.append("dato", "valor"); 
             var fileInput = document.getElementById('fileUpload2');
+            if(fileInput.files[0].size>1024*1024*3){
+                VerMensaje('error','El archivo excede el tamaño permitido en este sitio, Tamaño máximo del archivo a subir: 3MB');
+                $('#fileUpload2_vis').val('');
+                return;
+            }
             $('#estado').show();
+            var $bar = $('#estado-progress-bar');
+             $bar.width(0);
+             $bar.text("0%");
             formData.append('fileUpload',fileInput.files[0]);
             formData.append("dato", "valor");
             $.ajax({
@@ -346,7 +412,19 @@ function cargar_autocompletado(){
                 data: formData,
                 cache: false,
                 contentType: false,
-	     processData: false
+	     processData: false,
+             xhr: function() {
+                    myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        myXhr.upload.addEventListener('progress', function(prog) {
+                            var value = ~~((prog.loaded / prog.total) * 100);
+                            var $bar = $('#estado-progress-bar');
+                            $bar.width(value*250/100);
+                            $bar.text(value+ "%");
+                        }, false);
+                    }
+                    return myXhr;
+                }
             })
                 .done(function(res){
                     //alert(res);
@@ -368,6 +446,8 @@ function cargar_autocompletado(){
                    }
                    else{
                        VerMensaje('error',respuesta[0].msj);
+                       $('#fileUpload2').val('');
+                       
                    }
                    $('#estado').hide();
                 });
@@ -377,12 +457,21 @@ function cargar_autocompletado(){
         //$('#fileUploadOtro').val($('#fileUpload2').val());
         var formData = new FormData(document.getElementById("formuploadajax"));
             //formData.append("dato", "valor"); 
-            var fileInput = document.getElementById('fileUpload2');
+            var fileInput = document.getElementById('fileUpload2');  
+            if(fileInput.files[0].size>1024*1024*3){
+                VerMensaje('error','El archivo excede el tamaño permitido en este sitio, Tamaño máximo del archivo a subir: 3MB');
+                $('#fileUpload2_vis').val('');
+                return;
+            }
             formData.append('fileUpload',fileInput.files[0]);
+            
             formData.append("nombre_doc", $('#nombre_doc').val());
             formData.append("codigo_doc", $('#Codigo_doc').val());
             formData.append("version", $('#version').val());
             $('#estado').show();
+            var $bar = $('#estado-progress-bar');
+            $bar.width(0);
+            $bar.text("0%");
             $.ajax({
                 url: "pages/documentos/uploadFileOtro_ver.php",
                 type: "post",
@@ -390,7 +479,19 @@ function cargar_autocompletado(){
                 data: formData,
                 cache: false,
                 contentType: false,
-	     processData: false
+	     processData: false,
+             xhr: function() {
+                    myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        myXhr.upload.addEventListener('progress', function(prog) {
+                            var value = ~~((prog.loaded / prog.total) * 100);
+                            var $bar = $('#estado-progress-bar');
+                            $bar.width(value*250/100);
+                            $bar.text(value+ "%");
+                        }, false);
+                    }
+                    return myXhr;
+                }
             })
                 .done(function(res){
                    respuesta = $.parseJSON(res);
@@ -409,6 +510,7 @@ function cargar_autocompletado(){
                    }
                    else{
                        VerMensaje('error',respuesta[0].msj);
+                       $('#fileUpload2').val('');
                    }
                    $('#estado').hide();
                 });
@@ -419,6 +521,7 @@ function cargar_autocompletado(){
         document.getElementById('fileUpload2_vis').value = '';
         document.getElementById('tabla_fileUpload_vis').style.display = '';
         document.getElementById('estado_actual_vis').value = '';
+        $('#nombre_doc_vis').val('');        
     }
     
     function cargar_archivo_vis(){
@@ -426,11 +529,20 @@ function cargar_autocompletado(){
         var formData = new FormData(document.getElementById("formuploadajax"));
             //formData.append("dato", "valor"); 
             var fileInput = document.getElementById('fileUpload2_vis');
+            if(fileInput.files[0].size>1024*1024*3){
+                VerMensaje('error','El archivo excede el tamaño permitido en este sitio, Tamaño máximo del archivo a subir: 3MB');
+                $('#fileUpload2_vis').val('');
+                return;
+            }
+            
             formData.append('fileUpload',fileInput.files[0]);
             formData.append("nombre_doc", $('#nombre_doc').val());
             formData.append("codigo_doc", $('#Codigo_doc').val());
             formData.append("version", $('#version').val());
             $('#estado_vis').show();
+            var $bar = $('#estado-vis-progress-bar');
+            $bar.width(0);
+            $bar.text("0%");
             $.ajax({
                 url: "pages/documentos/uploadFileOtro2_vis.php",
                 type: "post",
@@ -438,7 +550,19 @@ function cargar_autocompletado(){
                 data: formData,
                 cache: false,
                 contentType: false,
-	     processData: false
+	     processData: false,
+             xhr: function() {
+                    myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        myXhr.upload.addEventListener('progress', function(prog) {
+                            var value = ~~((prog.loaded / prog.total) * 100);
+                            var $bar = $('#estado-vis-progress-bar');
+                            $bar.width(value*250/100);
+                            $bar.text(value+ "%");
+                        }, false);
+                    }
+                    return myXhr;
+                }
             })
                 .done(function(res){
                    respuesta = $.parseJSON(res);
@@ -457,6 +581,7 @@ function cargar_autocompletado(){
                    }
                    else{
                        VerMensaje('error',respuesta[0].msj);
+                       $('#fileUpload2_vis').val('');
                    }
                    $('#estado_vis').hide();
                 });
