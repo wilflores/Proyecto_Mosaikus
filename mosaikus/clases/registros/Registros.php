@@ -148,6 +148,18 @@
                 $this->operacion($sql, $atr);
                 return $this->dbl->data;
             }
+            
+            public function verItemsCamposDinamicos($id_unico){
+                $atr=array();
+                $sql = "SELECT 
+                                id
+                                ,descripcion                                
+                         FROM mos_documentos_formulario_items 
+                         WHERE fk_id_unico = $id_unico and vigencia = 'S' ORDER BY descripcion"; 
+                //echo $sql;
+                return $this->dbl->query($sql);                
+            }
+            
              public function verArbol($id_unico,$idRegistro){
                  //print_r($atr);
                 $atr=array();
@@ -181,8 +193,8 @@
 				,rf.idRegistro
                                 ,df.orden
                          FROM mos_documentos_datos_formulario df
-                            inner join mos_registro_formulario rf on rf.id_unico = df.id_unico
-                         WHERE df.IDDoc = $_SESSION[IDDoc] AND rf.idRegistro = $id 
+                            left join mos_registro_formulario rf on rf.id_unico = df.id_unico AND rf.idRegistro = $id 
+                         WHERE df.IDDoc = $_SESSION[IDDoc] and df.tipo in (1,2,3,4,5,6,10,13)
                          union all    
                         SELECT 
                             df.id_unico
@@ -194,8 +206,8 @@
                             ,rf.idRegistro
                              ,df.orden
                         FROM mos_documentos_datos_formulario df
-                        inner join mos_registro_item rf on rf.id_unico = df.id_unico 
-                        WHERE df.IDDoc = $_SESSION[IDDoc] AND rf.idRegistro = $id
+                        left join mos_registro_item rf on rf.id_unico = df.id_unico  AND rf.idRegistro = $id
+                        WHERE df.IDDoc = $_SESSION[IDDoc] and df.tipo in (7,8,9,11,12)
                         group by
                             df.id_unico
                             ,df.IDDoc
@@ -225,9 +237,9 @@
               public function DocTieneArbolRegistros($tipo){
                 $atr=array();
                 $sql = "SELECT
-                        IFNULL(count(mos_registro_item.idRegistro),0) cant
+                        IFNULL(count(id_unico),0) cant
                         FROM
-                        mos_registro_item
+                        mos_documentos_datos_formulario
                         WHERE
                         IDDoc= ".$_SESSION[IDDoc]." and 
                          tipo = '".$tipo."';";                 
@@ -238,9 +250,9 @@
               public function DocTieneCampo($tipo){
                 $atr=array();
                 $sql = "SELECT
-                        IFNULL(count(idRegistro),0) cant
+                        IFNULL(count(id_unico),0) cant
                         FROM
-                        mos_registro_formulario
+                        mos_documentos_datos_formulario
                         WHERE
                         IDDoc= ".$_SESSION[IDDoc]." and 
                          tipo = '".$tipo."';";                 
@@ -291,7 +303,7 @@ function semaforo($tupla,$key)
        $html = "<img class=\"SinBorde\" title=\"Vigente pero le quedan $dias dia(s) de vigencia\" src=\"diseno/images/amarillo.png\">";                                                                    
        return $html.'&nbsp;'.$dias;
    }
-   return "<img class=\"SinBorde\" title=\"Vigente y le quedan $dias dias\" src=\"diseno/images/verde.png\">".$dias;
+   return "<img class=\"SinBorde\" title=\"Vigente y le quedan $dias dias\" src=\"diseno/images/verde.png\">&nbsp;".$dias;
 }       
 
 function semaforoExcel($tupla,$key)
@@ -582,6 +594,13 @@ function BuscaOrganizacional($tupla)
                             ";//,$atr[version],$atr[correlativo],$atr[id_procesos],$atr[id_organizacion]
                     //echo $sql;
                         $this->dbl->insert_update($sql);
+                        if (isset($atr['nuevo']) && ($atr['nuevo'] == 1)){
+                            $sql = "INSERT INTO mos_registro_formulario(IDDoc,idRegistro,Nombre,tipo,id_unico)
+                            VALUES(
+                                $_SESSION[IDDoc],$atr[idRegistro],'$atr[Nombre]','$atr[tipo]',$atr[id_unico]
+                                );";//,$atr[version],$atr[correlativo],$atr[id_procesos],$atr[id_organizacion]
+                                $this->dbl->insert_update($sql);
+                        }
                     }
 
                     return "El mos_registro '$atr[descripcion_ano]' ha sido ingresado con exito";
@@ -765,7 +784,8 @@ function BuscaOrganizacional($tupla)
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
                         }
                         else if ($value[tipo]== '8'||$value[tipo]== '7'||$value[tipo]== '9'){
-                            $sql_left .= " LEFT JOIN(select t1.idRegistro, GROUP_CONCAT(t1.valor) as nom_detalle from mos_registro_item t1
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, GROUP_CONCAT(nombre_items.descripcion) as nom_detalle from mos_registro_item t1
+                                inner join mos_documentos_formulario_items nombre_items on nombre_items.id = t1.valor
                             where id_unico= $value[id_unico] group by t1.idRegistro ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
                         }
@@ -796,6 +816,8 @@ function BuscaOrganizacional($tupla)
                                                                 
                                 case '1':
                                 case '5':
+                                case '7':
+                                case '9':
                                     {
                                         $sql .= " OR upper(p$k.nom_detalle) LIKE '%". strtoupper($atr["b-filtro-sencillo"]) . "%'";
                                     }                                
@@ -898,7 +920,10 @@ function BuscaOrganizacional($tupla)
                                 break;
                             case '6':
                                 if (strlen($atr["p$k"])>0){
-                                    $sql .= " AND p$k.nom_detalle_aux = '". $atr["p$k"] . "'";
+                                    $sql .= " AND p$k.nom_detalle = '". $atr["p$k"] . "'";
+                                } 
+                                if (strlen($atr["b-id_organizacion-reg"])>0 && $atr["b-arbol-filtro"]=='persona'){
+                                    $sql .= " AND p$k.id_organizacion like '%". $atr["b-id_organizacion-reg"] . "%'";
                                 } 
                                 break;
                             case '1':
@@ -906,6 +931,16 @@ function BuscaOrganizacional($tupla)
                                 if (strlen($atr["p$k"])>0){
                                     $sql .= " AND p$k.nom_detalle LIKE '%". $atr["p$k"] . "%'";
                                 }                                
+                                break;
+                            case '11':
+                                if (strlen($atr["b-id_organizacion-reg"])>0 && $atr["b-arbol-filtro"]=='organizacional'){
+                                    $sql .= " AND p$k.nom_detalle like '%". $atr["b-id_organizacion-reg"] . "%'";
+                                } 
+                                break;
+                            case '12':
+                                if (strlen($atr["b-id_proceso-reg"])>0){
+                                    $sql .= " AND p$k.nom_detalle like '%". $atr["b-id_proceso-reg"] . "%'";
+                                } 
                                 break;
                             case '14':
                                 if (strlen($atr["p$k"])>0){
@@ -977,6 +1012,8 @@ function BuscaOrganizacional($tupla)
                                                                 
                                 case '1':
                                 case '5':
+                                case '7':
+                                case '9':
                                     {
                                         $sql .= " OR upper(p$k.nom_detalle) LIKE '%". strtoupper($atr["b-filtro-sencillo"]) . "%'";
                                     }                                
@@ -1065,6 +1102,9 @@ function BuscaOrganizacional($tupla)
                                 }                                
                                 break;
                             case '6':
+                                if (strlen($atr["p$k"])>0){
+                                    $sql .= " AND p$k.nom_detalle = '". $atr["p$k"] . "'";
+                                }
                                 if (strlen($atr["b-id_organizacion-reg"])>0 && $atr["b-arbol-filtro"]=='persona'){
                                     $sql .= " AND p$k.id_organizacion like '%". $atr["b-id_organizacion-reg"] . "%'";
                                 } 
@@ -1654,21 +1694,39 @@ function BuscaOrganizacional($tupla)
                     switch ($value[tipo]) {
                         case 'Seleccion Simple':
                         case '7':
-                            $cadenas = split("<br />", $value[valores]) ;
-                            $valores_actuales = split("<br/>", $value[valor]) ;
-                            $html = substr($html, 0, strlen($html)-39-strlen($value[Nombre]));
-                            $html .= '<div class="form-group" style="margin-bottom: 0px;"><label>' . $value[Nombre] . '</label>';  
-                            $html .= '</div><div class="form-group">
-                                        <label class="checkbox-inline" style="padding-top: 0px; padding-left: 0px;">';
-                            foreach ($cadenas as $valores) {
-                               
-                                $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="radio-inline">
-                                            <input '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="radio" value="' . $valores . '" name="p' . $i . '" id="p' . $i . '"> '. $valores . ' 
-                                          ';
-                                
-                                //$html .= '<input type="radio" class="form-box" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' value="' . $valores . '" size="20" name="campo_' . $i . '" id="campo_' . $i . '">'. $valores;
+//                             //$cadenas = split("<br />", $value[valores]) ;
+//                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+//                            $cadenas = array();
+//                            foreach ($items_campo as $value_item) {
+//                                $cadenas[$value_item[id]] = $value_item[descripcion];
+//                            }
+//                            $valores_actuales = split("<br/>", $value[valor]) ;
+//                            $html = substr($html, 0, strlen($html)-39-strlen($value[Nombre]));
+//                            $html .= '<div class="form-group" style="margin-bottom: 0px;"><label>' . $value[Nombre] . '</label>';  
+//                            $html .= '</div><div class="form-group">
+//                                        <label class="checkbox-inline" style="padding-top: 0px; padding-left: 0px;">';
+//                            foreach ($cadenas as $valores) {
+//                               
+//                                $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="radio-inline">
+//                                            <input '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="radio" value="' . $valores . '" name="p' . $i . '" id="p' . $i . '"> '. $valores . ' 
+//                                          ';
+//                                
+//                                //$html .= '<input type="radio" class="form-box" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' value="' . $valores . '" size="20" name="campo_' . $i . '" id="campo_' . $i . '">'. $valores;
+//                            }
+//                            $html .= '</label>';
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
                             }
-                            $html .= '</label>';
+                            //$html .= '<select id="campo_' . $i . '" name="campo_' . $i . '" class="form-box"><option value="">Seleccione</option>';
+                            $html .= '                                             
+                                                      <select class="form-control" name="p' . $i . '" id="p' . $i . '" >
+                                                        <option selected="" value="">-- Todos --</option>';
+                            foreach ($cadenas as $valores) {
+                                $html .= '<option '. ($value[valor] == $valores? 'selected' : '') .' value="' . $valores . '">' . $valores . '</option>';
+                            }
+                            $html .= '</select>';
                             break;
                         case '10':
                             $html = substr($html, 0, strlen($html)-39-strlen($value[Nombre]));
@@ -1688,35 +1746,44 @@ function BuscaOrganizacional($tupla)
                             break;
                         case 'Seleccion Multiple':
                         case '8':
-                            $cadenas = split("<br />", $value[valores]) ;
+                            //$cadenas = split("<br />", $value[valores]) ;
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
+                            }
                             $valores_actuales = split("<br />", $value[valor]) ;
                             $j = 1;
                             $html = substr($html, 0, strlen($html)-39-strlen($value[Nombre]));
                             $html .= '<div class="form-group" style="margin-bottom: 0px;"><label>' . $value[Nombre] . '</label>';  
-                            $html .= '</div><div class="form-group">
-                                        <label class="checkbox-inline" style="padding-top: 0px; padding-left: 0px;">';
+                            $html .= '</div><div class="form-group">';
                             foreach ($cadenas as $valores) {
                                 
                                 $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="checkbox-inline">
                                             <input id="p' . $i . '_' . $j . '" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="checkbox" value="' . $valores . '" name="p' . $i . '[]"> '. $valores . ' 
-                                          </label>';
+                                          </label><br>';
                                 //$html .= '<input id="campo_' . $i . '_' . $j . '" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="checkbox" value="' . $valores . '" name="campo_' . $i . '_' . $j . '">'. $valores;
                                 
                                 $j++;
                             }
-                            $html .= '</label>';
+                           // $html .= '</label>';
                             break;
                         case 'Combo':
                         case '9':
-                            $cadenas = split("<br />", $value[valores]) ;
+                            //$cadenas = split("<br />", $value[valores]) ;
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
+                            }
                             //$html .= '<select id="campo_' . $i . '" name="campo_' . $i . '" class="form-box"><option value="">Seleccione</option>';
                             $html .= '                                             
                                                       <select class="form-control" name="p' . $i . '" id="p' . $i . '" >
-                                                        <option selected="" value="">-- Seleccione --</option>';
+                                                        <option selected="" value="">-- Todos --</option>';
                             foreach ($cadenas as $valores) {
                                 $html .= '<option '. ($value[valor] == $valores? 'selected' : '') .' value="' . $valores . '">' . $valores . '</option>';
                             }
-                            $html .= '</select>';
+                            $html .= '</select>';                            
                             break;
                         case 'Texto':
                         case '1':
@@ -1965,45 +2032,72 @@ function BuscaOrganizacional($tupla)
                     switch ($value[tipo]) {
                         case 'Seleccion Simple':
                         case '7':
-                            $cadenas = split("<br />", $value[valores]) ;
-                            $valores_actuales = split("<br/>", $value[valor]) ;
-                            $html = substr($html, 0, strlen($html)-39-strlen($value[Nombre]));
-                            $html .= '<div class="form-group" style="margin-bottom: 0px;"><label>' . $value[Nombre] . '</label>';  
-                            $html .= '</div><div class="form-group">
-                                        <label class="checkbox-inline" style="padding-top: 0px; padding-left: 0px;">';
-                            foreach ($cadenas as $valores) {
-                               
-                                $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="radio-inline">
-                                            <input '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="radio" value="' . $valores . '" name="p' . $i . '" id="p' . $i . '"> '. $valores . ' 
-                                          ';
-                                
-                                //$html .= '<input type="radio" class="form-box" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' value="' . $valores . '" size="20" name="campo_' . $i . '" id="campo_' . $i . '">'. $valores;
+                            //$cadenas = split("<br />", $value[valores]) ;
+//                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+//                            $cadenas = array();
+//                            foreach ($items_campo as $value_item) {
+//                                $cadenas[$value_item[id]] = $value_item[descripcion];
+//                            }
+//                            $valores_actuales = split("<br/>", $value[valor]) ;
+//                            $html = substr($html, 0, strlen($html)-39-strlen($value[Nombre]));
+//                            $html .= '<div class="form-group" style="margin-bottom: 0px;"><label>' . $value[Nombre] . '</label>';  
+//                            $html .= '</div><div class="form-group">
+//                                        <label class="checkbox-inline" style="padding-top: 0px; padding-left: 0px;">';
+//                            foreach ($cadenas as $valores) {
+//                               
+//                                $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="radio-inline">
+//                                            <input '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="radio" value="' . $valores . '" name="p' . $i . '" id="p' . $i . '"> '. $valores . ' 
+//                                          ';
+//                                
+//                                //$html .= '<input type="radio" class="form-box" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' value="' . $valores . '" size="20" name="campo_' . $i . '" id="campo_' . $i . '">'. $valores;
+//                            }
+//                            $html .= '</label>';
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
                             }
-                            $html .= '</label>';
+                            //$html .= '<select id="campo_' . $i . '" name="campo_' . $i . '" class="form-box"><option value="">Seleccione</option>';
+                            $html .= '                                             
+                                                      <select class="form-control" name="p' . $i . '" id="p' . $i . '" >
+                                                        <option selected="" value="">-- Todos --</option>';
+                            foreach ($cadenas as $valores) {
+                                $html .= '<option '. ($value[valor] == $valores? 'selected' : '') .' value="' . $valores . '">' . $valores . '</option>';
+                            }
+                            $html .= '</select>';
                             break;
                         case 'Seleccion Multiple':
                         case '8':
-                            $cadenas = split("<br />", $value[valores]) ;
+                            //$cadenas = split("<br />", $value[valores]) ;
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
+                            }
                             $valores_actuales = split("<br />", $value[valor]) ;
                             $j = 1;
                             $html = substr($html, 0, strlen($html)-39-strlen($value[Nombre]));
                             $html .= '<div class="form-group" style="margin-bottom: 0px;"><label>' . $value[Nombre] . '</label>';  
-                            $html .= '</div><div class="form-group">
-                                        <label class="checkbox-inline" style="padding-top: 0px; padding-left: 0px;">';
+                            $html .= '</div><div class="form-group">';
                             foreach ($cadenas as $valores) {
                                 
                                 $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="checkbox-inline">
                                             <input id="p' . $i . '_' . $j . '" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="checkbox" value="' . $valores . '" name="p' . $i . '[]"> '. $valores . ' 
-                                          </label>';
+                                          </label><br>';
                                 //$html .= '<input id="campo_' . $i . '_' . $j . '" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="checkbox" value="' . $valores . '" name="campo_' . $i . '_' . $j . '">'. $valores;
                                 
                                 $j++;
                             }
-                            $html .= '</label>';
+                           // $html .= '</label>';
                             break;
                         case 'Combo':
                         case '9':
-                            $cadenas = split("<br />", $value[valores]) ;
+                            //$cadenas = split("<br />", $value[valores]) ;
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
+                            }
                             //$html .= '<select id="campo_' . $i . '" name="campo_' . $i . '" class="form-box"><option value="">Seleccione</option>';
                             $html .= '                                             
                                                       <select class="form-control" name="p' . $i . '" id="p' . $i . '" >
@@ -2230,24 +2324,35 @@ function BuscaOrganizacional($tupla)
                     switch ($value[tipo]) {
                         case 'Seleccion Simple':
                         case '7':
-                            $cadenas = split("<br />", $value[valores]) ;
+                            //$cadenas = split("<br />", $value[valores]) ;
                             $valores_actuales = split("<br/>", $value[valor]) ;
-                            foreach ($cadenas as $valores) {
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
+                            }
+                            
+                            foreach ($cadenas as $key => $valores) {
                                
                                 $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="radio-inline">
-                                            <input '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="radio" value="' . $valores . '" name="campo_' . $i . '" id="campo_' . $i . '"> '. $valores . ' 
+                                            <input '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="radio" value="' . $key . '" name="campo_' . $i . '" id="campo_' . $i . '"> '. $valores . ' 
                                           </label>';
                              }
                             break;
                         case 'Seleccion Multiple':
                         case '8':
-                            $cadenas = split("<br />", $value[valores]) ;
+                            //$cadenas = split("<br />", $value[valores]) ;
                             $valores_actuales = split("<br />", $value[valor]) ;
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
+                            }
                             $j = 1;
-                            foreach ($cadenas as $valores) {
+                            foreach ($cadenas as $key => $valores) {
                                 
                                 $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="checkbox-inline">
-                                            <input id="campo_' . $i . '_' . $j . '" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="checkbox" value="' . $valores . '" name="campo_' . $i . '_' . $j . '"> '. $valores . ' 
+                                            <input id="campo_' . $i . '_' . $j . '" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="checkbox" value="' . $key . '" name="campo_' . $i . '_' . $j . '"> '. $valores . ' 
                                           </label>';
                                 $j++;
                             }
@@ -2255,12 +2360,17 @@ function BuscaOrganizacional($tupla)
                             break;
                         case 'Combo':
                         case '9':
-                            $cadenas = split("<br />", $value[valores]) ;
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            //$cadenas = split("<br />", $value[valores]) ;
+                            $cadenas = array();                            
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
+                            }
                             $html .= '<div class="col-md-10">                                              
                                                       <select class="form-control" name="campo_' . $i . '" id="campo_' . $i . '" data-validation="required">
                                                         <option selected="" value="">-- Seleccione --</option>';
-                            foreach ($cadenas as $valores) {
-                                $html .= '<option '. ($value[valor] == $valores? 'selected' : '') .' value="' . $valores . '">' . $valores . '</option>';
+                            foreach ($cadenas as $key => $valores) {
+                                $html .= '<option '. ($value[valor] == $valores? 'selected' : '') .' value="' . $key . '">' . $valores . '</option>';
                             }
                             $html .= '</select></div>';
                             break;
@@ -2561,12 +2671,17 @@ function BuscaOrganizacional($tupla)
                     switch ($value[tipo]) {
                         case 'Seleccion Simple':
                         case '7':
-                            $cadenas = split("<br />", $value[valores]) ;
+                            //$cadenas = split("<br />", $value[valores]) ;
                             $valores_actuales = split(",", $value[valor]) ;
-                            foreach ($cadenas as $valores) {
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
+                            }
+                            foreach ($cadenas as $key => $valores) {
                                
                                 $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="radio-inline">
-                                            <input '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="radio" value="' . $valores . '" name="campo_' . $i . '" id="campo_' . $i . '"> '. $valores . ' 
+                                            <input '. (in_array($key, $valores_actuales)? 'checked' : '') .' type="radio" value="' . $key . '" name="campo_' . $i . '" id="campo_' . $i . '"> '. $valores . ' 
                                           </label>';
                                 
                                 //$html .= '<input type="radio" class="form-box" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' value="' . $valores . '" size="20" name="campo_' . $i . '" id="campo_' . $i . '">'. $valores;
@@ -2574,13 +2689,18 @@ function BuscaOrganizacional($tupla)
                             break;
                         case 'Seleccion Multiple':
                         case '8':
-                            $cadenas = split("<br />", $value[valores]) ;
+                            //$cadenas = split("<br />", $value[valores]) ;
                             $valores_actuales = split(",", $value[valor]) ;
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
+                            }
                             $j = 1;
-                            foreach ($cadenas as $valores) {
+                            foreach ($cadenas as $key => $valores) {
                                 
                                 $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="checkbox-inline">
-                                            <input id="campo_' . $i . '_' . $j . '" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="checkbox" value="' . $valores . '" name="campo_' . $i . '_' . $j . '"> '. $valores . ' 
+                                            <input id="campo_' . $i . '_' . $j . '" '. (in_array($key, $valores_actuales)? 'checked' : '') .' type="checkbox" value="' . $key . '" name="campo_' . $i . '_' . $j . '"> '. $valores . ' 
                                           </label>';
                                 //$html .= '<input id="campo_' . $i . '_' . $j . '" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="checkbox" value="' . $valores . '" name="campo_' . $i . '_' . $j . '">'. $valores;
                                 
@@ -2590,13 +2710,18 @@ function BuscaOrganizacional($tupla)
                             break;
                         case 'Combo':
                         case '9':
-                            $cadenas = split("<br />", $value[valores]) ;
+                            //$cadenas = split("<br />", $value[valores]) ;
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
+                            }
                             //$html .= '<select id="campo_' . $i . '" name="campo_' . $i . '" class="form-box"><option value="">Seleccione</option>';
                             $html .= '<div class="col-md-10">                                              
                                                       <select class="form-control" name="campo_' . $i . '" id="campo_' . $i . '" data-validation="required">
                                                         <option selected="" value="">-- Seleccione --</option>';
-                            foreach ($cadenas as $valores) {
-                                $html .= '<option '. ($value[valor] == $valores? 'selected' : '') .' value="' . $valores . '">' . $valores . '</option>';
+                            foreach ($cadenas as $key => $valores) {
+                                $html .= '<option '. ($value[valor] == $key? 'selected' : '') .' value="' . $key . '">' . $valores . '</option>';
                             }
                             $html .= '</select></div>';
                             break;
@@ -2729,6 +2854,8 @@ function BuscaOrganizacional($tupla)
                     //$html .= '<input id="validacion_' . $i . '" type="hidden" value="' . $value[validacion] . '" name="validacion_' . $i . '">';
                     $html .= '<input id="valores_' . $i . '" type="hidden" value="' . $value[valores] . '" name="valores_' . $i . '">';
                     $html .= '<input id="id_atributo_' . $i . '" type="hidden" value="' . $value[id_unico] . '" name="id_atributo_' . $i . '">';
+                    if (strlen($value[idRegistro]) == 0)
+                        $html .= '<input id="id_unico_campo_new_' . $i . '" type="hidden" value="' . $value[id_unico] . '" name="id_unico_campo_new_' . $i . '">';
                     $html .= '</div>';
                     $i++;
                 }
@@ -2837,6 +2964,9 @@ function BuscaOrganizacional($tupla)
                                     $params['id_usuario']= $_SESSION['USERID'];
                                     $params[idRegistro] = $parametros[id];
                                     $params[id_unico] = $parametros["id_atributo_$i"];
+                                    if (isset($parametros["id_unico_campo_new_$i"]))
+                                        $params['nuevo'] = 1;
+                                    else $params['nuevo'] = 0;
                                     $this->modificarRegistrosCampoDinamico($params);
                                     
                                 }

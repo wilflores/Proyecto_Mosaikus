@@ -2,12 +2,12 @@
 <div class="tabs"> 
 <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">
         <li><a href="#hv-orange-2" data-toggle="tab">Listado de Evidencias</a></li>  
-        <li><a href="#hv-red-2" data-toggle="tab">Agregar Evidencias</a></li>
+        <li><a href="#hv-red-2" style="{DISPLAY_AM}" data-toggle="tab">Agregar Evidencias</a></li>
               
     </ul>
 
 <div id="my-tab-content" class="tab-content"  style="padding: 45px 3%;">
-    <div class="tab-pane active" id="hv-red-2">
+    <div class="tab-pane active" id="hv-red-2" style="{DISPLAY_AM}">
         <form id="idFormulario-hv-2" class="form-horizontal" role="form">
             <div class="form-group">
                 <label for="fecha_evi" class="col-md-4 control-label" style="color: black;">{N_FECHA_EVI}</label>

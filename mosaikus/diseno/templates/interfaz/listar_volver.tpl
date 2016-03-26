@@ -71,17 +71,13 @@
                             <?php include 'treemenu.php' ?>
                         </div>
                         <div  class="table-container scrollable">
-                            
-                            <br>
-                           
+                            {DIV_ARBOL_ORGANIZACIONAL}
+                            <br>                           
                         </div>   
-
-                              {DIV_ARBOL_ORGANIZACIONAL}
-                              <br>
-                              <?php include 'treemenu.php' ?>
-                              {DIV_ARBOL_PROCESO}
-                              <br>
-                              <?php include 'treemenu.php' ?>
+                        <div  class="table-container scrollable">
+                            <br>
+                            {DIV_ARBOL_PROCESO} 
+                        </div>                              
                    
                       </div>
 
