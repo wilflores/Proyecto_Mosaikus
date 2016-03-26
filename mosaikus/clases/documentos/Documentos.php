@@ -677,11 +677,33 @@
                                 )";
                     //echo $sql;
                     $this->dbl->insert_update($sql);
+                    $sql = "SELECT MAX(id_unico) total_registros
+                         FROM mos_documentos_datos_formulario";
+                    $total_registros = $this->dbl->query($sql, $atr);
+                    $num_viaje = $total_registros[0][total_registros];                
+                    return $num_viaje;     
                     return "El Cargo '$atr[cod_cargo]' ha sido ingresado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
                         if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
                             return "Ya existe una sección con el mismo nombre.";                        
+                        return $error; 
+                    }
+            }
+            
+            public function actualizarCamposFormulario($atr){
+                try {
+                    $atr = $this->dbl->corregir_parametros($atr);                    
+                    $sql = "UPDATE mos_documentos_datos_formulario "
+                            . " SET orden = $atr[orden], Nombre = '$atr[nombre]', valores = '$atr[valores]'
+                            WHERE id_unico = $atr[id_unico]";
+                    //echo $sql;
+                    $this->dbl->insert_update($sql);
+                    return "El Cargo '$atr[cod_cargo]' ha sido ingresado con exito";
+                } catch(Exception $e) {
+                        $error = $e->getMessage();                     
+                        if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
+                            return "Ya existe una secciÃ³n con el mismo nombre.";                        
                         return $error; 
                     }
             }
@@ -1180,6 +1202,7 @@
                                 ,orden
                                 -- ,1 cant
                                 ,(SELECT count(*) FROM mos_registro_formulario WHERE id_unico =  mos_documentos_datos_formulario.id_unico) cant
+                                ,(SELECT count(*) FROM mos_registro_item WHERE id_unico =  mos_documentos_datos_formulario.id_unico) cant_2
                             FROM mos_documentos_datos_formulario  
                             
                             WHERE IDDoc = $atr[id] ORDER BY orden"; 
@@ -2271,6 +2294,7 @@
                 $contenido_1['DESC_OPERACION'] = "Guardar";
                 $contenido_1['OPC'] = "new";
                 $contenido_1['ID'] = "-1";
+                $contenido_1['TOK_NEW'] = time();
 
                 $template->setVars($contenido_1);
                 $objResponse = new xajaxResponse();               
@@ -2283,8 +2307,8 @@
                             lang: 'es'  
                           });");
                 $objResponse->addScript("$('#fecha').datepicker();");
-                $objResponse->addScript("$('#tabs-hv').tab();"
-                        . "$('#tabs-hv a:first').tab('show');");
+                $objResponse->addScript("$('#tabs-hv-2').tab();"
+                        . "$('#tabs-hv-2 a:first').tab('show');");
                 $objResponse->addScript($js);
                 return $objResponse;
             }
@@ -2599,14 +2623,25 @@
                                 $params[nombre] = $parametros["nombre_din_$i"];
                                 $params[tipo] = $parametros["tipo_din_$i"];                                
                                 $params[orden] = $parametros["orden_din_$i"];  
-                                if (($params[tipo] == "7")||($params[tipo] == "8")||($params[tipo] == "9" )||($params[tipo] == "13" )){
+                                //if (($params[tipo] == "7")||($params[tipo] == "8")||($params[tipo] == "9" )||($params[tipo] == "13" )){
+                                if (($params[tipo] == "13" )){  
                                     $params[valores] = str_replace("\n", "<br />", $parametros["valores_din_$i"]); 
                                 }
                                 else $params[valores] = '';
                                  
                                 
                                 //echo $parametros["cuerpo_$i"];
-                                $this->ingresarCamposFormulario($params);
+                                $id_unico = $this->ingresarCamposFormulario($params);
+                                if (($params[tipo] == "7")||($params[tipo] == "8")||($params[tipo] == "9" )){
+                                    $sql = 'INSERT INTO mos_documentos_formulario_items(fk_id_unico, descripcion, vigencia, tipo)'
+                                            . ' SELECT ' . $id_unico . ', descripcion, vigencia, '.$params[tipo] . ' '
+                                            . ' FROM mos_documentos_formulario_items_temp '
+                                            . ' WHERE tok = ' . $parametros[tok_new_edit] . ' AND id_usuario = ' . $_SESSION['CookIdUsuario'] . ' '
+                                            . ' AND fk_id_unico = ' . $parametros["cmb_din_$i"] . ' AND estado = 1';
+                                    //echo $sql;
+                                    $this->dbl->insert_update($sql);
+                                    
+                                }
                             }
                         }
                         try{
@@ -2898,35 +2933,78 @@
                 $item = "";
                 $js = "";
                 $i = 0;
+                $contenido_1['TOK_NEW'] = time();
                 $ids = array('7','8','9','1','2','3','5','6','10','11','12','13','14');
-                $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo', 'Árbol Organizacional', 'Árbol Procesos','Vigencia','Cargo');
+                $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','SemÃ¡foro', 'Ã�rbol Organizacional', 'Ã�rbol Procesos','Vigencia','Cargo');
                 
                 //$ids = array('7','8','9','1','2','3','5','6','10');
                 //$desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo');
                 foreach ($data as $value) {                          
                     $i++;
                     //echo $i;
-                    
+                    /*CARGA de items temporal para campos combo, seleccion simple y multiple*/
+                    if (($value[tipo] == 7) || ($value[tipo] == 8) || ($value[tipo] == 9)){
+                            $sql = "INSERT INTO mos_documentos_formulario_items_temp(fk_id_unico, descripcion, vigencia, tipo, fk_id_item, id_usuario, tok, estado)"
+                                    . " SELECT fk_id_unico, descripcion, vigencia, tipo, id, $_SESSION[CookIdUsuario],$contenido_1[TOK_NEW],0 "
+                                    . " FROM mos_documentos_formulario_items"
+                                    . " WHERE fk_id_unico = $value[id_unico] ";
+                            $this->dbl->insert_update($sql);
+                            $sql = "SELECT 
+                                    descripcion
+                                    ,vigencia
+                                    
+                                     
+                            FROM mos_documentos_formulario_items_temp 
+                            WHERE tok = $contenido_1[TOK_NEW] and id_usuario = $_SESSION[CookIdUsuario] and fk_id_unico = $value[id_unico] ORDER BY descripcion";
+                            $data_items = $this->dbl->query($sql);
+                            $value[valores] = '';
+                            foreach ($data_items as $value_items) {
+                                $value[valores] .= $value_items[descripcion] . '<br />';                                
+                                
+                            }
+                            $value[valores] = substr($value[valores], 0, strlen($value[valores])-6);
+                            
+                        }
                     $item = $item. '<tr id="tr-esp-' . $i . '">';                      
-                    if ($value[cant]*1 > 0){
+                    
+                    if (($value[cant]*1 > 0) || ($value[cant_2]*1 > 0)){
                         $item = $item. '<td align="center">'.
                                 '<i class="subir glyphicon glyphicon-arrow-up cursor-pointer"></i>
                                 <i class="bajar glyphicon glyphicon-arrow-down cursor-pointer"></i>' .
                                 '<input id="id_unico_din_'. $i . '" name="id_unico_din_'. $i . '" value="'.$value[id_unico].'" type="hidden" >'.
+                                '<input id="cmb_din_'. $i . '" type="hidden" name="cmb_din_'. $i . '" tok="' . $i . '" value="'.$value[id_unico].'">'.
                                 '<input id="orden_din_'. $i . '" name="orden_din_'. $i . '" value="'.$value[orden].'" type="hidden" >'.
                                             '&nbsp;' .                                             
                                        '  </td>';
                          $item = $item. '<td class="td-table-data">'.
-                                             '<input value="'.$value[Nombre].'" readonly="" class="form-control" type="text" size="15" >'.
+                                             '<input id="nombre_din_'. $i . '" value="'.$value[Nombre].'"  class="form-control" type="text" size="15" name="nombre_din_'. $i . '">'.
                                         '</td>';
                          
                          $item = $item. '<td>' .                                            
-                                            '<input id="tipo_din_'. $i . '" value="'.$desc[array_search($value["tipo"],$ids)].'" readonly="" class="form-control" type="text" size="15" >'.
+                                            '<input value="'.$desc[array_search($value["tipo"],$ids)].'" readonly="" class="form-control" type="text" size="15" >'.
+                                            '<input id="tipo_din_'. $i . '" name="tipo_din_'. $i . '" value="'.$value["tipo"].'" readonly="" class="form-control" type="hidden" size="15" >'.
                                          '</td>';
+//                         $item = $item.  '<td>' .
+//                           ' <textarea cols="30" id="valores_din_'. $i . '" name="valores_din_'. $i . '" rows="2" readonly="">'. str_replace("<br />", "<br>", $value[valores]) .'</textarea>'.
+//                        '</td>';
                          $item = $item.  '<td>' .
-                           ' <textarea cols="30" id="valores_din_'. $i . '" name="valores_din_'. $i . '" rows="2" readonly="">'. str_replace("<br />", "<br>", $value[valores]) .'</textarea>'.
-                        '</td>';
-                        
+                                            ' <textarea id="valores_din_'. $i . '" cols="30" rows="2" name="valores_din_'. $i . '" readonly="" class="form-control">'. str_replace("<br />", "<br>", $value[valores]) .'</textarea>'.
+                                         '</td>';
+                         $item = $item. '<td>' .
+                                            '<i class="icon icon-more cursor-pointer" style="display:none;" id="ico_cmb_din_'. $i . '" tok="'. $i .'"></i>'.
+                                         '</td>';
+                        $js .= '$("#ico_cmb_din_'. $i .'").click(function(e){ 
+                                    e.preventDefault();
+                                    var id = $(this).attr("tok");            
+                                    array = new XArray();
+                                    array.setObjeto("ItemsFormulario","indexItemsFormulario");
+                                    array.addParametro("tok",id);
+                                    array.addParametro("id",$("#cmb_din_"+id).val());
+                                    array.addParametro("titulo",$("#nombre_din_"+id).val());
+                                    array.addParametro("token", $("#tok_new_edit").val());
+                                    array.addParametro("import","clases.items_formulario.ItemsFormulario");
+                                    xajax_Loading(array.getArray());
+                                }); ';
                         $js .= "actualizar_atributo_dinamico($i);";
                         $item = $item. '</tr>' ;  
                     }else
@@ -2936,21 +3014,31 @@
                         $item = $item. '<td align="center">'.
                                             ' <a href="' . $i . '"  title="Eliminar " id="eliminar_esp_' . $i . '"> ' . 
                                             //' <imgsrc="diseno/images/ico_eliminar.png" style="cursor:pointer">' . 
-                                             '<i class="icon icon-remove"></i>'.
+                                             '<i class="icon icon-remove" style="width: 18px;"></i>'.
                                              '</a>' .
                                              '<i class="subir glyphicon glyphicon-arrow-up cursor-pointer"></i>
                                               <i class="bajar glyphicon glyphicon-arrow-down cursor-pointer"></i>'.
+                                              
+                                              '<input id="id_unico_din_'. $i . '" name="id_unico_din_'. $i . '" value="'.$value[id_unico].'" type="hidden" >'.
+                                              '<input id="cmb_din_'. $i . '" type="hidden" name="cmb_din_'. $i . '" tok="' . $i . '" value="'.$value[id_unico].'">'.
                                               '<input id="orden_din_'. $i . '" name="orden_din_'. $i . '" value="'.$value[orden].'" type="hidden" >'.
                                        '  </td>';
                          $item = $item. '<td class="td-table-data">'.
                                              '<input id="nombre_din_'. $i . '" value="'.$value[Nombre].'" class="form-control" type="text" data-validation="required" size="15" maxlength="20" name="nombre_din_'. $i . '">'.
                                         '</td>';
-                         $item = $item. '<td>' .
-                                            $ut_tool->combo_array("tipo_din_$i", $desc, $ids, false, $value["tipo"],"actualizar_atributo_dinamico($i);")  .
+                         $item = $item. '<td>' .                                            
+                                            '<input value="'.$desc[array_search($value["tipo"],$ids)].'" readonly="" class="form-control" type="text" size="15" >'.
+                                            '<input id="tipo_din_'. $i . '" name="tipo_din_'. $i . '" value="'.$value["tipo"].'" readonly="" class="form-control" type="hidden" size="15" >'.
                                          '</td>';
+//                         $item = $item. '<td>' .
+//                                            $ut_tool->combo_array("tipo_din_$i", $desc, $ids, false, $value["tipo"],"actualizar_atributo_dinamico($i);")  .
+//                                         '</td>';
                          $item = $item.  '<td>' .
-                           ' <textarea id="valores_din_'. $i . '" cols="30" rows="2" name="valores_din_'. $i . '" readonly="">'. str_replace("<br />", "<br>", $value[valores]) .'</textarea>'.
-                        '</td>';
+                                            ' <textarea id="valores_din_'. $i . '" cols="30" rows="2" name="valores_din_'. $i . '" readonly="" class="form-control">'. str_replace("<br />", "<br>", $value[valores]) .'</textarea>'.
+                                         '</td>';
+                         $item = $item. '<td>' .
+                                            '<i class="icon icon-more cursor-pointer" style="display:none;" id="ico_cmb_din_'. $i . '" tok="'. $i .'"></i>'.
+                                         '</td>';
                         
                         
                         $item = $item. '</tr>' ;                    
@@ -2961,7 +3049,20 @@
                                     var parent = $(this).parents().parents().get(0);
                                         $(parent).remove();
                             });';
+                        $js .= '$("#ico_cmb_din_'. $i .'").click(function(e){ 
+                                    e.preventDefault();
+                                    var id = $(this).attr("tok");            
+                                    array = new XArray();
+                                    array.setObjeto("ItemsFormulario","indexItemsFormulario");
+                                    array.addParametro("tok",id);
+                                    array.addParametro("id",$("#cmb_din_"+id).val());
+                                    array.addParametro("titulo",$("#nombre_din_"+id).val());
+                                    array.addParametro("token", $("#tok_new_edit").val());
+                                    array.addParametro("import","clases.items_formulario.ItemsFormulario");
+                                    xajax_Loading(array.getArray());
+                                }); ';
                         $js .= "actualizar_atributo_dinamico($i);";
+                        
                     }
                 }               
                 $contenido_1['ITEMS_ESP'] = $item;
@@ -2994,8 +3095,8 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");
-                $objResponse->addScript("$('#tabs-hv').tab();"
-                        . "$('#tabs-hv a:first').tab('show');");
+                $objResponse->addScript("$('#tabs-hv-2').tab();"
+                        . "$('#tabs-hv-2 a:first').tab('show');");
                 $objResponse->addScript("$js");
                 $objResponse->addScript("$js_din");
                 //$objResponse->addScript("$('#fecha').datepicker();");
@@ -3109,31 +3210,72 @@
                         }
                         $campos_dinamicos = new Parametros();
                         $campos_dinamicos->guardar_parametros_dinamicos($parametros, 1);
-                        $sql = "DELETE FROM mos_documentos_datos_formulario WHERE IDDoc = $parametros[id] "
-                                . " AND NOT id_unico IN (SELECT id_unico FROM mos_registro_formulario WHERE IDDoc = $parametros[id]) ";                               
-                        $this->dbl->insert_update($sql);
+//                        $sql = "DELETE FROM mos_documentos_datos_formulario WHERE IDDoc = $parametros[id] "
+//                                . " AND NOT id_unico IN (SELECT id_unico FROM mos_registro_formulario WHERE IDDoc = $parametros[id]) ";                               
+//                        $this->dbl->insert_update($sql);
                         $params[IDDoc] = $parametros[id];
                         for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
                             //echo $parametros["nro_pts_$i"];
-                            if (isset($parametros["nombre_din_$i"])){                                
+                            if (!isset($parametros["id_unico_din_$i"])){                                
                                 //$atr[IDDoc],'$atr[nombre]','$atr[tipo]','$atr[valores]'
                                 $params[nombre] = $parametros["nombre_din_$i"];
                                 $params[tipo] = $parametros["tipo_din_$i"];                                
                                 $params[orden] = $parametros["orden_din_$i"];  
-                                if (($params[tipo] == "7")||($params[tipo] == "8")||($params[tipo] == "9")||($params[tipo] == "13" )){
+                                //if (($params[tipo] == "7")||($params[tipo] == "8")||($params[tipo] == "9")||($params[tipo] == "13" )){
+                                if (($params[tipo] == "13" )){ 
                                     $params[valores] = str_replace("\n", "<br />", $parametros["valores_din_$i"]); 
                                 }
                                 else $params[valores] = '';
                                  
                                 
                                 //echo $parametros["cuerpo_$i"];
-                                $this->ingresarCamposFormulario($params);
+                                //$this->ingresarCamposFormulario($params);
+                                
+                                $id_unico = $this->ingresarCamposFormulario($params);
+                                if (($params[tipo] == "7")||($params[tipo] == "8")||($params[tipo] == "9" )){
+                                    $sql = 'INSERT INTO mos_documentos_formulario_items(fk_id_unico, descripcion, vigencia, tipo)'
+                                            . ' SELECT ' . $id_unico . ', descripcion, vigencia, '.$params[tipo] . ' '
+                                            . ' FROM mos_documentos_formulario_items_temp '
+                                            . ' WHERE tok = ' . $parametros[tok_new_edit] . ' AND id_usuario = ' . $_SESSION['CookIdUsuario'] . ' '
+                                            . ' AND fk_id_unico = ' . $parametros["cmb_din_$i"] . ' AND estado = 1';
+                                    //echo $sql;
+                                    $this->dbl->insert_update($sql);
+                                    
+                                }
                             }
                             else
-                                if (isset($parametros["valores_din_$i"])){ 
+                                //if (isset($parametros["valores_din_$i"]))
+                                { 
                                     $params[orden] = $parametros["orden_din_$i"];  
+                                    $params[nombre] = $parametros["nombre_din_$i"];
+                                    $params[tipo] = $parametros["tipo_din_$i"];                                
+                                    $params[orden] = $parametros["orden_din_$i"]; 
                                     $params[id_unico] = $parametros["id_unico_din_$i"];  
-                                    $this->actualizarOrdenCamposFormulario($params);
+                                    if (($params[tipo] == "13" )){ 
+                                        $params[valores] = str_replace("\n", "<br />", $parametros["valores_din_$i"]); 
+                                    }
+                                    else $params[valores] = '';
+                                    $this->actualizarCamposFormulario($params);
+                                    $sql = 'INSERT INTO mos_documentos_formulario_items(fk_id_unico, descripcion, vigencia, tipo)'
+                                            . ' SELECT ' . $params[id_unico] . ', descripcion, vigencia, '.$params[tipo] . ' '
+                                            . ' FROM mos_documentos_formulario_items_temp '
+                                            . ' WHERE tok = ' . $parametros[tok_new_edit] . ' AND id_usuario = ' . $_SESSION['CookIdUsuario'] . ' '
+                                            . ' AND fk_id_unico = ' . $parametros["cmb_din_$i"] . ' AND estado = 1';
+                                    //echo $sql;
+                                    $this->dbl->insert_update($sql);
+                                    $sql = 'update mos_documentos_formulario_items,mos_documentos_formulario_items_temp
+                                            set mos_documentos_formulario_items.descripcion = mos_documentos_formulario_items_temp.descripcion,
+                                            mos_documentos_formulario_items.vigencia = mos_documentos_formulario_items_temp.vigencia
+                                            where id_usuario = ' . $_SESSION['CookIdUsuario'] . ' and tok = ' . $parametros[tok_new_edit] . ' and mos_documentos_formulario_items_temp.fk_id_unico = ' . $parametros["cmb_din_$i"] . ' and mos_documentos_formulario_items.id = mos_documentos_formulario_items_temp.fk_id_item and estado = 2';
+                                    //echo $sql;
+                                    $this->dbl->insert_update($sql);
+                                    $sql = 'delete from mos_documentos_formulario_items
+                                            where id in (select fk_id_item from mos_documentos_formulario_items_temp 
+                                            where id_usuario = ' . $_SESSION['CookIdUsuario'] . ' and tok = ' . $parametros[tok_new_edit] . ' and fk_id_unico = '. $params[id_unico] .' and estado = 3)
+                                            and 0 = (SELECT count(*) from mos_registro_item where id_unico = fk_id_unico and tipo = mos_documentos_formulario_items.tipo and id = valor)';
+                                    //echo $sql;
+                                    $this->dbl->insert_update($sql);
+                                    
                                 }
                         }
                         $objResponse->addScriptCall("MostrarContenido");

@@ -44,7 +44,7 @@
                                     <div class="col-md-10">
                                         <p class="form-control-static" style="">
                                             <!--<img src="{PAHT_TO_IMG}adjunto.png">-->
-                                            <input type="text" class="form-control" style="width: 250px;display: inline;" id="info_nombre" readonly="readonly" name="info_nombre" value="{NOMBRE_DOC}">
+                                            <input type="text" class="form-control" style="width: 250px;display: inline;" id="info_nombre" readonly="readonly" name="info_nombre" value="{NOMBRE_DOC_AUX}">
                                             <!--<span id="info_nombre" style="display:inline;">{TXT_OTRO_METODO}&nbsp;</span>-->                                            
                                         </p>                      
                                   </div>         
@@ -54,7 +54,7 @@
                                         <label for="doc_fisico" class="col-md-6 control-label">{N_DOC_FISICO}</label>
                                         <div class="col-md-6">
                                           
-                                      </div>                                
+                                      </div>                                 
                                   </div>
 <div class="form-group">
                                         <label for="contentType" class="col-md-6 control-label">{N_CONTENTTYPE}</label>
@@ -146,12 +146,12 @@
                                     </div>
                                     <div class="col-md-15">
                                         <div class="tabs"> 
-                                        <ul id="tabs-hv" class="nav nav-tabs" data-tabs="tabs">
-                                            <li><a href="#hv-red" data-toggle="tab">Otros Datos</a></li>
-                                            <li><a href="#hv-orange" data-toggle="tab" id="tabs-form-reg" >Formulario para Registros</a></li>                                                    
+                                        <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">
+                                            <li><a href="#hv-red-2" data-toggle="tab">Otros Datos</a></li>
+                                            <li><a href="#hv-orange-2" data-toggle="tab" id="tabs-form-reg" >Parámetros para Indexación de Registros</a></li>                                                    
                                         </ul>
                                         <div id="my-tab-content" class="tab-content" style="padding: 45px 15px;">
-                                            <div class="tab-pane active" id="hv-red">
+                                            <div class="tab-pane active" id="hv-red-2">
                                                 <div class="form-group">
                                                     <label for="vigencia" class="col-md-6 control-label">{N_VIGENCIA}</label>
                                                     <div class="col-md-14">      
@@ -191,29 +191,35 @@
                                                 </div>
                                                 {OTROS_CAMPOS}
                                             </div>
-                                               <div class="tab-pane active" id="hv-orange">
+                                               <div class="tab-pane active" id="hv-orange-2">
                                                    <input type="hidden" id="num_items_esp" name="num_items_esp" value="{NUM_ITEMS_ESP}"/> 
+                                                   <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="{TOK_NEW}"/>
                                                    <!--<input type="button" class="button add" value="Agregar" onClick="agregar_esp();" >-->
                                                    <button type="button" onClick="agregar_esp();" class="btn btn-primary  btn-xs">Agregar</button>
                                                     <table id="table-items-esp" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">
                                                         <thead>
                                                             <tr bgcolor="#FFFFFF" height="30px">
-                                                                <th width="5%">
-                                                        <div align="left" style="width: 50px;"> </div>
+                                                                <th width="10%">
+                                                                    <div align="left" style="width: 50px;"> </div>
                                                                 </th>
-                                                                <th width="20%">
+                                                                <th width="25%">
                                                                     <div align="left">
                                                                         <div style="cursor:pointer;display:inline;">Nombre</div>
                                                                     </div>
                                                                 </th>
-                                                                <th width="18%">
+                                                                <th width="25%">
                                                                     <div align="left">
                                                                         <div style="cursor:pointer;display:inline;">Tipo</div>
                                                                     </div>
                                                                 </th>
-                                                                <th width="20%">
+                                                                <th width="35%">
                                                                     <div align="left">
                                                                         <div style="cursor:pointer;display:inline;">Valores</div>                                                
+                                                                    </div>
+                                                                </th>
+                                                                <th width="5%">
+                                                                    <div align="left">
+                                                                        <div style="cursor:pointer;display:inline;">&nbsp;</div>                                                
                                                                     </div>
                                                                 </th>
                                                                 
