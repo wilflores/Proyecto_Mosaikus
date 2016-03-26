@@ -1,68 +1,152 @@
-<?php
-	include_once('configuracion/configuracion.php');
+<!DOCTYPE html>
+<html lang="en">
 
-session_name($GLOBALS[SESSION]);
-session_start();
-session_unset();
-?>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-<link href="diseno/css/mos_style.css" rel="stylesheet" type="text/css">
-<link href="estilos/jquery.css" rel="stylesheet" type="text/css">
+    <title>Mosaikus</title>
+    <!-- Bootstrap Core CSS -->
+    <link
+        href='https://fonts.googleapis.com/css?family=Roboto:400,700,300,700italic,400italic,300italic'
+        rel='stylesheet' type='text/css'>
 
-<body topmargin="0" leftmargin="0" background="diseno/images/Fondo.png" style="overflow:hidden;">
-<form name="FrmPrincipalG" action=""method="post">
-<table width="100%" align="center" border="0" cellpadding="0" cellspacing="0" >
-	<tr>
-	<td width="100%" align="right" valign="top" ></td>
-	</tr>
-	<tr>
-	<td width="100%" align="right" >
+    <link href="vendor/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet">
+    <!-- jstree -->
+    <link href="dist/css/jstree-mosaikus/style.css" rel="stylesheet">
+    <link href="dist/css/styles.css" rel="stylesheet">
+</head>
 
-</td>
-	</tr>
-	<tr>
-<tr><td><br /></td></tr>
-	<td align="center">
-<br/>
-
-<table width="50%" align="center" border="0"  background="diseno/images/FondoDIV.png" cellpadding="5" cellspacing="0" >
-			<tr align="center" >
-			<td  colspan="5" align="center" >&nbsp;</td>
-			</tr>
-			<tr align="center" >
-			<td colspan="5" align="center" ></td>
-			</tr>
-			<tr align="center" >
-			<td width="3%" class="LetraGris_delgado" align="left" ></td>
-			<td  colspan="3"class="LineasBlancasDIV" align="left" ><br /><br /><br />Su sesión ha caducado.<?
-/*
-echo "Unidad = ".$CookNomUnidad."  Emp = ".$CookNomEmpresa."  Filial = ".$CookFilial."  Nuser =  ".$CookNamUsuario;
-echo " IdEmp = ".$CookIdEmpresa."  IdUS = ".$CookIdUsuario."  BD =".$Cookdatabase."  LOG = ".$CookLogginBD."  PWD = ".$CookPasswordDB;
+<body>
+<!-- #page-wrapper -->
+<div id="page-wrapper" class="page-sesion-caducada">
+    <!-- #page -->
+    <div id="page" class="page">
 
 
-*/?></td>
-			<td width="3%" class="LetraGris_delgado" align="left" ></td>
-			</tr>
-			<tr>
-<tr align="center" >
-			<td  colspan="5" align="left" ><br/></td>
-			</tr>
-			<td width="3%" align="left"  class="InputRojo"></td>
-                        <td colspan="3" align="left" ><a href="../msks/index.php"><span class="LetraBlanca10Link">Retornar a Página Principal</span></a></td>
-			<td width="3%" class="LetraGris" align="left" ></td>
-			</tr>
-			<tr align="center" >
-			<td  colspan="5" align="left" ></td>
-			</tr>
-		</table>
+        <!-- #header -->
+        <div class=" header-wrap">
+            <header class=" header">
+
+                <?php //include '..\templates\components\client-info.php' ?>
+                <!-- .branding Logotipo -->
+                <div class="branding">
+                    <a class="logo" href="#">
+                        <img src="dist/images/logo.png" title="">
+                    </a>
+                </div>
+                <!-- .branding Fin Logotipo -->
+                <!-- .status-bar -->
+<!--                --><?php //include 'templates\components\status-bar.php' ?>
+                <!-- Fin  .status-bar -->
+            </header>
+        </div>
+        <!-- Fin #header -->
+
+
+        <!-- .content-wrap  -->
+        <div class=" content-wrap">
+            <!-- #nav  Navegaci�n  -->
+<!--            <nav id="nav" class="col">-->
+<!--                --><?php //include 'templates\example\menu.php' ?>
+<!--            </nav>-->
+<!--            <!-- #nav Nevegaci�n -->
+<!--            --><?php //include 'templates\components\alert.php' ?>
+            <!-- .panels -->
+            <div class="panels">
+
+
+                <div class="container-fluid">
+                    <div class="row">
+
+                        <!-- .panel Panel Busqueda  -->
+<!--                        <div id="search"-->
+<!--                             class=" panel-hidden  panel-container col-md-offset-1  col-xs-4 ">-->
+<!--                            <div class="content-panel panel">-->
+<!--                                <div class="content">-->
+<!---->
+<!--<!--                                    --><?php ////include 'templates\components\search.php' ?>
+<!---->
+<!--                                </div>-->
+<!--                            </div>-->
+<!---->
+<!---->
+<!--                        </div>-->
+                        <!-- Fin .panel Panel Busqueda -->
+
+                        <!-- .panel Panel Contenido -->
+                        <div id="sesion-caducada" class=" col-md-offset-1 panel-container col-xs-23 ">
+
+<!--                            <a class="search-show" >-->
+<!--                                <i class="glyphicon glyphicon-search" data-toggle="collapse"  href="#search"></i>-->
+<!--                            </a>-->
+
+                            <div class="content-panel panel">
+                                <div class="content">
+
+                                    <div class="caducada"> 
+    <div class="head">
+        <h4>Su sesión ha caducado.</h4>
+    </div>
+    <div class="body">
+        <a href="../msks/index.php"> Retornar a Página Principal</a>
+    </div>
+</div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- Fin .panel Panel Contenido -->
+                        <!-- .panel Panel Detalle -->
+<!--                        <div id="detail-content" class=" panel-hidden panel-container col-xs-7 ">-->
+<!---->
+<!--                            <div class="content-panel panel">-->
+<!--                                <div class="content">-->
+<!--                                    <a class="close-detail"   href="#search">-->
+<!--                                        <i class="glyphicon glyphicon-remove"></i>-->
+<!--                                    </a>-->
+<!--                                    --><?php //include 'templates\base\detail.php' ?>
+<!---->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+                        <!-- Fin .panel Panel Detalle -->
 
 
 
-	</td></tr>
-	</table>
-</form>
+                    </div>
+                </div>
+            </div>
+            <!-- Fin .panels -->
+
+        </div>
+        <!-- Fin content-wrap Area de Contenido -->
+
+    </div>
+    <!-- Fin #page -->
+</div>
+<!-- Fin #page-wrapper -->
+
+
+<!-- jQuery -->
+<script src="../vendor/jquery/dist/jquery.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script
+    src="../vendor/bootstrap-sass/assets/javascripts/bootstrap.min.js"></script>
+
+<!-- jstree -->
+<script src="../vendor/jstree/dist/jstree.min.js"></script>
+<!-- Scrollbar ------------------>
+<script src="../vendor/perfect-scrollbar/js/perfect-scrollbar.jquery.js" type="application/javascript"></script>
+
+<!-- Scripts personalizaods -->
+
+
+<script src="../dist/js/ui.js"></script>
+
 </body>
-</html>
-
-
