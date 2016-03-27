@@ -180,7 +180,7 @@
                                                 </div>
                                                      {OTROS_CAMPOS}
                                                </div>
-                                               <div class="tab-pane active" id="hv-orange-2"> 
+                                               <div class="tab-pane active" id="hv-orange-2">
                                                    <input type="hidden" id="num_items_esp" name="num_items_esp" value="{NUM_ITEMS_ESP}"/> 
                                                    <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="{TOK_NEW}"/>
                                                    <!--<input type="button" class="button add" value="Agregar" onClick="agregar_esp();" >-->

@@ -28,7 +28,7 @@ function CambiaSinAcento($Texto)
     //echo $_POST['MAX_FILE_SIZE'];
     //echo $_FILES['fileUpload']['size'];
     //print_r($_FILES);
-    if (isset($_FILES['fileUpload']['name']) && ($_FILES['fileUpload']['size'] <= $_POST['MAX_FILE_SIZE']) && ($_FILES['fileUpload']['size']!= 0)) {
+    if (isset($_FILES['fileUpload']['name']) && ($_FILES['fileUpload']['size'] <= 1024*1024*3) && ($_FILES['fileUpload']['size']!= 0)) {
         switch (trim($type)){
             case 'application/msword':
                 $tipo = 'doc';
@@ -71,16 +71,30 @@ function CambiaSinAcento($Texto)
                     $tamano = filesize(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($_FILES['fileUpload']['name']));
                     $tamano_visual = number_format($tamano/ 1024, 2);
                     $nombres_aux = explode('-', $nombre);
-                    if (count($nombres_aux) != 3){
-                        $funcion = '- Documento no contiene formato apropiado: Código-Nombre archivo-Versión.Extension';
-                        $exito = 0;
-                        break;
+//                    if (count($nombres_aux) != 3){
+//                        $funcion = '- Documento no contiene formato apropiado: Código-Nombre archivo-Versión.Extension';
+//                        $exito = 0;
+//                        break;
+//                    }
+                    $version_doc = $codigo_doc = '';
+                    /*SI TIENE EL FORMATO COD-NOMBRE*/
+                    if (count($nombres_aux)>=2){
+                        $nombre_doc = str_replace('', '', $nombres_aux[1]);                    
+                        $codigo_doc = str_replace(' ', '', $nombres_aux[0]);
+                        /*SI TIENE EL FORMATO COD-NOMBRE-VERSION*/
+                        if (count($nombres_aux)>=3){
+                                $version_doc = str_replace(' ', '', $nombres_aux[2]);
+                                $version_doc = str_replace('V', '', strtoupper($version_doc));
+                                $version_doc = substr($version_doc, 0, strpos($version_doc, '.'));
+                        } 
+                        else {
+                            $nombre_doc = substr($nombre_doc, 0, strpos($nombre_doc, '.'));
+                        }
+                    }  else {
+                        $nombre_doc = str_replace('', '', $nombres_aux[0]);   
+                        $nombre_doc = substr($nombre_doc, 0, strpos($nombre_doc, '.'));
                     }
-                    $nombre_doc = str_replace('', '', $nombres_aux[1]);
-                    $codigo_doc = str_replace(' ', '', $nombres_aux[0]);
-                    $version_doc = str_replace(' ', '', $nombres_aux[2]);
-                    $version_doc = str_replace('V', '', strtoupper($version_doc));
-                    $version_doc = substr($version_doc, 0, strpos($version_doc, '.'));
+                   
                    
                     if ($nombre_doc == ''){
                         $funcion = '- Documento no contiene nombre.';
@@ -91,7 +105,7 @@ function CambiaSinAcento($Texto)
                 break;
             default:  //echo $type;
                 //$funcion = "window.parent.VerMensaje('error', 'El archivo $nombre tiene un formato no permitido para el documento');";
-                $funcion = "El archivo $type tiene un formato no permitido para el documento";
+                $funcion = "El archivo tiene un formato no permitido para el documento";
                 //$funcion = "alert('El archivo $nombre tiene un formato no permitido para el documento');";
 
 

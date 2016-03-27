@@ -54,7 +54,7 @@
                                         <label for="doc_fisico" class="col-md-6 control-label">{N_DOC_FISICO}</label>
                                         <div class="col-md-6">
                                           
-                                      </div>                                 
+                                      </div>                                
                                   </div>
 <div class="form-group">
                                         <label for="contentType" class="col-md-6 control-label">{N_CONTENTTYPE}</label>
