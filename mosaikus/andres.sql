@@ -45,3 +45,22 @@ CREATE TABLE `mos_registro_item` (
   `id_unico` int(11) NOT NULL,
   PRIMARY KEY (`idRegistro`,`id_unico`,`valor`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/****************************************/
+/*cambio del 27-03*/
+/****************************************/
+DROP TABLE IF EXISTS `mos_workflow_documentos`;
+CREATE TABLE `mos_workflow_documentos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_personal_responsable` int(11) DEFAULT NULL,
+  `email_responsable` varchar(255) DEFAULT NULL,
+  `id_personal_revisa` int(11) DEFAULT NULL,
+  `email_revisa` varchar(255) DEFAULT NULL,
+  `id_personal_aprueba` int(11) DEFAULT NULL,
+  `email_aprueba` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+
+INSERT INTO `mos_link` VALUES ('81', 'WorkflowDocumentos-indexWorkflowDocumentos-clases.workflow_documentos.WorkflowDocumentos', 'WorkFlow de Documentos', '3', '2', '', '55', null);
+
+INSERT INTO `mos_link_por_perfil` VALUES ('3', '81');
