@@ -4,6 +4,7 @@
     header("Pragma: no-cache");
     header("Expires: 0");
 
+    
     ?>
     <?php
             session_name('mosaikus');            
