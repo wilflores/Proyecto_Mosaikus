@@ -46,6 +46,7 @@
                         <input type="hidden" name="corder" id="corder-hv" value="{CORDER}"/>
                         <input type="hidden" name="sorder" id="sorder-hv" value="{SORDER}"/>
                         <input type="hidden" value="{COD_EMP}" id="b-cod_emp" name="b-cod_emp"/>
+                        {OTROS_CAMPOS} 
                     </form>
     <div class="tab-pane active" id="hv-orange">
         

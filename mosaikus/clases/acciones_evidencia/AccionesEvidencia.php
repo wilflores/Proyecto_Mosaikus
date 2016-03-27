@@ -297,13 +297,18 @@
                 */
 //                if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
 //                    array_push($func,array('nombre'=> 'editarAccionesEvidencia','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_modificar.png' title='Editar AccionesEvidencia'>"));
-                if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
-                    array_push($func,array('nombre'=> 'eliminarAccionesEvidencia','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\" title='Eliminar AccionesEvidencia'></i>"));
-                if ($parametros[col_accion] == -1){
-                    $config=array();
+                if (isset($parametros[reporte_ac])){
+                    $config=array(array("width"=>"1%", "ValorEtiqueta"=>"&nbsp;"));
                 }
-                else
-                    $config=array(array("width"=>"5%", "ValorEtiqueta"=>"&nbsp;"));
+                else{
+                    if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
+                        array_push($func,array('nombre'=> 'eliminarAccionesEvidencia','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\" title='Eliminar AccionesEvidencia'></i>"));
+                    if ($parametros[col_accion] == -1){
+                        $config=array();
+                    }
+                    else
+                        $config=array(array("width"=>"5%", "ValorEtiqueta"=>"&nbsp;"));
+                }
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
                 $array_columns =  explode('-', $parametros['mostrar-col']);
                 for($i=0;$i<count($config_col);$i++){
@@ -492,6 +497,9 @@
                                                                     , 'nombres', $val['cod_emp_relator']);
                 $contenido['OPC'] = "new";
 
+                /*PARAMETRO REPORTE AC*/
+                if (isset($parametros[reporte_ac]))
+                    $contenido[DISPLAY_AM] = 'display:none;';
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'acciones_evidencia/';
                 if (count($this->nombres_columnas) <= 0){
@@ -535,6 +543,7 @@
                     $objResponse->addScript("$('#myModal-Ventana-Titulo-2').html('Acciones ID: $_SESSION[id_accion] - Evidencias');");                                
                     $objResponse->addScript("$('#myModal-Ventana-2').on('hidden.bs.modal', function () {  
                                                 $('#myModal-Ventana').modal('show');
+                                                 $('body').css({'padding-right':'0px'});
                                             })");
                 }
                 else if (isset($parametros[id_accion_correctiva])){
