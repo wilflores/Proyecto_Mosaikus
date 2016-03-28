@@ -247,9 +247,9 @@
                     array_push($func,array('nombre'=> 'verWorkflowDocumentos','imagen'=> "<img style='cursor:pointer' src='diseno/images/find.png' title='Ver WorkflowDocumentos'>"));
                 */
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
-                    array_push($func,array('nombre'=> 'editarWorkflowDocumentos','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_modificar.png' title='Editar WorkflowDocumentos'>"));
+                    array_push($func,array('nombre'=> 'editarWorkflowDocumentos','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-edit\"  title='Editar WorkflowDocumentos'></i>"));
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
-                    array_push($func,array('nombre'=> 'eliminarWorkflowDocumentos','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_eliminar.png' title='Eliminar WorkflowDocumentos'>"));
+                    array_push($func,array('nombre'=> 'eliminarWorkflowDocumentos','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\"  title='Eliminar WorkflowDocumentos'></i>"));
                
                 $config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
@@ -344,13 +344,14 @@
  
             public function indexWorkflowDocumentos($parametros)
             {
+                $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
                 if ($parametros['corder'] == null) $parametros['corder']="id";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="1-2-3-4-5-6-7-"; 
+                    $parametros['mostrar-col']="2-3-4-5-6-7"; 
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */               
@@ -447,19 +448,19 @@
                 $contenido_1[ID_PERSONAL_RESPONSABLE] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
-                                                                            FROM mos_personal p WHERE interno = 1 and workflow = 'S'"
+                                                                            FROM mos_personal p WHERE interno = 1 and elaboro = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                 $contenido_1[ID_PERSONAL_REVISA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
-                                                                            FROM mos_personal p WHERE interno = 1 and workflow = 'S'"
+                                                                            FROM mos_personal p WHERE interno = 1 and reviso = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                 $contenido_1[ID_PERSONAL_APRUEBA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
-                                                                            FROM mos_personal p WHERE interno = 1 and workflow = 'S'"
+                                                                            FROM mos_personal p WHERE interno = 1 and aprobo = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                 
@@ -558,19 +559,19 @@
                 $contenido_1[ID_PERSONAL_RESPONSABLE] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
-                                                                            FROM mos_personal p WHERE interno = 1 and workflow = 'S'"
+                                                                            FROM mos_personal p WHERE interno = 1 and elaboro = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val["id_personal_responsable"]);
                 $contenido_1[ID_PERSONAL_REVISA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
-                                                                            FROM mos_personal p WHERE interno = 1 and workflow = 'S'"
+                                                                            FROM mos_personal p WHERE interno = 1 and reviso = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val["id_personal_revisa"]);
                 $contenido_1[ID_PERSONAL_APRUEBA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
-                                                                            FROM mos_personal p WHERE interno = 1 and workflow = 'S'"
+                                                                            FROM mos_personal p WHERE interno = 1 and aprobo = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val["id_personal_aprueba"]);
 

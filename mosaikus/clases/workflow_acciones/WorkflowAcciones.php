@@ -265,9 +265,9 @@
                     array_push($func,array('nombre'=> 'verWorkflowAcciones','imagen'=> "<img style='cursor:pointer' src='diseno/images/find.png' title='Ver WorkflowAcciones'>"));
                 */
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
-                    array_push($func,array('nombre'=> 'editarWorkflowAcciones','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_modificar.png' title='Editar WorkflowAcciones'>"));
+                    array_push($func,array('nombre'=> 'editarWorkflowAcciones','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-edit\"  title='Editar WorkflowAcciones'></i>"));
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
-                    array_push($func,array('nombre'=> 'eliminarWorkflowAcciones','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_eliminar.png' title='Eliminar WorkflowAcciones'>"));
+                    array_push($func,array('nombre'=> 'eliminarWorkflowAcciones','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\"  title='Eliminar WorkflowAcciones'></i>"));
                
                 $config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
@@ -363,13 +363,14 @@
  
             public function indexWorkflowAcciones($parametros)
             {
+                $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
                 if ($parametros['corder'] == null) $parametros['corder']="id";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="1-2-3-4-5-6-7-8-"; 
+                    $parametros['mostrar-col']="1-2-3-4-5-6-7-8"; 
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */               

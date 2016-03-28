@@ -58,7 +58,7 @@ function init_filtrar(){
 
     function validar(doc){
         if ($('#apellido_materno').val().length == 0) $('#apellido_materno').val(' ');
-        if ($('#workflow').is(':checked')){ 
+        if (($('#workflow').is(':checked'))||($('#reviso').is(':checked'))||($('#elaboro').is(':checked'))||($('#aprobo').is(':checked'))){ 
             $('#email').attr('data-validation',"email");
         }
         else {
