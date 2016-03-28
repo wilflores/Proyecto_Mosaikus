@@ -1357,7 +1357,7 @@
                 $config_col=array(
                array( "width"=>"1%","ValorEtiqueta"=>"ID"),     
                array( "width"=>"2%","ValorEtiqueta"=>"Estado"),
-               array( "width"=>"3%","ValorEtiqueta"=>link_titulos("Días", "dias_vig", $parametros)),
+               array( "width"=>"3%","ValorEtiqueta"=>link_titulos("Días", "dias_vig", $parametros,50)),
                array( "width"=>"8%","ValorEtiqueta"=>"<div style='width:100px'>&nbsp;</div>"),
                
                array( "width"=>"3%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[Codigo_doc], "Codigo_doc", $parametros)),
@@ -1369,7 +1369,7 @@
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[elaboro], "elaboro", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[reviso], "reviso", $parametros)),               
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[aprobo], "aprobo", $parametros)),
-               array( "width"=>"4%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[formulario], "formulario", $parametros)),
+               array( "width"=>"4%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[formulario], "formulario", $parametros,65)),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[v_meses], "v_meses", $parametros)),                    
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha], "fecha", $parametros)),                    
@@ -1378,7 +1378,7 @@
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos("Fecha de Revisión", "fecha_revision", $parametros)),  
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[palabras_claves], "palabras_claves", $parametros)),               
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),
-               array( "width"=>"15%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[arbproc], "arbproc", $parametros)),     
+               array( "width"=>"20%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[arbproc], "arbproc", $parametros)),     
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[observacion], "observacion", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[doc_fisico], "doc_fisico", $parametros)),               
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_filial], "id_filial", $parametros)),               
@@ -1449,7 +1449,8 @@
                     }
                 }
                 $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
-                $grid->setFuncion("semaforo", "semaforo");
+                //$grid->setFuncion("semaforo", "semaforo");
+                $grid->setFuncion("dias_vig", "semaforo_reporte");
                 $grid->setFuncion("accion", "colum_admin");
                 $grid->setFuncion("nom_visualiza", "archivo");
                 $grid->setFuncion("Codigo_doc", "codigo_doc");
@@ -1737,7 +1738,7 @@
                 if ($parametros['corder'] == null) $parametros['corder']="dias_vig";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="1-2-3-4-5-7-8-9-12-13-14-17-20";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
+                    $parametros['mostrar-col']="2-3-4-5-7-8-9-12-14-17-20";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
                 if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 }

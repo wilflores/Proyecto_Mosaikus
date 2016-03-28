@@ -5,12 +5,12 @@
                                           <input type="checkbox" name="SelectAcc" id="SelectAcc" value="0" class="checkbox-mos-col" checked="checked">   &nbsp;
                                       </label>
                                   </div>
-                            </div>-->
+                            </div>
       <div class="checkbox">
         <label>
           <input type="checkbox" name="SelectAcc" id="SelectAcc" value="1" class="checkbox-mos-col" checked="checked"> Estado
         </label>
-      </div>
+      </div>-->
 
 <div class="checkbox">                                  
                                   
@@ -84,7 +84,7 @@
                                   
     
                                       <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="13" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="13" class="checkbox-mos-col" >   &nbsp;
                                       {N_V_MESES}</label>
                                   
                             </div>

@@ -28,9 +28,9 @@ function validar_perfil($ruta='../../login.php'){
         $html = "<div onclick=\"link_titulos('$valor');\" style='cursor:pointer;display:inline;'>" .  htmlentities($titulo, ENT_QUOTES, "UTF-8")  . "</div>";     
      if ($parametros[corder] == $valor) {
          if ($parametros[sorder] == 'asc')
-            $html .= '<i class="icon icon-up"></i>';
+            $html = '<i class="icon icon-up"></i>'.$html;
          else
-            $html .= '<i class="icon icon-down"></i>';
+            $html = '<i class="icon icon-down"></i>'.$html;
          
          //$html .= "<img style='float:right;' src='diseno/images/$parametros[sorder].gif'/>";
      }
