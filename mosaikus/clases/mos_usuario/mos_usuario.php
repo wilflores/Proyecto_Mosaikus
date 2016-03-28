@@ -713,7 +713,7 @@
                 $reg_por_pagina = getenv("PAGINACION");
                 if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
 
-                if($parametros[modo] = 'portal')
+                if($parametros[modo] == 'portal')
                         $this->listarPerfilesPortal($parametros, $parametros['pag'], $reg_por_pagina);
                 else
                     $this->listarPerfiles($parametros, $parametros['pag'], $reg_por_pagina);
@@ -744,7 +744,7 @@
                 $columna_funcion = 0;
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                 
-                if($parametros[modo] = 'portal')
+                if($parametros[modo] == 'portal')
                     array_push($func,array('condicion'=> array('columna'=> 'cod_perfil', 'valor'=> " > 0"), 'parametros' => "$data[id]", 'nombre'=> 'configurarPerfilesPortal','imagen'=> "<i style='cursor:pointer' class=\"icon icon-more\" title='Administrar Perfiles Usuario'></i>"));
                 else
                     array_push($func,array('condicion'=> array('columna'=> 'cod_perfil', 'valor'=> " > 0"), 'parametros' => "$data[id]", 'nombre'=> 'configurarPerfiles','imagen'=> "<i style='cursor:pointer' class=\"icon icon-more\" title='Administrar Perfiles Usuario'></i>"));                    
