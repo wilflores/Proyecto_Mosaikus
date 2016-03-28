@@ -380,7 +380,7 @@
                                 ,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) elaboro_a
                                 ,CONCAT(CONCAT(UPPER(LEFT(re.nombres, 1)), LOWER(SUBSTRING(re.nombres, 2))),' ', CONCAT(UPPER(LEFT(re.apellido_paterno, 1)), LOWER(SUBSTRING(re.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(re.apellido_materno, 1)), LOWER(SUBSTRING(re.apellido_materno, 2)))) reviso_a
                                 ,CONCAT(CONCAT(UPPER(LEFT(ap.nombres, 1)), LOWER(SUBSTRING(ap.nombres, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_paterno, 1)), LOWER(SUBSTRING(ap.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_materno, 1)), LOWER(SUBSTRING(ap.apellido_materno, 2)))) aprobo_a
-
+                                ,d.publico
                          FROM mos_documentos  d
                                 left join mos_personal p on d.elaboro=p.cod_emp
                                 left join mos_personal re on d.reviso=re.cod_emp
@@ -766,16 +766,17 @@
                     $atr[doc_visualiza] = $doc_ver;
                     $atr[id_filial] = $_SESSION[CookFilial];
                     //
-                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo)                            
+                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo,publico)                            
                             VALUES(
                                 $atr[IDDoc],'$atr[Codigo_doc]','$atr[nombre_doc]',$atr[version],'$atr[fecha]','$atr[descripcion]','$atr[palabras_claves]','$atr[formulario]','$atr[vigencia]','$atr[doc_fisico]','$atr[contentType]',$atr[id_filial],'$atr[nom_visualiza]','$atr[doc_visualiza]','$atr[contentType_visualiza]',$atr[id_usuario],'$atr[observacion]','$atr[estrucorg]','$atr[arbproc]','$atr[apli_reg_estrorg]','$atr[apli_reg_arbproc]','$atr[workflow]',$atr[semaforo],$atr[v_meses],$atr[reviso],$atr[elaboro],$atr[aprobo]
+                                    ,'$atr[publico]'
                                 )";
                     //echo $sql;
                     $this->dbl->insert_update($sql);
                     /*
                     $this->registraTransaccion('Insertar','Ingreso el mos_documentos ' . $atr[descripcion_ano], 'mos_documentos');
                       */
-                    $nuevo = "IDDoc: \'$atr[IDDoc]\', Codigo Doc: \'$atr[Codigo_doc]\', Nombre Doc: \'$atr[nombre_doc]\', Version: \'$atr[version]\', Fecha: \'$atr[fecha]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', ContentType: \'$atr[contentType]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza]\', ContentType Visualiza: \'$atr[contentType_visualiza]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', ";
+                    $nuevo = "IDDoc: \'$atr[IDDoc]\', Codigo Doc: \'$atr[Codigo_doc]\', Nombre Doc: \'$atr[nombre_doc]\', Version: \'$atr[version]\', Fecha: \'$atr[fecha]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', ContentType: \'$atr[contentType]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza]\', ContentType Visualiza: \'$atr[contentType_visualiza]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Publico: \'$atr[publico]\'";
                     $this->registraTransaccionLog(1,$nuevo,'', '');
                     return $atr[IDDoc];
                     return "El mos_documentos '$atr[descripcion_ano]' ha sido ingresado con exito";
@@ -796,8 +797,8 @@
                     $atr[doc_visualiza] = $doc_ver;
                     $atr[id_filial] = $_SESSION[CookFilial];
                     //
-                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo)
-                            SELECT $atr[IDDoc],Codigo_doc,nombre_doc,version+1,'$atr[fecha]',descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,'$atr[observacion]',estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,$atr[elaboro],aprobo
+                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo,publico)
+                            SELECT $atr[IDDoc],Codigo_doc,nombre_doc,version+1,'$atr[fecha]',descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,'$atr[observacion]',estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,$atr[elaboro],aprobo,publico
                             FROM mos_documentos
                             WHERE IDDoc = $atr[id]                                                           
                                 ";
@@ -827,6 +828,9 @@
                             . " WHERE IDDoc = $atr[id] ";
                     $this->dbl->insert_update($sql);
                     $sql = "UPDATE mos_registro_formulario SET IDDoc = $atr[IDDoc]"
+                            . " WHERE IDDoc = $atr[id] ";
+                    $this->dbl->insert_update($sql);
+                    $sql = "UPDATE mos_registro_item SET IDDoc = $atr[IDDoc]"
                             . " WHERE IDDoc = $atr[id] ";
                     $this->dbl->insert_update($sql);
                     /*
@@ -907,11 +911,12 @@
                                     descripcion = '$atr[descripcion]',palabras_claves = '$atr[palabras_claves]',formulario = '$atr[formulario]',vigencia = '$atr[vigencia]'"
                             . ",nom_visualiza = $atr[nom_visualiza],doc_visualiza = $atr[doc_visualiza],contentType_visualiza = $atr[contentType_visualiza],id_usuario = $atr[id_usuario],observacion = '$atr[observacion]',estrucorg = '$atr[estrucorg]',arbproc = '$atr[arbproc]'"
                             . ",apli_reg_estrorg = '$atr[apli_reg_estrorg]',apli_reg_arbproc = '$atr[apli_reg_arbproc]',workflow = '$atr[workflow]',semaforo = $atr[semaforo],v_meses = $atr[v_meses],reviso = $atr[reviso],elaboro = $atr[elaboro],aprobo = $atr[aprobo]
+                               ,publico = '$atr[publico]'
                             WHERE  IDDoc = $atr[id]";      
                     $val = $this->verDocumentos($atr[id]);
                     $this->dbl->insert_update($sql);
-                    $nuevo = "IDDoc: \'$atr[IDDoc]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza_aux]\',ContentType Visualiza: \'$atr[contentType_visualiza_aux]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', ";
-                    $anterior = "IDDoc: \'$val[IDDoc]\', Codigo Doc: \'$val[Codigo_doc]\', Nombre Doc: \'$val[nombre_doc]\', Version: \'$val[version]\', Fecha: \'$val[fecha]\', Descripcion: \'$val[descripcion]\', Palabras Claves: \'$val[palabras_claves]\', Formulario: \'$val[formulario]\', Vigencia: \'$val[vigencia]\', ContentType: \'$val[contentType]\', Id Filial: \'$val[id_filial]\', Nom Visualiza: \'$val[nom_visualiza]\', ContentType Visualiza: \'$val[contentType_visualiza]\', Id Usuario: \'$val[id_usuario]\', Observacion: \'$val[observacion]\', Muestra Doc: \'$val[muestra_doc]\', Estrucorg: \'$val[estrucorg]\', Arbproc: \'$val[arbproc]\', Apli Reg Estrorg: \'$val[apli_reg_estrorg]\', Apli Reg Arbproc: \'$val[apli_reg_arbproc]\', Workflow: \'$val[workflow]\', Semaforo: \'$val[semaforo]\', V Meses: \'$val[v_meses]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\', ";
+                    $nuevo = "IDDoc: \'$atr[IDDoc]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza_aux]\',ContentType Visualiza: \'$atr[contentType_visualiza_aux]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Publico: \'$atr[publico]\'";
+                    $anterior = "IDDoc: \'$val[IDDoc]\', Codigo Doc: \'$val[Codigo_doc]\', Nombre Doc: \'$val[nombre_doc]\', Version: \'$val[version]\', Fecha: \'$val[fecha]\', Descripcion: \'$val[descripcion]\', Palabras Claves: \'$val[palabras_claves]\', Formulario: \'$val[formulario]\', Vigencia: \'$val[vigencia]\', ContentType: \'$val[contentType]\', Id Filial: \'$val[id_filial]\', Nom Visualiza: \'$val[nom_visualiza]\', ContentType Visualiza: \'$val[contentType_visualiza]\', Id Usuario: \'$val[id_usuario]\', Observacion: \'$val[observacion]\', Muestra Doc: \'$val[muestra_doc]\', Estrucorg: \'$val[estrucorg]\', Arbproc: \'$val[arbproc]\', Apli Reg Estrorg: \'$val[apli_reg_estrorg]\', Apli Reg Arbproc: \'$val[apli_reg_arbproc]\', Workflow: \'$val[workflow]\', Semaforo: \'$val[semaforo]\', V Meses: \'$val[v_meses]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\', Publico: \'$val[publico]\' ";
                     $this->registraTransaccionLog(2,$nuevo,$anterior, '');
                     /*
                     $this->registraTransaccion('Modificar','Modifico el Documentos ' . $atr[descripcion_ano], 'mos_documentos');
@@ -1012,6 +1017,17 @@
                                 $sql .= " AND upper(formulario) like '%" . strtoupper($atr["b-formulario"]) . "%'";
                     if (strlen($atr["b-vigencia"])>0)
                         $sql .= " AND upper(vigencia) like '%" . strtoupper($atr["b-vigencia"]) . "%'";
+                    if (strlen($atr["b-publico"])>0){
+                        if (strlen($atr["b-privado"])>0){
+                            
+                        }
+                        else
+                            
+                            $sql .= " AND publico = 'S'";
+                    }
+                    else
+                    if (strlen($atr["b-privado"])>0)
+                        $sql .= " AND publico = 'N'";
                     if (strlen($atr["b-doc_fisico"])>0)
                         $sql .= " AND doc_fisico = '". $atr["b-doc_fisico"] . "'";
                     if (strlen($atr["b-contentType"])>0)
@@ -1137,6 +1153,17 @@
                                 $sql .= " AND upper(formulario) like '%" . strtoupper($atr["b-formulario"]) . "%'";
                     if (strlen($atr["b-vigencia"])>0)
                         $sql .= " AND upper(vigencia) like '%" . strtoupper($atr["b-vigencia"]) . "%'";
+                    if (strlen($atr["b-publico"])>0){
+                        if (strlen($atr["b-privado"])>0){
+                            
+                        }
+                        else
+                            
+                            $sql .= " AND publico = 'S'";
+                    }
+                    else
+                    if (strlen($atr["b-privado"])>0)
+                        $sql .= " AND publico = 'N'";
                     if (strlen($atr["b-doc_fisico"])>0)
                         $sql .= " AND doc_fisico = '". $atr["b-doc_fisico"] . "'";
                     if (strlen($atr["b-contentType"])>0)
@@ -1293,6 +1320,9 @@
                                     . " WHERE IDDoc = $atr[id] ";
                             $this->dbl->insert_update($sql);
                             $sql = "UPDATE mos_registro_formulario SET IDDoc = $codigo"
+                                    . " WHERE IDDoc = $atr[id] ";
+                            $this->dbl->insert_update($sql);
+                            $sql = "UPDATE mos_registro_item SET IDDoc = $codigo"
                                     . " WHERE IDDoc = $atr[id] ";
                             $this->dbl->insert_update($sql);
                         }
@@ -2574,6 +2604,7 @@
                            
                     }
                     if (!isset($parametros[vigencia])) $parametros[vigencia] = 'N';
+                    if (!isset($parametros[publico])) $parametros[publico] = 'N';
                     //if (!isset($parametros[formulario])) $parametros[formulario] = 'N';
                     $parametros[formulario] = 'N';
                     for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
@@ -2846,6 +2877,7 @@
                 }
                 //$contenido_1[CHECKED_VIGENCIA] = 'checked="checked"';
                 $contenido_1[CHECKED_VIGENCIA] = $val["vigencia"] == 'S' ? 'checked="checked"' : '';
+                $contenido_1[CHECKED_PUBLICO] = $val["publico"] == 'S' ? 'checked="checked"' : '';
                 $contenido_1['SEMAFORO'] = $ut_tool->combo_array("semaforo", $desc, $ids,false,$val["semaforo"],false,false,false,false,'display:inline;width:70px');
 
                 $ids = array('0'); 
@@ -2935,7 +2967,7 @@
                 $i = 0;
                 $contenido_1['TOK_NEW'] = time();
                 $ids = array('7','8','9','1','2','3','5','6','10','11','12','13','14');
-                $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','SemÃ¡foro', 'Ã�rbol Organizacional', 'Ã�rbol Procesos','Vigencia','Cargo');
+                $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo', 'Árbol Organizacional', 'Árbol Procesos','Vigencia','Cargo');
                 
                 //$ids = array('7','8','9','1','2','3','5','6','10');
                 //$desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo');
@@ -3044,7 +3076,8 @@
                         $item = $item. '</tr>' ;                    
                         $js .= '$("#eliminar_esp_'. $i .'").click(function(e){ 
                                     e.preventDefault();
-                                    var id = $(this).attr("href");                                
+                                    var id = $(this).attr("href");  
+                                    $("#id_unico_del").val($("#id_unico_del").val() + $("#id_unico_din_"+id).val() + ",");
                                     $("tr-esp-'. $i .'").remove();
                                     var parent = $(this).parents().parents().get(0);
                                         $(parent).remove();
@@ -3210,9 +3243,13 @@
                         }
                         $campos_dinamicos = new Parametros();
                         $campos_dinamicos->guardar_parametros_dinamicos($parametros, 1);
-//                        $sql = "DELETE FROM mos_documentos_datos_formulario WHERE IDDoc = $parametros[id] "
-//                                . " AND NOT id_unico IN (SELECT id_unico FROM mos_registro_formulario WHERE IDDoc = $parametros[id]) ";                               
-//                        $this->dbl->insert_update($sql);
+                        if (strlen($parametros[id_unico_del])>0){
+                            $parametros[id_unico_del] = substr($parametros[id_unico_del], 0, strlen($parametros[id_unico_del]) - 1);
+                            $sql = "DELETE FROM mos_documentos_datos_formulario WHERE id_unico IN ($parametros[id_unico_del]) "
+                                . " AND NOT id_unico IN (SELECT id_unico FROM mos_registro_formulario WHERE IDDoc = $parametros[id]) ";                               
+                            $this->dbl->insert_update($sql);
+                        }
+
                         $params[IDDoc] = $parametros[id];
                         for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
                             //echo $parametros["nro_pts_$i"];
@@ -3294,7 +3331,7 @@
  
             public function eliminar($parametros)
             {
-                $val = $this->verDocumentos($parametros[id]);
+                //$val = $this->verDocumentos($parametros[id]);
                 $respuesta = $this->eliminarDocumentos($parametros);
                 $objResponse = new xajaxResponse();
                 if (preg_match("/ha sido eliminada con exito/",$respuesta ) == true) {

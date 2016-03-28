@@ -160,6 +160,14 @@
                                                             <input type="hidden" class="form-control" value="{WORKFLOW}" id="workflow" name="workflow" placeholder="{N_WORKFLOW}" data-validation="required"/>
                                                         </label>
                                                     </div>                              
+                                                </div>                                                        
+                                                <div class="form-group">
+                                                        <label for="vigencia" class="col-md-6 control-label">{N_PUBLICO}</label>
+                                                        <div class="col-md-14">      
+                                                            <label class="checkbox-inline" style="padding-top: 0px;">
+                                                                <input type="checkbox" name="publico" id="publico" value="S" {CHECKED_PUBLICO}>   &nbsp;                                                                
+                                                            </label>
+                                                        </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="elaboro" class="col-md-6 control-label">{N_ELABORO}</label>                                                
@@ -194,6 +202,7 @@
                                                <div class="tab-pane active" id="hv-orange-2">
                                                    <input type="hidden" id="num_items_esp" name="num_items_esp" value="{NUM_ITEMS_ESP}"/> 
                                                    <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="{TOK_NEW}"/>
+                                                   <input type="hidden" id="id_unico_del" name="id_unico_del" value=""/>
                                                    <!--<input type="button" class="button add" value="Agregar" onClick="agregar_esp();" >-->
                                                    <button type="button" onClick="agregar_esp();" class="btn btn-primary  btn-xs">Agregar</button>
                                                     <table id="table-items-esp" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">

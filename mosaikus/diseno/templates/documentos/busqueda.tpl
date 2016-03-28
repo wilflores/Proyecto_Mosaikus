@@ -75,14 +75,26 @@
                                   <div class="col-md-2">
                                     <input type="text" class="form-control" id="b-palabras_claves" name="b-palabras_claves" placeholder="{N_PALABRAS_CLAVES}" />
                                 </div>                                
-                            </div>-->
+                            </div>
 <div class="form-group">
                                   <label for="formulario" class="control-label">{N_FORMULARIO}</label>
                 
                                     <label class="checkbox-inline" style="padding-top: 0px;">
                                         <input type="checkbox" id="b-formulario" name="b-formulario" value="S">   &nbsp;
                                     </label>                                        
-                            </div>
+                            </div>-->
+                                  
+                            <div class="form-group" style="margin-bottom: 0px;">                                
+                                <label class="checkbox-inline"> 
+                                    <input type="checkbox" id="b-formulario" name="b-formulario" value="S"> {N_FORMULARIO} </label>                                     
+                            </div>   
+                            <div class="form-group">                                                                
+                                <label class="checkbox-inline"> 
+                                    <input type="checkbox" id="b-publico" name="b-publico" value="S"> Documento {N_PUBLICO} </label>  
+                                    <br>
+                                    <label class="checkbox-inline"> 
+                                    <input type="checkbox" id="b-privado" name="b-privado" value="N"> Documento Privado </label> 
+                            </div>   
 <!--<div class="form-group">
                                   <label for="vigencia" class="col-md-2 control-label">{N_VIGENCIA}</label>
                                   <div class="col-md-2">

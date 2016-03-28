@@ -151,6 +151,14 @@
                                                         </div>
                                                 </div>
                                                 <div class="form-group">
+                                                        <label for="vigencia" class="col-md-6 control-label">{N_PUBLICO}</label>
+                                                        <div class="col-md-14">      
+                                                            <label class="checkbox-inline" style="padding-top: 0px;">
+                                                                <input type="checkbox" name="publico" id="publico" value="S" {CHECKED_PUBLICO}>   &nbsp;                                                                
+                                                            </label>
+                                                        </div>
+                                                </div>
+                                                <div class="form-group">
                                                     <label for="elaboro" class="col-md-6 control-label">{N_ELABORO}</label>                                                
                                                     <div class="col-md-14">                                              
                                                       <select id="elaboro" name="elaboro" data-validation="required">

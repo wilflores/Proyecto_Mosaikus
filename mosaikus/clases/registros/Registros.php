@@ -207,7 +207,7 @@
                              ,df.orden
                         FROM mos_documentos_datos_formulario df
                         left join mos_registro_item rf on rf.id_unico = df.id_unico  AND rf.idRegistro = $id
-                        WHERE df.IDDoc = $_SESSION[IDDoc] and df.tipo in (7,8,9,11,12)
+                        WHERE df.IDDoc = $_SESSION[IDDoc] and df.tipo in (7,8,9,11,12,14)
                         group by
                             df.id_unico
                             ,df.IDDoc

@@ -26,7 +26,7 @@ function CambiaSinAcento($Texto)
     $nombre = $_FILES['fileUpload']['name'];
     //print_r($_FILES);
     //if (isset($_FILES['fileUpload']['name']) && ($_FILES['fileUpload']['size'] <= $_POST['MAX_FILE_SIZE'])) {
-    if (isset($_FILES['fileUpload']['name']) && ($_FILES['fileUpload']['size'] <= $_POST['MAX_FILE_SIZE']) && ($_FILES['fileUpload']['size']!= 0)) {
+    if (isset($_FILES['fileUpload']['name']) && ($_FILES['fileUpload']['size'] <= 1024*1024*3) && ($_FILES['fileUpload']['size']!= 0)) {
         switch (trim($type)){
             case 'application/msword':
                 $tipo = 'doc';
@@ -114,7 +114,7 @@ function CambiaSinAcento($Texto)
                 break;
             default:  //echo $type;
                 //$funcion = "window.parent.VerMensaje('error', 'El archivo $nombre tiene un formato no permitido para el documento');";
-                $funcion = "El archivo $type tiene un formato no permitido para el documento";
+                $funcion = "El archivo tiene un formato no permitido para el documento";
                 //$funcion = "alert('El archivo $nombre tiene un formato no permitido para el documento');";
 
 

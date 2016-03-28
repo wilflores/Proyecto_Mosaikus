@@ -71,3 +71,10 @@ CREATE TABLE `mos_documentos_formulario_items_temp` (
   PRIMARY KEY (`id`),
   KEY `fk_id_unico` (`fk_id_unico`)
 ) ENGINE=InnoDB AUTO_INCREMENT=200 DEFAULT CHARSET=latin1;
+
+-- campo publico documento 07/03/2016
+
+ALTER TABLE `mos_documentos`
+ADD COLUMN `publico`  char(1) NULL DEFAULT 'N' AFTER `aprobo`;
+
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('publico', 'Público', '6');

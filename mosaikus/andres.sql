@@ -61,6 +61,6 @@ CREATE TABLE `mos_workflow_documentos` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
-INSERT INTO `mos_link` VALUES ('81', 'WorkflowDocumentos-indexWorkflowDocumentos-clases.workflow_documentos.WorkflowDocumentos', 'WorkFlow de Documentos', '3', '2', '', '55', null);
+INSERT INTO `mos_link` VALUES ('82', 'WorkflowDocumentos-indexWorkflowDocumentos-clases.workflow_documentos.WorkflowDocumentos', 'WorkFlow de Documentos', '3', '2', '', '55', null);
 
-INSERT INTO `mos_link_por_perfil` VALUES ('3', '81');
+INSERT INTO `mos_link_por_perfil` VALUES ('1', '82');
