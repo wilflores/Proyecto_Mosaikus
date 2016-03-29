@@ -26,9 +26,27 @@
             array.addParametro('import','clases.mos_usuario.mos_usuario');
             xajax_Loading(array.getArray());
     }
+    
+function r_init_filtrar(){
+        document.getElementById('contenido-aux').style.display='';
+        document.getElementById('contenido-form-aux').style.display='none';
+        document.getElementById('contenido-form-aux').innerHTML='';
+        document.getElementById('contenido').style.display='none';
+        document.getElementById('contenido-form').style.display='none';
+        $('#contenido-form-aux').parent().hide();
+        $('#contenido-aux').parent().show();
+        $('#contenido').parent().hide();
+        $('#contenido-form').parent().hide();
+    
+        //init_tabla_reporte_reg();
+        PanelOperator.initPanels("-aux");
+        ScrollBar.initScroll();
+        r_init_filtro_rapido();
+}
+    
     function validar_perfil_usuario(doc){
         
-        if($('#idFormulario').isValid()) {
+        if($('#r-idFormulario').isValid()) {
             $( "#btn-guardar" ).html('Procesando..');
             $( "#btn-guardar" ).prop( "disabled", true );
             array = new XArray();
@@ -41,19 +59,43 @@
                 return;
             }
             array.addParametro('nodos',_TxtIdNodos);
-
-            
-            array.setObjeto('mos_usuario','cargarConfiguracionPerfiles');                
-                      
+            array.setObjeto('mos_usuario','cargarConfiguracionPerfiles');                                      
             array.addParametro('permiso',document.getElementById('permiso_modulo').value);
-            array.getForm('idFormulario');
+            array.getForm('r-idFormulario');
             array.addParametro('import','clases.mos_usuario.mos_usuario');
             xajax_Loading(array.getArray());
+
         }else{
         
         }        
     }
-    
+
+    function validar_perfil_usuario_portal(doc){
+        
+        if($('#r-idFormulario').isValid()) {
+            $( "#btn-guardar" ).html('Procesando..');
+            $( "#btn-guardar" ).prop( "disabled", true );
+            array = new XArray();
+                        
+            var iframe = document.getElementById("iframearbol");
+            iframe.contentWindow.submitMe();
+            var _TxtIdNodos = document.getElementById("nodos").value = iframe.contentWindow.document.getElementById('jsfields').value;
+            if (_TxtIdNodos == ''){
+                VerMensaje('error','Debe Ingresar el Parte del Menu a Permitir');
+                return;
+            }
+            array.addParametro('nodos',_TxtIdNodos);
+            array.setObjeto('mos_usuario','cargarConfiguracionPerfilesPortal');                                      
+            array.addParametro('permiso',document.getElementById('permiso_modulo').value);
+            array.getForm('r-idFormulario');
+            array.addParametro('import','clases.mos_usuario.mos_usuario');
+            xajax_Loading(array.getArray());
+
+        }else{
+        
+        }        
+    }
+
     function validar(doc){        
         if($('#idFormulario').isValid()) {
             $( "#btn-guardar" ).html('Procesando..');
@@ -142,13 +184,20 @@
     function configurarPerfiles(id_filial){      
         array = new XArray();
         array.setObjeto('mos_usuario','configurarPerfil');
-        //array.addParametro('id_usuario',id_usuario);
-        //array.addParametro('cod_perfil',cod_perfil);
         array.addParametro('if_filial',id_filial);
         array.addParametro('import','clases.mos_usuario.mos_usuario');
         xajax_Loading(array.getArray());        
     }    
-    
+
+    function configurarPerfilesPortal(id_filial){      
+        array = new XArray();
+        array.setObjeto('mos_usuario','configurarPerfilPortal');
+        array.addParametro('if_filial',id_filial);
+        array.addParametro('import','clases.mos_usuario.mos_usuario');
+        xajax_Loading(array.getArray());        
+    }    
+
+
     function verPagina(pag,doc){
         array = new XArray();
         if (doc== null)
@@ -187,4 +236,12 @@
         array.addParametro('import','clases.mos_usuario.mos_usuario');
         xajax_Loading(array.getArray());        
     }
-    
+
+    function perfil_portal(id){         
+        array = new XArray();
+        array.setObjeto('mos_usuario','perfil_portal');
+        array.addParametro('id_usuario',id);
+
+        array.addParametro('import','clases.mos_usuario.mos_usuario');
+        xajax_Loading(array.getArray());        
+    }

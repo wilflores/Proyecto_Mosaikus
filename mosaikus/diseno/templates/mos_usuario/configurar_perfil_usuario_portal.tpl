@@ -32,7 +32,7 @@
                         <div class="col-md-9">
                             <label for="vigencia" class="col-md-10 control-label" style="text-align: left;">Accesos&nbsp;a&nbsp;Estructura</label>
                             <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
-                            <iframe id="iframearbol" src="pages/mos_usuario/listaEstructura.php?id_usuario={ID_USUARIO}&cod_perfil={COD_PERFIL}&id_filial={ID_FILIAL}" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>
+                            <iframe id="iframearbol" src="pages/mos_usuario/listaEstructura.php?id_usuario={ID_USUARIO}&cod_perfil={COD_PERFIL}&id_filial={ID_FILIAL}&portal=S" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>
                         </div>
 
 
@@ -44,8 +44,8 @@
                                 <!--<input class="button save" name="guardar" type="button" value="{DESC_OPERACION}" onClick="validar(document);">
                                 <input class="button " type="button" value="Cancelar" onclick="funcion_volver('{PAGINA_VOLVER}');">
                                 -->
-                                <button type="button" id="btn-guardar" class="btn btn-primary" onClick="validar_perfil_usuario(document);">{DESC_OPERACION}</button>                                
-                                <button type="button" class="btn btn-default" onclick="perfil_especialista({ID_USUARIO});">Cancelar</button>
+                                <button type="button" id="btn-guardar" class="btn btn-primary" onClick="validar_perfil_usuario_portal(document);">{DESC_OPERACION}</button>                                
+                                <button type="button" class="btn btn-default" onclick="perfil_portal({ID_USUARIO});">Cancelar</button>
 
                                 <input type="hidden" id="opc" name="opc" value="{OPC}">
                                 <input type="hidden" id="id"  name="id"  value="{ID}">

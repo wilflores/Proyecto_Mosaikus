@@ -1,4 +1,5 @@
 <?php
+
  import("clases.interfaz.Pagina");        
         class mos_usuario extends Pagina{
         private $templates;
@@ -58,6 +59,12 @@
                return $this->dbl->data[0];
             }
      
+            public function verfilialPortal($id){
+               $atr=array();
+               $sql="SELECT id, id_usuario, cod_perfil_portal as cod_perfil FROM mos_usuario_filial WHERE id = $id";
+               $this->operacion($sql, $atr);
+               return $this->dbl->data[0];
+            }
 
              public function vermos_usuario($id){
                 $atr=array();
@@ -361,11 +368,11 @@
                     $columna_funcion = 13;
                 }*/
                 if ($_SESSION[CookM] == 'S')
-                    array_push($func,array('nombre'=> 'vermos_usuario','imagen'=> "<img style='cursor:pointer'  class=\"icon icon-view-document\" title='Ver Usuario'>"));                
+                    array_push($func,array('nombre'=> 'vermos_usuario','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-view-document\" title='Ver Usuario'></i>"));                
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
-                    array_push($func,array('nombre'=> 'editarmos_usuario','imagen'=> "<img style='cursor:pointer'  class=\"icon icon-edit\" title='Editar Usuario'>"));
+                    array_push($func,array('nombre'=> 'editarmos_usuario','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-edit\" title='Editar Usuario'></i>"));
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
-                    array_push($func,array('nombre'=> 'eliminarmos_usuario','imagen'=> "<img style='cursor:pointer'  class=\"icon icon-remove\" title='Eliminar Usuario'>"));
+                    array_push($func,array('nombre'=> 'eliminarmos_usuario','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-remove\" title='Eliminar Usuario'></i>"));
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                     array_push($func,array('nombre'=> 'configurarmos_usuario','imagen'=> "<i style='cursor:pointer' class=\"icon icon-more\" title='Configurar Perfiles'></i>"));
 
@@ -429,7 +436,10 @@
                 $contenido_1['NOMBRES'] = ($val[apellido_paterno].", ".$val[nombres]);
                 $contenido_1['COD_PERFIL'] = $val2["cod_perfil"];
                 $contenido_1['DESCRIPCION_PERFIL'] = $val2["descripcion_perfil"]; 
-                $contenido_1['TITULO_FORMULARIO'] = "Configurar&nbsp;Perfiles";
+                $contenido_1['TITULO_FORMULARIO'] = 'Usuario [ '.$val[nombres] . ', ' .$val[apellido_paterno].' ]
+                            <img class="SinBorde" src="diseno/images/flecha.gif">Lista de Perfiles
+                            <img class="SinBorde" src="diseno/images/flecha.gif">'.$val2["descripcion_perfil"];                
+                //$contenido_1['TITULO_FORMULARIO'] = "Configurar&nbsp;Perfiles";
                 $contenido_1['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Usuarios";
                 $contenido_1['PAGINA_VOLVER'] = "listarmos_usuario.php";
                 $contenido_1['DESC_OPERACION'] = "Guardar";
@@ -449,9 +459,62 @@
 
                 //$template->setVars($contenido);
                 $objResponse = new xajaxResponse();
-                $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
+                $objResponse->addAssign('contenido-form-aux',"innerHTML",$template->show());
                 $objResponse->addScriptCall("calcHeight");
-                $objResponse->addScriptCall("MostrarContenido2");          
+                $objResponse->addScriptCall("MostrarContenido2Aux");          
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("$.validate({
+                            lang: 'es'  
+                          });");  return $objResponse;                
+                
+            }
+
+            public function configurarPerfilPortal($parametros){
+                
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                $ut_tool = new ut_Tool();
+                $filial = $this->verfilialPortal($parametros[if_filial]);
+                
+                $val = $this->vermos_usuario($filial[id_usuario]); 
+                //$usuario = $val[apellido_paterno].", ".$val[nombres];
+
+                import("clases.perfiles.Perfiles");
+                $perfil = new Perfiles();
+                $val2 = $perfil->verPerfilesPortal($filial[cod_perfil]);
+                //print_r($val2);
+                $contenido_1['ID_FILIAL'] = $parametros[if_filial];
+                $contenido_1['ID_USUARIO'] = $val["id_usuario"];
+                $contenido_1['NOMBRES'] = ($val[apellido_paterno].", ".$val[nombres]);
+                $contenido_1['COD_PERFIL'] = $val2["cod_perfil"];
+                $contenido_1['DESCRIPCION_PERFIL'] = $val2["descripcion_perfil"]; 
+                $contenido_1['TITULO_FORMULARIO'] = 'Usuario [ '.$val[nombres] . ', ' .$val[apellido_paterno].' ]
+                            <img class="SinBorde" src="diseno/images/flecha.gif">Lista de Perfiles Portal
+                            <img class="SinBorde" src="diseno/images/flecha.gif">'.$val2["descripcion_perfil"];                
+                //$contenido_1['TITULO_FORMULARIO'] = "Configurar&nbsp;Perfiles";
+                $contenido_1['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Usuarios";
+                $contenido_1['PAGINA_VOLVER'] = "listarmos_usuario.php";
+                $contenido_1['DESC_OPERACION'] = "Guardar";
+                $contenido_1['OPC'] = "conf_perfil_usuario";
+                $contenido_1['ID'] = $val["id"];
+
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
+                $template->setTemplate("configurar_perfil_usuario_portal");
+                $template->setVars($contenido_1);
+                
+                $contenido['CAMPOS'] = $template->show();
+
+                //$template->PATH = PATH_TO_TEMPLATES.'interfaz/';
+                //$template->setTemplate("formulario");
+
+
+                //$template->setVars($contenido);
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('contenido-form-aux',"innerHTML",$template->show());
+                $objResponse->addScriptCall("calcHeight");
+                $objResponse->addScriptCall("MostrarContenido2Aux");          
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
@@ -604,6 +667,43 @@
                 
                     $this->operacion($sql, $atr);
              }
+
+            public function listarPerfilesPortal($atr, $pag, $registros_x_pagina){
+                
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $sql_left = $sql_col_left = "";
+                    $sql = "SELECT COUNT(*) total_registros
+                         FROM mos_usuario_filial AS muf INNER JOIN mos_perfil_portal AS mp ON muf.cod_perfil = mp.cod_perfil 
+                         WHERE muf.cod_perfil IS NOT NULL AND id_usuario ='$atr[id_usuario]' ";
+                    if (strlen($atr[valor])>0)
+                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
+                                 if (strlen($atr["b-cod_perfil"])>0)
+                        $sql .= " AND cod_perfil = '". $atr["b-cod_perfil"] . "'";
+                        if (strlen($atr["b-descripcion_perfil"])>0)
+                            $sql .= " AND upper(descripcion_perfil) like '%" . strtoupper($atr["b-descripcion_perfil"]) . "%'";
+                        if (strlen($atr["b-orden"])>0)
+                            $sql .= " AND orden = '". $atr["b-orden"] . "'";
+
+                    $total_registros = $this->dbl->query($sql, $atr);
+                    $this->total_registros = $total_registros[0][total_registros];   
+            
+                    $sql = "SELECT muf.id, mp.cod_perfil,mp.descripcion_perfil
+                                     $sql_col_left
+                            FROM mos_usuario_filial AS muf INNER JOIN mos_perfil_portal AS mp ON muf.cod_perfil_portal = mp.cod_perfil $sql_left
+                            WHERE muf.cod_perfil_portal IS NOT NULL AND id_usuario ='$atr[id_usuario]' ";
+                
+                    if (strlen($atr[valor])>0)
+                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
+                                 if (strlen($atr["b-cod_perfil"])>0)
+                        $sql .= " AND cod_perfil = '". $atr["b-cod_perfil"] . "'";
+                    if (strlen($atr["b-descripcion_perfil"])>0)
+                        $sql .= " AND upper(descripcion_perfil) like '%" . strtoupper($atr["b-descripcion_perfil"]) . "%'";
+
+                    $sql .= " order by $atr[corder] $atr[sorder] ";
+                    $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                
+                    $this->operacion($sql, $atr);
+             }
              
             public function verListaPerfiles($parametros){
                 
@@ -613,7 +713,12 @@
                     $parametros['pag'] = 1;
                 $reg_por_pagina = getenv("PAGINACION");
                 if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
-                $this->listarPerfiles($parametros, $parametros['pag'], $reg_por_pagina);
+
+                if($parametros[modo] == 'portal')
+                        $this->listarPerfilesPortal($parametros, $parametros['pag'], $reg_por_pagina);
+                else
+                    $this->listarPerfiles($parametros, $parametros['pag'], $reg_por_pagina);
+                
                 $data=$this->dbl->data;
                 
                 if (count($this->nombres_columnas) <= 0){
@@ -640,8 +745,10 @@
                 $columna_funcion = 0;
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                 
-                
-                    array_push($func,array('condicion'=> array('columna'=> 'cod_perfil', 'valor'=> " > 0"), 'parametros' => "$data[id]", 'nombre'=> 'configurarPerfiles','imagen'=> "<i style='cursor:pointer' class=\"icon icon-more\" title='Administrar Perfiles Usuario'></i>"));
+                if($parametros[modo] == 'portal')
+                    array_push($func,array('condicion'=> array('columna'=> 'cod_perfil', 'valor'=> " > 0"), 'parametros' => "$data[id]", 'nombre'=> 'configurarPerfilesPortal','imagen'=> "<i style='cursor:pointer' class=\"icon icon-more\" title='Administrar Perfiles Usuario'></i>"));
+                else
+                    array_push($func,array('condicion'=> array('columna'=> 'cod_perfil', 'valor'=> " > 0"), 'parametros' => "$data[id]", 'nombre'=> 'configurarPerfiles','imagen'=> "<i style='cursor:pointer' class=\"icon icon-more\" title='Administrar Perfiles Usuario'></i>"));                    
                 
                 $config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
@@ -669,8 +776,7 @@
                 //}
                 return $out;
             } 
-        public function perfil_especialista($parametros){     
-                $contenido[TITULO_MODULO] = 'Administracion Usuario / Perfil';
+            public function perfil_especialista($parametros){                
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
@@ -678,46 +784,134 @@
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
                 if ($parametros['mostrar-col'] == null) 
                     $parametros['mostrar-col']="1"; 
-                /*if (count($this->parametros) <= 0){
-                        $this->cargar_parametros();
-                } */               
-                $k = 19;
-                $contenido[PARAMETROS_OTROS] = "";
-                $grid = $this->verListaPerfiles($parametros);
-//                $contenido['CORDER'] = $parametros['corder'];
-//                $contenido['SORDER'] = $parametros['sorder'];
-//                $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
-                $contenido['TABLA'] = $grid['tabla'];
-                $contenido['PAGINADO'] = $grid['paginado'];
-                //$contenido['OPCIONES_BUSQUEDA'] = " <option value='campo'>campo</option>";
-                //$contenido['JS_NUEVO'] = 'funcion_volver("listarmos_usuario.php");';
-                $contenido['TITULO_NUEVO'] = 'Volver&nbsp;a&nbsp;Usuarios';
-                $contenido['TABLA'] = $grid['tabla'];
-                $contenido['PAGINADO'] = $grid['paginado'];
+                $parametros['modo'] = 'especialista';
+                session_name("$GLOBALS[SESSION]");
+                session_start();                                                                
+                $_SESSION[IDDoc] = $parametros[id];                
 
+                $grid = $this->verListaPerfiles($parametros); 
+                $val = $this->vermos_usuario($parametros[id_usuario]);                
+                $contenido[TITULO_MODULO] = 'Usuario [ '.$val[nombres] . ', ' .$val[apellido_paterno].' ]
+                            <img class="SinBorde" src="diseno/images/flecha.gif">
+                            Lista de Perfiles Especialista';
+                $contenido[TITULO] = $parametros[titulo];
+                $_SESSION[Codigo_doc] = $val[Codigo_doc];
+                $contenido['CORDER'] = $parametros['corder'];
+                $contenido['SORDER'] = $parametros['sorder'];
+                $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['OPCIONES_BUSQUEDA'] = " <option value='campo'>campo</option>";
+                //$contenido['JS_NUEVO'] = 'nuevo_Registros();';
+                //$contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;Registros';
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
                 $template = new Template();
+
                 $template->PATH = PATH_TO_TEMPLATES.'perfiles/';
                 $template->setTemplate("mostrar_colums");
                 $template->setVars($contenido);
+
+
                 $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
                 $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
-                $template->setTemplate("listar_perfil");
+                $template->setTemplate("listar_volver");
+                
                 $template->setVars($contenido);
-                //$this->contenido['CONTENIDO']  = $template->show();
-                //$this->asigna_contenido($this->contenido);
-                //return $template->show();
                 if (isset($parametros['html']))
                     return $template->show();
                 $objResponse = new xajaxResponse();
-                $objResponse->addAssign('contenido',"innerHTML",$template->show());
-                $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
-                $objResponse->addAssign('modulo_actual',"value","Usuarios");
+                $objResponse->addAssign('desc-mod-act',"innerHTML","Registros - Documento [$val[Codigo_doc] - $val[nombre_doc]]");
+                $objResponse->addAssign('contenido-aux',"innerHTML",$template->show());
+                $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);                
+                $objResponse->addAssign('modulo_actual',"value","mos_usuario");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'mos_usuario/mos_usuario.js');
                 $objResponse->addScript("$('#MustraCargando').hide();");
-                $objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
-                return $objResponse;            
-        }
- 
+                $objResponse->addScript($js);
+                /*Js init_tabla*/
+                $objResponse->addScript("$('.ver-mas').on('click', function (event) {
+                                    event.preventDefault();
+                                    var id = $(this).attr('tok');
+                                    $('#myModal-Ventana-Cuerpo').html($('#ver-mas-'+id).val());
+                                    $('#myModal-Ventana-Titulo').html('');
+                                    $('#myModal-Ventana').modal('show');
+                                });");                
+                //$objResponse->addScript('r_init_filtrar();');
+                $objResponse->addScript('setTimeout(function(){ r_init_filtrar(); }, 500);');
+                //$objResponse->addScriptCall("MostrarContenidoAux"); 
+                return $objResponse;
+                
+            }
+            
+             public function perfil_portal($parametros){                
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                if ($parametros['corder'] == null) $parametros['corder']="descripcion_perfil";
+                if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
+                if ($parametros['mostrar-col'] == null) 
+                    $parametros['mostrar-col']="1"; 
+
+                $parametros['modo'] = 'portal';
+                session_name("$GLOBALS[SESSION]");
+                session_start();                                                                
+                $_SESSION[IDDoc] = $parametros[id];                
+
+                $grid = $this->verListaPerfiles($parametros); 
+                $val = $this->vermos_usuario($parametros[id_usuario]);                
+                $contenido[TITULO_MODULO] = 'Usuario [ '.$val[nombres] . ', ' .$val[apellido_paterno].' ]
+                            <img class="SinBorde" src="diseno/images/flecha.gif">
+                            Lista de Perfiles Portal';
+                $contenido[TITULO] = $parametros[titulo];
+                $_SESSION[Codigo_doc] = $val[Codigo_doc];
+                $contenido['CORDER'] = $parametros['corder'];
+                $contenido['SORDER'] = $parametros['sorder'];
+                $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['OPCIONES_BUSQUEDA'] = " <option value='campo'>campo</option>";
+                //$contenido['JS_NUEVO'] = 'nuevo_Registros();';
+                //$contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;Registros';
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
+                $template = new Template();
+
+                $template->PATH = PATH_TO_TEMPLATES.'perfiles/';
+                $template->setTemplate("mostrar_colums");
+                $template->setVars($contenido);
+
+
+                $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
+                $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
+                $template->setTemplate("listar_volver");
+                
+                $template->setVars($contenido);
+                if (isset($parametros['html']))
+                    return $template->show();
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('desc-mod-act',"innerHTML","Registros - Documento [$val[Codigo_doc] - $val[nombre_doc]]");
+                $objResponse->addAssign('contenido-aux',"innerHTML",$template->show());
+                $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);                
+                $objResponse->addAssign('modulo_actual',"value","mos_usuario");
+                $objResponse->addIncludeScript(PATH_TO_JS . 'mos_usuario/mos_usuario.js');
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript($js);
+                /*Js init_tabla*/
+                $objResponse->addScript("$('.ver-mas').on('click', function (event) {
+                                    event.preventDefault();
+                                    var id = $(this).attr('tok');
+                                    $('#myModal-Ventana-Cuerpo').html($('#ver-mas-'+id).val());
+                                    $('#myModal-Ventana-Titulo').html('');
+                                    $('#myModal-Ventana').modal('show');
+                                });");                
+                //$objResponse->addScript('r_init_filtrar();');
+                $objResponse->addScript('setTimeout(function(){ r_init_filtrar(); }, 500);');
+                //$objResponse->addScriptCall("MostrarContenidoAux"); 
+                return $objResponse;
+                
+            }
             public function indexmos_usuario($parametros)
             {
                 if(!class_exists('Template')){
@@ -1102,12 +1296,25 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
 
     public function verPerfilesUsuario($id){                
         $atr=array();
-        $sql = "SELECT cod_perfil FROM mos_usuario_filial WHERE cod_perfil IS NOT NULL AND id_usuario = $id ";
-        
+        $sql = "SELECT cod_perfil FROM mos_usuario_filial WHERE cod_perfil IS NOT NULL AND id_usuario = $id ";        
         $this->operacion($sql, $atr);
         return $this->dbl->data;
     }    
 
+    public function verPerfilesEspecialista($id_usuario, $cod_perfil){
+        $atr=array();
+        $sql = "SELECT id_estructura FROM mos_usuario_estructura WHERE id_usuario = $id_usuario AND cod_perfil =  $cod_perfil AND portal = 'N'";        
+        $this->operacion($sql, $atr);
+        return $this->dbl->data;        
+    }
+    
+    public function verPerfilesPortal($id_usuario, $cod_perfil){
+        $atr=array();
+        $sql = "SELECT id_estructura FROM mos_usuario_estructura WHERE id_usuario = $id_usuario AND cod_perfil =  $cod_perfil AND portal = 'S'";        
+        $this->operacion($sql, $atr);
+        return $this->dbl->data;        
+    }
+    
     public function MuestraPerfilesPortal(){
         $sql="SELECT * FROM mos_perfil_portal ORDER BY descripcion_perfil";
         $data = $this->dbl->query($sql, $atr);
@@ -1143,7 +1350,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
     public function eliminarPerfilesEstructura($atr){
            try {   
                
-               $respuesta = $this->dbl->delete("mos_usuario_estructura", "id_usuario_filial = $atr[id_filial]");
+               $respuesta = $this->dbl->delete("mos_usuario_estructura", "id_usuario_filial = $atr[id_filial]  AND portal = 'N'");
                return "ha sido eliminada con exito";
            } catch(Exception $e) {
                $error = $e->getMessage();                     
@@ -1152,13 +1359,27 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
                return $error; 
            }
     } 
+
+        public function eliminarPerfilesEstructuraPortal($atr){
+           try {   
+               
+               $respuesta = $this->dbl->delete("mos_usuario_estructura", "id_usuario_filial = $atr[id_filial]  AND portal = 'S'");
+               return "ha sido eliminada con exito";
+           } catch(Exception $e) {
+               $error = $e->getMessage();                     
+               if (preg_match("/alumno_inscrito_fk_id_ano_escolar_fkey/",$error ) == true) 
+                   return "No se puede eliminar el año escolar porque existen alumnos inscritos para el año seleccionado.";                        
+               return $error; 
+           }
+    } 
+
     
     public function ingresarPerfilesEstructura($atr){
         try {  
             
             $atr = $this->dbl->corregir_parametros($atr);
-            $sql = "INSERT INTO mos_usuario_estructura(id_usuario_filial,id_estructura,id_usuario, cod_perfil)
-                    VALUES($atr[id_filial],$atr[id_estructura],$atr[id_usuario],$atr[cod_perfil])";
+            $sql = "INSERT INTO mos_usuario_estructura(id_usuario_filial,id_estructura,id_usuario, cod_perfil, portal)
+                    VALUES($atr[id_filial],$atr[id_estructura],$atr[id_usuario],$atr[cod_perfil], 'N')";
             $this->dbl->insert_update($sql);
             return "Los Perfiles han sido ingresado con exito";
         } catch(Exception $e) {
@@ -1168,6 +1389,23 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
                 return $error; 
             }        
     }
+    
+    public function ingresarPerfilesEstructuraPortal($atr){
+        try {  
+            
+            $atr = $this->dbl->corregir_parametros($atr);
+            $sql = "INSERT INTO mos_usuario_estructura(id_usuario_filial,id_estructura,id_usuario, cod_perfil, portal)
+                    VALUES($atr[id_filial],$atr[id_estructura],$atr[id_usuario],$atr[cod_perfil], 'S')";
+            $this->dbl->insert_update($sql);
+            return "Los Perfiles han sido ingresado con exito";
+        } catch(Exception $e) {
+                $error = $e->getMessage();                     
+                if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
+                    return "Ya existe una sección con el mismo nombre.";                        
+                return $error; 
+            }        
+    }
+    
     public function ingresarPerfilesUsuario($atr){
         try {                
             $atr = $this->dbl->corregir_parametros($atr);
@@ -1246,6 +1484,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
 
    public function cargarConfiguracionPerfiles($parametros)
    {   
+       
        session_name("$GLOBALS[SESSION]");
        session_start();
        $objResponse = new xajaxResponse();
@@ -1260,6 +1499,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
                }
                 $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
        }else{
+          
             $arr = explode(",", $parametros[nodos]);
             $arrportal = explode(",", $parametros[nodosportal]);
             
@@ -1271,8 +1511,11 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
                  $params[id_estructura] = $temp;
                  $respuesta = $this->ingresarPerfilesEstructura($params);
             }           
-            $objResponse->addScriptCall("MostrarContenido");
-            $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+//            $objResponse->addScriptCall("MostrarContenido");
+//            $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+            $objResponse->addScriptCall("MostrarContenidoAux");
+            $objResponse->addScriptCall('VerMensaje','exito',"Perfil actualizado con exito");
+            
        }
        $objResponse->addScript("$('#MustraCargando').hide();"); 
        $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
@@ -1280,5 +1523,44 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
        return $objResponse;
    }    
    
-   
+  public function cargarConfiguracionPerfilesPortal($parametros)
+   {          
+       session_name("$GLOBALS[SESSION]");
+       session_start();
+       $objResponse = new xajaxResponse();
+       unset ($parametros['opc']);
+            
+       $validator = new FormValidator();                
+       if(!$validator->ValidateForm($parametros)){
+               $error_hash = $validator->GetErrors();
+               $mensaje="";
+               foreach($error_hash as $inpname => $inp_err){
+                       $mensaje.="- $inp_err <br/>";
+               }
+                $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
+       }else{
+          
+            $arr = explode(",", $parametros[nodos]);
+            $arrportal = explode(",", $parametros[nodosportal]);
+            
+            $params[id_usuario] = $parametros[id_usuario];
+            $params[id_filial] = $parametros[id_filial]; 
+            $params[cod_perfil] = $parametros[cod_perfil];
+            $this->eliminarPerfilesEstructuraPortal($parametros);
+            foreach($arr as $temp){
+                 $params[id_estructura] = $temp;
+                 $respuesta = $this->ingresarPerfilesEstructuraPortal($params);
+            }           
+//            $objResponse->addScriptCall("MostrarContenido");
+//            $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+            $objResponse->addScriptCall("MostrarContenidoAux");
+            $objResponse->addScriptCall('VerMensaje','exito',"Perfil actualizado con exito");
+            
+       }
+       $objResponse->addScript("$('#MustraCargando').hide();"); 
+       $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                               $( '#btn-guardar' ).prop( 'disabled', false );");
+       return $objResponse;
+   }    
+    
  }?>
