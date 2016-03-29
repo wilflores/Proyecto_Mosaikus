@@ -23,7 +23,7 @@ function limpiar_titulo(){
 }
 
 function init_documentos(){
-    alert('init_documentos');
+    //alert('init_documentos');
     $( "#b-reviso" ).select2({
         placeholder: "Selecione el revisor",
         allowClear: true
@@ -57,7 +57,7 @@ function init_documentos(){
 
 
 function init_ver_registros()
-{alert('init_ver_registros');
+{//alert('init_ver_registros');
     $('#a-ver-registros').on('click', function (event) {
             event.preventDefault();
             

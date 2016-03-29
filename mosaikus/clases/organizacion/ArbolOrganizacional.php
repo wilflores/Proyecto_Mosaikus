@@ -287,6 +287,12 @@
                 $reg_por_pagina = getenv("PAGINACION");
                 if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
                 $this->listarArbolOrganizacionalReporte($parametros, $parametros['pag'], $reg_por_pagina);
+                /*CALCULA EL NUMERO DE NIVELES DEL ARBOL*/
+                $niveles = $this->numeroNivelesHijos(array(2));
+                $out[titulo] = "";
+                for($i=1;$i<=$niveles;$i++){
+                    $out[titulo] .= "<th>Nivel $i</th>" ;
+                }
                 $data=$this->dbl->data;
                 $html = "";
                 
@@ -500,6 +506,25 @@
                 return $objResponse;
             }
             
+            /**
+             * Devuelve el numero de niveles del arbol
+             * 
+             */
+            public function numeroNivelesHijos($param=array(),$num=0) {
+                $ids = implode(",", $param);
+                $sql = "select id from mos_organizacion where parent_id in ($ids)";
+                $data = $this->dbl->query($sql);
+                if (count($data)>0){
+                    $param = array();
+                    foreach ($data as $value) {
+                        $param[] = $value[id];
+                    }
+                    $num++;
+                    return $this->numeroNivelesHijos($param,$num);
+                }
+                return $num;                                
+            }
+            
             public function indexArbolOrganizacionalReporte($parametros)
             {
                 $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
@@ -532,6 +557,9 @@
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
                 $contenido['TABLA'] = $grid['tabla'];
+                $contenido[TITULO_TABLA] = $grid['titulo'];
+                
+                
                 $contenido['PAGINADO'] = $grid['paginado'];
                 $contenido['FECHA'] = date('d/m/Y');
                 //$contenido['OPCIONES_BUSQUEDA'] = " <option value='campo'>campo</option>";
@@ -555,6 +583,7 @@
                 $template->PATH = PATH_TO_TEMPLATES.'organizacion/';
                 
                 $contenido[ID_EMPRESA] = $_SESSION[CookIdEmpresa];
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $this->jstree_ao();                
                 $template->setTemplate("listar_reporte");
                 $template->setVars($contenido);
                 //$this->contenido['CONTENIDO']  = $template->show();
@@ -568,6 +597,11 @@
                 $objResponse->addAssign('modulo_actual',"value","organizacion");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'organizacion/organizacion.js');
                 $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript('init_filtro_ao_simple();
+                                        PanelOperator.initPanels("");
+                                        ScrollBar.initScroll();
+                                        PanelOperator.resize();
+                                        ');
                 return $objResponse;
             }
          

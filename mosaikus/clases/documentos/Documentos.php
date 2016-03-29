@@ -1063,11 +1063,11 @@
                     if (strlen($atr["b-v_meses"])>0)
                                $sql .= " AND v_meses = '". $atr["b-v_meses"] . "'";
                     if (strlen($atr["b-reviso"])>0)
-                               $sql .= " AND reviso = '". $atr["b-reviso"] . "'";
+                               $sql .= " AND d.reviso = '". $atr["b-reviso"] . "'";
                     if (strlen($atr["b-elaboro"])>0)
-                               $sql .= " AND elaboro = '". $atr["b-elaboro"] . "'";
+                               $sql .= " AND d.elaboro = '". $atr["b-elaboro"] . "'";
                     if (strlen($atr["b-aprobo"])>0)
-                        $sql .= " AND aprobo = '". $atr["b-aprobo"] . "'";
+                        $sql .= " AND d.aprobo = '". $atr["b-aprobo"] . "'";
 
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
@@ -1199,11 +1199,11 @@
                     if (strlen($atr["b-v_meses"])>0)
                                $sql .= " AND v_meses = '". $atr["b-v_meses"] . "'";
                     if (strlen($atr["b-reviso"])>0)
-                               $sql .= " AND reviso = '". $atr["b-reviso"] . "'";
+                               $sql .= " AND d.reviso = '". $atr["b-reviso"] . "'";
                     if (strlen($atr["b-elaboro"])>0)
-                               $sql .= " AND elaboro = '". $atr["b-elaboro"] . "'";
+                               $sql .= " AND d.elaboro = '". $atr["b-elaboro"] . "'";
                     if (strlen($atr["b-aprobo"])>0)
-                        $sql .= " AND aprobo = '". $atr["b-aprobo"] . "'";
+                        $sql .= " AND d.aprobo = '". $atr["b-aprobo"] . "'";
                     if (strlen($atr["nodos"])>0)
                         $sql .= " AND d.IDDoc in (SELECT DISTINCT IDDoc
                                                     FROM mos_registro_item 

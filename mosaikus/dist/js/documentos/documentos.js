@@ -280,7 +280,7 @@ function cargar_autocompletado(){
             array.addParametro('import','clases.documentos.Documentos');
             xajax_Loading(array.getArray());
         }else{
-            alertify.error("Existen campos no validos.",0); 
+            alertify.error("Existen campos no validos.",5); 
         }
     }
     
