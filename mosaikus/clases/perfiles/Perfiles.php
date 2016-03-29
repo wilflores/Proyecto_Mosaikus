@@ -1,5 +1,4 @@
 <?php
-
  import("clases.interfaz.Pagina");        
         class Perfiles extends Pagina{
         private $templates;
