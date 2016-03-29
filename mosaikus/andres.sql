@@ -64,3 +64,11 @@ CREATE TABLE `mos_workflow_documentos` (
 INSERT INTO `mos_link` VALUES ('82', 'WorkflowDocumentos-indexWorkflowDocumentos-clases.workflow_documentos.WorkflowDocumentos', 'WorkFlow de Documentos', '3', '2', '', '55', null);
 
 INSERT INTO `mos_link_por_perfil` VALUES ('1', '82');
+
+INSERT INTO `mos_nombres_campos` VALUES ('242', 'id', 'id', '23', 'id');
+INSERT INTO `mos_nombres_campos` VALUES ('243', 'id_personal_responsable', 'id_personal_responsable', '23', 'id_personal_responsable');
+INSERT INTO `mos_nombres_campos` VALUES ('244', 'email_responsable', 'email_responsable', '23', 'email_responsable');
+INSERT INTO `mos_nombres_campos` VALUES ('245', 'id_personal_revisa', 'id_personal_revisa', '23', 'id_personal_revisa');
+INSERT INTO `mos_nombres_campos` VALUES ('246', 'email_revisa', 'email_revisa', '23', 'email_revisa');
+INSERT INTO `mos_nombres_campos` VALUES ('247', 'id_personal_aprueba', 'id_personal_aprueba', '23', 'id_personal_aprueba');
+INSERT INTO `mos_nombres_campos` VALUES ('248', 'email_aprueba', 'email_aprueba', '23', 'email_aprueba');
