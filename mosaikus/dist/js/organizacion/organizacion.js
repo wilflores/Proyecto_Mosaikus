@@ -58,19 +58,19 @@
     }
     function verPagina(pag,doc){
         array = new XArray();
-        if (doc== null)
-        {
-             $('form')[0].reset();             
-        }
+//        if (doc== null)
+//        {
+//             $('form')[0].reset();             
+//        }
         array.getForm('busquedaFrm'); 
-        if ((isNaN(document.getElementById("reg_por_pag").value) == true) || (parseInt(document.getElementById("reg_por_pag").value) <= 0)){
-            array.addParametro('reg_por_pagina', 10);
-            document.getElementById("reg_por_pag").value = 10
-        }
-        else
-        {
-            array.addParametro('reg_por_pagina', document.getElementById("reg_por_pag").value);
-        }
+//        if ((isNaN(document.getElementById("reg_por_pag").value) == true) || (parseInt(document.getElementById("reg_por_pag").value) <= 0)){
+//            array.addParametro('reg_por_pagina', 10);
+//            document.getElementById("reg_por_pag").value = 10
+//        }
+//        else
+//        {
+//            array.addParametro('reg_por_pagina', document.getElementById("reg_por_pag").value);
+//        }
         array.addParametro('permiso',document.getElementById('permiso_modulo').value);
         array.addParametro('pag',pag);
         array.setObjeto('ArbolOrganizacional','buscar');
@@ -91,6 +91,7 @@
     }
     
     function reporte_ao_pdf(){
-         window.open('pages/organizacion/reporte_ao_pdf.php?','_blank');
+        var params = getForm('busquedaFrm'); ;
+         window.open('pages/organizacion/reporte_ao_pdf.php?'+params,'_blank');
     }
     

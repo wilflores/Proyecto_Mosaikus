@@ -15,7 +15,10 @@
             include_once('configuracion/configuracion.php');
             import('clases.organizacion.ArbolOrganizacional');
             $pagina = new ArbolOrganizacional();
-            $html = $pagina->verListaArbolOrganizacionalReporte(array());
+            if (strlen($_GET['b-id_organizacion'])== 0)
+                $params['b-id_organizacion'] = 2;
+            else $params['b-id_organizacion'] = $_GET['b-id_organizacion'];
+            $html = $pagina->verListaArbolOrganizacionalReporte($params);
 
     ?>
 
@@ -95,10 +98,11 @@ td{
                     <table class="table table-report  ">
                       <thead>
                       <tr>
+                          <?php echo $html[titulo]; ?><!--
                         <th style="width: 450px;">GERENCIAS</th>
                         <th style="width: 450px;">ÁREAS</th>
                         <th style="width: 450px;">SUB - ÁREAS</th>
-                        <th style="width: 450px;">SUB - ÁREAS</th>
+                        <th style="width: 450px;">SUB - ÁREAS</th>-->
 
 
                       </tr>

@@ -11,11 +11,15 @@
 	import('clases.organizacion.ArbolOrganizacional');
 
 	$pagina = new ArbolOrganizacional();
-	$tabla = $pagina->verListaArbolOrganizacionalReporte(array());
+        if (strlen($_GET['b-id_organizacion'])== 0)
+            $params['b-id_organizacion'] = 2;
+        else $params['b-id_organizacion'] = $_GET['b-id_organizacion'];
+	$tabla = $pagina->verListaArbolOrganizacionalReporte($params);
         $template = new Template();
         $template->PATH = PATH_TO_TEMPLATES.'organizacion/';
         $contenido_1 = array();
         $contenido_1[TABLA] = $tabla[tabla];
+        $contenido_1[TITULO] = $tabla[titulo];
         $contenido_1['HOME'] = HOME;
         $contenido_1[FECHA] = date('d/m/Y');
         $contenido_1['N_PAG'] = '{PAGENO}/{nbpg}';
@@ -33,7 +37,14 @@
         $pdf = new GenerarPDFReportes();
         //echo 1;
         //echo $template->show();
-        $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 1, true, 0,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
+        //$tabla[niveles] = 9;
+        if ($tabla[niveles] <= 4)
+            $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 1, true, 0,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
+        else if ($tabla[niveles] <= 8) 
+            $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 1, true, 1,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
+        else 
+            $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 3, true, 1,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
+            
 //        require_once ('clases/MPDF60/mpdf.php');
 //        $mpdf = new mPDF();
 //$html = '<div class="container">

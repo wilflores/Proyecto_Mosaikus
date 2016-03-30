@@ -56,10 +56,8 @@
                     <table class="table table-report  ">
                       <thead>
                       <tr>
-                          <th style="width: 25%">GERENCIAS</th>
-                        <th style="width: 25%">ÁREAS</th>
-                        <th style="width: 25%">SUB - ÁREAS</th>
-                        <th style="width: 25%">SUB - ÁREAS</th>
+                          {TITULO}
+                         
 
 
                       </tr>

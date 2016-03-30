@@ -170,14 +170,21 @@
              public function listarArbolOrganizacionalReporte($atr, $pag, $registros_x_pagina){
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
-                                       
-            
-                    $sql = "select g.id g_id, g.title g,a.id a_id, a.title a,sa1.id sa1_id, sa1.title sa1,sa2.id sa2_id,sa2.title sa2 
-                        from mos_organizacion g
-                                LEFT JOIN mos_organizacion a on a.parent_id = g.id
-                                LEFT JOIN mos_organizacion sa1 on sa1.parent_id =a.id
-                                LEFT JOIN mos_organizacion sa2 on sa2.parent_id = sa1.id
-                                where g.parent_id = 2";
+                    $k = 1;                    
+                    for($k=1;$k<=$atr[niveles];$k++) {
+                        if ($k==1){
+                            $sql_left .= "mos_organizacion a$k ";                            
+                        }
+                        else{
+                            $sql_left.= " LEFT JOIN mos_organizacion a$k on a$k.parent_id = a".($k-1).".id ";
+                        }
+                        $sql_col_left .= ",a$k.id id_$k, a$k.title nombre_$k";                        
+                    }
+                    
+                    $sql = "select 1 $sql_col_left
+                        from $sql_left
+                                where a1.parent_id = ". $atr["b-id_organizacion"];
+                    //echo $sql;
                     
                     //$sql .= " order by $atr[corder] $atr[sorder] ";
                     //$sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
@@ -286,16 +293,41 @@
                     $parametros['pag'] = 1;
                 $reg_por_pagina = getenv("PAGINACION");
                 if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
-                $this->listarArbolOrganizacionalReporte($parametros, $parametros['pag'], $reg_por_pagina);
+                
                 /*CALCULA EL NUMERO DE NIVELES DEL ARBOL*/
-                $niveles = $this->numeroNivelesHijos(array(2));
+                $out[niveles] = $niveles = $parametros[niveles] = $this->numeroNivelesHijos(array($parametros["b-id_organizacion"]));
                 $out[titulo] = "";
                 for($i=1;$i<=$niveles;$i++){
-                    $out[titulo] .= "<th>Nivel $i</th>" ;
+                    $out[titulo] .= "<th style=\"width: ". 100 / $niveles  . "%\" >Nivel $i</th>" ;
                 }
+                $this->listarArbolOrganizacionalReporte($parametros, $parametros['pag'], $reg_por_pagina);
                 $data=$this->dbl->data;
+                //print_r($data);
                 $html = "";
                 
+                $id_aux = $ids = $con_g = array();
+                for($i=1;$i<=$niveles;$i++){                                           
+                    $id_aux[$i] = $data[0]["id_$i"];
+                    $con_g[$i] = 0;
+                    
+                }  
+                foreach ($data as $value) {
+                    for($i=1;$i<=$niveles;$i++){
+                        if ($value["id_$i"] != $id_aux[$i]){
+                            $ids[$id_aux[$i]] = $con_g[$i];
+                            $id_aux[$i] = $value["id_$i"];
+                            $con_g[$i] = 1;
+                        }
+                        else
+                            $con_g[$i]++;
+                    }                    
+                }
+                for($i=1;$i<=$niveles;$i++){                    
+                    $ids[$id_aux[$i]] = $con_g[$i];                        
+                }  
+                //print_r($ids);
+                
+                /*
                 $g_id = $a_id = $sa1_id = $sa2_id = array();
                 $g_id_aux = $data[0][g_id];
                 $a_id_aux = $data[0][a_id];
@@ -339,7 +371,27 @@
                 $sa1_id[$sa1_id_aux] = $con_sa1;
                 $sa1_id[$sa2_id_aux] = $con_sa2;
                 
-                $g_id_aux = $a_id_aux = $sa1_id_aux = $sa2_id_aux = '';
+                $g_id_aux = $a_id_aux = $sa1_id_aux = $sa2_id_aux = '';*/
+                $id_aux = array();
+                foreach ($data as $value) {
+                    
+                    $html .= '<tr class="odd gradeX">';
+                    for($i=1;$i<=$niveles;$i++){
+                        if ($value["id_$i"] != ''){
+                            if ($value["id_$i"] != $id_aux[$i]){
+                                $html .= '<td rowspan="'. $ids[$value["id_$i"]] .'">'.$value["nombre_$i"].'</td>';
+                                $id_aux[$i] = $value["id_$i"];;
+                            }
+                        }
+                        else
+                            $html .= '<td>&nbsp;</td>';
+                    }
+                                        
+
+
+                     $html .= '</tr>';
+                }
+                /*
                 foreach ($data as $value) {
                     $html .= '<tr class="odd gradeX">';
                     if ($value[g_id] != $g_id_aux){
@@ -366,7 +418,7 @@
 
 
                      $html .= '</tr>';
-                }
+                }*/
                 
                 //echo $html;
                 //print_r($sa2_id);
@@ -552,6 +604,7 @@
                             </div>';
                     $k++;
                 }
+                $parametros["b-id_organizacion"] = 2;
                 $grid = $this->verListaArbolOrganizacionalReporte($parametros);
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
@@ -772,14 +825,22 @@
             }
      
  
-                public function buscar($parametros)
+            public function buscar($parametros)
             {
-                $grid = $this->verListaArbolOrganizacional($parametros);                
+                $grid = $this->verListaArbolOrganizacionalReporte($parametros);                
                 $objResponse = new xajaxResponse();
-                $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
-                $objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
+                
+                $html = '<table class="table table-report  ">
+                      <thead>
+                      <tr>'.$grid[titulo].'</tr>
+                      </thead>
+                      <tbody>'.$grid[tabla].'</tbody>
+                    </table>';
+                $objResponse->addAssign('grid',"innerHTML",$html);
+                //$objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
                           
                 $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("PanelOperator.resize();");
                 return $objResponse;
             }
          

@@ -28,15 +28,17 @@
                     return 2;}
             }
             //print_r($_SESSION);
-            function Loading($parametros){                
-                if(isset($parametros['id_menu_opcion'])){  
-                    if($_SESSION['CookIdUsuario']=='')// && $_SESSION['ID_ROL']=='')	 	
+            function Loading($parametros){   
+                if($_SESSION['CookIdUsuario']=='')// && $_SESSION['ID_ROL']=='')	 	
                     {
                             $objResponse = new xajaxResponse();
                             //$objResponse->addScript("alert('Su sesion ha expirado')");
                             $objResponse->addScript("location.replace('mos_logout.php')");
                             return $objResponse;
                     }
+                if(isset($parametros['id_menu_opcion']))
+                {  
+                    
                     $encryt = new EnDecryptText();                                
                     $pagina = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
                     $sql = 'Select descripcion,nombre_link FROM mos_link WHERE cod_link = ' . $parametros['id_menu_opcion'];
