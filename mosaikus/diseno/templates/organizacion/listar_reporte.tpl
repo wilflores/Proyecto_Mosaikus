@@ -56,6 +56,18 @@
                     </div>
 
                 </div>
+                    <div class="report-footer" style="border-top: 0px solid #cfd8dc;margin-top: 0px;padding-bottom: 0px;padding-top: 0px;">
+                        <div class="report-actions">
+                            <ul class="nav">
+                                <li><i class="icon icon-transmision cursor-pointer" title="Exportar Excel" onclick="exportarExcel();"></i></li>
+                                <li><i class="icon icon-alert-print cursor-pointer" title="Generar PDF" onclick="reporte_ao_pdf();"></i></li>
+                                <!--<li><i class="glyphicon glyphicon-print"></i></li>
+                                <li><i class="glyphicon glyphicon-print"></i></li>-->
+
+
+                            </ul>
+                        </div>    
+                    </div>
             </div>
             
             <div class="report-body" id="grid">                    
@@ -85,8 +97,8 @@
                 </div>
                 <div class="report-actions">
                     <ul class="nav">
-                        <li><i class="icon icon-transmision cursor-pointer" onclick="exportarExcel();"></i></li>
-                        <li><i class="icon icon-view-document cursor-pointer" onclick="reporte_ao_pdf();"></i></li>
+                        <li><i class="icon icon-transmision cursor-pointer" title="Exportar Excel" onclick="exportarExcel();"></i></li>
+                        <li><i class="icon icon-alert-print cursor-pointer" title="Generar PDF" onclick="reporte_ao_pdf();"></i></li>
                         <!--<li><i class="glyphicon glyphicon-print"></i></li>
                         <li><i class="glyphicon glyphicon-print"></i></li>-->
 

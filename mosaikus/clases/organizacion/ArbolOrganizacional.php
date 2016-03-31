@@ -302,6 +302,7 @@
                 }
                 $this->listarArbolOrganizacionalReporte($parametros, $parametros['pag'], $reg_por_pagina);
                 $data=$this->dbl->data;
+                $out[filas] = count($data);
                 //print_r($data);
                 $html = "";
                 
@@ -827,6 +828,8 @@
  
             public function buscar($parametros)
             {
+                if (strlen($parametros['b-id_organizacion'])== 0)
+                    $parametros['b-id_organizacion'] = 2;                
                 $grid = $this->verListaArbolOrganizacionalReporte($parametros);                
                 $objResponse = new xajaxResponse();
                 
