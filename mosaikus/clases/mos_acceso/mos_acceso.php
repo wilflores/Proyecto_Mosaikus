@@ -1,4 +1,5 @@
 <?php
+
     import("clases.interfaz.Pagina");
     class mos_acceso extends Pagina{
         private $templates;
