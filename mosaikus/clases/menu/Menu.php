@@ -1,5 +1,4 @@
 <?php
-
  import("clases.interfaz.Pagina");
         include_once(dirname(dirname(dirname(__FILE__))).'/clases/bd/SQLServer.php');
         class Menu extends Pagina{
