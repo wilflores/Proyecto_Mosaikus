@@ -186,13 +186,17 @@
                 //if($SuperUser!='S')
                 $Consulta.=" where t1.id_usuario='".$_SESSION[CookIdUsuario]."' and  t1.id_filial='".$_SESSION[CookFilial]."' AND t3.dependencia = 0";
                 $Consulta.=" group by t3.cod_link order by t3.dependencia,t3.orden asc";
-                //print_r($_SESSION);
-                //echo $Consulta;
-                $this->operacion_2($Consulta, $parametros);
-                
-                //print_r($this->dbl->data);
+                //$this->operacion_2($Consulta, $parametros);                
+
+                import('clases.mos_acceso.mos_acceso');                
+                $acceso = new mos_acceso();
+                $nodos = $acceso->obtenerNodosMenu($_SESSION[CookIdUsuario], $_SESSION[CookFilial],'Especialista');
+                $padres = $acceso->obtenerHijosMenu($nodos, 0); 
+                                                               
                 $html = '';
-                foreach ($this->dbl->data as $value) {
+                
+                //foreach ($this->dbl->data as $value) {
+                foreach ($padres as $value) {
                     $html .= $this->buscar_hijo($value,1);
                 }
 //                $sql = "UPDATE mos_usuario_filial SET ultimo_acceso = 1 WHERE id_usuario='".$_SESSION[CookIdUsuario]."' and  id_filial='".$_SESSION[CookFilial]."'";
@@ -213,10 +217,15 @@
                 //print_r($_SESSION);
                 //echo $Consulta;
                 $this->operacion_2($Consulta, $parametros);
+
+                import('clases.mos_acceso.mos_acceso');                
+                $acceso = new mos_acceso();
+                $nodos = $acceso->obtenerNodosMenu($_SESSION[CookIdUsuario], $_SESSION[CookFilial],'Portal');
+                $padres = $acceso->obtenerHijosMenu($nodos, 0); 
                 
-                //print_r($this->dbl->data);
                 $html = '';
-                foreach ($this->dbl->data as $value) {
+                //foreach ($this->dbl->data as $value) {
+                foreach ($padres as $value) {
                     $html .= $this->buscar_hijo_portal($value,1);
                 }
 //                $sql = "UPDATE mos_usuario_filial SET ultimo_acceso = 2 WHERE id_usuario='".$_SESSION[CookIdUsuario]."' and  id_filial='".$_SESSION[CookFilial]."'";
