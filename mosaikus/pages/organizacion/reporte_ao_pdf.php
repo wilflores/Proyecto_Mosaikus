@@ -37,10 +37,14 @@
         $pdf = new GenerarPDFReportes();
         //echo 1;
         //echo $template->show();
-        //$tabla[niveles] = 9;
-        if ($tabla[niveles] <= 4)
+        $tabla[niveles] = 5;
+        if ($tabla[niveles] <= 6){
+            if ($tabla[filas] > 30)
+                $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 3, true, 0,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
+            else
             $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 1, true, 0,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
-        else if ($tabla[niveles] <= 8) 
+        }
+        else if ($tabla[niveles] <= 10) 
             $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 1, true, 1,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
         else 
             $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 3, true, 1,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
