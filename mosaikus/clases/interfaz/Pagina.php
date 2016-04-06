@@ -663,6 +663,7 @@ class Pagina{
         $sql = "SELECT COUNT(*) total_registros
                         FROM mos_usuario_filial 
                 WHERE id_usuario='".$_SESSION[CookIdUsuario]."' and  id_filial='".$_SESSION[CookFilial]."' AND cod_perfil_portal > 0";
+        
         $total_registros = $menu->dbl->query($sql, $atr);
         $total = $total_registros[0][total_registros];  
         if ($total > 0){
