@@ -47,12 +47,13 @@
             }
             
             public function ingresarMenuArbol($atr){
-                try {                    
+                try {                           
                     $atr = $this->dbl->corregir_parametros($atr);
-                    $sql = "INSERT INTO mos_link_por_perfil_portal(cod_perfil,cod_link, visualizar_terceros)
+                    $sql = "INSERT INTO mos_link_por_perfil_portal(cod_perfil,cod_link)
                             VALUES(
-                                $atr[cod_perfil],$atr[id], $atr[visualizar_terceros], 
+                                $atr[cod_perfil],$atr[id] 
                                 )";
+                    
                     $this->dbl->insert_update($sql);
                     return "El Perfil '$atr[cod_perfil]' ha sido ingresado con exito";
                 } catch(Exception $e) {

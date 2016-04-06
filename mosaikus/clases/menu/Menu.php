@@ -216,13 +216,13 @@
                 $Consulta.=" group by t3.cod_link order by t3.dependencia,t3.orden asc";
                 //print_r($_SESSION);
                 //echo $Consulta;
-                $this->operacion_2($Consulta, $parametros);
+                //$this->operacion_2($Consulta, $parametros);
 
                 import('clases.mos_acceso.mos_acceso');                
                 $acceso = new mos_acceso();
                 $nodos = $acceso->obtenerNodosMenu($_SESSION[CookIdUsuario], $_SESSION[CookFilial],'Portal');
                 $padres = $acceso->obtenerHijosMenu($nodos, 0); 
-                
+                //print_r($padres);
                 $html = '';
                 //foreach ($this->dbl->data as $value) {
                 foreach ($padres as $value) {

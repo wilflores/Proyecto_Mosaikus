@@ -71,19 +71,30 @@
             
             global $arbol;
             $arbol = $this->dbl->data;
-                    
-            $sql = "select distinct t3.dependencia
-                from mos_usuario_filial t1 inner join mos_link_por_perfil t2 on t1.cod_perfil=t2.cod_perfil inner join mos_link t3 on t2.cod_link=t3.cod_link 
-                where t1.id_usuario='$usuario' and t1.id_filial='$filial' 	
-                group by t3.cod_link 
-                order by t3.dependencia,t3.orden asc";
+            if($modo == 'Especialista')        
+                $sql = "select distinct t3.dependencia
+                    from mos_usuario_filial t1 inner join mos_link_por_perfil t2 on t1.cod_perfil=t2.cod_perfil inner join mos_link t3 on t2.cod_link=t3.cod_link 
+                    where t1.id_usuario='$usuario' and t1.id_filial='$filial' 	
+                    group by t3.cod_link 
+                    order by t3.dependencia,t3.orden asc";
+            else
+                $sql="select distinct t3.dependencia
+                    from mos_usuario_filial t1 inner join mos_link_por_perfil_portal t2 on t1.cod_perfil_portal=t2.cod_perfil  inner join mos_link_portal t3 on t2.cod_link=t3.cod_link
+                    where t1.id_usuario='$usuario' and  t1.id_filial='$filial'
+                    group by t3.cod_link 
+                    order by t3.dependencia,t3.orden asc
+                     ";    
+                
             $this->operacion($sql, $atr);
             $padres = $this->dbl->data;             
           
             foreach ($padres as $arrN) {                
                 $this->recursiveGenerateCite($arrN);
             }
+            //ordenar el arbol obtenido
             asort($arbol);
+            
+            //recorro 
             foreach ($arbol as $k1 => $v1) {
                 foreach ($arbol as $k2 => $v2) {
                     if ($k1 != $k2) {
@@ -93,6 +104,7 @@
                     }
                 }
             }
+            //print_r($arbol); die();
             return $arbol;
         }
     }

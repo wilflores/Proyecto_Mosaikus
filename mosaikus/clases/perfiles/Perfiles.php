@@ -34,12 +34,11 @@
                 }                
             }
 
-            public function verMenuArbol($id){                
+            public function verMenuArbol($id){                                
                 $atr=array();
                 $sql = "SELECT cod_perfil,cod_link
                          FROM mos_link_por_perfil 
-                         WHERE cod_perfil = $id ";
-                //print_r($sql);
+                         WHERE cod_perfil = $id ";                
                 $this->operacion($sql, $atr);
                 return $this->dbl->data;
             }
@@ -803,7 +802,7 @@
 
     public function MuestraHijos($id){
         $sql="SELECT * FROM mos_link WHERE dependencia = ".$id." ORDER BY orden";
-        $data = $this->dbl->query($sql, $atr);
+        $data = $this->dbl->query($sql, $atr);       
         $cabecera = "<ul>";
         foreach ($data as $arr) {
                 $extra .= "<li id=\"phtml_".$arr[cod_link]."\"><a href=\"#\">".($arr[nombre_link])."</a>".$this->MuestraHijos($arr[cod_link])."</li>";		                
