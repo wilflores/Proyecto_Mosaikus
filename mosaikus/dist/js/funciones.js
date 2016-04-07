@@ -1,4 +1,191 @@
 
+function admin_ao(){    
+        var to = false;
+        $('#demo_q').keyup(function () {
+                if(to) { clearTimeout(to); }
+                to = setTimeout(function () {
+                        var v = $('#demo_q').val();
+                        $('#tree').jstree(true).search(v);
+                }, 250);
+        });
+        $('#tree')
+                .jstree({
+                        'core' : {
+                                'data' : {
+                                        'url' : 'clases/organizacion/server.php',
+                                        //'url' : 'clases/organizacion/response.php?operation=get_node',
+                                        'data' : function (node) {
+                                                return { 'id' : node.id };
+                                        }
+                                },
+                                'check_callback' : true,
+                                'themes' : {
+                                        'responsive' : false
+                                }
+                        },
+                        'force_text' : true,
+                        'plugins' : ['state','dnd','contextmenu','search']
+                })
+                .on('delete_node.jstree', function (e, data) {
+                        $.get('clases/organizacion/response.php?operation=delete_node', { 'id' : data.node.id })
+                                .done(function (d) {
+                                    if(d.exito==2){
+                                        VerMensaje('error',''+d.msj+'');
+                                        data.instance.refresh();
+                                    }
+
+                                        //data.instance.set_id(data.node, d.id);
+                                })
+                                .fail(function (jqXHR, textStatus, errorThrown) {
+                                     console.log(jqXHR.responseText);
+                                     if (jqXHR.responseText.indexOf('mos_documentos_estrorg_arbolproc_ibfk_1')!=-1){
+                                         VerMensaje('error','No se puede eliminar el &aacute;rea, existen Documentos asociados');
+                                     }else if (jqXHR.responseText.indexOf('mos_acciones_correctivas_ibfk_1')!=-1){
+                                         VerMensaje('error','No se puede eliminar el &aacute;rea, existen Acciones Correctivas asociadas');
+                                     }else if (jqXHR.responseText.indexOf('mos_correcciones_ibfk_1')!=-1){
+                                         VerMensaje('error','No se puede eliminar el &aacute;rea, existen Correcciones asociadas');
+                                     }else if (jqXHR.responseText.indexOf('mos_personal_ibfk_1')!=-1){
+                                         VerMensaje('error','No se puede eliminar el &aacute;rea, existen personas asociados');
+                                     }
+                                        data.instance.refresh();
+                                });
+                })
+                .on('create_node.jstree', function (e, data) {
+                        $.get('clases/organizacion/response.php?operation=create_node', { 'id' : data.node.parent, 'position' : data.position, 'text' : data.node.text })
+                                .done(function (d) {
+                                        data.instance.set_id(data.node, d.id);
+                                })
+                                .fail(function () {
+                                        data.instance.refresh();
+                                });
+                })
+                .on('rename_node.jstree', function (e, data) {
+                        $.get('clases/organizacion/response.php?operation=rename_node', { 'id' : data.node.id, 'text' : data.text })
+                                .fail(function () {
+                                        data.instance.refresh();
+                                });
+                })
+                .on('move_node.jstree', function (e, data) {
+                        $.get('clases/organizacion/response.php?operation=move_node', { 'id' : data.node.id, 'parent' : data.parent, 'position' : data.position })
+                                .fail(function () {
+                                        data.instance.refresh();
+                                });
+                })
+                .on('copy_node.jstree', function (e, data) {
+                        $.get('clases/organizacion/response.php?operation=copy_node', { 'id' : data.original.id, 'parent' : data.parent, 'position' : data.position })
+                                .always(function () {
+                                        data.instance.refresh();
+                                });
+                })
+                .on('changed.jstree', function (e, data) {
+                        if (data.selected.length > 0){
+                            //console.log($("#divtree").jstree("get_selected").text());
+                            var arr = data.selected[0].split("_");
+                            id = arr[1];
+                            $('#b-id_organizacion').val(data.selected[0]);
+                            //alert($('#b-id_organizacion-reg'));
+                        }
+                        else
+                            $('#b-id_organizacion').val('');
+                });
+
+}
+
+function admin_ap(){    
+        var to = false;
+        $('#demo_q').keyup(function () {
+                if(to) { clearTimeout(to); }
+                to = setTimeout(function () {
+                        var v = $('#demo_q').val();
+                        $('#tree').jstree(true).search(v);
+                }, 250);
+        });
+        
+        $('#tree')
+                .jstree({
+                        'core' : {
+                                'data' : {
+                                        'url' : 'clases/arbol_procesos/server.php?id_ao='+$('#b-id_organizacion').val(),
+                                        //'url' : 'clases/organizacion/response.php?operation=get_node',
+                                        'data' : function (node) {
+                                                return { 'id' : node.id };
+                                        }
+                                },
+                                'check_callback' : true,
+                                'themes' : {
+                                        'responsive' : false
+                                }
+                        },
+                        'force_text' : true,
+                        'plugins' : ['state','dnd','contextmenu','search']
+                })
+                .on('delete_node.jstree', function (e, data) {
+                        $.get('clases/arbol_procesos/response.php?operation=delete_node', { 'id' : data.node.id })
+                                .done(function (d) {
+                                    if(d.exito==2){
+                                        VerMensaje('error',''+d.msj+'');
+                                        data.instance.refresh();
+                                    }
+
+                                        //data.instance.set_id(data.node, d.id);
+                                })
+                                .fail(function (jqXHR, textStatus, errorThrown) {
+                                     //console.log(jqXHR.responseText);
+                                     if (jqXHR.responseText.indexOf('mos_documentos_estrorg_arbolproc_ibfk_1')!=-1){
+                                         VerMensaje('error','No se puede eliminar el &aacute;rea, existen Documentos asociados');
+                                     }else if (jqXHR.responseText.indexOf('mos_acciones_correctivas_ibfk_1')!=-1){
+                                         VerMensaje('error','No se puede eliminar el &aacute;rea, existen Acciones Correctivas asociadas');
+                                     }else if (jqXHR.responseText.indexOf('mos_correcciones_ibfk_1')!=-1){
+                                         VerMensaje('error','No se puede eliminar el &aacute;rea, existen Correcciones asociadas');
+                                     }else if (jqXHR.responseText.indexOf('mos_personal_ibfk_1')!=-1){
+                                         VerMensaje('error','No se puede eliminar el &aacute;rea, existen personas asociados');
+                                     }
+                                        data.instance.refresh();
+                                });
+                })
+                .on('create_node.jstree', function (e, data) {
+                        $.get('clases/arbol_procesos/response.php?operation=create_node', { 'id' : data.node.parent, 'position' : data.position, 'text' : data.node.text, 'id_organizacion':$('#b-id_organizacion').val() })
+                                .done(function (d) {
+                                        data.instance.set_id(data.node, d.id);
+                                })
+                                .fail(function () {
+                                        data.instance.refresh();
+                                });
+                })
+                .on('rename_node.jstree', function (e, data) {
+                        $.get('clases/arbol_procesos/response.php?operation=rename_node', { 'id' : data.node.id, 'text' : data.text })
+                                .fail(function () {
+                                        data.instance.refresh();
+                                });
+                })
+                .on('move_node.jstree', function (e, data) {
+                        $.get('clases/arbol_procesos/response.php?operation=move_node', { 'id' : data.node.id, 'parent' : data.parent, 'position' : data.position, 'id_organizacion':$('#b-id_organizacion').val() })
+                                .fail(function (jqXHR, textStatus, errorThrown) {
+                                    if (jqXHR.responseText.indexOf('id_organizacion')!=-1){
+                                         VerMensaje('error','No se puede mover el proceso a la raiz, existe mas de un &aacute;rea seleccionada');
+                                    }
+                                        data.instance.refresh();
+                                });
+                })
+                .on('copy_node.jstree', function (e, data) {
+                        $.get('clases/arbol_procesos/response.php?operation=copy_node', { 'id' : data.original.id, 'parent' : data.parent, 'position' : data.position })
+                                .always(function () {
+                                        data.instance.refresh();
+                                });
+                })
+                .on('changed.jstree', function (e, data) {
+                        if (data.selected.length > 0){
+                            //console.log($("#divtree").jstree("get_selected").text());
+                            var arr = data.selected[0].split("_");
+                            id = arr[1];
+                            $('#b-id_proceso').val(data.selected[0]);
+                            //alert($('#b-id_organizacion-reg'));
+                        }
+                        else
+                            $('#b-id_proceso').val('');
+                });
+
+}
 
 function marcar_desmarcar_checked_columns(checked){
     
@@ -57,6 +244,55 @@ function init_filtro_ao_simple(){
             $('#b-id_organizacion').val('');
     
         verPagina(1,document);
+        //console.log(data.selected);
+    });
+}
+
+function init_filtro_ao_multiple(checkbox_cascade){
+    $('#div-ao').jstree(
+            {
+//                "types": {
+//                    "verde": {
+//                        "icon": "diseno/images/verde.png"
+//                    },
+//                    "rojo": {
+//                        "icon": "diseno/images/rojo.png"
+//                    }
+//                },
+                "checkbox":{
+                    three_state : false,
+                        cascade : 'down'
+                },
+                "plugins": ["search", "types","checkbox"]
+            }
+        );
+    $('#div-ao').on("changed.jstree", function (e, data) {
+        if (data.selected.length > 0){
+            //console.log($("#divtree").jstree("get_selected").text());
+            var arr;
+            var id = '';
+            for(i=0;i<data.selected.length;i++){
+                arr = data.selected[i].split("_");
+                id = id + arr[1] + ',';
+            }
+            id = id.substr(0,id.length-1);
+            //alert(id);
+            $('#b-id_organizacion').val(id);
+            //alert($('#b-id_organizacion-reg'));
+        }
+        else
+            $('#b-id_organizacion').val('');
+    
+        if ( $("#tree").length > 0 ){
+            if ($('#b-id_organizacion').val() == '')
+                $("#id-tree-ap").html('<div id="tree">Seleccione un &Aacute;rea para administrar el &Aacute;rbol de Procesos</div>');
+            else
+            {
+                $("#id-tree-ap").html('<div id="tree"></div>');
+                admin_ap();
+            }
+        }
+        //verPagina(1,document);
         //console.log(data.selected);
     });
 }

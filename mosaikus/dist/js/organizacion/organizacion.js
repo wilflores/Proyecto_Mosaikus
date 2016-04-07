@@ -1,4 +1,40 @@
+function demo_create() {
+        var ref = $('#tree').jstree(true),
+                sel = ref.get_selected();
+        if(!sel.length) { return false; }
+        sel = sel[0];
+        sel = ref.create_node(sel, {"type":"file"});
+        if(sel) {
+                ref.edit(sel);
+        }
+};
+function demo_rename() {
+        var ref = $('#tree').jstree(true),
+                sel = ref.get_selected();
+        if(!sel.length) { return false; }
+        sel = sel[0];
+        ref.edit(sel);
+};
+function demo_delete() {
+        var ref = $('#tree').jstree(true),
+                sel = ref.get_selected();
+        if(!sel.length) { return false; }
+        ref.delete_node(sel);
+};
 
+function demo_abrir(){
+    var ref = $('#tree').jstree(true),
+                sel = ref.get_selected();
+        if(!sel.length) { ref.open_all(); }
+        ref.open_all(sel);
+}
+
+function demo_cerrar(){
+    var ref = $('#tree').jstree(true),
+                sel = ref.get_selected();
+        if(!sel.length) { ref.close_all(); }
+        ref.close_all(sel);
+}
     
     function filtrar_mostrar_colums(){
         var colums = '1-2-3-4-';

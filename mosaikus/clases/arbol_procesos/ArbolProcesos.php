@@ -462,6 +462,13 @@
                 $contenido['PAGINADO'] = $grid['paginado'];
                 $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
 
+                import('clases.organizacion.ArbolOrganizacional');
+
+
+                $ao = new ArbolOrganizacional();
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao();
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] = str_replace('Árbol Organizacional', 'Árbol Organizacional &nbsp;&nbsp;<input type="text" value="" style="box-shadow:inset 0 0 4px #eee; width:220px; margin:0; padding:6px 12px; border-radius:4px; border:1px solid silver; font-size:1.1em;" id="demo_q_ao" placeholder="Buscar">', $contenido[DIV_ARBOL_ORGANIZACIONAL]);
+                
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'arbol_procesos/';
 
@@ -486,8 +493,17 @@
                 $objResponse->addAssign('contenido',"innerHTML",$template->show());
                 $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
                 $objResponse->addAssign('modulo_actual',"value","arbol_procesos");
-                $objResponse->addIncludeScript(PATH_TO_JS . 'arbol_procesos/arbol_procesos.js');
+                $objResponse->addIncludeScript(PATH_TO_JS . 'arbol_procesos/arbol_procesos.js?'.  rand());
                 $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("init_filtro_ao_multiple();");
+                $objResponse->addScript("var to = false;
+                    $('#demo_q_ao').keyup(function () {                    
+                                if(to) { clearTimeout(to); }
+                                to = setTimeout(function () {
+                                        var v = $('#demo_q_ao').val();
+                                        $('#div-ao').jstree(true).search(v);
+                                }, 250);
+                        });");
                 return $objResponse;
             }
             
@@ -1124,5 +1140,66 @@
             }
             return $OrgNom;
         }
+        
+        /**
+         *  Devuelve la array para administrar el arbol 
+         *          
+         */
+        public function admin_jstree_ap($parametros){
+            $atr = $this->dbl->corregir_parametros($parametros);
+            $sql = "SELECT * FROM mos_arbol_procesos where id_organizacion in ($atr[id_ao]) AND level = 2 ";
+            //echo $sql;
+            $data = $this->dbl->query($sql);
+            if (count($data)==0) return array();
+            $data_hijo = '';
+            foreach ($data as $value) {
+                $result = $this->AdminMuestraHijos($value[id]); 
+                if (is_array($data_hijo)){
+                    $data_hijo = array_merge($data_hijo,$result);
+                }
+                else 
+                    $data_hijo = $result;
+            }
+                               
+
+            return $data_hijo;
+        }
+        
+        /**
+         *  Devuelve el HTML para el jtree incluyendo los hijos 
+         * 
+         * @param int $id Id del arbol de proceso
+         * 
+         * @param int $contar Plus para contar el numero de registros hijos en el arbol
+         */
+	public function AdminMuestraHijos($id){
+		
+                $items = array();
+                $sql="select * from mos_arbol_procesos
+				Where id = $id";
+                $data = $this->dbl->query($sql, $atr);
+                $items[0] = array(id=>$data[0][id], text=>$data[0][title], "state" => array("opened" => true ));
+                
+                $sql="select * from mos_arbol_procesos
+				Where parent_id = $id";
+                //echo $sql;
+		//$resp = mysql_query($sql);
+                $data = $this->dbl->query($sql, $atr);
+                //print_r($data);
+                $contador = 0;
+                $data_hijo= '';
+		$cabecera = "<ul>";
+                foreach ($data as $arr) {//data-jstree='{ \"type\" : \"rojo\" }'                    
+                    $result = $this->AdminMuestraHijos($arr[id]);                    	
+                    if (is_array($data_hijo)){
+                        $data_hijo = array_merge($data_hijo,$result);
+                    }
+                    else 
+                        $data_hijo = $result;
+                }
+		$items[0][children] = $data_hijo;
+                //$return[contador] = $contador+$data_hijo[contador];                
+		return $items;
+	}
      
  }?>

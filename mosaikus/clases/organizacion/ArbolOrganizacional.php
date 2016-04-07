@@ -30,13 +30,13 @@
              public function verArbolOrganizacional($id){
                 $atr=array();
                 $sql = "SELECT id
-,parent_id
-,position
-,left
-,right
-,level
-,title
-,type
+                        ,parent_id
+                        ,position
+                        ,left
+                        ,right
+                        ,level
+                        ,title
+                        ,type
 
                          FROM mos_organizacion 
                          WHERE id = $id "; 
@@ -554,8 +554,9 @@
                 $objResponse->addAssign('contenido',"innerHTML",$template->show());
                 $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
                 $objResponse->addAssign('modulo_actual',"value","organizacion");
-                $objResponse->addIncludeScript(PATH_TO_JS . 'organizacion/organizacion.js');
+                $objResponse->addIncludeScript(PATH_TO_JS . 'organizacion/organizacion.js?'.  rand());
                 $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("admin_ao();");
                 return $objResponse;
             }
             
@@ -931,6 +932,54 @@
 
             return $template->show();
         }
+        
+        /**
+         *  Devuelve la array para administrar el arbol 
+         *          
+         */
+        public function admin_jstree_ao(){
+            
+            $result = $this->AdminMuestraHijos(2);                    
+
+            return $result;
+        }
+        
+        /**
+         *  Devuelve el HTML para el jtree incluyendo los hijos 
+         * 
+         * @param int $id Id del arbol organizacional
+         * 
+         * @param int $contar Plus para contar el numero de registros hijos en el arbol
+         */
+	public function AdminMuestraHijos($id){
+		
+                $items = array();
+                $sql="select * from mos_organizacion
+				Where id = $id";
+                $data = $this->dbl->query($sql, $atr);
+                $items[0] = array(id=>$data[0][id], text=>$data[0][title], "state" => array("opened" => true ));
+                
+                $sql="select * from mos_organizacion
+				Where parent_id = $id";
+                //echo $sql;
+		//$resp = mysql_query($sql);
+                $data = $this->dbl->query($sql, $atr);
+                //print_r($data);
+                $contador = 0;
+                $data_hijo= '';
+		$cabecera = "<ul>";
+                foreach ($data as $arr) {//data-jstree='{ \"type\" : \"rojo\" }'                    
+                    $result = $this->AdminMuestraHijos($arr[id]);                    	
+                    if (is_array($data_hijo)){
+                        $data_hijo = array_merge($data_hijo,$result);
+                    }
+                    else 
+                        $data_hijo = $result;
+                }
+		$items[0][children] = $data_hijo;
+                //$return[contador] = $contador+$data_hijo[contador];                
+		return $items;
+	}
         
         /**
          * Devuelve la estructura HTML del primer nivel para el jtree 

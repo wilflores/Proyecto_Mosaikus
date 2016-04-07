@@ -78,3 +78,108 @@ ALTER TABLE `mos_documentos`
 ADD COLUMN `publico`  char(1) NULL DEFAULT 'N' AFTER `aprobo`;
 
 INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('publico', 'Público', '6');
+
+-- cambio en mos_roganizacon
+
+ALTER TABLE `mos_organizacion`
+CHANGE COLUMN `left` `left_a`  bigint(20) UNSIGNED NOT NULL AFTER `position`;
+
+ALTER TABLE `mos_organizacion`
+CHANGE COLUMN `right` `right_a`  bigint(20) UNSIGNED NOT NULL AFTER `left_a`;
+
+delete from mos_cargo_estrorg_arbolproc where id not in (select id from  mos_organizacion);
+
+ALTER TABLE `mos_cargo_estrorg_arbolproc`
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;
+
+ALTER TABLE `mos_organizacion`
+MODIFY COLUMN `id`  int(9) UNSIGNED NOT NULL AUTO_INCREMENT FIRST ,
+MODIFY COLUMN `parent_id`  int(9) UNSIGNED NOT NULL AFTER `id`;
+
+ALTER TABLE `mos_organizacion`
+ADD UNIQUE INDEX (`id`) ;
+
+ALTER TABLE `mos_organizacion`
+MODIFY COLUMN `id`  int(9) NOT NULL AUTO_INCREMENT FIRST ;
+
+
+ALTER TABLE `mos_cargo_estrorg_arbolproc` ADD FOREIGN KEY (`id`) REFERENCES `mos_organizacion` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `mos_documentos_estrorg_arbolproc` ADD FOREIGN KEY (`id_organizacion_proceso`) REFERENCES `mos_organizacion` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_personal` ADD FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_acciones_correctivas` ADD FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_correcciones` ADD FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_cargo_estrorg_arbolproc` DROP FOREIGN KEY `FK_REFERENCE_18`;
+
+ALTER TABLE `mos_cargo_estrorg_arbolproc` ADD CONSTRAINT `FK_REFERENCE_18` FOREIGN KEY (`cod_cargo`) REFERENCES `mos_cargo` (`cod_cargo`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+ALTER TABLE `mos_arbol_procesos`
+CHANGE COLUMN `left` `left_a`  bigint(20) UNSIGNED NOT NULL AFTER `position`,
+CHANGE COLUMN `right` `right_a`  bigint(20) UNSIGNED NOT NULL AFTER `left_a`;
+
+
+ALTER TABLE `mos_arbol_procesos`
+ADD COLUMN `id_organizacion`  int NULL AFTER `type`;
+
+ALTER TABLE `mos_arbol_procesos`
+MODIFY COLUMN `id`  bigint(20) NOT NULL AUTO_INCREMENT FIRST ;
+
+ALTER TABLE `mos_arbol_procesos`
+MODIFY COLUMN `id`  int(20) NOT NULL AUTO_INCREMENT FIRST ,
+MODIFY COLUMN `parent_id`  int(20) UNSIGNED NOT NULL AFTER `id`;
+
+ALTER TABLE `mos_arbol_procesos`
+ENGINE=InnoDB;
+
+
+ALTER TABLE `mos_arbol_procesos` ADD FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_acciones_correctivas` ADD FOREIGN KEY (`id_proceso`) REFERENCES `mos_arbol_procesos` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_correcciones` ADD CONSTRAINT `mos_correcciones_ibfk_2` FOREIGN KEY (`id_proceso`) REFERENCES `mos_arbol_procesos` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+DROP TABLE IF EXISTS `mos_arbol_procesos_nombres`;
+CREATE TABLE `mos_arbol_procesos_nombres` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `title` text CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+insert into mos_arbol_procesos_nombres (id,title) select id, title from mos_arbol_procesos;
+
+DROP TABLE IF EXISTS `mos_organizacion_nombres`;
+CREATE TABLE `mos_organizacion_nombres` (
+  `id` int(20) unsigned NOT NULL AUTO_INCREMENT,
+  `title` text CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+insert into mos_organizacion_nombres (id,title) select id, title from mos_organizacion;
+
+DROP TRIGGER IF EXISTS `actualiza_nombre_proceso_ins`;
+DELIMITER ;;
+CREATE TRIGGER `actualiza_nombre_proceso_ins` BEFORE INSERT ON `mos_arbol_procesos_nombres` FOR EACH ROW UPDATE mos_arbol_procesos SET title = NEW.title WHERE id = NEW.id
+;;
+DELIMITER ;
+DROP TRIGGER IF EXISTS `actualiza_nombre_proceso`;
+DELIMITER ;;
+CREATE TRIGGER `actualiza_nombre_proceso` BEFORE UPDATE ON `mos_arbol_procesos_nombres` FOR EACH ROW UPDATE mos_arbol_procesos SET title = NEW.title WHERE id = NEW.id
+;;
+DELIMITER ;
+DROP TRIGGER IF EXISTS `actualizar_nombre_area_ins`;
+DELIMITER ;;
+CREATE TRIGGER `actualizar_nombre_area_ins` BEFORE INSERT ON `mos_organizacion_nombres` FOR EACH ROW UPDATE mos_organizacion SET title = NEW.title WHERE id = NEW.id
+;;
+DELIMITER ;
+DROP TRIGGER IF EXISTS `actualizar_nombre_area`;
+DELIMITER ;;
+CREATE TRIGGER `actualizar_nombre_area` BEFORE UPDATE ON `mos_organizacion_nombres` FOR EACH ROW UPDATE mos_organizacion SET title = NEW.title WHERE id = NEW.id
+;;
+DELIMITER ;
+
