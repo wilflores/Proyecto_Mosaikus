@@ -51,6 +51,39 @@
             return $param;
         }
 
+        
+        public function obtenerNodosArbol($usuario, $modulo, $modo){
+            $atr = array();
+            if($modo == 'Especialista')
+                $sql = "SELECT
+                        mos_l.cod_link
+                        ,mos_l.nombre_link
+                        ,mos_o.id
+                        ,mos_o.title
+                        ,mos_p.nuevo
+                        ,mos_p.modificar
+                        ,mos_p.eliminar
+                        ,mos_p.recordatorio
+                        ,mos_p.modificar_terceros
+                        ,mos_p.visualizar_terceros
+                FROM
+                        mos_usuario_estructura AS mos_ue 
+                        INNER JOIN mos_perfil AS mos_p ON mos_ue.cod_perfil = mos_p.cod_perfil
+                        INNER JOIN mos_link_por_perfil AS mos_lp ON mos_ue.cod_perfil = mos_lp.cod_perfil
+                        INNER JOIN mos_link AS mos_l On mos_lp.cod_link = mos_l.cod_link
+                        INNER JOIN mos_organizacion AS mos_o ON mos_ue.id_estructura = mos_o.id
+                WHERE 
+                        mos_ue.portal = 'N'
+                        AND mos_ue.id_usuario =$usuario
+                        AND mos_l.cod_link = $modulo
+                    ";
+            else
+                $sql="";    
+            $this->operacion($sql, $atr);
+            global $arbol;
+            $arbol = $this->dbl->data;
+            return $arbol;                        
+        }
         public function obtenerNodosMenu($usuario, $filial, $modo){
             $atr = array();
             if($modo == 'Especialista')
