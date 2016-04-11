@@ -46,6 +46,8 @@
                                         <!--<input type="hidden" name="reg_por_pag" id="reg_por_pag" value="12"/>-->
                                         <input type="hidden" name="corder" id="corder" value="{CORDER}"/>
                                         <input type="hidden" name="sorder" id="sorder" value="{SORDER}"/>
+                                        <input type="hidden" name="cod_link" id="cod_link" value="{COD_LINK}"/>
+                                        <input type="hidden" name="modo" id="modo" value="{MODO}"/>
                                       </form>
                                       <div class="searh-footer">
 

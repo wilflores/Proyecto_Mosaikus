@@ -48,7 +48,7 @@
                 <div class="form-group" id="tabla_fileUpload"  style="{CSS_TABLA_FILEUPLOAD}">
                         <label for="archivo" class="col-md-4 control-label" style="color:black">{N_ARCHIVO}</label>
                         <div class="col-md-20">
-                            <input type="file" class="form-control" value="{ARCHIVO}" id="fileUpload2" name="fileUpload2" onchange="cargar_archivo_otro();"/>
+                            <input type="file" value="{ARCHIVO}" id="fileUpload2" name="fileUpload2" onchange="cargar_archivo_otro();"/>
                             <input type="hidden" id="estado_actual" name="estado_actual">
                             <input type="hidden" id="filename" name="filename" value="{FILENAME}">
                             <input type="hidden" id="tamano" name="tamano" value="{TAMANO}">

@@ -1253,6 +1253,37 @@
 		return $return;
 	}
         
+        /**
+         * Devuelve los padres de un nodo del arbol
+         * @param array $tupla 
+         * @return string
+         */
+        function BuscaOrganizacional($tupla)
+        {
+                $OrgNom = "";
+                if (strlen($tupla[id_organizacion]) > 0) {                                           
+                        $Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                        $Resp3 = $this->dbl->query($Consulta3,array());
+
+                        foreach ($Resp3 as $Fila3) 
+                        {
+                                if($Fila3[organizacion_padre]==2)
+                                {
+                                        $OrgNom.=($Fila3[identificacion]);
+                                        return($OrgNom);                                        
+                                }
+                                else
+                                {
+                                        $OrgNom .= $this->BuscaOrganizacional(array('id_organizacion' => $Fila3[organizacion_padre])) . ' -> ' . ($Fila3[identificacion]);
+                                }
+                        }
+                }
+                else
+                    $OrgNom .= $_SESSION[CookNomEmpresa];
+                return $OrgNom;
+
+        }
+        
         
      
  }?>

@@ -492,7 +492,10 @@ public function setData2($cssclass, $data, $funciones=array(), $colbotones=-1,$n
                         $this->datos.="	<td align=\"center\" $atributos>";
                         //print_r($funciones);
                         if (isset($funciones[funcion])){
-                            @eval(" \$this->datos .= $funciones[funcion](\$fila);");
+                            if ($this->Parent == null)
+                                @eval(" \$this->datos .= $funciones[funcion](\$fila);");
+                            else 
+                                @eval(" \$this->datos .= \$this->Parent->$funciones[funcion](\$fila);");
                         }
                         else{
                             foreach ($funciones as $fun) {

@@ -35,13 +35,13 @@
                                           <input type="checkbox" name="SelectAcc" id="SelectAcc" value="10" class="checkbox-mos-col" checked="checked">   &nbsp;
                                       {N_VIGENCIA}</label>
                                   </div>
-                            
+                            <!--
                                   <div class="checkbox">      
                                       <label >
                                           <input type="checkbox" name="SelectAcc" id="SelectAcc" value="11" class="checkbox-mos-col" checked="checked">   &nbsp;
                                       {N_INTERNO}</label>
                                   </div>
-                            
+                            -->
                             
                                   <div class="checkbox">      
                                       <label >

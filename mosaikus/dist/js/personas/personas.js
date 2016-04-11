@@ -1,5 +1,5 @@
     function filtrar_mostrar_colums(){
-        var colums = '1-2-3-4-';
+        var colums = '0-1-2-3-4-';
          $('.checkbox-mos-col').each(function() {
                 if (this.checked){
                     colums = colums + this.value + '-';
@@ -24,6 +24,8 @@
         array = new XArray();
         array.setObjeto('HojadeVida','indexHojadeVida');
         array.addParametro('id',id);
+        array.addParametro('modo',document.getElementById('modo').value);
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
         array.addParametro('import','clases.Hoja_de_Vida.HojadeVida');
         xajax_Loading(array.getArray());
     }        
@@ -110,6 +112,10 @@
             else
                 array.setObjeto('Personas','actualizar');
             array.addParametro('permiso',document.getElementById('permiso_modulo').value);
+            /**/
+            array.addParametro('modo',document.getElementById('modo').value);
+            array.addParametro('cod_link',document.getElementById('cod_link').value);
+            /**/
             array.getForm('idFormulario');
             array.addParametro('import','clases.personas.Personas');
             xajax_Loading(array.getArray());

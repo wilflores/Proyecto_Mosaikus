@@ -96,8 +96,24 @@
                         return $error; 
                     }
             }
+            
+            /**
+             * Devuelve el numero de niveles del arbol
+             * 
+             */
+            public function numeroNivelesHijos() {
+                //$ids = implode(",", $param);
+                $sql = "select max(level) level from mos_arbol_procesos ";
+                $data = $this->dbl->query($sql);
+                
+                if (count($data)>0){
+                    $num = $data[0][level] - 1;
+                }
+                return $num;                                
+            }
+            
              public function listarArbolProcesosReporte($atr, $pag, $registros_x_pagina){
-                    $atr = $this->dbl->corregir_parametros($atr);
+                    /*$atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
                      $sql = "select g.id g_id, g.title g,a.id a_id, a.title a,sa1.id sa1_id, sa1.title sa1,sa2.id sa2_id,sa2.title sa2 
                         from mos_arbol_procesos g
@@ -106,7 +122,29 @@
                                 LEFT JOIN mos_arbol_procesos sa2 on sa2.parent_id = sa1.id
                                 where g.parent_id = 2";
 //                    $sql .= " order by $atr[corder] $atr[sorder] ";
-//                    $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+//                    $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";*/
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $sql_left = $sql_col_left = $sql_order = "";
+                    $k = 1;                    
+                    for($k=2;$k<=$atr[niveles]+1;$k++) {
+                        if ($k==2){
+                            $sql_left .= "mos_arbol_procesos a$k ";  
+                            $sql_order = "a$k.id_organizacion,a$k.title";
+                            $sql_col_left .= ",a$k.id_organizacion id_1,a$k.id id_$k, a$k.title nombre_$k";    
+                        }
+                        else{
+                            $sql_left.= " LEFT JOIN mos_arbol_procesos a$k on a$k.parent_id = a".($k-1).".id ";
+                            $sql_order .= ",a$k.title";
+                            $sql_col_left .= ",a$k.id id_$k, a$k.title nombre_$k";  
+                        }
+                                              
+                    }
+                    
+                    $sql = "select 1 $sql_col_left
+                        from $sql_left
+                                where NOT a2.id_organizacion IS NULL AND a2.parent_id = ". $atr["b-id_organizacion"] . ""
+                            . " ORDER BY $sql_order";
+                   //echo $sql;
                     $this->operacion($sql, $atr);
              }
              
@@ -282,10 +320,55 @@
                     $parametros['pag'] = 1;
                 $reg_por_pagina = getenv("PAGINACION");
                 if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
+                
+                /*CALCULA EL NUMERO DE NIVELES DEL ARBOL*/
+                $out[niveles] = $niveles = $parametros[niveles] = $this->numeroNivelesHijos();
+                $out[titulo] = "";
+                if ($niveles == 2){
+                    $ancho_area = 50;
+                }
+                else $ancho_area = 40;
+                for($i=1;$i<=$niveles;$i++){
+                    if ($i==1){
+                        $out[titulo] .= "<th style=\"width: ".$ancho_area  . "%\" >&Aacute;rea</th>" ;                        
+                        $out[titulo] .= "<th style=\"width: ". (100  - $ancho_area) / $niveles  . "%\" >Proceso</th>" ;                        
+                    }
+                    else if ($i==$niveles){
+                        $out[titulo] .= "<th style=\"width: ". (100  - $ancho_area) / $niveles  . "%\" >Actividad</th>" ;   
+                    }
+                    else 
+                      $out[titulo] .= "<th style=\"width: ". (100  - $ancho_area) / $niveles  . "%\" >SubProceso $i</th>" ;
+                    
+                }
+                
                 $this->listarArbolProcesosReporte($parametros, $parametros['pag'], $reg_por_pagina);
-                $data=$this->dbl->data;
+                $data=$this->dbl->data;                                
+                $out[filas] = count($data);
+                //print_r($data);
                 $html = "";
                 
+                $id_aux = $ids = $con_g = array();
+                for($i=1;$i<=$niveles+1;$i++){                                           
+                    $id_aux[$i] = $data[0]["id_$i"];
+                    $con_g[$i] = 0;
+                    
+                }  
+                /*Suma cuantas veces se repite un nodo*/
+                foreach ($data as $value) {
+                    for($i=1;$i<=$niveles+1;$i++){
+                        if ($value["id_$i"] != $id_aux[$i]){
+                            $ids[$id_aux[$i]] = $con_g[$i];
+                            $id_aux[$i] = $value["id_$i"];
+                            $con_g[$i] = 1;
+                        }
+                        else
+                            $con_g[$i]++;
+                    }                    
+                }
+                for($i=1;$i<=$niveles+1;$i++){                    
+                    $ids[$id_aux[$i]] = $con_g[$i];                        
+                }  
+                /*
                 $g_id = $a_id = $sa1_id = $sa2_id = array();
                 $g_id_aux = $data[0][g_id];
                 $a_id_aux = $data[0][a_id];
@@ -322,8 +405,8 @@
                     else
                         $con_sa2++;
                 }
-                
-                
+                */
+                /*
                 $g_id[$g_id_aux] = $con_g;
                 $a_id[$a_id_aux] = $con_a;
                 $sa1_id[$sa1_id_aux] = $con_sa1;
@@ -357,7 +440,37 @@
 
                      $html .= '</tr>';
                 }
+                */
                 
+                //print_r($data);
+                $id_aux = array();
+                if (!class_exists('ArbolOrganizacional')){
+                    import('clases.organizacion.ArbolOrganizacional');
+                }
+                $ao = new ArbolOrganizacional();
+                foreach ($data as $value) {
+                    
+                    $html .= '<tr class="odd gradeX">';
+                    for($i=1;$i<=$niveles+1;$i++){
+                        if ($value["id_$i"] != ''){
+                            if ($value["id_$i"] != $id_aux[$i]){
+                                if ($i == 1){
+                                    $nombre_area = $ao->BuscaOrganizacional(array('id_organizacion'=>$value[$i]));
+                                    $html .= '<td rowspan="'. $ids[$value["id_$i"]] .'">'.$nombre_area.'</td>';
+                                }                                    
+                                else                                        
+                                    $html .= '<td rowspan="'. $ids[$value["id_$i"]] .'">'.$value["nombre_$i"].'</td>';
+                                $id_aux[$i] = $value["id_$i"];;
+                            }
+                        }
+                        else
+                            $html .= '<td>&nbsp;</td>';
+                    }
+                                        
+
+
+                     $html .= '</tr>';
+                }
                 $out[tabla] = $html;
                 //$out['tabla']= $grid->armarTabla();
 //                if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina)){
@@ -534,11 +647,14 @@
                             </div>';
                     $k++;
                 }
+                $parametros["b-id_organizacion"] = 2;
                 $grid = $this->verListaArbolProcesosReporte($parametros);
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
                 $contenido['TABLA'] = $grid['tabla'];
+                $contenido[TITULO_TABLA] = $grid['titulo'];
+                
                 $contenido['PAGINADO'] = $grid['paginado'];
                 $contenido['OPCIONES_BUSQUEDA'] = " <option value='campo'>campo</option>";
                 $contenido['JS_NUEVO'] = 'nuevo_ArbolProcesos();';

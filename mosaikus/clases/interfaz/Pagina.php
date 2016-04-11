@@ -756,5 +756,19 @@ class Pagina{
         
         echo $template->show();
     }
+    
+    function formatear_rut($tupla){
+            if ($tupla[extranjero]=='NO'){
+                $cadena = str_pad($tupla[id_personal],8,0,STR_PAD_LEFT);
+                $largo_cadena = strlen($cadena);
+                $cadena_izquierda = substr($cadena, 0, $largo_cadena-1);
+                $cadena_derecha = substr($cadena, $largo_cadena-1, 1);
+
+                $final = number_format($cadena_izquierda,0,"",".")."-".$cadena_derecha;
+                return $final;
+            }
+            return $tupla[id_personal];
+
+        } 
 }
 ?>

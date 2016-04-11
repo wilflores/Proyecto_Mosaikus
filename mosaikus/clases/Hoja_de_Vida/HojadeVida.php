@@ -1,48 +1,3 @@
-<?php                
-        function archivo($tupla)
-        {
-            if (strlen($tupla[nom_archivo])>0){
-                //<img class=\"SinBorde\"  src=\"diseno/images/pdf.png\">
-                if ($tupla[tipo]=='Cap'){
-                    $html = "<a title=\"Ver $tupla[nom_archivo]\" target=\"_blank\" href=\"pages/personal_capacitacion/descargar_archivo.php?id=$tupla[id_registro]&token=" . md5($tupla[id_registro]) ."\">
-                            
-                            <i class=\"icon icon-view-document\"></i>
-                        </a>";
-                }
-                else{
-                    $html = "<a target=\"_blank\" title=\"Ver $tupla[nom_archivo]\" href=\"pages/Hoja_de_Vida/descargar_archivo.php?id=$tupla[cod_hoja_vida]&token=" . md5($tupla[cod_hoja_vida]) ."\">                            
-                            <i class=\"icon icon-view-document\"></i>
-                        </a>";
-                }
-                return $html;
-            }
-            return "No aplica";
-        }
-        
-        function columna_accion($tupla)
-        {
-            $html = "&nbsp;";
-            if (strlen($tupla[id_registro])<=0){
-                if($_SESSION[CookM] == 'S'){
-                    $html .= '<a onclick="javascript:editarHojadeVida(\''.$tupla[cod_hoja_vida].'\' );">
-                                <i style="cursor:pointer" class="icon icon-edit"  title="Editar Anotaci&oacute;n" style="cursor:pointer"></i>
-                            </a>';
-                }
-                if($_SESSION[CookE] == 'S'){
-                    $html .= '<a onclick="javascript:eliminarHojadeVida(\''.$tupla[cod_hoja_vida].'\');;">
-                                <i style="cursor:pointer" class="icon icon-remove" title="Eliminar Anotaci&oacute;n" style="cursor:pointer"></i>
-                            </a>';
-                }
-            }
-            return $html;
-        }
-        function formato_codigo($tupla){
-            //return str_pad($tupla[cod_hoja_vida], 6, "0", STR_PAD_LEFT);
-            $cod = $tupla[cod_hoja_vida];
-            //echo '0'.str_pad($cod, 5, '0', STR_PAD_LEFT);
-            return '&nbsp;'.str_pad($cod, 6, '0', STR_PAD_LEFT);
-        }
-?>
 <?php
  import("clases.interfaz.Pagina");        
         class HojadeVida extends Pagina{
@@ -50,6 +5,9 @@
         private $bd;
         private $total_registros;
         private $parametros;
+        private $per_crear;
+        private $per_editar;
+        private $per_eliminar;
             
             public function HojadeVida(){
                 parent::__construct();
@@ -57,6 +15,7 @@
                 $this->dbl = new Mysql($this->encryt->Decrypt_Text($_SESSION[BaseDato]), $this->encryt->Decrypt_Text($_SESSION[LoginBD]), $this->encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $this->parametros = array();
                 $this->contenido = array();
+                $this->per_crear = $this->per_editar = $this->per_eliminar = 'N';
             }
 
             private function operacion($sp, $atr){
@@ -86,6 +45,83 @@
                 }
                 
             }
+            
+            /**
+             * Busca los permisos que tiene el usuario en el modulo
+             */
+            private function cargar_permisos($parametros){
+                if (strlen($parametros[cod_link])>0){
+                    if(!class_exists('mos_acceso')){
+                        import("clases.mos_acceso.mos_acceso");
+                    }
+                    $acceso = new mos_acceso();
+                    $data_permisos = $acceso->obtenerPermisosModulo($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros['b-id_organizacion']);                    
+                    foreach ($data_permisos as $value) {
+                        if ($value[nuevo] == 'S'){
+                            $this->per_crear =  'S';
+                            break;
+                        }
+                    }                                               
+                    foreach ($data_permisos as $value) {
+                        if ($value[modificar] == 'S'){
+                            $this->per_editar =  'S';
+                            break;
+                        }
+                    } 
+                    foreach ($data_permisos as $value) {
+                        if ($value[eliminar] == 'S'){
+                            $this->per_eliminar =  'S';
+                            break;
+                        }
+                    } 
+                }
+            }
+                        
+            
+        public function archivo($tupla)
+        {
+            if (strlen($tupla[nom_archivo])>0){
+                //<img class=\"SinBorde\"  src=\"diseno/images/pdf.png\">
+                if ($tupla[tipo]=='Cap'){
+                    $html = "<a title=\"Ver $tupla[nom_archivo]\" target=\"_blank\" href=\"pages/personal_capacitacion/descargar_archivo.php?id=$tupla[id_registro]&token=" . md5($tupla[id_registro]) ."\">
+                            
+                            <i class=\"icon icon-view-document\"></i>
+                        </a>";
+                }
+                else{
+                    $html = "<a target=\"_blank\" title=\"Ver $tupla[nom_archivo]\" href=\"pages/Hoja_de_Vida/descargar_archivo.php?id=$tupla[cod_hoja_vida]&token=" . md5($tupla[cod_hoja_vida]) ."\">                            
+                            <i class=\"icon icon-view-document\"></i>
+                        </a>";
+                }
+                return $html;
+            }
+            return "No aplica";
+        }
+        
+        public function columna_accion($tupla)
+        {
+            $html = "&nbsp;";
+            if (strlen($tupla[id_registro])<=0){
+                if($this->per_editar == 'S'){
+                    $html .= '<a onclick="javascript:editarHojadeVida(\''.$tupla[cod_hoja_vida].'\' );">
+                                <i style="cursor:pointer" class="icon icon-edit"  title="Editar Anotaci&oacute;n" style="cursor:pointer"></i>
+                            </a>';
+                }                
+                if($this->per_eliminar == 'S'){
+                    $html .= '<a onclick="javascript:eliminarHojadeVida(\''.$tupla[cod_hoja_vida].'\');;">
+                                <i style="cursor:pointer" class="icon icon-remove" title="Eliminar Anotaci&oacute;n" style="cursor:pointer"></i>
+                            </a>';
+                }
+            }
+            return $html;
+        }
+        
+        public function formato_codigo($tupla){
+            //return str_pad($tupla[cod_hoja_vida], 6, "0", STR_PAD_LEFT);
+            $cod = $tupla[cod_hoja_vida];
+            //echo '0'.str_pad($cod, 5, '0', STR_PAD_LEFT);
+            return '&nbsp;'.str_pad($cod, 6, '0', STR_PAD_LEFT);
+        }
 
              public function verHojadeVida($id){
                 $atr=array();
@@ -442,8 +478,9 @@
                     }
                 }
                 $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
+                $grid->setParent($this);
                 $grid->setFuncion("archivo", "archivo");
-                $grid->setFuncion("cod_hoja_vida", "formato_codigo");
+//                $grid->setFuncion("cod_hoja_vida", "formato_codigo");
                 
                 //$grid->setFuncion("en_proceso_inscripcion", "enProcesoInscripcion");
                 //$grid->setAligns(1,"center");
@@ -550,12 +587,14 @@
                 }
                 $persona = new Personas();
                 $ver_persona = $persona->verPersonas($parametros[id]);
+                $parametros['b-id_organizacion'] = $ver_persona[id_organizacion];
                 $parametros['b-cod_emp'] = $parametros[id];
                 $contenido['COD_EMP'] = $parametros[id];
                 $contenido['NOMBRES'] = $ver_persona['nombres'] . ' ' . $ver_persona['apellido_paterno'] . ' ' . $ver_persona['apellido_materno'];
                 $contenido[RUT] = formatear_rut($ver_persona);
                 $contenido[FECHA_NACIMIENTO] = $ver_persona[fecha_nacimiento];
                 $contenido[CARGO] = $ver_persona[cargo];
+                $this->cargar_permisos($parametros);
                 $grid = $this->verListaHojadeVida($parametros);
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
@@ -616,10 +655,10 @@
                 $objResponse->addScript("$('#hv-fecha').datepicker();");
                 $objResponse->addScript("$('#tabs-hv').tab();"
                         . "$('#tabs-hv a:first').tab('show');"
-                        . "$('a[data-toggle=\"tab\"]').on('shown.bs.tab', function (e) {
-
-                        console.log ( $(e.target).attr('id') );
-                }); ScrollBar.initScroll();");
+                        . "ScrollBar.initScroll();");
+                if ($this->per_crear == 'N'){                    
+                    $objResponse->addScript ("$('.nav-tabs a[href=\"#hv-red\"]').hide();");
+                }
                 
                 return $objResponse;
             }
@@ -779,6 +818,7 @@
                           });");
                 //$objResponse->addScript("$('#tabs-hv a:first').tab('show');");
                 $objResponse->addScript("$('.nav-tabs a[href=\"#hv-red\"]').tab('show');");
+                $objResponse->addScript ("$('.nav-tabs a[href=\"#hv-red\"]').show();");
                 //$objResponse->addScript("$('#fecha').datepicker();");
                 return $objResponse;
             }
@@ -859,14 +899,24 @@
             }
      
  
-                public function buscar($parametros)
+            public function buscar($parametros)
             {
+                if(!class_exists('Personas')){
+                    import("clases.personas.Personas");
+                }
+                $persona = new Personas();
+                $ver_persona = $persona->verPersonas($parametros['b-cod_emp']);
+                $parametros['b-id_organizacion'] = $ver_persona[id_organizacion];                
+                $this->cargar_permisos($parametros);
                 $grid = $this->verListaHojadeVida($parametros);                
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('grid-hv',"innerHTML",$grid[tabla]);
                 //$objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
                           
                 $objResponse->addScript("$('#MustraCargando').hide();");
+                if ($this->per_crear == 'N'){                    
+                    $objResponse->addScript ("$('.nav-tabs a[href=\"#hv-red\"]').hide();");
+                }
                 return $objResponse;
             }
          

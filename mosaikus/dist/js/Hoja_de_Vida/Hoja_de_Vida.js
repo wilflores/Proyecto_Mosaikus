@@ -104,7 +104,7 @@
                 array.setObjeto('HojadeVida','actualizar');
             array.addParametro('permiso',document.getElementById('permiso_modulo').value);
             array.getForm('idFormulario-hv');
-            array.addParametro('import','clases.Hoja_de_Vida.HojadeVida');
+            array.addParametro('import','clases.Hoja_de_Vida.HojadeVida');            
             xajax_Loading(array.getArray());
         }else{
         
@@ -147,6 +147,8 @@
         array.addParametro('pag',pag);
         array.setObjeto('HojadeVida','buscar');
         array.addParametro('import','clases.Hoja_de_Vida.HojadeVida');
+        array.addParametro('modo',document.getElementById('modo').value);
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
         $('#MustraCargando').show();
         xajax_Loading(array.getArray());
     }

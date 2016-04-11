@@ -24,10 +24,7 @@
                     <table class="table table-report  ">
                       <thead>
                       <tr>
-                        <th>PROCESO</th>
-                        <th>SUB - PROCESO</th>
-                        <th>SUB - PROCESO</th>
-                        <th>SUB - PROCESO</th>
+                        {TITULO_TABLA}
 
 
                       </tr>

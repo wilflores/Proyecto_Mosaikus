@@ -10,14 +10,49 @@
         public $nombres_columnas;
         private $placeholder;
         public $campos_activos;
+        private $id_org_acceso;
 
             public function Personas(){
                 parent::__construct();
                 $this->asigna_script('personas/personas.js');                                                
                 $this->dbl = new Mysql($this->encryt->Decrypt_Text($_SESSION[BaseDato]), $this->encryt->Decrypt_Text($_SESSION[LoginBD]), $this->encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $this->parametros = $this->nombres_columnas = $this->placeholder = $this->campos_activos = array();
-                $this->contenido = array();
+                $this->contenido = $this->id_org_acceso = array();
             }
+            
+            /**
+             * Activa los nodos donde se tiene explicitamente acceso
+             */
+            private function cargar_acceso_nodos($parametros){
+                if (strlen($parametros[cod_link])>0){
+                    if(!class_exists('mos_acceso')){
+                        import("clases.mos_acceso.mos_acceso");
+                    }
+                    $acceso = new mos_acceso();
+                    $data_ids_acceso = $acceso->obtenerNodosArbol($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo]);
+                    foreach ($data_ids_acceso as $value) {
+                        $this->id_org_acceso[$value[id]] = $value;
+                    }                                            
+                }
+            }
+            
+            /**
+             * Devuelve si el usuario tiene permiso de crear personas
+             * @param array $parametros 
+             * @return string
+             */
+            private function permiso_crear($parametros){
+                if (count($this->id_org_acceso) <= 0){
+                    $this->cargar_acceso_nodos($parametros);
+                }                
+                foreach ($this->id_org_acceso as $value) {
+                    if ($value[nuevo] == 'S'){
+                        return 'S';
+                    }
+                }                
+                return 'N';
+            }
+                    
 
             private function operacion($sp, $atr){
                 $param=array();
@@ -111,6 +146,16 @@
                     if ($total > 0){
                         return "- Ya existe una persona registrada con la misma cedula";
                     }
+                    /*Carga Acceso segun el arbol*/
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);
+                    }                    
+                    /*Valida Restriccion*/
+                    if (!isset($this->id_org_acceso[$atr[id_organizacion]]))
+                        return '- Acceso denegado para registrar persona en el &aacute;rea seleccionada.';
+                    if (!(($this->id_org_acceso[$atr[id_organizacion]][nuevo]== 'S') || ($this->id_org_acceso[$atr[id_organizacion]][modificar] == S)))
+                        return '- Acceso denegado para registrar persona en el &aacute;rea ' . $this->id_org_acceso[$atr[id_organizacion]][title] . '.';
+                    
                     if (strlen($atr[fecha_ingreso])== 10){
                         $atr[fecha_ingreso] = "'$atr[fecha_ingreso]'";                        
                     }
@@ -193,6 +238,16 @@
                     if ($total > 0){
                         return "- Ya existe una persona registrada con la misma cedula";
                     }
+                    /*Carga Acceso segun el arbol*/
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);
+                    }                    
+                    /*Valida Restriccion*/
+                    if (!isset($this->id_org_acceso[$atr[id_organizacion]]))
+                        return '- Acceso denegado para registrar persona en el &aacute;rea seleccionada.';
+                    if (!(($this->id_org_acceso[$atr[id_organizacion]][nuevo]== 'S') || ($this->id_org_acceso[$atr[id_organizacion]][modificar] == S)))
+                        return '- Acceso denegado para registrar persona en el &aacute;rea ' . $this->id_org_acceso[$atr[id_organizacion]][title] . '.';
+
                     if (strlen($atr[fecha_ingreso])== 10){
                         $atr[fecha_ingreso] = "'$atr[fecha_ingreso]'";                        
                     }
@@ -233,6 +288,7 @@
                     }
             }
              public function listarPersonas($atr, $pag, $registros_x_pagina){
+                    
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
                     if (count($this->parametros) <= 0){
@@ -247,6 +303,9 @@
                         $k++;
                     }
                     
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);
+                    }
                     
                     $sql = "SELECT COUNT(*) total_registros
                          FROM mos_personal p
@@ -310,9 +369,15 @@
                                 $sql .= " AND upper(aprobo) like '%" . strtoupper($atr["b-aprobo"]) . "%'";
                     if (strlen($atr["b-extranjero"])>0)
                         $sql .= " AND upper(extranjero) like '%" . strtoupper($atr["b-extranjero"]) . "%'";
+                    if (count($this->id_org_acceso)>0){                            
+                        $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
+                    }
+                    
 
                     $total_registros = $this->dbl->query($sql, $atr);
-                    $this->total_registros = $total_registros[0][total_registros];   
+                    $this->total_registros = $total_registros[0][total_registros];                       
+                    //print_r($atr);
+                    
             
                     $sql = "SELECT cod_emp
                                     ,id_personal
@@ -398,7 +463,9 @@
                                 $sql .= " AND upper(aprobo) like '%" . strtoupper($atr["b-aprobo"]) . "%'";
                     if (strlen($atr["b-extranjero"])>0)
                                 $sql .= " AND upper(extranjero) like '%" . strtoupper($atr["b-extranjero"]) . "%'";
-
+                    if (count($this->id_org_acceso)>0){                            
+                        $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
+                    }
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //echo $sql;
@@ -511,13 +578,14 @@
                 $grid->SetConfiguracionMSKS("tblPersonas", "");
                 $config_col=array(
                     
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos("Cod Emp", "cod_emp", $parametros)),
-               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_personal], "id_personal", $parametros)),
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos("Cod Emp", "cod_emp", $parametros,80)),
+                    array("width"=>"15%", "ValorEtiqueta"=>"<div style='width:80px'>&nbsp;</div>"),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_personal], "id_personal", $parametros,90)),
                array( "width"=>"8%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[nombres], "nombres", $parametros)),
                array( "width"=>"8%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apellido_paterno], "apellido_paterno", $parametros)),
                array( "width"=>"8%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apellido_materno], "apellido_materno", $parametros)),
                
-               array( "width"=>"15%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_organizacion], "id_organizacion", $parametros)),     
+               array( "width"=>"15%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_organizacion], "id_organizacion", $parametros,200)),     
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_nacimiento], "fecha_nacimiento", $parametros)),
                     
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[genero], "genero", $parametros)),
@@ -551,22 +619,22 @@
 
                 $func= array();
 
-                $columna_funcion = 0;
+                $columna_funcion = -1;
                 /*if (strrpos($parametros['permiso'], '1') > 0){
                     
                     $columna_funcion = 20;
                 }
                 if ($parametros['permiso'][1] == "1")
                     array_push($func,array('nombre'=> 'verPersonas','imagen'=> "<img style='cursor:pointer' src='diseno/images/find.png' title='Ver Personas'>"));
-                */
+               
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                     array_push($func,array('nombre'=> 'editarPersonas','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-edit\"   title='Editar Personas'></i>"));
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
                     array_push($func,array('nombre'=> 'eliminarPersonas','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\" title='Eliminar Personas'></i>"));
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")<img style='cursor:pointer' src='diseno/images/hoja_vida.png' title='Hoja de Vida'>
                     array_push($func,array('nombre'=> 'HojadeVida','imagen'=> "<i style='cursor:pointer' class=\"icon icon-hoja-vida\" title='Hoja de Vida'></i>"));
-               
-                $config=array(array("width"=>"15%", "ValorEtiqueta"=>"<div style='width:100px'>&nbsp;</div>"));
+                */
+                $config=array();
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
                 $array_columns =  explode('-', $parametros['mostrar-col']);
                 //print_r($array_columns);
@@ -591,8 +659,10 @@
                     }
                 }
                  //print_r($grid->hidden);
+                $grid->setParent($this);
                 $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
                 $grid->setFuncion("id_personal", "formatear_rut");
+                $grid->setFuncion("cod_emp", "colum_admin");
                 $grid->setFuncion("id_organizacion", "BuscaOrganizacional");
                 //
                 //$grid->setAligns(1,"center");
@@ -606,6 +676,66 @@
                 }
                 return $out;
             }
+            
+        public function colum_admin($tupla)
+        {
+            //echo 1;
+            //if($_SESSION[CookM] == 'S')
+            if ($this->id_org_acceso[$tupla[id_organizacion]][modificar] == 'S')
+            {
+                //<img title=\"Modificar Documento $tupla[nombre_doc]\" src=\"diseno/images/ico_modificar.png\" style=\"cursor:pointer\">
+                $html = "<a href=\"#\" onclick=\"javascript:editarPersonas('". $tupla[cod_emp] . "');\"  title=\"Editar Personas\">                            
+                            <i class=\"icon icon-edit\"></i>
+                        </a>";
+            }
+            //if($_SESSION[CookE] == 'S')
+            if ($this->id_org_acceso[$tupla[id_organizacion]][eliminar] == 'S')
+            {
+                //<img title="Eliminar '.$tupla[nombre_doc].'" src="diseno/images/ico_eliminar.png" style="cursor:pointer">
+                $html .= '<a href="#" onclick="javascript:eliminarPersonas(\''. $tupla[cod_emp] . '\');" title="Eliminar Personas">
+                        <i class="icon icon-remove"></i>
+                        
+                    </a>'; 
+            }
+            //if ($_SESSION[CookN] == 'S')
+            {
+                //<img title="Crear Versión '.$tupla[nombre_doc].'" src="diseno/images/ticket_ver.png" style="cursor:pointer">
+                $html .= '<a href="#" onclick="javascript:HojadeVida(\''. $tupla[cod_emp] . '\');" title="Hoja de Vida">                        
+                            <i class="icon icon-hoja-vida"></i>
+                    </a>'; 
+            }
+            
+            return $html;
+            
+        }
+            
+        function BuscaOrganizacional($tupla)
+        {
+                $OrgNom = "";
+                if (strlen($tupla[id_organizacion]) > 0) {                                           
+                        $Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                        $Resp3 = $this->dbl->query($Consulta3,array());
+
+                        foreach ($Resp3 as $Fila3) 
+                        {
+                                if($Fila3[organizacion_padre]==2)
+                                {
+                                        $OrgNom.=($Fila3[identificacion]);
+                                        return($OrgNom);                                        
+                                }
+                                else
+                                {
+                                        $OrgNom .= $this->BuscaOrganizacional(array('id_organizacion' => $Fila3[organizacion_padre])) . ' -> ' . ($Fila3[identificacion]);
+                                }
+                        }
+                }
+                else
+                    $OrgNom .= $_SESSION[CookNomEmpresa];
+                return $OrgNom;
+
+        }
+        
+        
      
  
         public function exportarExcel($parametros){
@@ -691,7 +821,7 @@
                 if ($parametros['corder'] == null) $parametros['corder']="apellido_paterno";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="1-2-3-4-5-8-9-10-11-13-14-15-16-17"; 
+                    $parametros['mostrar-col']="0-1-2-3-4-5-8-9-10-13-14-15-16-17"; 
                 if (count($this->campos_activos) <= 0){
                         $this->cargar_campos_activos();
                 }                 
@@ -722,8 +852,11 @@
                             ';
                     $k++;
                 }
+                
                 $grid = $this->verListaPersonas($parametros);
                 $contenido['CORDER'] = $parametros['corder'];
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
                 $contenido['TABLA'] = $grid['tabla'];
@@ -733,7 +866,7 @@
                 $contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;Personas';
                 $contenido['TABLA'] = $grid['tabla'];
                 $contenido['PAGINADO'] = $grid['paginado'];
-                $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
+                $contenido['PERMISO_INGRESAR'] = $this->permiso_crear($parametros) == 'S' ? '' : 'display:none;';
                 
                 import('clases.organizacion.ArbolOrganizacional');
 
