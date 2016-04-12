@@ -5,13 +5,14 @@
         private $bd;
         private $total_registros;
         private $parametros;
+        private $id_org_acceso;
             
             public function ArbolOrganizacional(){
                 parent::__construct();
                 $this->asigna_script('organizacion/organizacion.js');                                             
                 $this->dbl = new Mysql($this->encryt->Decrypt_Text($_SESSION[BaseDato]), $this->encryt->Decrypt_Text($_SESSION[LoginBD]), $this->encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $this->parametros = array();
-                $this->contenido = array();
+                $this->contenido = $this->id_org_acceso = array();
             }
 
             private function operacion($sp, $atr){
@@ -169,6 +170,7 @@
              
              public function listarArbolOrganizacionalReporte($atr, $pag, $registros_x_pagina){
                     $atr = $this->dbl->corregir_parametros($atr);
+                    $this->cargar_acceso_nodos($atr);
                     $sql_left = $sql_col_left = "";
                     $k = 1;                    
                     for($k=1;$k<=$atr[niveles];$k++) {
@@ -183,7 +185,7 @@
                     
                     $sql = "select 1 $sql_col_left
                         from $sql_left
-                                where a1.parent_id = ". $atr["b-id_organizacion"];
+                                where a1.parent_id = ". $atr["b-id_organizacion"] . " AND a1.id IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
                     //echo $sql;
                     
                     //$sql .= " order by $atr[corder] $atr[sorder] ";
@@ -518,6 +520,8 @@
                     $k++;
                 }
                 $grid = $this->verListaArbolOrganizacional($parametros);
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
@@ -937,11 +941,43 @@
          *  Devuelve la array para administrar el arbol 
          *          
          */
-        public function admin_jstree_ao(){
-            
-            $result = $this->AdminMuestraHijos(2);                    
+        public function admin_jstree_ao($parametros){
+            $parametros = $this->dbl->corregir_parametros($parametros);
+            $this->cargar_acceso_nodos($parametros);
+            if (strlen($parametros[cod_link])>0){
+               if(!class_exists('mos_acceso')){
+                   import("clases.mos_acceso.mos_acceso");
+               }
+               $acceso = new mos_acceso();
+               $data_ids_acceso = $acceso->obtenerNodosArbol($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo]);
+               //print_r($data_ids_acceso);
+               foreach ($data_ids_acceso as $value) {
+                   $this->id_org_acceso_exclusivo[$value[id]] = $value;
+               }                                            
+           }
+           $sql = "Select min(level) level FROM mos_organizacion WHERE id IN (". implode(',', array_keys($this->id_org_acceso_exclusivo)) . ")";
+           
+           $nivel_acceso = $this->dbl->query($sql);
+           $nivel_acceso = $nivel_acceso[0][level];
+           $sql = "Select id FROM mos_organizacion WHERE id IN (". implode(',', array_keys($this->id_org_acceso)) . ") AND level = $nivel_acceso";
+           $data = $this->dbl->query($sql);
+           if (count($data)==0) return array();
+            $data_hijo = '';
+            foreach ($data as $value) {
+                $result = $this->AdminMuestraHijos($value[id]); 
+                if (is_array($data_hijo)){
+                    $data_hijo = array_merge($data_hijo,$result);
+                }
+                else 
+                    $data_hijo = $result;
+            }
+                               
 
-            return $result;
+            return $data_hijo;
+           
+           //$result = $this->AdminMuestraHijos(2);                    
+
+           return $result;
         }
         
         /**
@@ -982,13 +1018,39 @@
 	}
         
         /**
+        * Activa los nodos donde se tiene acceso
+        */
+       private function cargar_acceso_nodos($parametros){
+           if (strlen($parametros[cod_link])>0){
+               if(!class_exists('mos_acceso')){
+                   import("clases.mos_acceso.mos_acceso");
+               }
+               $acceso = new mos_acceso();
+               $data_ids_acceso = $acceso->obtenerArbolEstructura($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo]);
+               //print_r($data_ids_acceso);
+               foreach ($data_ids_acceso as $value) {
+                   $this->id_org_acceso[$value[id]] = $value;
+               }                                            
+           }
+       }
+        
+        /**
          * Devuelve la estructura HTML del primer nivel para el jtree 
          */
         public function MuestraPadre($contar,$parametros=array()){
+            
+            $this->cargar_acceso_nodos($parametros);
 		$sql="Select * from mos_organizacion
-				Where parent_id = 2";
+				Where parent_id = 1";
                 
-                $data = $this->dbl->query($sql, $atr);
+                //
+                if (count($this->id_org_acceso)>0){
+                    $data = $this->obtenerNodosArbolNivel($this->id_org_acceso,1);
+                }
+                else{
+                    $data = $this->dbl->query($sql, $atr);
+                }
+                //print_r($data);
 
 		$padre_final = "";
                 
@@ -996,7 +1058,7 @@
                 foreach ($data as $arrP) {//data-jstree='{ \"type\" : \"verde\" }'
                        // $arrP[id];
                         $data_hijo = $this->MuestraHijos($arrP[id],$contar,$parametros);
-                        $cuerpo .= "<li  id=\"phtml_".$arrP[id]."\">";
+                        $cuerpo .= "<li  id=\"phtml_".$arrP[id]."\" class=\"jstree-open\">";
                         switch ($contar) {
                             case 1:
                                 $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
@@ -1122,7 +1184,10 @@
 				Where parent_id = $id";
                 //echo $sql;
 		//$resp = mysql_query($sql);
-                $data = $this->dbl->query($sql, $atr);
+                //
+                if (count($this->id_org_acceso)>0)
+                    $data = $this->obtenerNodosArbolNivel($this->id_org_acceso,$id);
+                else $data = $this->dbl->query($sql, $atr);
                 //print_r($data);
                 $contador = 0;
                 $data_hijo= array();

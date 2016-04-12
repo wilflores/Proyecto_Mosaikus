@@ -12,7 +12,7 @@ function admin_ao(){
                 .jstree({
                         'core' : {
                                 'data' : {
-                                        'url' : 'clases/organizacion/server.php',
+                                        'url' : 'clases/organizacion/server.php?cod_link='+$('#cod_link').val()+'&modo='+$('#modo').val(),
                                         //'url' : 'clases/organizacion/response.php?operation=get_node',
                                         'data' : function (node) {
                                                 return { 'id' : node.id };

@@ -14,6 +14,8 @@
         if (strlen($_GET['b-id_organizacion'])== 0)
             $params['b-id_organizacion'] = 2;
         else $params['b-id_organizacion'] = $_GET['b-id_organizacion'];
+        $params[cod_link] = $_GET[cod_link];
+        $params[modo] = $_GET[modo];
 	$tabla = $pagina->verListaArbolOrganizacionalReporte($params);
         $template = new Template();
         $template->PATH = PATH_TO_TEMPLATES.'organizacion/';

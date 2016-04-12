@@ -563,6 +563,8 @@
                     $k++;
                 }
                 $grid = $this->verListaArbolProcesos($parametros);
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
@@ -579,7 +581,8 @@
 
 
                 $ao = new ArbolOrganizacional();
-                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao();
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
+                
                 $contenido[DIV_ARBOL_ORGANIZACIONAL] = str_replace('Árbol Organizacional', 'Árbol Organizacional &nbsp;&nbsp;<input type="text" value="" style="box-shadow:inset 0 0 4px #eee; width:220px; margin:0; padding:6px 12px; border-radius:4px; border:1px solid silver; font-size:1.1em;" id="demo_q_ao" placeholder="Buscar">', $contenido[DIV_ARBOL_ORGANIZACIONAL]);
                 
                 $template = new Template();
@@ -1263,7 +1266,7 @@
          */
         public function admin_jstree_ap($parametros){
             $atr = $this->dbl->corregir_parametros($parametros);
-            $sql = "SELECT * FROM mos_arbol_procesos where id_organizacion in ($atr[id_ao]) AND level = 2 ";
+            $sql = "SELECT * FROM mos_arbol_procesos where id_organizacion in ($atr[id_ao]) AND level = 2 ORDER BY position";
             //echo $sql;
             $data = $this->dbl->query($sql);
             if (count($data)==0) return array();

@@ -872,7 +872,7 @@
 
 
                 $ao = new ArbolOrganizacional();
-                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao();
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'personas/';

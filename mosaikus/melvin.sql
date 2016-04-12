@@ -183,3 +183,58 @@ CREATE TRIGGER `actualizar_nombre_area` BEFORE UPDATE ON `mos_organizacion_nombr
 ;;
 DELIMITER ;
 
+-- cambios en documentos
+
+ALTER TABLE `mos_documentos_estrorg_arbolproc`
+DROP INDEX `ind02`;
+
+
+ALTER TABLE  `mos_documentos_estrorg_arbolproc` DROP FOREIGN KEY  `mos_documentos_estrorg_arbolproc_ibfk_1`;
+
+ALTER TABLE `mos_documentos_estrorg_arbolproc` ADD FOREIGN KEY (`id_organizacion_proceso`) REFERENCES `mos_organizacion` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_personal`
+DROP INDEX `ind02`,
+DROP INDEX `ind03`,
+DROP INDEX `ind04`,
+DROP INDEX `Ind05`;
+
+ALTER TABLE `mos_personal` DROP FOREIGN KEY `mos_personal_ibfk_1`;
+
+ALTER TABLE `mos_personal` ADD FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_cargo_estrorg_arbolproc` DROP FOREIGN KEY `FK_REFERENCE_18`;
+
+ALTER TABLE `mos_cargo_estrorg_arbolproc` DROP FOREIGN KEY `mos_cargo_estrorg_arbolproc_ibfk_1`;
+
+ALTER TABLE `mos_cargo_estrorg_arbolproc` ADD FOREIGN KEY (`cod_cargo`) REFERENCES `mos_cargo` (`cod_cargo`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_cargo_estrorg_arbolproc` ADD FOREIGN KEY (`id`) REFERENCES `mos_organizacion` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `mos_arbol_procesos` DROP FOREIGN KEY `mos_arbol_procesos_ibfk_1`;
+
+
+ALTER TABLE `mos_arbol_procesos` ADD FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_acciones_correctivas` ADD FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_acciones_correctivas` ADD FOREIGN KEY (`id_proceso`) REFERENCES `mos_arbol_procesos` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_correcciones` DROP FOREIGN KEY `mos_correcciones_ibfk_1`;
+
+ALTER TABLE `mos_correcciones` DROP FOREIGN KEY `mos_correcciones_ibfk_2`;
+
+
+DROP TRIGGER IF EXISTS `libera_areas`;
+
+DELIMITER ;;
+CREATE TRIGGER `libera_areas` BEFORE UPDATE ON `mos_arbol_procesos`
+FOR EACH ROW BEGIN 
+      IF (NEW.level > 2) THEN
+            SET new.id_organizacion = NULL;
+     END IF;
+   
+END;
+
+;;
+DELIMITER ;

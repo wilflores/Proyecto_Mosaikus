@@ -11,7 +11,7 @@ session_name("$GLOBALS[SESSION]");
                 session_start();
 	$pagina = new ArbolOrganizacional();
 	
-	$items = $pagina->admin_jstree_ao();
+	$items = $pagina->admin_jstree_ao($_GET);
 	
 
 //echo '[{"id":2,"text":"Santa Teresa","children":true}]';

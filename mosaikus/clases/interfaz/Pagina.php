@@ -770,5 +770,20 @@ class Pagina{
             return $tupla[id_personal];
 
         } 
+        
+        public function obtenerNodosArbolNivel($coleccion, $padre){
+            $param=$orden=array();
+            foreach ($coleccion as $arrC){               
+                if($arrC['parent_id'] == $padre && $arrC['title'] != '')
+                    array_push($param, $arrC);
+            }  
+            
+            foreach ($param as $clave => $fila) {
+                $orden[$clave] = $fila['position'];                    
+            }
+            array_multisort($orden, SORT_ASC, $param); 
+            
+            return $param;
+        }
 }
 ?>
