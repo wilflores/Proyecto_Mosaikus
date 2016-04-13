@@ -975,16 +975,16 @@ public function EnviarEMail($NombreFrom,$para,$asunto,$cuerpo,$adjuntos=array(),
     $user='saludmedioambienteseguridad.chile@masisa.com';
     try {
       $mail->Host       = "mail.yourdomain.com"; // SMTP server
-      $mail->SMTPDebug  = 0;                     // enables SMTP debug information (for testing)
+      $mail->SMTPDebug  = 1;                     // enables SMTP debug information (for testing)
       $mail->SMTPAuth   = true;                  // enable SMTP authentication
       $mail->SMTPSecure = "ssl";                 // sets the prefix to the servier
-      $mail->Host       = "smtp.gmail.com";      // sets GMAIL as the SMTP server
+      $mail->Host       = "iso.mosaikus.cl";      // sets GMAIL as the SMTP server
       $mail->Port       = 465;                   // set the SMTP port for the GMAIL server
-      $mail->Username   = "mailmasisa.venezuela@gmail.com";  // GMAIL username
-      $mail->Password   = "Mejoramiento.2014";            // GMAIL password      
-      $mail->Username   = CORREO_SALIENTE; //"saludmedioambienteseguridad.chile@masisa.com" ;  // GMAIL username
-      $mail->Password   = CONTRASENA_CORREO_SALIENTE;// "masisa.2014";            // GMAIL password      
-      $mail->SetFrom($user, $NombreFrom);
+      $mail->Username   = "notificacion@mosaikus.com";  // GMAIL username
+      $mail->Password   = "^R%iNf.T#7*W";            // GMAIL password      
+      //$mail->Username   = CORREO_SALIENTE; //"saludmedioambienteseguridad.chile@masisa.com" ;  // GMAIL username
+      //$mail->Password   = CONTRASENA_CORREO_SALIENTE;// "masisa.2014";            // GMAIL password      
+      $mail->SetFrom('notificacion@mosaikus.com', $NombreFrom);
       //$mail->AddReplyTo('name@yourdomain.com', 'First Last');
       $mail->Subject = $asunto;
       $mail->AltBody = 'To view the message, please use an HTML compatible email viewer!'; // optional - MsgHTML will create an alternate automatically
