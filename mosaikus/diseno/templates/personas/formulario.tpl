@@ -125,8 +125,12 @@
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-xs-10">
-                                    <label class="col-md-10 control-label" style="text-align: left;" for="vigencia">Árbol organizacional</label>
+                                    
+                                    <!--
                                     <iframe id="iframearbol" src="pages/personas/emb_jstree_single_persona.php?id={ID_ORGANIZACION}&cod_cargo={COD_CARGO}" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>
+                                    -->
+                                    {DIV_ARBOL_ORGANIZACIONAL}
+                                    <input type="hidden" id="cargar_cargo" name="cargar_cargo" value="{CARGAR_CARGO}">
                                 </div>
                                 <div class="col-xs-12">
 

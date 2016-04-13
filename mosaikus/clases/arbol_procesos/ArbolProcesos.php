@@ -665,6 +665,12 @@
                 $contenido['TABLA'] = $grid['tabla'];
                 $contenido['PAGINADO'] = $grid['paginado'];
                 $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
+                
+                import('clases.organizacion.ArbolOrganizacional');
+
+
+                $ao = new ArbolOrganizacional();
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros); 
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'arbol_procesos/';
@@ -692,6 +698,11 @@
                 $objResponse->addAssign('modulo_actual',"value","arbol_procesos");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'arbol_procesos/arbol_procesos.js');
                 $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript('init_filtro_ao_simple();
+                                        PanelOperator.initPanels("");
+                                        ScrollBar.initScroll();
+                                        PanelOperator.resize();
+                                        ');
                 return $objResponse;
             }
          

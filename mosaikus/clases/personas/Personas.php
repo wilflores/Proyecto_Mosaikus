@@ -1056,6 +1056,13 @@
 //                            </div>';
 //                    $k++;
 //                }
+                import('clases.organizacion.ArbolOrganizacional');
+
+
+                $ao = new ArbolOrganizacional();
+                $parametros[opcion] = 'simple';
+                $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
+                $contenido_1[CARGAR_CARGO] = 1;
                 
                 $template->setVars($contenido_1);
                 $contenido['CAMPOS'] = $template->show();
@@ -1097,6 +1104,7 @@
                         changeYear: true
                       });");
                 $objResponse->addScript($js);
+                $objResponse->addScript('ao_simple();');
                 return $objResponse;
             }
      
@@ -1259,7 +1267,13 @@
                 $ids = array('', '1', '2'); 
                 $desc = array('Seleccione', 'Masculino', 'Femenino');
                 $contenido_1['GENERO'] = $ut_tool->combo_array("genero", $desc, $ids, $genero_validacion, $val["genero"]);
-                $contenido_1['OPCION_CARGO_VACIO'] = 'Ingrese &Aacute;rbol Organizacional antes de especificar un cargo';
+                $contenido_1['OPCION_CARGO_VACIO'] = 'Seleccione';
+                $contenido_1['CARGOS'] = $ut_tool->OptionsCombo("Select c.cod_cargo,c.descripcion From mos_cargo c
+                        inner join mos_cargo_estrorg_arbolproc r ON r.cod_cargo = c.cod_cargo
+                        Where r.id = ".$val["id_organizacion"]." 
+                        Order By c.descripcion "
+                                                                    , 'cod_cargo'
+                                                                    , 'descripcion', $val['cod_cargo']);
                 $contenido_1['FECHA_NACIMIENTO'] = ($val["fecha_nacimiento"]);
                 $contenido_1['FECHA_INGRESO'] = ($val["fecha_ingreso"]);
                 $contenido_1['FECHA_EGRESO'] = ($val["fecha_egreso"]);
@@ -1285,6 +1299,12 @@
                 $contenido_1[CHECKED_EXT_NO] = $val["extranjero"] == 'NO' ? 'checked="checked"' : '';
                 $contenido_1[CHECKED_EXT_SI] = $val["extranjero"] == 'SI' ? 'checked="checked"' : '';
 
+                import('clases.organizacion.ArbolOrganizacional');
+                $ao = new ArbolOrganizacional();
+                $parametros[opcion] = 'simple';
+                $parametros[nodos_seleccionados] = array($val[id_organizacion]);
+                $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
+                
                 if(!class_exists('Parametros')){
                     import("clases.parametros.Parametros");
                 }
@@ -1371,6 +1391,7 @@
                         changeYear: true
                       });");
                 $objResponse->addScript($js);
+                $objResponse->addScript('ao_simple();');
                 return $objResponse;
             }
      

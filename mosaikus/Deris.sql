@@ -1,27 +1,25 @@
 -- cambios sql
-ALTER TABLE `mos_perfil`
-ADD COLUMN `modificar_terceros`  char(2) NULL AFTER `recordatorio`,
-ADD COLUMN `visualizar_terceros`  char(2) NULL AFTER `modificar_terceros`;
-
 insert into mos_nombres_campos(nombre_campo, texto, modulo, placeholder) values ('cod_perfil','Codigo Perfil',19,'cod_perfil');
 insert into mos_nombres_campos(nombre_campo, texto, modulo, placeholder) values ('descripcion_perfil','Descripcion Perfil',19,'descripcion_perfil');
 insert into mos_nombres_campos(nombre_campo, texto, modulo, placeholder) values ('nuevo','Acceso a Nuevo',19,'nuevo');
 insert into mos_nombres_campos(nombre_campo, texto, modulo, placeholder) values ('modificar','Acceso a Modificar',19,'modificar');
 insert into mos_nombres_campos(nombre_campo, texto, modulo, placeholder) values ('eliminar','Acceso a Eliminar',19,'eliminar');
 insert into mos_nombres_campos(nombre_campo, texto, modulo, placeholder) values ('recordatorio','Acceso a Recordatorio',19,'recordatorio');
-
-insert into mos_nombres_campos(nombre_campo, texto, modulo, placeholder) values ('modificar_terceros','Modificar de Terceros',19,'modificar_terceros');
+insert into mos_nombres_campos(nombre_campo, texto, modulo, placeholder) values ('modificar_terceros','Modificar a Terceros',19,'modificar_terceros');
 insert into mos_nombres_campos(nombre_campo, texto, modulo, placeholder) values ('visualizar_terceros','Visualizar de Terceros',19,'visualizar_terceros');
-
-ALTER TABLE `mos_perfil_portal`
-ADD COLUMN `modificar_terceros`  char(2) NULL DEFAULT NULL AFTER `recordatorio`,
-ADD COLUMN `visualizar_terceros`  char(2) NULL DEFAULT NULL AFTER `modificar_terceros`;
-
-
 insert into mos_nombres_campos(nombre_campo, texto, modulo, placeholder) values ('cod_perfil','Codigo Perfil',21,'cod_perfil');
 insert into mos_nombres_campos(nombre_campo, texto, modulo, placeholder) values ('descripcion_perfil','Descripcion Perfil',21,'descripcion_perfil');
 insert into mos_nombres_campos(nombre_campo, texto, modulo, placeholder) values ('visualizar_terceros','Visualizar de Terceros',21,'visualizar_terceros');
 
+
+ALTER TABLE `mos_perfil`
+ADD COLUMN `modificar_terceros`  char(2) NULL AFTER `recordatorio`,
+ADD COLUMN `visualizar_terceros`  char(2) NULL AFTER `modificar_terceros`;
+
+
+ALTER TABLE `mos_perfil_portal`
+ADD COLUMN `modificar_terceros`  char(2) NULL DEFAULT NULL AFTER `recordatorio`,
+ADD COLUMN `visualizar_terceros`  char(2) NULL DEFAULT NULL AFTER `modificar_terceros`;
 
 ALTER TABLE `mos_usuario`
 ADD COLUMN `cedula`  varchar(10) NULL AFTER `password_1`;
@@ -39,7 +37,7 @@ UPDATE `mos_link` SET `descripcion`='mos_usuario-indexMos_usuario-clases.mos_usu
 -- tercer corte
 
 
-ALTER TABLE `mos_usuario_filial` AUTO_INCREMENT=8:
+-- ALTER TABLE `mos_usuario_filial` AUTO_INCREMENT=8:
 
 
 ALTER TABLE `mos_usuario_filial`
@@ -60,8 +58,6 @@ CREATE TABLE `mos_usuario_estructura` (
 
 -- cuarto corte 
 
-ALTER TABLE `mos_usuario`
-MODIFY COLUMN `id_usuario`  int(11) NOT NULL AUTO_INCREMENT FIRST ;
 
 UPDATE `mos_usuario` SET `id_usuario`='1' WHERE (`id_usuario`='10107598');
 UPDATE `mos_usuario` SET `id_usuario`='2' WHERE (`id_usuario`='10712831');
@@ -74,6 +70,17 @@ UPDATE `mos_usuario_filial` SET `id_usuario`='2' WHERE (`id_usuario`='10712831')
 UPDATE `mos_usuario_filial` SET `id_usuario`='3' WHERE (`id_usuario`='13029681') AND (`id_filial`='1');
 UPDATE `mos_usuario_filial` SET `id_usuario`='4' WHERE (`id_usuario`='13064872') AND (`id_filial`='1');
 UPDATE `mos_usuario_filial` SET `id_usuario`='5' WHERE (`id_usuario`='13315840') AND (`id_filial`='1');
+
+UPDATE mos_log SET realizo = 1 WHERE realizo = 10107598;
+UPDATE mos_log SET realizo = 2 WHERE realizo = 10107598;
+
+ALTER TABLE `mos_usuario`
+MODIFY COLUMN `id_usuario`  int(11) NOT NULL AUTO_INCREMENT FIRST ;
+-- revisar numero para el autoincrement
+ALTER TABLE `mos_usuario`
+AUTO_INCREMENT=7;
+
+
 
 
 -- fin primera actualizacion
@@ -99,11 +106,11 @@ UPDATE `mos_usuario_filial` SET `id_usuario`='5' WHERE (`id_usuario`='13315840')
 -- fin punto 2
 
 
--- inicio punto 3
+-- inicio punto 3 revisar al momento de ejecutar para el auto_increment
     ALTER TABLE `mos_usuario_filial`
     ADD COLUMN `id`  int NULL AUTO_INCREMENT FIRST,
     ADD PRIMARY KEY (`id`);
-    ALTER TABLE `mos_usuario_filial` AUTO_INCREMENT=8
+    ALTER TABLE `mos_usuario_filial` AUTO_INCREMENT=8;
 -- fin punto 3
 -- fin segunda actualizacion
 
@@ -112,3 +119,12 @@ UPDATE `mos_usuario_filial` SET `id_usuario`='5' WHERE (`id_usuario`='13315840')
 ALTER TABLE `mos_usuario_estructura`
 ADD COLUMN `portal`  char(1) NULL AFTER `cod_perfil`;
 -- fin tercera actualizacion
+
+INSERT INTO  `desarrollo`.`mos_link_por_perfil` (`cod_perfil` ,`cod_link`)VALUES ('1',  '10'), ('1',  '80'), ('1',  '81');
+
+ALTER TABLE `mos_perfil`
+MODIFY COLUMN `cod_perfil`  int(3) NOT NULL AUTO_INCREMENT FIRST ;
+
+ALTER TABLE `mos_perfil_portal`
+MODIFY COLUMN `cod_perfil`  int(3) NOT NULL AUTO_INCREMENT FIRST ;
+

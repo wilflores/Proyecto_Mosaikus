@@ -82,8 +82,71 @@
             array = new XArray();
             array.setObjeto('Personas','crear');
             array.addParametro('import','clases.personas.Personas');
+            array.addParametro('modo',document.getElementById('modo').value);
+            array.addParametro('cod_link',document.getElementById('cod_link').value);
             xajax_Loading(array.getArray());
     }
+    
+    function ao_simple(){
+    $('#div-ao-form').jstree(
+//            {
+//                "types": {
+//                    "verde": {
+//                        "icon": "diseno/images/verde.png"
+//                    },
+//                    "rojo": {
+//                        "icon": "diseno/images/rojo.png"
+//                    }
+//                },
+//                "plugins": ["search", "wholerow", "types"]
+//            }
+        );
+    $('#div-ao-form').on("changed.jstree", function (e, data) {
+        if (data.selected.length > 0){
+            //console.log($("#divtree").jstree("get_selected").text());
+            var arr = data.selected[0].split("_");
+            id = arr[1];
+            if ($('#cargar_cargo').val() == '1')
+                cargar_cargos(id,0);
+            else{
+                $('#cargar_cargo').val('1');
+            }
+            //alert($('#b-id_organizacion-reg'));
+        }
+        
+        //console.log(data.selected);
+    });
+    $('#div-ao-form').jstree(true).open_all();               
+        
+}
+
+function ao_multiple(){
+    $('#div-ao-form').jstree(
+            {
+                "checkbox":{
+                    three_state : false,
+                        cascade : 'down'
+                },
+                "plugins": ["search", "types","checkbox"]
+            }
+        );
+    $('#div-ao-form').on("changed.jstree", function (e, data) {
+        if (data.selected.length > 0){
+            var arr;
+            var id = '';
+            for(i=0;i<data.selected.length;i++){
+                arr = data.selected[i].split("_");
+                id = id + arr[1] + ',';
+            }
+            id = id.substr(0,id.length-1);
+            $('#nodos').val(id);
+        }
+        else
+            $('#nodos').val('');
+    });
+    $('#div-ao-form').jstree(true).open_all();               
+        
+}
 
     function validar(doc){
         if ($('#apellido_materno').val().length == 0) $('#apellido_materno').val(' ');
@@ -129,6 +192,8 @@
         array.setObjeto('Personas','editar');
         array.addParametro('id',id);
         array.addParametro('import','clases.personas.Personas');
+        array.addParametro('modo',document.getElementById('modo').value);
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
         xajax_Loading(array.getArray());
     }
 

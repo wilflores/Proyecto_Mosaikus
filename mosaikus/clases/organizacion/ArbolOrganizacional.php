@@ -931,7 +931,12 @@
             if($parametros['opcion']=='reg')
                 $template->setTemplate("jstree_ao_reg");
             else
-                $template->setTemplate("jstree_ao");
+                if ($parametros['opcion']=='simple')
+                    $template->setTemplate("jstree_ao_simple");
+                else {
+                    $template->setTemplate("jstree_ao");
+                }
+                
             $template->setVars($contenido_1);            
 
             return $template->show();
@@ -1058,6 +1063,11 @@
                 foreach ($data as $arrP) {//data-jstree='{ \"type\" : \"verde\" }'
                        // $arrP[id];
                         $data_hijo = $this->MuestraHijos($arrP[id],$contar,$parametros);
+                        if ((is_array($parametros[nodos_seleccionados]))&&(in_array($arrP[id], $parametros[nodos_seleccionados]))){
+                            $select_aux = 'jstree-clicked';
+                            //$select_aux = '';
+                        }
+                        else $select_aux = '';
                         $cuerpo .= "<li  id=\"phtml_".$arrP[id]."\" class=\"jstree-open\">";
                         switch ($contar) {
                             case 1:
@@ -1069,7 +1079,7 @@
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
-                                $cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador). ")</a>";
+                                $cuerpo .= "<a href=\"#\" class=\"$select_aux\">".($arrP[title])." (". ($contador). ")</a>";
                                 break;
                             case 2:
                                 $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
@@ -1080,7 +1090,7 @@
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
-                                $cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador). ")</a>";
+                                $cuerpo .= "<a href=\"#\" class=\"$select_aux\">".($arrP[title])." (". ($contador). ")</a>";
                                 break;
                             case 3:
                                 switch ($parametros[tipo_data]) {
@@ -1108,7 +1118,7 @@
                                 $return[realizada] = $data_aux[0][realizada] + (isset($data_hijo[realizada])?$data_hijo[realizada]:0) ;
 
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
-                                $cuerpo .= "<a href=\"#\">".($arrP[title])." ($return[total];$return[atrasadas];$return[en_plazo];$return[realizada_atraso];$return[realizada] )</a>";
+                                $cuerpo .= "<a href=\"#\" class=\"$select_aux\">".($arrP[title])." ($return[total];$return[atrasadas];$return[en_plazo];$return[realizada_atraso];$return[realizada] )</a>";
                                 break;
                             //cuenta los registros de un documento
                             case 4:
@@ -1124,7 +1134,7 @@
                                 $contador='';
                                 $contador=$data_aux[0][cant];
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
-                                $cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador). ")</a>";
+                                $cuerpo .= "<a href=\"#\" class=\"$select_aux\">".($arrP[title])." (". ($contador). ")</a>";
                                 break;
                             case 6:
                                 $sql = "select IFNULL(COUNT(cod_emp),0) cant 
@@ -1157,11 +1167,11 @@
                                // if($contador_uni==0 && $contador==0)
                                  //   $cuerpo .= "<a href=\"#\">".($arrP[title])." ()</a>";
                                 //else
-                                    $cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador_uni.';'.$contador). ")</a>";
+                                    $cuerpo .= "<a href=\"#\" class=\"$select_aux\">".($arrP[title])." (". ($contador_uni.';'.$contador). ")</a>";
                                 break;
 
                             default:
-                                $cuerpo .= "<a href=\"#\">".($arrP[title])." </a>";
+                                $cuerpo .= "<a href=\"#\" class=\"$select_aux\">".($arrP[title])." </a>";
                                 break;
                         }
                         $cuerpo .= "$data_hijo[html]";
@@ -1195,7 +1205,12 @@
                 foreach ($data as $arr) {//data-jstree='{ \"type\" : \"rojo\" }' 
                     $contador = array();
                     $data_hijo = $this->MuestraHijos($arr[id],$contar,$parametros);
-                    $extra .= "<li id=\"phtml_".$arr[id]."\">";
+                    if ((is_array($parametros[nodos_seleccionados]))&&(in_array($arr[id], $parametros[nodos_seleccionados]))){
+                        $select_aux = 'jstree-clicked';
+                        //$select_aux = '';
+                    }
+                    else $select_aux = '';
+                    $extra .= "<li id=\"phtml_".$arr[id]."\" >";
                     switch ($contar) {
                             case 1:
                                 $sql = "SELECT COUNT(*) total "
@@ -1204,7 +1219,7 @@
                                     . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arr[id]) . ")   AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S'";
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
-                                $extra .= "<a href=\"#\">".($arr[title])." (". ($contador) .")</a>";
+                                $extra .= "<a href=\"#\" class=\"$select_aux\">".($arr[title])." (". ($contador) .")</a>";
                                 break;
                             case 2:
                                 $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
@@ -1215,7 +1230,7 @@
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
-                                $extra .= "<a href=\"#\">".($arr[title])." (". ($contador). ")</a>";
+                                $extra .= "<a href=\"#\" class=\"$select_aux\">".($arr[title])." (". ($contador). ")</a>";
                                 break;
                             case 3:
                                 //print_r($arr);
@@ -1251,7 +1266,7 @@
                                 $return[realizada_atraso] += $data_aux[0][realizada_atraso] + (isset($data_hijo[realizada_atraso])?$data_hijo[realizada_atraso]:0) ;
                                 $return[realizada] += $data_aux[0][realizada] + (isset($data_hijo[realizada])?$data_hijo[realizada]:0) ;
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
-                                $extra .= "<a href=\"#\">".($arr[title])." ($contador[total];$contador[atrasadas];$contador[en_plazo];$contador[realizada_atraso];$contador[realizada] )</a>";
+                                $extra .= "<a href=\"#\" class=\"$select_aux\">".($arr[title])." ($contador[total];$contador[atrasadas];$contador[en_plazo];$contador[realizada_atraso];$contador[realizada] )</a>";
                                 break;
                             case 4:
                                 $sql="SELECT
@@ -1267,7 +1282,7 @@
                                 $contador='';
                                 $contador=$data_aux[0][cant];
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
-                                $extra .= "<a href=\"#\">".($arr[title])." (". ($contador). ")</a>";
+                                $extra .= "<a href=\"#\" class=\"$select_aux\">".($arr[title])." (". ($contador). ")</a>";
                                 break;
                             case 6:
                                 $sql="select IFNULL(COUNT(cod_emp),0) cant 
@@ -1300,12 +1315,12 @@
                                  //if($contador_uni==0 && $contador==0)
                                   //   $extra .= "<a href=\"#\">".($arr[title])." ()</a>";
                                  //else
-                                     $extra .= "<a href=\"#\">".($arr[title])." (". ($contador_uni.';'.$contador). ")</a>";
+                                     $extra .= "<a href=\"#\" class=\"$select_aux\">".($arr[title])." (". ($contador_uni.';'.$contador). ")</a>";
                                 break;
                             
                             default:
-                                
-                                $extra .= "<a href=\"#\">".($arr[title])."</a>";
+                                //
+                                $extra .= "<a href=\"#\" class=\"$select_aux\">".($arr[title])."</a>";
                                 break;
                         }
 			$extra .= $data_hijo[html]."
