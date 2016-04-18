@@ -140,15 +140,18 @@
                                   <div class="form-group">
                                     
                                     <div class="col-md-9">
-                                        <label for="vigencia" class="col-md-12 control-label" style="text-align: left;">Árbol organizacional</label>
+                                        <!--label for="vigencia" class="col-md-12 control-label" style="text-align: left;">Árbol organizacional</label>
+                                        
+                                        <iframe id="iframearbol" src="pages/cargo/prueba_arbolV4.php?IDDoc={IDDOC}" frameborder="0" width="100%" height="310px" scrolling="no"></iframe-->
                                         <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
-                                        <iframe id="iframearbol" src="pages/cargo/prueba_arbolV4.php?IDDoc={IDDOC}" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>
+                                        {DIV_ARBOL_ORGANIZACIONAL}
                                     </div>
                                     <div class="col-md-15">
                                         <div class="tabs"> 
                                         <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">
                                             <li><a href="#hv-red-2" data-toggle="tab">Otros Datos</a></li>
-                                            <li><a href="#hv-orange-2" data-toggle="tab" id="tabs-form-reg" >Parámetros para Indexación de Registros</a></li>                                                    
+                                            <li><a href="#hv-orange-2" data-toggle="tab" id="tabs-form-reg" >Parámetros para Indexación de Registros</a></li>
+                                            <li><a href="#hv-orange-3" data-toggle="tab" id="tabs-historico-wf" >Hist&oacute;rico Flujo de Datos</a></li>
                                         </ul>
                                         <div id="my-tab-content" class="tab-content" style="padding: 45px 15px;">
                                             <div class="tab-pane active" id="hv-red-2">
@@ -170,33 +173,15 @@
                                                         </div>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label for="elaboro" class="col-md-6 control-label">{N_ELABORO}</label>                                                
+                                                    <label for="elaboro" class="col-md-6 control-label">{N_ID_WORKFLOW_DOCUMENTO}</label>                                                
                                                     <div class="col-md-14">                                              
-                                                      <select id="elaboro" name="elaboro" data-validation="required">
+                                                      <select id="id_workflow_documento" name="id_workflow_documento" data-validation="required">
                                                         <option selected="" value="">-- No Asignado --</option>
-                                                        {ELABORO}
+                                                        {ID_WORKFLOW_DOCUMENTO}
                                                      </select>
                                                   </div>   
                                                 </div>
-                                                <div class="form-group">
-                                                    <label for="reviso" class="col-md-6 control-label">{N_REVISO}</label>                                            
-                                                    <div class="col-md-14">                                              
-                                                      <select id="reviso" name="reviso" >
-                                                        <option selected="" value="">-- No Aplica --</option>
-                                                        {REVISORES}
-                                                     </select>
-                                                  </div>                                
-                                                </div>
-                                                
-                                                <div class="form-group">
-                                                    <label for="aprobo" class="col-md-6 control-label">{N_APROBO}</label>
-                                                    <div class="col-md-14">                                              
-                                                      <select id="aprobo" name="aprobo" >
-                                                        <option selected="" value="">-- No Aplica --</option>
-                                                        {APROBO}
-                                                     </select>
-                                                  </div>                                                                             
-                                                </div>
+
                                                 {OTROS_CAMPOS}
                                             </div>
                                                <div class="tab-pane active" id="hv-orange-2">
@@ -240,6 +225,32 @@
                                                         </tbody>
                                                     </table>
                                                </div>
+                                            <div class="tab-pane active" id="hv-orange-3">
+                                                    <table id="table-histo" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">
+                                                        <thead>
+                                                            <tr bgcolor="#FFFFFF" height="30px">
+                                                                <th width="20%">
+                                                                    <div align="left">
+                                                                        <div style="cursor:pointer;display:inline;">Fecha</div>
+                                                                    </div>
+                                                                </th>
+                                                                <th width="55%">
+                                                                    <div align="left">
+                                                                        <div style="cursor:pointer;display:inline;">Descripcion</div>
+                                                                    </div>
+                                                                </th>
+                                                                <th width="25%">
+                                                                    <div align="left">
+                                                                        <div style="cursor:pointer;display:inline;">Usuario</div>                                                
+                                                                    </div>
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {ITEMS_HISTO}
+                                                        </tbody>
+                                                    </table>                                                
+                                            </div>
                                             </div>
                                         </div> 
                                         <!--
@@ -300,12 +311,15 @@
         <div class="col-lg-offset-2 col-lg-10">
             <!--<input class="button save" name="guardar" type="button" value="{DESC_OPERACION}" onClick="validar(document);">-->
             <button type="button" class="btn btn-primary" onClick="validar(document);" id="btn-guardar">{DESC_OPERACION}</button>
+            <button type="button" {VERNOTIFICAR} class="btn btn-primary" onClick="document.getElementById('notificar').value='si';validar(document);" id="btn-guardar">{DESC_OPERACION_NOTIFICAR}</button>
             
             <!--<input class="button " type="button" value="Cancelar" onclick="funcion_volver('{PAGINA_VOLVER}');">-->
             <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">Cancelar</button>
             
             <input type="hidden" id="opc" name="opc" value="{OPC}">
             <input type="hidden" id="id"  name="id"  value="{ID}">
+            <input type="hidden" id="notificar"  name="notificar"  value="">
+            <input type="hidden" id="etapa" name="etapa" value="{ETAPA}">
         </div>
     </div>
         </div></div>
