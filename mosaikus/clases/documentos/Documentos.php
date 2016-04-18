@@ -208,14 +208,31 @@
         
         
         function colum_admin($tupla)
-        {
-            if($_SESSION[CookM] == 'S'){
-                //<img title=\"Modificar Documento $tupla[nombre_doc]\" src=\"diseno/images/ico_modificar.png\" style=\"cursor:pointer\">
+        {   //echo $_SESSION['CookCodEmp'];
+            //print_r($tupla);
+           //if($_SESSION[CookM] == 'S')          
+           if(strpos($tupla[arbol_organizacional],',')){
+               if($tupla[cod_elabora]==$_SESSION['CookCodEmp'] || $_SESSION[CookM] == 'S'){
                 $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
                             <i class=\"icon icon-edit\"></i>
                         </a>";
+                }
+           }
+           else{
+              // if(isset($this->id_org_acceso[$tupla[arbol_organizacional]][modificar]))
+               print_r($this->id_org_acceso);
+//                if (array_key_exists($tupla[arbol_organizacional], $this->id_org_acceso)){
+//                    if ($this->id_org_acceso[$tupla[arbol_organizacional]][modificar] == 'S')
+//                     {
+//                     $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
+//                                 <i class=\"icon icon-edit\"></i>
+//                             </a>";
+//                     }
+//               }
             }
+            //echo 'asas';
             if($_SESSION[CookE] == 'S'){
+           // if ($this->id_org_acceso[$tupla[id_organizacion][eliminar]] == 'S'){
                 //<img title="Eliminar '.$tupla[nombre_doc].'" src="diseno/images/ico_eliminar.png" style="cursor:pointer">
                 $html .= '<a href="#" onclick="javascript:eliminarDocumentos(\''. $tupla[IDDoc] . '\');" title="Eliminar '.$tupla[nombre_doc].'">
                         <i class="icon icon-remove"></i>
@@ -234,6 +251,13 @@
                             <i class="icon icon-r"></i>
                     </a>'; 
             }
+            if ($_SESSION[CookN] == 'S'){
+                //<img title="Crear Revisión '.$tupla[nombre_doc].'" src="diseno/images/ticket_rev.png" style="cursor:pointer">
+                $html .= '<a href="#" onclick="javascript:verWorkFlow(\''. $tupla[IDDoc] . '\');" title="Ver Flujo de Trabajo '.$tupla[nombre_doc].'" >                        
+                            <i class="icon  icon-document"></i>
+                    </a>'; 
+            }
+            //array_push($func,array('nombre'=> 'verWorkFlow','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_nuevo.png' title='Ver Flujo de Trabajo'>"));
             return $html;
             
         }
@@ -277,13 +301,15 @@
         private $parametros;
         public $nombres_columnas;
         private $placeholder;
-            
+        private $id_org_acceso;
+        
             public function Documentos(){
                 parent::__construct();
                 $this->asigna_script('documentos/documentos.js');                                             
                 $this->dbl = new Mysql($this->encryt->Decrypt_Text($_SESSION[BaseDato]), $this->encryt->Decrypt_Text($_SESSION[LoginBD]), $this->encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $this->parametros = $this->nombres_columnas = $this->placeholder = array();
                 $this->contenido = array();
+                $this->id_org_acceso = array();
             }
 
             private function operacion($sp, $atr){
@@ -304,7 +330,21 @@
                 }
                 
             }
-            
+            /**
+             * Activa los nodos donde se tiene explicitamente acceso
+             */
+            private function cargar_acceso_nodos($parametros){
+                if (strlen($parametros[cod_link])>0){
+                    if(!class_exists('mos_acceso')){
+                        import("clases.mos_acceso.mos_acceso");
+                    }
+                    $acceso = new mos_acceso();
+                    $data_ids_acceso = $acceso->obtenerNodosArbol($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo]);
+                    foreach ($data_ids_acceso as $value) {
+                        $this->id_org_acceso[$value[id]] = $value;
+                    }                                            
+                }
+            }            
             private function cargar_placeholder(){
                 $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE modulo = 6";
                 $nombres_campos = $this->dbl->query($sql, array());
@@ -313,7 +353,38 @@
                 }
                 
             }
-
+            public function verWFemail($id){
+                $atr=array();
+                $sql = "select email, nombres, apellido_paterno,etapa_workflow, estado_workflow, observacion_rechazo 
+                        from mos_personal inner join 
+                        (
+                                SELECT
+                                case 
+                                        when mos_documentos.etapa_workflow='estado_pendiente_revision' and mos_documentos.estado_workflow='OK' then mos_documentos.reviso
+                                ELSE
+                                        case when mos_documentos.etapa_workflow='estado_pendiente_revision' and mos_documentos.estado_workflow='RECHAZADO' then 
+                                                mos_documentos.elaboro
+                                        else 
+                                                case when mos_documentos.etapa_workflow='estado_pendiente_aprobacion' then mos_documentos.aprobo 
+                                                else 
+                                                        case when mos_documentos.etapa_workflow='estado_aprobado' then mos_documentos.elaboro
+                                                                END
+                                                end	
+                                end
+                                end as id_persona,
+                                mos_documentos.IDDoc,
+                                mos_documentos.etapa_workflow,
+                                mos_documentos.estado_workflow,
+                                mos_documentos.observacion_rechazo
+                                FROM
+                                mos_documentos
+                                where IDDoc=$id
+                        ) as wf
+                        on mos_personal.cod_emp= id_persona;"; 
+                //echo $sql;
+                $this->operacion($sql, $atr);
+                return $this->dbl->data[0];
+            }
             public function verDocumentoFuente($id){
                 $atr=array();
                 $sql = "SELECT                             
@@ -381,12 +452,22 @@
                                 ,CONCAT(CONCAT(UPPER(LEFT(re.nombres, 1)), LOWER(SUBSTRING(re.nombres, 2))),' ', CONCAT(UPPER(LEFT(re.apellido_paterno, 1)), LOWER(SUBSTRING(re.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(re.apellido_materno, 1)), LOWER(SUBSTRING(re.apellido_materno, 2)))) reviso_a
                                 ,CONCAT(CONCAT(UPPER(LEFT(ap.nombres, 1)), LOWER(SUBSTRING(ap.nombres, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_paterno, 1)), LOWER(SUBSTRING(ap.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_materno, 1)), LOWER(SUBSTRING(ap.apellido_materno, 2)))) aprobo_a
                                 ,d.publico
+                                ,d.id_workflow_documento
+                                ,d.estado_workflow
+                                ,d.etapa_workflow
+                                ,wf.email_responsable
+                                ,wf.email_revisa
+                                ,wf.email_aprueba
+                                ,dao.id_organizacion
                          FROM mos_documentos  d
                                 left join mos_personal p on d.elaboro=p.cod_emp
                                 left join mos_personal re on d.reviso=re.cod_emp
                                 left join mos_personal ap on d.aprobo=ap.cod_emp
+                                left join mos_workflow_documentos wf on d.id_workflow_documento = wf.id
+                                left JOIN (select IDDoc id , GROUP_CONCAT(id_organizacion_proceso) id_organizacion from mos_documentos_estrorg_arbolproc GROUP BY IDDoc) AS dao ON  d.IDDoc = dao.id
                          WHERE IDDoc = $id "; 
                 $this->operacion($sql, $atr);
+                //echo $sql;
                 return $this->dbl->data[0];
             }
             
@@ -615,6 +696,84 @@
             }
             return "Vigente";
         }
+        public function colum_admin($tupla)
+        {   //echo $_SESSION[CookM];
+            //print_r($tupla);
+           //if($_SESSION[CookM] == 'S')  
+           //**********EDITAR **********
+           if($_SESSION[SuperUser] == 'S'){
+                $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
+                            <i class=\"icon icon-edit\"></i>
+                        </a>";
+                } 
+           else{
+                if(strpos($tupla[arbol_organizacional],',')){
+                    if($tupla[cod_elabora]==$_SESSION['CookCodEmp']){
+                     $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
+                                 <i class=\"icon icon-edit\"></i>
+                             </a>";
+                     }
+                }
+                else{
+                     if (array_key_exists($tupla[arbol_organizacional], $this->id_org_acceso)){
+                         if ($this->id_org_acceso[$tupla[arbol_organizacional]][modificar] == 'S')
+                          {
+                          $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
+                                      <i class=\"icon icon-edit\"></i>
+                                  </a>";
+                          }
+                    }
+                }
+            }
+           //********** ELIMINAR **********
+           if($_SESSION[SuperUser] == 'S'){
+                $html .= '<a href="#" onclick="javascript:eliminarDocumentos(\''. $tupla[IDDoc] . '\');" title="Eliminar '.$tupla[nombre_doc].'">
+                        <i class="icon icon-remove"></i>                        
+                    </a>'; 
+                } 
+           else{
+                if(strpos($tupla[arbol_organizacional],',')){
+                    if($tupla[cod_elabora]==$_SESSION['CookCodEmp']){
+                        $html .= '<a href="#" onclick="javascript:eliminarDocumentos(\''. $tupla[IDDoc] . '\');" title="Eliminar '.$tupla[nombre_doc].'">
+                        <i class="icon icon-remove"></i>                        
+                        </a>';
+                     }
+                }
+                else{
+                     if (array_key_exists($tupla[arbol_organizacional], $this->id_org_acceso)){
+                         if ($this->id_org_acceso[$tupla[arbol_organizacional]][eliminar] == 'S')
+                          {
+                          $html .= '<a href="#" onclick="javascript:eliminarDocumentos(\''. $tupla[IDDoc] . '\');" title="Eliminar '.$tupla[nombre_doc].'">
+                            <i class="icon icon-remove"></i>                        
+                            </a>';
+                          }
+                    }
+                }
+            }
+            
+            if ($_SESSION[CookN] == 'S'){
+                //<img title="Crear Versión '.$tupla[nombre_doc].'" src="diseno/images/ticket_ver.png" style="cursor:pointer">
+                $html .= '<a href="#" onclick="javascript:crearVersionDocumentos(\''. $tupla[IDDoc] . '\');" title="Crear Versión '.$tupla[nombre_doc].'">                        
+                            <i class="icon icon-v"></i>
+                    </a>'; 
+            }
+            if ($_SESSION[CookN] == 'S'){
+                //<img title="Crear Revisión '.$tupla[nombre_doc].'" src="diseno/images/ticket_rev.png" style="cursor:pointer">
+                $html .= '<a href="#" onclick="javascript:crearRevisionDocumentos(\''. $tupla[IDDoc] . '\');" title="Crear Revisión '.$tupla[nombre_doc].'" >                        
+                            <i class="icon icon-r"></i>
+                    </a>'; 
+            }
+            
+            if($tupla[cod_elabora]==$_SESSION['CookCodEmp'] ||$tupla[cod_revisa]==$_SESSION['CookCodEmp'] || $tupla[cod_aprueba]==$_SESSION['CookCodEmp']){
+                //<img title="Crear Revisión '.$tupla[nombre_doc].'" src="diseno/images/ticket_rev.png" style="cursor:pointer">
+                $html .= '<a href="#" onclick="javascript:verWorkFlow(\''. $tupla[IDDoc] . '\');" title="Ver Flujo de Trabajo '.$tupla[nombre_doc].'" >                        
+                            <i class="icon  icon-document"></i>
+                    </a>'; 
+            }
+            //array_push($func,array('nombre'=> 'verWorkFlow','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_nuevo.png' title='Ver Flujo de Trabajo'>"));
+            return $html;
+            
+        }
         
                         
         
@@ -744,6 +903,7 @@
             }
             
             public function ingresarDocumentos($atr,$archivo,$doc_ver){
+               // print_r($atr);
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
                     $atr[IDDoc] = $this->codigo_siguiente();
@@ -755,6 +915,37 @@
                     if ($total > 0){
                         return "- Ya existe una documento registrado con el mismo código";
                     }
+                    /*Carga Acceso segun el arbol*/
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);
+                    }
+                    //***********************************
+                    //para validar que los nodos seleccionados
+                    //tenga permisos
+                    $organizacion = array();
+                    if(strpos($atr[nodos],',')){    
+                        $organizacion = explode(",", $atr[nodos]);
+                    }
+                    else{
+                        $organizacion[] = $atr[nodos];                    
+                    }
+                    //print_r($organizacion);
+                    $areas='';
+                    foreach ($organizacion as $value) {
+                        if (isset($this->id_org_acceso[$value])){
+                            if(!($this->id_org_acceso[$value][nuevo]=='S' || $this->id_org_acceso[$value][modificar]=='S'))
+                                $areas .= $this->id_org_acceso[$value][title].',';
+                        } else{
+                            $areas='break';
+                            break;
+                        }
+                    }
+                    /*Valida Restriccion*/
+                    if ($areas=='break')
+                        return '- Acceso denegado para registrar Documentos en el &aacute;rea seleccionada.';
+                    if ($areas!='break' && $areas!='' )
+                        return '- Acceso denegado para registrar Documentos en el &aacute;rea ' . $areas . '.';                    
+                     //***********************************
                     if (strlen($atr[reviso])== 0){
                         $atr[reviso] = "NULL";                     
                     }                    
@@ -765,11 +956,25 @@
                     $atr[doc_fisico] = $archivo;
                     $atr[doc_visualiza] = $doc_ver;
                     $atr[id_filial] = $_SESSION[CookFilial];
+                    if($atr[notificar]=='si'){
+                        if($atr[reviso]==''){
+                            $atr[etapa_workflow]="'estado_pendiente_aprobacion'";
+                        }
+                        else{
+                            $atr[etapa_workflow]="'estado_pendiente_revision'";
+                        }
+                        $atr[estado_workflow]="'OK'";
+                        $atr[id_usuario_workflow]=$atr[id_usuario];                            
+                    }else
+                    {   $atr[etapa_workflow]='NULL';
+                        $atr[estado_workflow]='NULL';
+                        $atr[id_usuario_workflow]=$atr[id_usuario];
+                    }   
                     //
-                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo,publico)                            
+                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo,publico, id_workflow_documento,etapa_workflow,estado_workflow,id_usuario_workflow)                            
                             VALUES(
                                 $atr[IDDoc],'$atr[Codigo_doc]','$atr[nombre_doc]',$atr[version],'$atr[fecha]','$atr[descripcion]','$atr[palabras_claves]','$atr[formulario]','$atr[vigencia]','$atr[doc_fisico]','$atr[contentType]',$atr[id_filial],'$atr[nom_visualiza]','$atr[doc_visualiza]','$atr[contentType_visualiza]',$atr[id_usuario],'$atr[observacion]','$atr[estrucorg]','$atr[arbproc]','$atr[apli_reg_estrorg]','$atr[apli_reg_arbproc]','$atr[workflow]',$atr[semaforo],$atr[v_meses],$atr[reviso],$atr[elaboro],$atr[aprobo]
-                                    ,'$atr[publico]'
+                                    ,'$atr[publico]',$atr[id_workflow_documento],$atr[etapa_workflow],$atr[estado_workflow],$atr[id_usuario_workflow] 
                                 )";
                     //echo $sql;
                     $this->dbl->insert_update($sql);
@@ -884,6 +1089,7 @@
             }
 
             public function modificarDocumentos($atr,$archivo){
+
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
                     $atr[doc_visualiza] = $archivo;                    
@@ -901,19 +1107,77 @@
                         $atr[nom_visualiza] = "'$atr[nom_visualiza]'";   
                         
                     }
+                    /*Carga Acceso segun el arbol*/
+                   // print_r($atr);
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);
+                    }
+                    //***********************************
+                    //para validar que los nodos seleccionados
+                    //tenga permisos
+                    $organizacion = array();
+                    if(strpos($atr[nodos],',')){    
+                        $organizacion = explode(",", $atr[nodos]);
+                    }
+                    else{
+                        $organizacion[] = $atr[nodos];                    
+                    }
+                    //print_r($organizacion);
+                    $areas='';
+                    foreach ($organizacion as $value) {
+                        if (isset($this->id_org_acceso[$value])){
+                            if(!($this->id_org_acceso[$value][nuevo]=='S' || $this->id_org_acceso[$value][modificar]=='S'))
+                                $areas .= $this->id_org_acceso[$value][title].',';
+                        } else{
+                            $areas='break';
+                            break;
+                        }
+                    }
+                    /*Valida Restriccion*/
+                    if ($areas=='break')
+                        return '- Acceso denegado para registrar Documentos en el &aacute;rea seleccionada.';
+                    if ($areas!='break' && $areas!='' )
+                        return '- Acceso denegado para registrar Documentos en el &aacute;rea ' . $areas . '.';                    
+                     //***********************************
+                    
                     if (strlen($atr[reviso])== 0){
                         $atr[reviso] = "NULL";                     
                     }                    
                     if (strlen($atr[aprobo])== 0){
                         $atr[aprobo] = "NULL";                     
                     }
+                    if($atr[notificar]=='si'){
+                        if($atr[reviso]=='NULL'){
+                            $atr[etapa_workflow]="'estado_pendiente_aprobacion'";
+                        }
+                        else{
+                            $atr[etapa_workflow]="'estado_pendiente_revision'";
+                        }
+                        $sql_wf = ", id_workflow_documento=$atr[id_workflow_documento],
+                                    id_usuario_workflow=$atr[id_usuario],
+                                   etapa_workflow=$atr[etapa_workflow],
+                                   observacion_rechazo=null,
+                                   estado_workflow='OK'";
+                    }else
+                    {   
+                        $sql_wf = ", id_workflow_documento=$atr[id_workflow_documento],
+                                    id_usuario_workflow=$atr[id_usuario],
+                                   etapa_workflow=NULL,
+                                   observacion_rechazo=null,
+                                   estado_workflow=NULL";
+                    }  
+                    //echo $sql_wf;
+                    //die;
                     $sql = "UPDATE mos_documentos SET                            
                                     descripcion = '$atr[descripcion]',palabras_claves = '$atr[palabras_claves]',formulario = '$atr[formulario]',vigencia = '$atr[vigencia]'"
                             . ",nom_visualiza = $atr[nom_visualiza],doc_visualiza = $atr[doc_visualiza],contentType_visualiza = $atr[contentType_visualiza],id_usuario = $atr[id_usuario],observacion = '$atr[observacion]',estrucorg = '$atr[estrucorg]',arbproc = '$atr[arbproc]'"
                             . ",apli_reg_estrorg = '$atr[apli_reg_estrorg]',apli_reg_arbproc = '$atr[apli_reg_arbproc]',workflow = '$atr[workflow]',semaforo = $atr[semaforo],v_meses = $atr[v_meses],reviso = $atr[reviso],elaboro = $atr[elaboro],aprobo = $atr[aprobo]
-                               ,publico = '$atr[publico]'
+                               ,publico = '$atr[publico]' $sql_wf
                             WHERE  IDDoc = $atr[id]";      
+                   // echo $sql;
+                   // die;
                     $val = $this->verDocumentos($atr[id]);
+                   
                     $this->dbl->insert_update($sql);
                     $nuevo = "IDDoc: \'$atr[IDDoc]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza_aux]\',ContentType Visualiza: \'$atr[contentType_visualiza_aux]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Publico: \'$atr[publico]\'";
                     $anterior = "IDDoc: \'$val[IDDoc]\', Codigo Doc: \'$val[Codigo_doc]\', Nombre Doc: \'$val[nombre_doc]\', Version: \'$val[version]\', Fecha: \'$val[fecha]\', Descripcion: \'$val[descripcion]\', Palabras Claves: \'$val[palabras_claves]\', Formulario: \'$val[formulario]\', Vigencia: \'$val[vigencia]\', ContentType: \'$val[contentType]\', Id Filial: \'$val[id_filial]\', Nom Visualiza: \'$val[nom_visualiza]\', ContentType Visualiza: \'$val[contentType_visualiza]\', Id Usuario: \'$val[id_usuario]\', Observacion: \'$val[observacion]\', Muestra Doc: \'$val[muestra_doc]\', Estrucorg: \'$val[estrucorg]\', Arbproc: \'$val[arbproc]\', Apli Reg Estrorg: \'$val[apli_reg_estrorg]\', Apli Reg Arbproc: \'$val[apli_reg_arbproc]\', Workflow: \'$val[workflow]\', Semaforo: \'$val[semaforo]\', V Meses: \'$val[v_meses]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\', Publico: \'$val[publico]\' ";
@@ -948,6 +1212,8 @@
         }
         
              public function listarDocumentos($atr, $pag, $registros_x_pagina){
+                 // HABILIYAR LA COLUMNA ESYAD0
+                    //print_r($atr);
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
                     if (count($this->parametros) <= 0){
@@ -972,10 +1238,17 @@
                                 left join mos_personal p on d.elaboro=p.cod_emp
                                 left join mos_personal re on d.reviso=re.cod_emp
                                 left join mos_personal ap on d.aprobo=ap.cod_emp
+                                left join mos_workflow_documentos wf on d.id_workflow_documento = wf.id
                                 left join (select IDDoc, count(*) num_rev, max(fechaRevision) fecha_revision from mos_documento_revision GROUP BY IDDoc) as rev ON rev.IDDoc = d.IDDoc
                             $sql_left
                                 $filtro_ao
-                            WHERE muestra_doc='S' ";
+                            WHERE muestra_doc='S' " ;
+                            if($_SESSION[SuperUser]!='S'){
+                                $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
+                                $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_revision' and d.estado_workflow='OK') or ";    
+                                $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK')) ";    
+                            }
+                            //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND (upper(Codigo_doc) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%' OR upper(nombre_doc) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
                     }
@@ -1069,6 +1342,12 @@
                     if (strlen($atr["b-aprobo"])>0)
                         $sql .= " AND d.aprobo = '". $atr["b-aprobo"] . "'";
 
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);                    
+                    }
+                    if (count($this->id_org_acceso)>0){                            
+                        $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";                        
+                    }
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
             
@@ -1093,7 +1372,8 @@
                                     ,num_rev
                                     ,DATE_FORMAT(fecha_revision, '%d/%m/%Y') fecha_rev
                                     ,CASE d.vigencia WHEN 'S' Then 'Si' ELSE 'No' END vigencia
-                                    ,1 arbol_organizacional
+                                    ,dao.arbol_organizacional arbol_organizacional
+                                    ,d.etapa_workflow
                                     -- ,id_filial                                    
                                     -- ,id_usuario
                                     ,d.observacion
@@ -1102,16 +1382,29 @@
                                     -- ,arbproc
                                     -- ,apli_reg_estrorg
                                     -- ,apli_reg_arbproc
-                                    ,d.workflow                                                                                                            
+                                    ,d.workflow  
+                                    ,p.email
+                                    ,'".$_SESSION[SuperUser]."' superuser
+                                    ,p.cod_emp cod_elabora    
+                                    ,re.cod_emp cod_revisa 
+                                    ,ap.cod_emp cod_aprueba 
                                      $sql_col_left
                             FROM mos_documentos d
                                 left join mos_personal p on d.elaboro=p.cod_emp
                                 left join mos_personal re on d.reviso=re.cod_emp
                                 left join mos_personal ap on d.aprobo=ap.cod_emp
+                                left join mos_workflow_documentos wf on d.id_workflow_documento = wf.id
                                 left join (select IDDoc, count(*) num_rev, max(fechaRevision) fecha_revision from mos_documento_revision GROUP BY IDDoc) as rev ON rev.IDDoc = d.IDDoc
+                                INNER JOIN (select IDDoc id , GROUP_CONCAT(id_organizacion_proceso) arbol_organizacional from mos_documentos_estrorg_arbolproc GROUP BY IDDoc) AS dao ON dao.id = d.IDDoc
                             $sql_left
                                 $filtro_ao
                             WHERE muestra_doc='S' ";
+                            if($_SESSION[SuperUser]!='S'){
+                                $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
+                                $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_revision' and d.estado_workflow='OK') or ";    
+                                $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK')) ";    
+                            }
+                            //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND (upper(Codigo_doc) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%' OR upper(nombre_doc) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
                     }
@@ -1215,7 +1508,7 @@
 
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
-                    //echo $sql;
+                    //  echo $sql;
                     $this->operacion($sql, $atr);
              }
              
@@ -1337,7 +1630,35 @@
                         return $error; 
                     }
              }
-     
+             public function cambiarestadowf($atr){
+                    try {
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $sql = "UPDATE mos_documentos 
+                        SET                            
+                        estado_workflow = '$atr[estado]',
+                            etapa_workflow = '$atr[etapa]',
+                            observacion_rechazo = '$atr[observacion_rechazo]',    
+                            fecha_estado_workflow = now(),id_usuario_workflow = $atr[id_usuario]
+                            WHERE  IDDoc = $atr[id]";     
+                    //echo $sql;
+                    $val = $this->verDocumentos($atr[id]);
+                    $this->dbl->insert_update($sql);
+                    
+                    $nuevo = "Id usuario wf: \'$atr[id_usuario_workflow]\', etapa_workflow = \'$atr[etapa]\', estado wf: \'$atr[estado_workflow]\', ";
+                    $anterior = "Id usuario wf: \'$val[id_usuario_workflow]\', etapa_workflow = \'$val[etapa_workflow]\', estado wf: \'$val[estado_workflow]\',  ";
+                    $this->registraTransaccionLog(49,$nuevo,$anterior, '');
+                    /*
+                    $this->registraTransaccion('Modificar','Modifico el WorkflowDocumentos ' . $atr[descripcion_ano], 'mos_workflow_documentos');
+                    */
+                    return "El flujo de trabajo de documentos ha sido actualizado con exito";
+                } catch(Exception $e) {
+                        $error = $e->getMessage();                     
+                        if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
+                            return "Ya existe una sección con el mismo nombre.";                        
+                        return $error; 
+                    }
+
+             }
  
      public function verListaDocumentos($parametros){
                 $grid= "";
@@ -1347,6 +1668,7 @@
                 $reg_por_pagina = getenv("PAGINACION");
                 if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
                 $this->listarDocumentos($parametros, $parametros['pag'], $reg_por_pagina);
+                
                 $data=$this->dbl->data;
                 
                 if (count($this->nombres_columnas) <= 0){
@@ -1379,6 +1701,7 @@
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[palabras_claves], "palabras_claves", $parametros)),               
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),
                array( "width"=>"20%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[arbproc], "arbproc", $parametros)),     
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[etapa_workflow], "etapa_workflow", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[observacion], "observacion", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[doc_fisico], "doc_fisico", $parametros)),               
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_filial], "id_filial", $parametros)),               
@@ -1419,6 +1742,8 @@
                     array_push($func,array('nombre'=> 'editarDocumentos','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_modificar.png' title='Editar Documentos'>"));
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
                     array_push($func,array('nombre'=> 'eliminarDocumentos','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_eliminar.png' title='Eliminar Documentos'>"));
+                if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
+                    array_push($func,array('nombre'=> 'verWorkFlow','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_nuevo.png' title='Ver Flujo de Trabajo'>"));
                
                 $config=array();
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
@@ -1448,8 +1773,10 @@
                             break;
                     }
                 }
+                
                 $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
                 //$grid->setFuncion("semaforo", "semaforo");
+                $grid->setParent($this);
                 $grid->setFuncion("dias_vig", "semaforo_reporte");
                 $grid->setFuncion("accion", "colum_admin");
                 $grid->setFuncion("nom_visualiza", "archivo");
@@ -1472,6 +1799,7 @@
                 {
                     $out['paginado']=$grid->setPaginadohtmlMSKS("verPagina", "document");
                 }
+                
                 return $out;
             }
                 
@@ -1731,14 +2059,14 @@
  
  
             public function indexDocumentos($parametros)
-            {
+            { //print_r($parametros);
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
                 if ($parametros['corder'] == null) $parametros['corder']="dias_vig";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="2-3-4-5-7-8-9-12-14-17-20";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
+                    $parametros['mostrar-col']="2-3-4-5-7-8-9-12-14-17-20-21";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
                 if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 }
@@ -1755,7 +2083,11 @@
                             </div>';
                     $k++;
                 }
+                $parametros['email_usuario']= $_SESSION['CookEmail'];
                 $grid = $this->verListaDocumentos($parametros);
+                
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];                
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
@@ -1788,7 +2120,7 @@
 
 
                 $ao = new ArbolOrganizacional();
-                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao();
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'documentos/';
                 if (count($this->nombres_columnas) <= 0){
@@ -2226,13 +2558,20 @@
          
  
             public function crear($parametros)
-            {
+            {    session_name("$GLOBALS[SESSION]");
+                session_start();            
+                import('clases.organizacion.ArbolOrganizacional');
+                $ao = new ArbolOrganizacional();
+                $parametros[opcion] = 'simple';
+                
+                
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
                 
                 $ut_tool = new ut_Tool();
                 $contenido_1   = array();
+                $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
                 }
@@ -2263,22 +2602,36 @@
                     $ids[] = $i;
                 }
                 $contenido_1['V_MESES'] = $ut_tool->combo_array("v_meses", $desc, $ids,false,24,false,false,false,false,'display:inline;width:70px');
-
-                $contenido_1['REVISORES'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE reviso = 'S'"
-                                                                    , 'cod_emp'
-                                                                    , 'nombres', $val['cod_emp_relator']);
-                $contenido_1['ELABORO'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE elaboro = 'S'"
-                                                                    , 'cod_emp'
-                                                                    , 'nombres', $val['cod_emp_relator']);
-                $contenido_1['APROBO'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE aprobo = 'S'"
-                                                                    , 'cod_emp'
-                                                                    , 'nombres', $val['cod_emp_relator']);
+                //$_SESSION[CookEmail]
+                //$_SESSION[CookCodEmp]
+                if($_SESSION[SuperUser]=='S'){
+                    $sql="SELECT wf.id,
+                            CONCAT('".$this->nombres_columnas[elaboro]."=>', 
+                            CONCAT(CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_materno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2)))) 
+                            ,' | ".$this->nombres_columnas[reviso]."=>', 
+                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
+                            ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            FROM mos_workflow_documentos AS wf
+                            left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
+                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
+                }
+                else
+                {
+                    $sql="SELECT wf.id,
+                            CONCAT('".$this->nombres_columnas[reviso]."=>', 
+                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))),'N/A') 
+                            ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            FROM mos_workflow_documentos AS wf
+                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                    WHERE wf.id_personal_responsable='".$_SESSION['CookCodEmp']."'";
+                    
+                }
+                //echo $sql;
+                $contenido_1['ID_WORKFLOW_DOCUMENTO'] = $ut_tool->OptionsCombo($sql
+                                                                    , 'id'
+                                                                    , 'wf', $val['cod_emp_relator']);
                 $contenido_1['WORKFLOW'] = 'N';
                 if(!class_exists('Parametros')){
                     import("clases.parametros.Parametros");
@@ -2326,6 +2679,7 @@
                 $contenido_1['OPC'] = "new";
                 $contenido_1['ID'] = "-1";
                 $contenido_1['TOK_NEW'] = time();
+                $contenido_1['DESC_OPERACION_NOTIFICAR'] = "Guardar y Notificar";
 
                 $template->setVars($contenido_1);
                 $objResponse = new xajaxResponse();               
@@ -2337,6 +2691,8 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");
+                $objResponse->addScript('ao_multiple();');
+
                 $objResponse->addScript("$('#fecha').datepicker();");
                 $objResponse->addScript("$('#tabs-hv-2').tab();"
                         . "$('#tabs-hv-2 a:first').tab('show');");
@@ -2615,23 +2971,34 @@
                                 break;
                             }
                     }
-                    
+                    if($parametros["id_workflow_documento"]!=''){
+                        import("clases.workflow_documentos.WorkflowDocumentos");
+                        $wf = new WorkflowDocumentos();
+                        $datoswf = $wf->verWorkflowDocumentos($parametros["id_workflow_documento"]);
+                        //reviso,elaboro,aprobo
+                        $parametros['reviso']=$datoswf['id_personal_revisa'];
+                        $parametros['elaboro']=$datoswf['id_personal_responsable'];
+                        $parametros['aprobo']=$datoswf['id_personal_aprueba'];
+                        
+                    }
                     $respuesta = $this->ingresarDocumentos($parametros,$archivo,$doc_vis);
 
                     //if (preg_match("/ha sido ingresado con exito/",$respuesta ) == true) {
                     if (strlen($respuesta ) < 10 ) {
-//                        if (count($this->parametros) <= 0){
-//                            $this->cargar_parametros();
-//                        }                                                                
-//                        foreach ($this->parametros as $value) {                    
-//                            $params[cod_parametro_det] = $parametros["cmb-".$value[cod_parametro]];
-//                            $params[cod_parametro] = $value[cod_parametro];
-//                            $params[id_registro] = $respuesta;
-//                            if (strlen($params[cod_parametro_det])>0)
-//                                $this->ingresarParametro($params);
-//                            //$this->ingresarParametro($params);
-//                        }
                         $parametros[id] = $respuesta;
+                        //ENVIAR EMAIL SI ES GUARDAR Y NOTIFICAR
+                        if($parametros['notificar']=='si'){
+                            $correowf = $this->verWFemail($parametros[id]);
+                            if($correowf[email]!=''){
+                                $this->cargar_nombres_columnas();
+                                $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
+                                $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
+                                //$correowf[email] = 'azambrano75@gmail.com';
+                                $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
+                                $ut_tool = new ut_Tool();
+                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
+                            } 
+                        }                        
                         if(!class_exists('Parametros')){
                             import("clases.parametros.Parametros");
                         }
@@ -2823,11 +3190,24 @@
  
             public function editar($parametros)
             {
+                import('clases.organizacion.ArbolOrganizacional');
+                $ao = new ArbolOrganizacional();
+                $parametros[opcion] = 'simple';
+                // aqui tienes que cargar los id asociados al documento, tienes que armar el array simple, ejemplo array(15,45,78)
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
                 $ut_tool = new ut_Tool();
-                $val = $this->verDocumentos($parametros[id]); 
+                $val = $this->verDocumentos($parametros[id]);
+                $organizacion = array();
+                if(strpos($val[id_organizacion],',')){    
+                        $organizacion = explode(",", $val[id_organizacion]);
+                    }
+                    else{
+                        $organizacion[] = $val[id_organizacion];                    
+                    }
+                $parametros[nodos_seleccionados] = $organizacion;
+                $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
 
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
@@ -2887,23 +3267,36 @@
                     $desc[] = str_pad($i, 2, "0", STR_PAD_LEFT);                    
                     $ids[] = $i;
                 }
+               // echo $_SESSION['CookCodEmp'].'-'.$_SESSION[SuperUser];
                 $contenido_1['V_MESES'] = $ut_tool->combo_array("v_meses", $desc, $ids,false,$val["v_meses"],false,false,false,false,'display:inline;width:70px');
-
-                $contenido_1['REVISORES'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE reviso = 'S'"
-                                                                    , 'cod_emp'
-                                                                    , 'nombres', $val['reviso']);
-                $contenido_1['ELABORO'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE elaboro = 'S'"
-                                                                    , 'cod_emp'
-                                                                    , 'nombres', $val['elaboro']);
-                $contenido_1['APROBO'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE aprobo = 'S'"
-                                                                    , 'cod_emp'
-                                                                    , 'nombres', $val['aprobo']);
+                if($_SESSION[SuperUser]=='S'){
+                    $sql="SELECT wf.id,
+                            CONCAT('".$this->nombres_columnas[elaboro]."=>', 
+                            CONCAT(CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_materno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2)))) 
+                            ,' | ".$this->nombres_columnas[reviso]."=>', 
+                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
+                            ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            FROM mos_workflow_documentos AS wf
+                            left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
+                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
+                }
+                else
+                {
+                    $sql="SELECT wf.id,
+                            CONCAT('".$this->nombres_columnas[reviso]."=>', 
+                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
+                            ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            FROM mos_workflow_documentos AS wf
+                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                    WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."' or wf.id_personal_revisa='".$_SESSION['CookCodEmp']."')";
+                    
+                }
+                //echo $sql;
+                $contenido_1['ID_WORKFLOW_DOCUMENTO'] = $ut_tool->OptionsCombo($sql
+                                                                    , 'id'
+                                                                    , 'wf', $val['id_workflow_documento']);
 //                if (count($this->parametros) <= 0){
 //                        $this->cargar_parametros();
 //                }                                
@@ -3101,12 +3494,35 @@
                 }               
                 $contenido_1['ITEMS_ESP'] = $item;
                 $contenido_1['NUM_ITEMS_ESP'] = $i;
-                
-                
+                $sql = "SELECT fecha_registro f1,DATE_FORMAT(fecha_registro, '%d/%m/%Y %H:%m')fecha_registro, descripcion_operacion, "
+                        . "CONCAT(CONCAT(UPPER(LEFT(user.nombres, 1)), LOWER(SUBSTRING(user.nombres, 2))),' ', CONCAT(UPPER(LEFT(user.apellido_paterno, 1)), LOWER(SUBSTRING(user.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(user.apellido_materno, 1)), LOWER(SUBSTRING(user.apellido_materno, 2)))) usuario "
+                        . "FROM mos_historico_wf_documentos wf inner join mos_usuario user "
+                        . " on wf.id_usuario = user.id_usuario "
+                        . " WHERE IDDoc = $parametros[id] order by f1 desc";
+                //echo $sql;
+                $historia = $this->dbl->query($sql, array());
+                foreach ($historia as $value) {
+                    $item_histo .="<tr>";
+                    $item_histo .="<td>".$value[fecha_registro]."</td>";
+                    $item_histo .="<td>".$value[descripcion_operacion]."</td>";
+                    $item_histo .="<td>".$value[usuario]."</td>";
+                    $item_histo .="</tr>";
+                }                
+                $contenido_1['ITEMS_HISTO'] = $item_histo;
                 $template->PATH = PATH_TO_TEMPLATES.'documentos/';
                 $template->setTemplate("formulario_editar");
                 //$template->setVars($contenido_1);
-
+                //print_r($val);
+               // echo $_SESSION['CookEmail'];
+                if($val["etapa_workflow"]=='' && $val["estado_workflow"]=='')
+                    $contenido_1['VERNOTIFICAR'] = '';
+                else{
+                    if($val["etapa_workflow"]=='estado_pendiente_revision' && $val["estado_workflow"]=='RECHAZADO' && $val["email_responsable"]==$_SESSION['CookEmail'])
+                        $contenido_1['VERNOTIFICAR'] = '';
+                    else
+                        $contenido_1['VERNOTIFICAR'] = "style='display:none;'";
+                }
+                $contenido_1['ETAPA'] = $val["etapa_workflow"];
                 //$contenido['CAMPOS'] = $template->show();
 
                 //$template->PATH = PATH_TO_TEMPLATES.'interfaz/';
@@ -3116,6 +3532,7 @@
                 $contenido_1['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Documentos";
                 $contenido_1['PAGINA_VOLVER'] = "listarDocumentos.php";
                 $contenido_1['DESC_OPERACION'] = "Guardar";
+                $contenido_1['DESC_OPERACION_NOTIFICAR'] = "Guardar y Notificar";
                 $contenido_1['OPC'] = "upd";
                 $contenido_1['ID'] = $val["IDDoc"];
 
@@ -3129,6 +3546,7 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");
+                $objResponse->addScript('ao_multiple();');
                 $objResponse->addScript("$('#tabs-hv-2').tab();"
                         . "$('#tabs-hv-2 a:first').tab('show');");
                 $objResponse->addScript("$js");
@@ -3212,12 +3630,35 @@
                                 break;
                             }
                     }
+                    if($parametros["id_workflow_documento"]!=''){
+                        import("clases.workflow_documentos.WorkflowDocumentos");
+                        $wf = new WorkflowDocumentos();
+                        $datoswf = $wf->verWorkflowDocumentos($parametros["id_workflow_documento"]);
+                        //reviso,elaboro,aprobo
+                        $parametros['reviso']=$datoswf['id_personal_revisa'];
+                        $parametros['elaboro']=$datoswf['id_personal_responsable'];
+                        $parametros['aprobo']=$datoswf['id_personal_aprueba'];
+                    }
                     
                     $respuesta = $this->modificarDocumentos($parametros,$doc_vis);
 
                     if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {  
                         //print_r($parametros);
                         //print_r($parametros[nodos]);
+                        //ENVIAR EMAIL SI ES GUARDAR Y NOTIFICAR
+                        if($parametros['notificar']=='si'){
+                            $correowf = $this->verWFemail($parametros[id]);
+                           // print_r($correowf);
+                            if($correowf[email]!=''){
+                                $this->cargar_nombres_columnas();
+                                $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
+                                $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
+                                //$correowf[email] = 'azambrano75@gmail.com';
+                                $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
+                                $ut_tool = new ut_Tool();
+                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
+                            } 
+                        }
                         $arr = explode(",", $parametros[nodos]);
                         $params[IDDoc] = $parametros[id];
                         $this->eliminarCargosArbol($parametros);
@@ -3348,7 +3789,8 @@
      
  
             public function buscar($parametros)
-            {
+            {   $parametros['email_usuario']= $_SESSION['CookEmail'];
+
                 $grid = $this->verListaDocumentos($parametros);                
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
@@ -3533,7 +3975,223 @@
                 
                 return $objResponse;
             }
+
+            public function ver_workflow($parametros)
+            {
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                $parametros['email_usuario']= $_SESSION['CookEmail'];
+                $ut_tool = new ut_Tool();
+                $val = $this->verDocumentos($parametros[id]); 
+                //foreach ( $this->nombres_columnas as $key => $value)
+                $this->cargar_nombres_columnas();
+                //print_r($this->nombres_columnas);
+               // print_r($val);
+                //ESTADOS DE WF
+                //estado_pendiente_revision
+                //estado_pendiente_aprobacion
+                //estado_aprobado
+                $contenido_1['IDDOC']=$parametros[id];
+                $contenido_1['MOSTRARCAMBIAR']='style="display:none"';
+                $contenido_1['MOSTRARRECHAZAR']='style="display:none"'; 
+
+                $sql = "SELECT fecha_registro f1,DATE_FORMAT(fecha_registro, '%d/%m/%Y %H:%m')fecha_registro, descripcion_operacion, "
+                        . "CONCAT(CONCAT(UPPER(LEFT(user.nombres, 1)), LOWER(SUBSTRING(user.nombres, 2))),' ', CONCAT(UPPER(LEFT(user.apellido_paterno, 1)), LOWER(SUBSTRING(user.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(user.apellido_materno, 1)), LOWER(SUBSTRING(user.apellido_materno, 2)))) usuario "                        
+                        . "FROM mos_historico_wf_documentos wf inner join mos_usuario user "
+                        . " on wf.id_usuario = user.id_usuario "
+                        . " WHERE IDDoc = $parametros[id] order by f1 desc";
+                //echo $sql;
+                $historia = $this->dbl->query($sql, array());
+                $item_histo .='<table class=table table-striped table-condensed  width=100%>';
+                    $item_histo .="<thead><tr>";
+                    $item_histo .="<th>Fecha</th>";
+                    $item_histo .="<th>Operacion</th>";
+                    $item_histo .="<th>Usuario</th>";
+                    $item_histo .="</tr></thead>";
+                foreach ($historia as $value) {
+                    $item_histo .="<tr>";
+                    $item_histo .="<td>".$value[fecha_registro]."</td>";
+                    $item_histo .="<td>".str_replace('"',"'",$value[descripcion_operacion])."</td>";
+                    $item_histo .="<td>".$value[usuario]."</td>";
+                    $item_histo .="</tr>";
+                }                
+                $item_histo .="</table>";
+                //$item_histo='sakdsjasd askdj aksdjn askdjnasdk jas dkajsdn kajsdn askdjn';
+                $cuadro_historico = '.. <br/>
+                    <a href="#" tok="' .$parametros[id]. '-doc" class="ver-mas">
+                        <i class="glyphicon glyphicon-search" href="#search"></i> Ver Historial
+                        <input type="hidden" id="ver-mas-' .$parametros[id]. '-doc" value="'.$item_histo.'"/>
+                    </a>';
+                $contenido_1['VERHISTO']=$cuadro_historico;
+                //EL USUARIO ES QUIEN REVISA
+                if($val[etapa_workflow]=='estado_pendiente_revision' ){
+                    $contenido_1['ETAPANUEVA']='estado_pendiente_aprobacion';
+                    $contenido_1['ETAPARECHAZO']='estado_pendiente_revision';
+                    if($val[email_revisa]==$parametros['email_usuario'] && $val[estado_workflow]=='OK'){
+                        //ESTA EN PENDIENTE REVISION
+                        $contenido_1['TITULOESTADO']=$this->nombres_columnas[reviso];
+                        $contenido_1['MOSTRARCAMBIAR']='';
+                        $contenido_1['MOSTRARRECHAZAR']=''; 
+                    }
+                    $persona_pendiente = $val[reviso_a];
+                }
+                if($val[etapa_workflow]=='estado_pendiente_aprobacion'){
+                    $contenido_1['ETAPANUEVA']='estado_aprobado';
+                    $contenido_1['ETAPARECHAZO']='estado_pendiente_revision';
+                    if($val[email_aprueba]==$parametros['email_usuario'] && $val[estado_workflow]=='OK'){
+                        //ESTA EN PENDIENTE APROBACION
+                        $contenido_1['TITULOESTADO']=$this->nombres_columnas[aprobo];
+                        $contenido_1['MOSTRARCAMBIAR']='';
+                        $contenido_1['MOSTRARRECHAZAR']='';
+                    }
+                    $persona_pendiente = $val[aprobo_a];
+                }
+                if($val[etapa_workflow]=='estado_aprobado'){
+                    $persona_pendiente = $val[aprobo_a];
+                }
+                $objResponse = new xajaxResponse();
+                /*DOCUMENTO DE VISUALIZACION*/
+                $archivo_aux = $this->verDocumentoPDF($parametros[id]);
+                $contenido2 = $archivo_aux[doc_visualiza];
+                $http = (isset($_SERVER['HTTPS'])) ? 'https' : 'http';
+                $iframe = '';
+                if (strlen($contenido2)>0){
+                    
+                    $html = "<a target=\"_blank\" title=\"Ver Documento PDF\"  href=\"pages/documentos/descargar_archivo_pdf.php?id=$archivo_aux[IDDoc]&token=" . md5($archivo_aux[IDDoc]) ."&des=1\">
+                            
+                            <i class=\"icon icon-download\"></i>
+                        </a>";                
+               
+                    $titulo_doc = $archivo_aux[nom_visualiza];
             
+                    
+                    
+                    $sql = "SELECT extension FROM mos_extensiones WHERE extension = '$archivo_aux[contentType_visualiza]' OR contentType = '$archivo_aux[contentType_visualiza]'";
+                    $total_registros = $this->dbl->query($sql, $atr);
+                    $Ext2 = $total_registros[0][extension];
+                    $NombreDoc = $archivo_aux[nom_visualiza].'.'.$Ext2;
+                    //echo $NombreDoc;
+                    
+                    //header("Content-type: application/pdf");
+                    //
+                    //                            
+
+                    //print $contenido2;
+                    $version = "HOJA_VIDA";
+                    $Codigo = $Ext2 = "";
+                    $carpeta =  $this->encryt->Decrypt_Text($_SESSION[BaseDato]);
+                    $documento = new visualizador_documentos($carpeta, $NombreDoc, $Codigo, $version, $Ext2, $contenido2);
+
+                    $ruta_doc = $documento->ActivarDocumento();
+                    $titulo_doc = $documento->getNombreArchivo();
+                    $iframe = '<iframe id="iframe-vis-aux" src="'.$ruta_doc.'" style="height:90%;width:100%;" frameborder="0"></iframe>';
+                }
+                else{
+                    $archivo_aux = $this->verDocumentoFuente($parametros[id]);
+                    $sql = "SELECT extension FROM mos_extensiones WHERE extension = '$archivo_aux[contentType]' OR contentType = '$archivo_aux[contentType]'";
+                    $total_registros = $this->dbl->query($sql, array());
+                    $Ext2 = $total_registros[0][extension];  
+                    $NombreDoc = $archivo_aux[nombre_doc];
+                    //echo $NombreDoc;
+                    $contenido2 = $archivo_aux[doc_fisico];
+                    //header("Content-type: application/pdf");
+                    //print $contenido2;
+                    $version = $archivo_aux[version];
+                    $Codigo = $archivo_aux[Codigo_doc];
+                    $carpeta =  $this->encryt->Decrypt_Text($_SESSION[BaseDato]);
+                    $documento = new visualizador_documentos($carpeta, $NombreDoc, $Codigo, $version, $Ext2, $contenido2);
+
+                    $ruta_doc = $documento->ActivarDocumento();
+                    $titulo_doc = $documento->getNombreArchivo();
+                    $html = "<a target=\"_blank\" title=\"Ver Documento Fuente\"  href=\"pages/documentos/descargar_archivo.php?id=$archivo_aux[IDDoc]&token=" . md5($archivo_aux[IDDoc]) ."&des=1\">
+                            
+                            <i class=\"icon icon-view-document\"></i>
+                        </a>";
+                    $iframe = '<iframe id="iframe-vis" src="'.$http.'://docs.google.com/gview?url='.$ruta_doc.'&embedded=true" style="height:90%;width:100%;" frameborder="0"></iframe>';
+                }
+                $html_registro = '';
+                if ($archivo_aux[formulario]== 'S'){
+                    $html_registro = " <li> <a id=\"a-ver-registros\" title=\"Ver Registros\" tok=\"$archivo_aux[IDDoc]\"  href=\"#\">
+                            
+                            <i class=\"icon icon-more\"></i>
+                        </a>  </li>";
+                }
+                
+                $html = '<div style="height:700px;" class="content-panel panel">
+                <div class="content">
+                    <div class="info-container" style="height:700px;">
+                        <div class="row" id="div-iframe-vis"  style="height:100%;">
+                            <!--<iframe id="iframe-vis" src="#" style="height:90%;width:100%;" frameborder="0"></iframe>-->
+                            <!--<iframe id="iframe-vis" src="'.$http.'://docs.google.com/gview?url='.$ruta_doc.'&embedded=true" style="height:90%;width:100%;" frameborder="0"></iframe>-->
+                            '.$iframe.'
+                        </div>
+                        <!--<textarea id="text-iframe">'.$http.'://docs.google.com/gview?url='.$ruta_doc.'</textarea>-->
+                        
+                    </div>
+              </div></div>';
+                /**/
+                $contenido_1['DOCVISUALIZA']=$html;
+                
+                /*VER DOCUMENTO FUENTE*/
+                $archivo_aux = $this->verDocumentoFuente($parametros[id]);
+                $sql = "SELECT extension FROM mos_extensiones WHERE extension = '$archivo_aux[contentType]' OR contentType = '$archivo_aux[contentType]'";
+                $total_registros = $this->dbl->query($sql, array());
+                //print_r($total_registros);
+                $Ext2 = $total_registros[0][extension];  
+                $NombreDoc = $archivo_aux[nombre_doc];
+                //echo $NombreDoc;
+                $contenido2 = $archivo_aux[doc_fisico];
+                //header("Content-type: application/pdf");
+                //print $contenido2;
+                $version = $archivo_aux[version];
+                $Codigo = $archivo_aux[Codigo_doc];
+                $carpeta =  $this->encryt->Decrypt_Text($_SESSION[BaseDato]);
+                $documento = new visualizador_documentos($carpeta, $NombreDoc, $Codigo, $version, $Ext2, $contenido2);
+                
+                $ruta_doc = $documento->ActivarDocumento();
+                
+                $html = '<div style="height:700px;" class="content-panel panel">
+                <div class="content">
+                  <div class="row" style="height:700px;">
+                        <iframe src="http://docs.google.com/gview?url='.$ruta_doc.'&embedded=true" style="height:100%;width:100%;" frameborder="0"></iframe>
+                  </div>
+
+                </div>
+              </div>';
+                /**/
+               
+               $contenido_1['DOCFUENTE']=$html;
+               $contenido_1['PAGINA_VOLVER'] = "listarDocumentos.php";
+               $contenido_1['TITULO_FORMULARIO'] = 'Flujo de Trabajo "'.$this->nombres_columnas[$val[etapa_workflow]].'"-'.$val[estado_workflow].' por '.$persona_pendiente;
+               //echo $val[etapa_workflow] 
+              // print_r($this->nombres_columnas);
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'documentos/';
+                $template->setTemplate("formulario_wf");
+                $template->setVars($contenido_1);
+                
+                $contenido_1['OPC'] = "upd";
+                $contenido_1['ID'] = $val["IDDoc"];
+
+                $template->setVars($contenido_1);
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
+                
+                $objResponse->addScriptCall("calcHeight");
+                $objResponse->addScriptCall("MostrarContenido2");    
+                $objResponse->addScriptCall('cargar_autocompletado');
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("init_tabla();");
+                $objResponse->addScript("$.validate({
+                            lang: 'es'  
+                          });");
+                $objResponse->addScript("$('#tabs-hv-2').tab();"
+                        . "$('#tabs-hv-2 a:first').tab('show');");
+                //$objResponse->addScript('setTimeout(function(){ alert("vaaa");$(\'#iframe-vis\').attr("src",$("#text-iframe").html()+"&embedded=true");},1000);');
+                $objResponse->addScript("$js");
+                return $objResponse;
+            }            
             public function buscar_reporte($parametros)
             {   ///print_r($parametros);
                 $grid = $this->verListaDocumentosReporte($parametros);
@@ -3612,5 +4270,35 @@
 
                 return $template->show();
             }
-     
+            public function cambiar_estado($parametros)
+            {   //print_r($parametros);
+                $parametros['id_usuario']= $_SESSION['CookIdUsuario'];
+                $respuesta = $this->cambiarestadowf($parametros);
+                $objResponse = new xajaxResponse();
+               // print_r($parametros);
+                if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
+                        $correowf = $this->verWFemail($parametros[id]);
+                        //echo $correowf[email];
+                        if($correowf[email]!=''){
+                            $this->cargar_nombres_columnas();
+                            $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
+                            $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
+                            if($correowf[estado_workflow]=='RECHAZADO'){
+                                $cuerpo .= 'Rechazado por:<br><span style="color:red">'.$correowf[observacion_rechazo].'</span>';
+                            }
+                            //$correowf[email] = 'azambrano75@gmail.com';
+                            $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
+                            $ut_tool = new ut_Tool();
+                            //echo $cuerpo;
+                            $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
+                        } 
+                        //die;
+                    $objResponse->addScriptCall("MostrarContenido");
+                    $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+                }
+                else
+                    $objResponse->addScriptCall('VerMensaje','error',$respuesta);
+                $objResponse->addScript("$('#MustraCargando').hide();");
+            return $objResponse;
+            }     
  }?>
