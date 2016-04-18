@@ -72,3 +72,81 @@ INSERT INTO `mos_nombres_campos` VALUES ('245', 'id_personal_revisa', 'id_person
 INSERT INTO `mos_nombres_campos` VALUES ('246', 'email_revisa', 'email_revisa', '23', 'email_revisa');
 INSERT INTO `mos_nombres_campos` VALUES ('247', 'id_personal_aprueba', 'id_personal_aprueba', '23', 'id_personal_aprueba');
 INSERT INTO `mos_nombres_campos` VALUES ('248', 'email_aprueba', 'email_aprueba', '23', 'email_aprueba');
+/****************************************/
+/*cambio del 29-03*/
+/****************************************/
+ALTER TABLE `mos_documentos`
+ADD COLUMN `id_workflow_documento`  int NULL AFTER `aprobo`,
+ADD COLUMN `estado_workflow`  varchar(50) NULL AFTER `id_workflow_documento`,
+ADD COLUMN `fecha_estado_workflow`  datetime NULL AFTER `estado_workflow`,
+ADD COLUMN `id_usuario_workflow`  int NULL AFTER `fecha_estado_workflow`;
+
+ALTER TABLE `mos_documentos`
+MODIFY COLUMN `fecha_estado_workflow`  timestamp NULL DEFAULT CURRENT_TIMESTAMP AFTER `estado_workflow`;
+
+ALTER TABLE `mos_documentos`
+ADD COLUMN `etapa_workflow`  varchar(50) NULL AFTER `id_workflow_documento`;
+
+ALTER TABLE `mos_documentos`
+ADD COLUMN `observacion_rechazo`  text NULL AFTER `id_usuario_workflow`;
+
+DROP TABLE IF EXISTS `mos_historico_wf_documentos`;
+CREATE TABLE `mos_historico_wf_documentos` (
+  `id` int(11) NOT NULL DEFAULT '0',
+  `IDDoc` int(11) DEFAULT NULL,
+  `fecha_registro` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `descripcion_operacion` text DEFAULT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `mos_nombres_campos` VALUES ('278', 'id_workflow_documento', 'Flujo de Trabajo de Documento', '6', 'Flujo de Trabajo de Documento');
+INSERT INTO `mos_nombres_campos` VALUES ('279', 'estado_workflow', 'Estado de Flujo de Trabajo', '6', 'Estado de Flujo de Trabajo');
+INSERT INTO `mos_nombres_campos` VALUES ('280', 'fecha_estado_workflow', 'Fecha de Flujo de Trabajo', '6', 'Fecha de Flujo de Trabajo');
+INSERT INTO `mos_nombres_campos` VALUES ('281', 'id_usuario_workflow', 'Usuario de Flujo de Trabajo', '6', 'Usuario de Flujo de Trabajo');
+INSERT INTO `mos_nombres_campos` VALUES ('282', 'estado_pendiente_aprobacion', 'Pendiente de Aprobacion', '6', 'Pendiente de Aprobacion');
+INSERT INTO `mos_nombres_campos` VALUES ('283', 'estado_pendiente_revision', 'Pendiente de Revision', '6', 'Pendiente de Revision');
+INSERT INTO `mos_nombres_campos` VALUES ('284', 'estado_aprobado', 'Aprobado', '6', 'Aprobado');
+INSERT INTO `mos_nombres_campos` VALUES ('308', 'etapa_workflow', 'Etapa de Flujo de Trabajo', '6', 'Etapa de Flujo de Trabajo');
+
+DROP TRIGGER `registra_mos_historico_wf_documentos`;
+
+CREATE DEFINER=`root`@`localhost` TRIGGER `registra_mos_historico_wf_documentos` AFTER INSERT ON `mos_documentos`
+FOR EACH ROW BEGIN
+/*guarda historico al insertar un doc*/
+         DECLARE etapa text;  
+			IF(NEW.id_workflow_documento is not null)THEN
+				set etapa= (SELECT
+				IFNULL(mos_nombres_campos.texto,'')
+				FROM
+				mos_nombres_campos
+				WHERE
+				mos_nombres_campos.modulo = 6 AND
+				mos_nombres_campos.nombre_campo = NEW.etapa_workflow);
+
+        INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+				VALUES (NEW.IDDoc,CONCAT('NUEVO DOCUMENTO',IFNULL(NEW.estado_workflow,''),etapa ),NEW.id_usuario_workflow);
+			END IF;
+END;
+
+CREATE DEFINER=`root`@`localhost` TRIGGER `registra_mos_historico_wf_documentos_cambio` BEFORE UPDATE ON `mos_documentos`
+FOR EACH ROW BEGIN
+/*guarda historico al modificar un doc si cambian los datos del wf*/
+        DECLARE etapa text;  
+				set etapa= (SELECT
+				IFNULL(mos_nombres_campos.texto,'')
+				FROM
+				mos_nombres_campos
+				WHERE
+				mos_nombres_campos.modulo = 6 AND
+				mos_nombres_campos.nombre_campo = NEW.etapa_workflow);
+
+			IF((NEW.etapa_workflow<>OLD.etapa_workflow) or (NEW.estado_workflow<>OLD.estado_workflow)) THEN
+        INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+				VALUES (NEW.IDDoc,CONCAT('ESTADO:',NEW.estado_workflow,' ',IFNULL(NEW.observacion_rechazo,''),',cambio a ',etapa),NEW.id_usuario_workflow);
+			END IF;
+			IF(OLD.etapa_workflow is Null and NEW.etapa_workflow<>'') THEN
+        INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+				VALUES (NEW.IDDoc,CONCAT('ESTADO:',NEW.estado_workflow,' ',IFNULL(NEW.observacion_rechazo,''),',cambio a ',etapa),NEW.id_usuario_workflow);
+			END IF;
+END;
