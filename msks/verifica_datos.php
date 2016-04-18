@@ -114,13 +114,16 @@
                         $pagina2 = new Mysql($Fila["db"],$Fila["loginDB"],$Fila["passwordDB"]);
 
 			//$CookNamUsuario=NombreUsuario($CookIdUsuario);
-			$Consulta="select id_usuario,super_usuario "
+			$Consulta="select id_usuario,super_usuario,usuario.email "
                                 //. ",CONCAT(UPPER(LEFT(nombres, 1)), LOWER(SUBSTRING(nombres, 2))) nombres"
-                                . ",initcap(nombres) nombres"
-                                . ",CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))) apellido_paterno "
-                                . ",CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))) apellido_materno "
-                                . " from mos_usuario where email='".$TxtUsuario."' and (password_1='".md5($TxtPwd)."')";
-                        //echo $Consulta;
+                                . ",initcap(usuario.nombres) nombres"
+                                . ",CONCAT(UPPER(LEFT(usuario.apellido_paterno, 1)), LOWER(SUBSTRING(usuario.apellido_paterno, 2))) apellido_paterno "
+                                . ",CONCAT(UPPER(LEFT(usuario.apellido_materno, 1)), LOWER(SUBSTRING(usuario.apellido_materno, 2))) apellido_materno "
+                                . ",cod_emp "
+                                . " from mos_usuario usuario LEFT JOIN mos_personal persona "
+                                . " on usuario.email = persona.email "
+                                . " where usuario.email='".$TxtUsuario."' and (password_1='".md5($TxtPwd)."')";
+                       // echo $Consulta;
                         $data = $pagina2->query($Consulta, array());
                         //echo count($data);
                         if (count($data)<=0){
@@ -133,7 +136,13 @@
 			$_SESSION[CookIdEmpresa]=$id_empresa;//$Fila["id_empresa"];
 			$_SESSION[CookIdUsuario]=$Fila2["id_usuario"];
 			$_SESSION[CookWeb]='S';
-
+                        //cambio del 29/03/2016
+                        //GUARDAMOS EL CORREO DEL USUARIO Y COD EMP SI LO POSEE
+                        $_SESSION[CookEmail]=$Fila2["email"];
+                        $_SESSION[CookCodEmp]=$Fila2["cod_emp"];
+                        //cambio del 29/03/2016
+                        //GUARDAMOS EL CORREO DEL USUARIO Y COD EMP SI LO POSEE
+                        
 			
                         //print_r($data);
                         
