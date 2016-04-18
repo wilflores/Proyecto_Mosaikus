@@ -180,16 +180,8 @@ function cargar_autocompletado(){
     
 
     
-        $( "#reviso" ).select2({
+        $( "#id_workflow_documento" ).select2({
             placeholder: "Selecione el revisor",
-            allowClear: true
-          }); 
-          $( "#elaboro" ).select2({
-            placeholder: "Selecione el elaborador",
-            allowClear: true
-          }); 
-          $( "#aprobo" ).select2({
-            placeholder: "Selecione el aprobador",
             allowClear: true
           }); 
           
@@ -224,6 +216,8 @@ function cargar_autocompletado(){
     function nuevo_Documentos(){
             array = new XArray();
             array.setObjeto('Documentos','crear');
+            array.addParametro('modo',document.getElementById('modo').value);            
+            array.addParametro('cod_link',document.getElementById('cod_link').value);
             array.addParametro('import','clases.documentos.Documentos');
             xajax_Loading(array.getArray());
     }
@@ -268,13 +262,16 @@ function cargar_autocompletado(){
                 }
             }
             
-            $( "#btn-guardar" ).html('Procesando..');
-            $( "#btn-guardar" ).prop( "disabled", true );
+    //        $( "#btn-guardar" ).html('Procesando..');
+    //        $( "#btn-guardar" ).prop( "disabled", true );
             array = new XArray();
             if (doc.getElementById("opc").value == "new")
                 array.setObjeto('Documentos','guardar');
             else
                 array.setObjeto('Documentos','actualizar');
+          
+            array.addParametro('modo',document.getElementById('modo').value);
+            array.addParametro('cod_link',document.getElementById('cod_link').value);
             array.addParametro('permiso',document.getElementById('permiso_modulo').value);
             array.getForm('idFormulario');
             array.addParametro('import','clases.documentos.Documentos');
@@ -331,6 +328,8 @@ function cargar_autocompletado(){
     function editarDocumentos(id){
         array = new XArray();
         array.setObjeto('Documentos','editar');
+        array.addParametro('modo',document.getElementById('modo').value);            
+        array.addParametro('cod_link',document.getElementById('cod_link').value);        
         array.addParametro('id',id);
         array.addParametro('import','clases.documentos.Documentos');
         xajax_Loading(array.getArray());
@@ -587,3 +586,82 @@ function cargar_autocompletado(){
                 });
     }
     
+function verWorkFlow(id){
+    array = new XArray();
+    array.setObjeto('Documentos','ver_workflow');
+    array.addParametro('id',id);
+    array.addParametro('import','clases.documentos.Documentos');
+    xajax_Loading(array.getArray());
+    //PanelOperator.showDetail('');    
+}
+function CambiarEstadoWF(estado,etapa,id){
+    array = new XArray();
+    array.setObjeto('Documentos','cambiar_estado');
+    array.addParametro('id',id);
+    array.addParametro('estado',estado);
+    array.addParametro('etapa',etapa);
+    array.addParametro('import','clases.documentos.Documentos');
+    xajax_Loading(array.getArray());
+}
+function RechazarWF(estado,etapa,id){
+    if(document.getElementById("observacion_rechazo").style.display==''){
+        array = new XArray();
+        array.setObjeto('Documentos','cambiar_estado');
+        array.addParametro('id',id);
+        array.addParametro('estado',estado);
+        array.addParametro('etapa',etapa);
+        array.addParametro('observacion_rechazo',document.getElementById("observacion_rechazo").value);
+        array.addParametro('import','clases.documentos.Documentos');
+        xajax_Loading(array.getArray());
+        $('#myModal-observacion-rechazo').modal('hide');
+        
+        }
+    else{
+        document.getElementById("observacion_rechazo").style.display='';
+        alertify.error("Cargue una observacion de rechazo y vuelva a presionar Rechazar",5); 
+    }
+        
+}
+ function Notificar(doc){
+            array = new XArray();
+            array.setObjeto('Documentos','actualizar_notificar_wf');
+            array.addParametro('permiso',document.getElementById('permiso_modulo').value);
+            array.getForm('idFormulario');
+            array.addParametro('import','clases.documentos.Documentos');
+            xajax_Loading(array.getArray());
+    }
+ function GuardarNotificar(doc){
+            array = new XArray();
+            array.setObjeto('Documentos','actualizar_notificar_wf');
+            array.addParametro('permiso',document.getElementById('permiso_modulo').value);
+            array.getForm('idFormulario');
+            array.addParametro('import','clases.documentos.Documentos');
+            xajax_Loading(array.getArray());
+    }    
+function ao_multiple(){
+    $('#div-ao-form').jstree(
+            {
+                "checkbox":{
+                    three_state : false,
+                        cascade : 'down'
+                },
+                "plugins": ["search", "types","checkbox"]
+            }
+        );
+    $('#div-ao-form').on("changed.jstree", function (e, data) {
+        if (data.selected.length > 0){
+            var arr;
+            var id = '';
+            for(i=0;i<data.selected.length;i++){
+                arr = data.selected[i].split("_");
+                id = id + arr[1] + ',';
+            }
+            id = id.substr(0,id.length-1);
+            $('#nodos').val(id);
+        }
+        else
+            $('#nodos').val('');
+    });
+    $('#div-ao-form').jstree(true).open_all();               
+        
+}    
