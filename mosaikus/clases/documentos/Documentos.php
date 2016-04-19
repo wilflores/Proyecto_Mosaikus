@@ -339,7 +339,7 @@
                         import("clases.mos_acceso.mos_acceso");
                     }
                     $acceso = new mos_acceso();
-                    $data_ids_acceso = $acceso->obtenerNodosArbol($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo]);
+                    $data_ids_acceso = $acceso->obtenerNodosArbol($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo],$parametros[terceros]);
                     foreach ($data_ids_acceso as $value) {
                         $this->id_org_acceso[$value[id]] = $value;
                     }                                            
@@ -540,7 +540,7 @@
                     $Resp3 = $this->dbl->query($Consulta3,array());                    
                     foreach ($Resp3 as $Fila3) 
                     {                                                        
-                        $Nivls .= BuscaOrganizacional(array('id_organizacion' => $Fila3[id_organizacion_proceso]))."<br /><br />";
+                        $Nivls .= $this->BuscaOrganizacional(array('id_organizacion' => $Fila3[id_organizacion_proceso]))."<br /><br />";
                     }
                     if($Nivls!='')
                             $Nivls=substr($Nivls,0,strlen($Nivls)-6);
@@ -549,6 +549,32 @@
             }
             
             return $Nivls;
+
+        }
+        
+        function BuscaOrganizacional($tupla)
+        {
+                $OrgNom = "";
+                if (strlen($tupla[id_organizacion]) > 0) {                                           
+                        $Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                        $Resp3 = $this->dbl->query($Consulta3,array());
+
+                        foreach ($Resp3 as $Fila3) 
+                        {
+                                if($Fila3[organizacion_padre]==2)
+                                {
+                                        $OrgNom.=($Fila3[identificacion]);
+                                        return($OrgNom);                                        
+                                }
+                                else
+                                {
+                                        $OrgNom .= $this->BuscaOrganizacional(array('id_organizacion' => $Fila3[organizacion_padre])) . ' -> ' . ($Fila3[identificacion]);
+                                }
+                        }
+                }
+                else
+                    $OrgNom .= $_SESSION[CookNomEmpresa];
+                return $OrgNom;
 
         }
         
@@ -563,7 +589,7 @@
                     $Resp3 = $this->dbl->query($Consulta3,array());                    
                     foreach ($Resp3 as $Fila3) 
                     {                                                        
-                        $Nivls .= BuscaOrganizacional(array('id_organizacion' => $Fila3[id_organizacion_proceso]))."<br /><br />";
+                        $Nivls .= $this->BuscaOrganizacional(array('id_organizacion' => $Fila3[id_organizacion_proceso]))."<br /><br />";
                     }
                     if($Nivls!='')
                             $Nivls=substr($Nivls,0,strlen($Nivls)-6);
@@ -594,6 +620,31 @@
                     </a>';
             }
             //return $tupla[analisis_causal];
+            
+            return $Nivls;
+
+        }
+        
+        function BuscaRegistrosAdministrador($tupla)
+        {
+            If ($tupla[formulario] == 'N')
+                return 'No Aplica';
+            
+            $encryt = new EnDecryptText();
+            $dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            $Nivls = "";
+            {                                           
+                    //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                    $Consulta3="select count(*) cant from mos_registro where IDDoc='".$tupla[IDDoc]."'";                    
+                    $Resp3 = $dbl->query($Consulta3,array());                    
+                    $resp3 = $Resp3[0][cant];
+                    //<img border="0" title="Ver Registros" src="diseno/images/ico_explorer.png">
+                    $html = '<a class="LinksinLinea" title="Ver Registros" href="JavaScript:MuestraFormulario('.$tupla[IDDoc].')">
+                                <i class="icon icon-more"></i>
+                            </a>' . str_pad($resp3, 5, '0', STR_PAD_LEFT);
+
+                    return  $html;
+            }
             
             return $Nivls;
 
@@ -699,7 +750,7 @@
         public function colum_admin($tupla)
         {   //echo $_SESSION[CookM];
             //print_r($tupla);
-           //if($_SESSION[CookM] == 'S')  
+           //if($_SESSION[CookM] == 'S')            
            //**********EDITAR **********
            if($_SESSION[SuperUser] == 'S'){
                 $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
@@ -708,15 +759,16 @@
                 } 
            else{
                 if(strpos($tupla[arbol_organizacional],',')){
-                    if($tupla[cod_elabora]==$_SESSION['CookCodEmp']){
+                    if(($tupla[cod_elabora]==$_SESSION['CookCodEmp'])&&($this->id_org_acceso[$tupla[arbol_organizacional]][modificar] == 'S')){
                      $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
                                  <i class=\"icon icon-edit\"></i>
                              </a>";
                      }
                 }
                 else{
+                    
                      if (array_key_exists($tupla[arbol_organizacional], $this->id_org_acceso)){
-                         if ($this->id_org_acceso[$tupla[arbol_organizacional]][modificar] == 'S')
+                         if ($this->id_org_acceso[$tupla[arbol_organizacional]][modificar_terceros] == 'S')
                           {
                           $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
                                       <i class=\"icon icon-edit\"></i>
@@ -741,7 +793,7 @@
                 }
                 else{
                      if (array_key_exists($tupla[arbol_organizacional], $this->id_org_acceso)){
-                         if ($this->id_org_acceso[$tupla[arbol_organizacional]][eliminar] == 'S')
+                         if (($tupla[cod_elabora]==$_SESSION['CookCodEmp']) && ($this->id_org_acceso[$tupla[arbol_organizacional]][eliminar] == 'S'))
                           {
                           $html .= '<a href="#" onclick="javascript:eliminarDocumentos(\''. $tupla[IDDoc] . '\');" title="Eliminar '.$tupla[nombre_doc].'">
                             <i class="icon icon-remove"></i>                        
@@ -1233,6 +1285,10 @@
                         $filtro_ao .= " INNER JOIN ("
                                 . " select IDDoc from mos_documentos_estrorg_arbolproc where id_organizacion_proceso in (". $id_org . ") GROUP BY IDDoc) as ao ON ao.IDDoc = d.IDDoc ";//" AND id_organizacion IN (". $id_org . ")";
                     }
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);                    
+                    }
+                    
                     $sql = "SELECT COUNT(*) total_registros
                          FROM mos_documentos  d
                                 left join mos_personal p on d.elaboro=p.cod_emp
@@ -1242,11 +1298,13 @@
                                 left join (select IDDoc, count(*) num_rev, max(fechaRevision) fecha_revision from mos_documento_revision GROUP BY IDDoc) as rev ON rev.IDDoc = d.IDDoc
                             $sql_left
                                 $filtro_ao
-                            WHERE muestra_doc='S' " ;
-                            if($_SESSION[SuperUser]!='S'){
+                            WHERE muestra_doc='S' " ;                    
+                                                                                                                
+                            if(($_SESSION[SuperUser]!='S')&&(isset($parametros[terceros]))){
                                 $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
                                 $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_revision' and d.estado_workflow='OK') or ";    
-                                $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK')) ";    
+                                $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK') ";    
+                                $sql .= " OR  d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")))"; 
                             }
                             //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
                     if (strlen($atr['b-filtro-sencillo'])>0){
@@ -1341,13 +1399,12 @@
                                $sql .= " AND d.elaboro = '". $atr["b-elaboro"] . "'";
                     if (strlen($atr["b-aprobo"])>0)
                         $sql .= " AND d.aprobo = '". $atr["b-aprobo"] . "'";
-
-                    if (count($this->id_org_acceso) <= 0){
-                        $this->cargar_acceso_nodos($atr);                    
+                    /*Acceso a los documentos segun el arbol, no aplica para el administrador de documentos*/
+                    if ((!isset($parametros[terceros]))){                            
+                        //$sql .= " AND id_organizacion IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")";                        
+                        $sql .= " AND  d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . "))"; 
                     }
-                    if (count($this->id_org_acceso)>0){                            
-                        $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";                        
-                    }
+                    
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
             
@@ -1399,10 +1456,11 @@
                             $sql_left
                                 $filtro_ao
                             WHERE muestra_doc='S' ";
-                            if($_SESSION[SuperUser]!='S'){
+                            if(($_SESSION[SuperUser]!='S')&&(isset($parametros[terceros]))){
                                 $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
                                 $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_revision' and d.estado_workflow='OK') or ";    
-                                $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK')) ";    
+                                $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK') ";    
+                                $sql .= " OR  d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")))"; 
                             }
                             //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
                     if (strlen($atr['b-filtro-sencillo'])>0){
@@ -1505,7 +1563,12 @@
                         $sql .= " AND d.IDDoc in (SELECT DISTINCT IDDoc
                                                     FROM mos_registro_item 
                                                     where valor in (".$atr["nodosp"].") and tipo='12')";
-
+                    
+                    /*Acceso a los documentos segun el arbol, no aplica para el administrador de documentos*/
+                    if ((!isset($parametros[terceros]))){                            
+                        //$sql .= " AND id_organizacion IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")";                        
+                        $sql .= " AND  d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . "))"; 
+                    }
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //  echo $sql;
@@ -1715,7 +1778,13 @@
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apli_reg_estrorg], "apli_reg_estrorg", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apli_reg_arbproc], "apli_reg_arbproc", $parametros)),
                array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
-               
+               array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+               array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    //array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    //array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
                
                
                 );
@@ -1737,14 +1806,14 @@
                 }
                 if ($parametros['permiso'][1] == "1")
                     array_push($func,array('nombre'=> 'verDocumentos','imagen'=> "<img style='cursor:pointer' src='diseno/images/find.png' title='Ver Documentos'>"));
-                */
+                
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                     array_push($func,array('nombre'=> 'editarDocumentos','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_modificar.png' title='Editar Documentos'>"));
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
                     array_push($func,array('nombre'=> 'eliminarDocumentos','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_eliminar.png' title='Eliminar Documentos'>"));
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
                     array_push($func,array('nombre'=> 'verWorkFlow','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_nuevo.png' title='Ver Flujo de Trabajo'>"));
-               
+               */
                 $config=array();
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
                 $array_columns =  explode('-', $parametros['mostrar-col']);
@@ -1781,7 +1850,7 @@
                 $grid->setFuncion("accion", "colum_admin");
                 $grid->setFuncion("nom_visualiza", "archivo");
                 $grid->setFuncion("Codigo_doc", "codigo_doc");
-                $grid->setFuncion("formulario", "BuscaRegistros");
+                $grid->setFuncion("formulario", "BuscaRegistrosAdministrador");
                 $grid->setFuncion("version", "version");
                 $grid->setFuncion("arbol_organizacional", "BuscaOrganizacionalTodosVerMas");
                 $grid->setAligns(1,"center");
@@ -1843,7 +1912,8 @@
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos("Fecha de Revisión", "fecha_revision", $parametros)),  
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[palabras_claves], "palabras_claves", $parametros)),               
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),
-               array( "width"=>"15%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[arbproc], "arbproc", $parametros)),     
+               array( "width"=>"15%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[arbproc], "arbproc", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[etapa_workflow], "etapa_workflow", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[observacion], "observacion", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[doc_fisico], "doc_fisico", $parametros)),               
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_filial], "id_filial", $parametros)),               
@@ -1857,6 +1927,11 @@
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apli_reg_estrorg], "apli_reg_estrorg", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apli_reg_arbproc], "apli_reg_arbproc", $parametros)),
                array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+               array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+               array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
                
                
                
@@ -2071,7 +2146,7 @@
                         $this->cargar_parametros();
                 }
                 $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
-                $k = 23;
+                $k = 29;
                 $contenido[PARAMETROS_OTROS] = "";
                 foreach ($this->parametros as $value) {                    
                     //$parametros['mostrar-col'] .= "-$k";
@@ -2084,6 +2159,8 @@
                     $k++;
                 }
                 $parametros['email_usuario']= $_SESSION['CookEmail'];
+                /*Para visualizar los documentos de terceros*/
+                $parametros[terceros] = 'S';
                 $grid = $this->verListaDocumentos($parametros);
                 
                 $contenido['MODO'] = $parametros['modo'];
@@ -2232,6 +2309,8 @@
                     $k++;
                 }
                 $grid = $this->verListaDocumentosReporte($parametros);
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];  
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
@@ -2269,7 +2348,7 @@
                         <iframe id="iframearbolP" src="pages/cargo/arbol_proceso_registros.php" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
                 
                 $ao = new ArbolOrganizacional();
-                $contenido[DIV_ARBOL_ORGANIZACIONAL] = $ao->jstree_ao(2);
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] = $ao->jstree_ao(2,$parametros);
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'documentos/';
@@ -2422,6 +2501,8 @@
                     $k++;
                 }
                 $grid = $this->verListaDocumentosReporte($parametros);
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];  
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
@@ -2454,7 +2535,7 @@
 
 
                 $ao = new ArbolOrganizacional();
-                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(1);
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(1,$parametros);
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'documentos/';
@@ -4194,6 +4275,8 @@
             }            
             public function buscar_reporte($parametros)
             {   ///print_r($parametros);
+                /*Para visualizar los documentos de terceros*/
+                $parametros[terceros] = 'S';
                 $grid = $this->verListaDocumentosReporte($parametros);
                 $objResponse = new xajaxResponse();
                 

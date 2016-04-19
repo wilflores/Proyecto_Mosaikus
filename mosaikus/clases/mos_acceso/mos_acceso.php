@@ -169,9 +169,9 @@
             
             return $arbol;
         }
-        public function obtenerNodosArbol($usuario, $modulo, $modo){
+        public function obtenerNodosArbol($usuario, $modulo, $modo,$visualiza_tercero=''){
             $atr = array();
-            if($modo == 'Especialista')
+            if($modo == 'Especialista'){
                 $sql = "SELECT
                         mos_l.cod_link
                         ,mos_l.nombre_link
@@ -195,6 +195,10 @@
                         AND mos_ue.id_usuario =$usuario
                         AND mos_l.cod_link = $modulo
                     ";
+                if (strlen($visualiza_tercero) > 0){
+                    $sql .= " AND mos_p.visualizar_terceros = 'N' ";
+                }
+            }
             else
                 $sql = "SELECT
                         mos_l.cod_link

@@ -238,3 +238,39 @@ END;
 
 ;;
 DELIMITER ;
+
+-- ajustes en personal 14/04/2016
+
+update mos_personal set email = NULL where email = '';
+
+ALTER TABLE `mos_personal`
+ADD UNIQUE INDEX (`email`) ;
+
+INSERT INTO `mos_parametro_categoria` (`cod_categoria`, `descripcion`, `nombre_div`, `activo`) VALUES ('14', 'Inspecciones', 'Inspecciones', 'S');
+
+INSERT INTO `mos_link` (`nombre_link`, `dependencia`, `tipo`, `orden`) VALUES ('Inspecciones', '0', '1', '10');
+UPDATE `mos_link` SET `cod_link`='83' WHERE (`cod_link`='0');
+INSERT INTO `mos_link` (`cod_link`, `nombre_link`, `dependencia`, `tipo`, `orden`) VALUES ('84', 'Plantillas de Inspecciones', '83', '3', '2');
+-- INSERT INTO `mos_link_por_perfil` (`cod_perfil`, `cod_link`) VALUES ('1', '83');
+-- INSERT INTO `mos_link_por_perfil` (`cod_perfil`, `cod_link`) VALUES ('1', '84');
+UPDATE `mos_link` SET `imagen`='planesp' WHERE (`cod_link`='83');
+UPDATE `mos_link` SET `descripcion`='PlantilaInspecciones-indexPlantilaInspecciones-clases.plantilla_inspecciones.PlantilaInspecciones' WHERE (`cod_link`='84');
+
+-- ALTER TABLE `mos_tipo_inspecciones` ADD COLUMN `codigo`  varchar(50) NULL AFTER `id`;
+
+ALTER TABLE `mos_log`
+ADD COLUMN `id_registro`  int NULL AFTER `id`;
+
+ALTER TABLE `mos_log`
+MODIFY COLUMN `accion`  text NULL AFTER `fecha_hora`,
+MODIFY COLUMN `anterior`  text NULL AFTER `accion`;
+
+ALTER TABLE `mos_documentos_formulario_items_temp`
+ADD COLUMN `descripcion_larga`  text NULL AFTER `tok`,
+ADD COLUMN `peso`  int NULL DEFAULT 0 AFTER `descripcion_larga`;
+
+ALTER TABLE `mos_documentos_formulario_items_temp`
+ADD COLUMN `orden`  int NULL AFTER `peso`;
+
+
+

@@ -168,10 +168,14 @@
                         $atr[fecha_egreso] = "'$atr[fecha_egreso]'";                        
                     }
                     else $atr[fecha_egreso] = "NULL";
+                    if (strlen($atr[email])!= ''){
+                        $atr[email] = "'$atr[email]'";                        
+                    }
+                    else $atr[email] = "NULL";
                     
                     $sql = "INSERT INTO mos_personal(cod_emp,id_personal,nombres,apellido_paterno,apellido_materno,genero,fecha_nacimiento,vigencia,interno,id_filial,id_organizacion,cod_cargo,workflow,email,relator,reviso,elaboro,aprobo,extranjero, fecha_ingreso, fecha_egreso)
                             VALUES(
-                                $atr[cod_emp],'$atr[id_personal]','$atr[nombres]','$atr[apellido_paterno]','$atr[apellido_materno]','$atr[genero]',$atr[fecha_nacimiento],'$atr[vigencia]','$atr[interno]',$atr[id_filial],$atr[id_organizacion],$atr[cod_cargo],'$atr[workflow]','$atr[email]','$atr[relator]','$atr[reviso]','$atr[elaboro]','$atr[aprobo]','$atr[extranjero]'
+                                $atr[cod_emp],'$atr[id_personal]','$atr[nombres]','$atr[apellido_paterno]','$atr[apellido_materno]','$atr[genero]',$atr[fecha_nacimiento],'$atr[vigencia]','$atr[interno]',$atr[id_filial],$atr[id_organizacion],$atr[cod_cargo],'$atr[workflow]',$atr[email],'$atr[relator]','$atr[reviso]','$atr[elaboro]','$atr[aprobo]','$atr[extranjero]'
                                     ,$atr[fecha_ingreso],$atr[fecha_egreso]
                                 )";
                     $this->dbl->insert_update($sql);
@@ -181,8 +185,8 @@
                     return "El mos_personal '$atr[descripcion_ano]' ha sido ingresado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
-                        if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
-                            return "Ya existe una sección con el mismo nombre.";                        
+                        if (preg_match("/for key 'email'/",$error ) == true) 
+                            return "Ya existe una persona con el mismo correo.";                        
                         return $error; 
                     }
             }
@@ -260,8 +264,12 @@
                         $atr[fecha_nacimiento] = "'$atr[fecha_nacimiento]'";                        
                     }
                     else $atr[fecha_nacimiento] = "NULL";
+                    if (strlen($atr[email])!= ''){
+                        $atr[email] = "'$atr[email]'";                        
+                    }
+                    else $atr[email] = "NULL";
                     $sql = "UPDATE mos_personal SET                            
-                                    id_personal = '$atr[id_personal]',nombres = '$atr[nombres]',apellido_paterno = '$atr[apellido_paterno]',apellido_materno = '$atr[apellido_materno]',genero = '$atr[genero]',fecha_nacimiento = $atr[fecha_nacimiento],vigencia = '$atr[vigencia]',interno = '$atr[interno]',id_organizacion = $atr[id_organizacion],cod_cargo = $atr[cod_cargo],workflow = '$atr[workflow]',email = '$atr[email]',relator = '$atr[relator]',reviso = '$atr[reviso]',elaboro = '$atr[elaboro]',aprobo = '$atr[aprobo]',extranjero = '$atr[extranjero]'
+                                    id_personal = '$atr[id_personal]',nombres = '$atr[nombres]',apellido_paterno = '$atr[apellido_paterno]',apellido_materno = '$atr[apellido_materno]',genero = '$atr[genero]',fecha_nacimiento = $atr[fecha_nacimiento],vigencia = '$atr[vigencia]',interno = '$atr[interno]',id_organizacion = $atr[id_organizacion],cod_cargo = $atr[cod_cargo],workflow = '$atr[workflow]',email = $atr[email],relator = '$atr[relator]',reviso = '$atr[reviso]',elaboro = '$atr[elaboro]',aprobo = '$atr[aprobo]',extranjero = '$atr[extranjero]'
                                         ,fecha_ingreso=$atr[fecha_ingreso], fecha_egreso=$atr[fecha_egreso]
                             WHERE  cod_emp = $atr[id]";    
                     $val = $this->verPersonas($atr[id]);
@@ -275,7 +283,7 @@
                     if ($atr[fecha_nacimiento] != 'NULL'){
                         $atr[fecha_nacimiento] = "\\" . substr($atr[fecha_nacimiento], 0, strlen($atr[fecha_nacimiento])-1)  . "\'";
                     }
-                    $nuevo = "Rut: \'$atr[id_personal]\',Nombres: \'$atr[nombres]\', Apellido Paterno: \'$atr[apellido_paterno]\', Apellido Materno: \'$atr[apellido_materno]\', Genero: \'$atr[genero]\', Fecha Nacimiento: $atr[fecha_nacimiento], Vigencia: \'$atr[vigencia]\', Interno: \'$atr[interno]\', Id Organizacion: $atr[id_organizacion], Cargo: $atr[cod_cargo], Workflow: \'$atr[workflow]\', Email: \'$atr[email]\', Relator: \'$atr[relator]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Extranjero: \'$atr[extranjero]\'";
+                    $nuevo = "Rut: \'$atr[id_personal]\',Nombres: \'$atr[nombres]\', Apellido Paterno: \'$atr[apellido_paterno]\', Apellido Materno: \'$atr[apellido_materno]\', Genero: \'$atr[genero]\', Fecha Nacimiento: $atr[fecha_nacimiento], Vigencia: \'$atr[vigencia]\', Interno: \'$atr[interno]\', Id Organizacion: $atr[id_organizacion], Cargo: $atr[cod_cargo], Workflow: \'$atr[workflow]\', Email: $atr[email], Relator: \'$atr[relator]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Extranjero: \'$atr[extranjero]\'";
                     $anterior = "Rut: \'$val[id_personal]\',Nombres: \'$val[nombres]\', Apellido Paterno: \'$val[apellido_paterno]\', Apellido Materno: \'$val[apellido_materno]\', Genero: \'$val[genero]\', Fecha Nacimiento: \'$val[fecha_nacimiento]\', Vigencia: \'$val[vigencia]\', Interno: \'$val[interno]\', Id Organizacion: $val[id_organizacion], Cargo: $val[cod_cargo], Workflow: \'$val[workflow]\', Email: \'$val[email]\', Relator: \'$val[relator]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\', Extranjero: \'$val[extranjero]\'";
                     $this->registraTransaccionLog(19,$nuevo,$anterior, '');
                     //$this->registraTransaccion('Modificar','Modifico el Personas ' . $atr[descripcion_ano], 'mos_personal');
@@ -313,9 +321,12 @@
                          WHERE 1 = 1 ";
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND ((upper(id_personal) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
-                        $sql .= " OR (upper(nombres) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
-                        $sql .= " OR (upper(apellido_paterno) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
-                        $sql .= " OR (upper(apellido_materno) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
+                        $sql .= " OR (1 = 1";
+                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);                                                  
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                           $sql .= " AND (upper(concat(nombres, ' ', apellido_paterno, ' ' , apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                        } 
+                        $sql .= " ) ";
                         $sql .= " OR (upper(c.descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
                     }
                     if (strlen($atr[valor])>0)
@@ -381,9 +392,9 @@
             
                     $sql = "SELECT cod_emp
                                     ,id_personal
-                                    ,nombres
-                                    ,apellido_paterno
-                                    ,apellido_materno
+                                    ,initcap(nombres) nombres
+                                    ,initcap(apellido_paterno) apellido_paterno
+                                    ,initcap(apellido_materno) apellido_materno
                                     ,id_organizacion
                                     ,DATE_FORMAT(fecha_nacimiento, '%d/%m/%Y') fecha_nacimiento
                                     ,CASE genero WHEN 1 THEN 'Masculino' ELSE 'Femenino' END genero
@@ -406,9 +417,12 @@
                             WHERE 1 = 1 ";
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND ((upper(id_personal) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
-                        $sql .= " OR (upper(nombres) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
-                        $sql .= " OR (upper(apellido_paterno) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
-                        $sql .= " OR (upper(apellido_materno) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
+                        $sql .= " OR (1 = 1";
+                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);                                                  
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                           $sql .= " AND (upper(concat(nombres, ' ', apellido_paterno, ' ' , apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                        } 
+                        $sql .= " ) ";
                         $sql .= " OR (upper(c.descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
                     }
                     if (strlen($atr[valor])>0)

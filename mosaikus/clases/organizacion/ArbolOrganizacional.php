@@ -6,13 +6,14 @@
         private $total_registros;
         private $parametros;
         private $id_org_acceso;
+        private $id_org_acceso_explicito;
             
             public function ArbolOrganizacional(){
                 parent::__construct();
                 $this->asigna_script('organizacion/organizacion.js');                                             
                 $this->dbl = new Mysql($this->encryt->Decrypt_Text($_SESSION[BaseDato]), $this->encryt->Decrypt_Text($_SESSION[LoginBD]), $this->encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $this->parametros = array();
-                $this->contenido = $this->id_org_acceso = array();
+                $this->contenido = $this->id_org_acceso = $this->id_org_acceso_explicito = array();
             }
 
             private function operacion($sp, $atr){
@@ -171,22 +172,24 @@
              public function listarArbolOrganizacionalReporte($atr, $pag, $registros_x_pagina){
                     $atr = $this->dbl->corregir_parametros($atr);
                     $this->cargar_acceso_nodos($atr);
-                    $sql_left = $sql_col_left = "";
+                    $sql_left = $sql_col_left = $sql_where = "";
                     $k = 1;                    
                     for($k=1;$k<=$atr[niveles];$k++) {
                         if ($k==1){
-                            $sql_left .= "mos_organizacion a$k ";                            
+                            $sql_left .= "mos_organizacion a$k ";       
+                            $sql_where .= " AND a$k.id IN (". implode(',', array_keys($this->id_org_acceso)) . ") ";
                         }
                         else{
-                            $sql_left.= " LEFT JOIN mos_organizacion a$k on a$k.parent_id = a".($k-1).".id ";
+                            $sql_left.= " LEFT JOIN mos_organizacion a$k on a$k.parent_id = a".($k-1).".id  AND a$k.id IN (". implode(',', array_keys($this->id_org_acceso)) . ") ";
                         }
-                        $sql_col_left .= ",a$k.id id_$k, a$k.title nombre_$k";                        
+                        $sql_col_left .= ",a$k.id id_$k, a$k.title nombre_$k";   
+                        
                     }
                     
                     $sql = "select 1 $sql_col_left
                         from $sql_left
-                                where a1.parent_id = ". $atr["b-id_organizacion"] . " AND a1.id IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
-                    //echo $sql;
+                                where a1.parent_id IN ( ". $atr["b-id_organizacion"] . ") $sql_where";
+                        //echo $sql;
                     
                     //$sql .= " order by $atr[corder] $atr[sorder] ";
                     //$sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
@@ -611,7 +614,14 @@
                     $k++;
                 }
                 $parametros["b-id_organizacion"] = 2;
+                if (count($this->id_org_acceso) <= 0){
+                    $this->cargar_acceso_nodos($parametros);
+                }
+                //print_r($parametros);
+                //print_r($this->id_org_acceso_explicito);
                 $grid = $this->verListaArbolOrganizacionalReporte($parametros);
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
@@ -642,7 +652,7 @@
                 $template->PATH = PATH_TO_TEMPLATES.'organizacion/';
                 
                 $contenido[ID_EMPRESA] = $_SESSION[CookIdEmpresa];
-                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $this->jstree_ao();                
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $this->jstree_ao(0,$parametros);                
                 $template->setTemplate("listar_reporte");
                 $template->setVars($contenido);
                 //$this->contenido['CONTENIDO']  = $template->show();
@@ -834,7 +844,10 @@
             public function buscar($parametros)
             {
                 if (strlen($parametros['b-id_organizacion'])== 0)
-                    $parametros['b-id_organizacion'] = 2;                
+                    $parametros['b-id_organizacion'] = 2;     
+                if (count($this->id_org_acceso) <= 0){
+                    $this->cargar_acceso_nodos($parametros);
+                }
                 $grid = $this->verListaArbolOrganizacionalReporte($parametros);                
                 $objResponse = new xajaxResponse();
                 
@@ -1025,7 +1038,7 @@
         /**
         * Activa los nodos donde se tiene acceso
         */
-       private function cargar_acceso_nodos($parametros){
+       public function cargar_acceso_nodos($parametros){
            if (strlen($parametros[cod_link])>0){
                if(!class_exists('mos_acceso')){
                    import("clases.mos_acceso.mos_acceso");
@@ -1035,6 +1048,23 @@
                //print_r($data_ids_acceso);
                foreach ($data_ids_acceso as $value) {
                    $this->id_org_acceso[$value[id]] = $value;
+               }                                            
+           }
+       }
+       
+       /**
+        * Activa los nodos donde se tiene acceso
+        */
+       private function cargar_acceso_nodos_explicito($parametros){
+           if (strlen($parametros[cod_link])>0){
+               if(!class_exists('mos_acceso')){
+                   import("clases.mos_acceso.mos_acceso");
+               }
+               $acceso = new mos_acceso();
+               $data_ids_acceso = $acceso->obtenerNodosArbol($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo]);
+               //print_r($data_ids_acceso);
+               foreach ($data_ids_acceso as $value) {
+                   $this->id_org_acceso_explicito[$value[id]] = $value;
                }                                            
            }
        }

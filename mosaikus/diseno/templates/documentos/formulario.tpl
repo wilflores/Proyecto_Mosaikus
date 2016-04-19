@@ -128,7 +128,7 @@
                                   </div>
                                   <div class="form-group">
                                     
-                                    <div class="col-md-9">
+                                    <div class="col-md-9" style="max-height: 350px;overflow-y: scroll;">
                                         <!--label for="vigencia" class="col-md-10 control-label" style="text-align: left;">Árbol organizacional</label>
                                         <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
                                         <iframe id="iframearbol" src="pages/cargo/prueba_arbolV4.php?IDDoc={IDDOC}" frameborder="0" width="100%" height="310px" scrolling="no"></iframe-->
@@ -218,7 +218,7 @@
 
 
     <div class="form-group">
-        <div class="col-lg-offset-2 col-lg-10">
+        <div class="col-lg-offset-2 col-lg-15">
             <!--<input class="button save" name="guardar" type="button" value="">-->
             <button type="button" class="btn btn-primary" onClick="validar(document);" id="btn-guardar">{DESC_OPERACION}</button>
             <button type="button" class="btn btn-primary" onClick="document.getElementById('notificar').value='si';validar(document);" id="btn-guardar">{DESC_OPERACION_NOTIFICAR}</button>

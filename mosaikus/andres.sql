@@ -100,18 +100,18 @@ CREATE TABLE `mos_historico_wf_documentos` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `mos_nombres_campos` VALUES ('278', 'id_workflow_documento', 'Flujo de Trabajo de Documento', '6', 'Flujo de Trabajo de Documento');
-INSERT INTO `mos_nombres_campos` VALUES ('279', 'estado_workflow', 'Estado de Flujo de Trabajo', '6', 'Estado de Flujo de Trabajo');
-INSERT INTO `mos_nombres_campos` VALUES ('280', 'fecha_estado_workflow', 'Fecha de Flujo de Trabajo', '6', 'Fecha de Flujo de Trabajo');
-INSERT INTO `mos_nombres_campos` VALUES ('281', 'id_usuario_workflow', 'Usuario de Flujo de Trabajo', '6', 'Usuario de Flujo de Trabajo');
-INSERT INTO `mos_nombres_campos` VALUES ('282', 'estado_pendiente_aprobacion', 'Pendiente de Aprobacion', '6', 'Pendiente de Aprobacion');
-INSERT INTO `mos_nombres_campos` VALUES ('283', 'estado_pendiente_revision', 'Pendiente de Revision', '6', 'Pendiente de Revision');
-INSERT INTO `mos_nombres_campos` VALUES ('284', 'estado_aprobado', 'Aprobado', '6', 'Aprobado');
-INSERT INTO `mos_nombres_campos` VALUES ('308', 'etapa_workflow', 'Etapa de Flujo de Trabajo', '6', 'Etapa de Flujo de Trabajo');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES ('id_workflow_documento', 'Flujo de Trabajo de Documento', '6', 'Flujo de Trabajo de Documento');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES ('estado_workflow', 'Estado de Flujo de Trabajo', '6', 'Estado de Flujo de Trabajo');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES ('fecha_estado_workflow', 'Fecha de Flujo de Trabajo', '6', 'Fecha de Flujo de Trabajo');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES ('id_usuario_workflow', 'Usuario de Flujo de Trabajo', '6', 'Usuario de Flujo de Trabajo');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES ('estado_pendiente_aprobacion', 'Pendiente de Aprobacion', '6', 'Pendiente de Aprobacion');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES ('estado_pendiente_revision', 'Pendiente de Revision', '6', 'Pendiente de Revision');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES ('estado_aprobado', 'Aprobado', '6', 'Aprobado');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES ('etapa_workflow', 'Etapa de Flujo de Trabajo', '6', 'Etapa de Flujo de Trabajo');
 
-DROP TRIGGER `registra_mos_historico_wf_documentos`;
-
-CREATE DEFINER=`root`@`localhost` TRIGGER `registra_mos_historico_wf_documentos` AFTER INSERT ON `mos_documentos`
+DROP TRIGGER IF EXISTS `registra_mos_historico_wf_documentos`;
+DELIMITER ;;
+CREATE TRIGGER `registra_mos_historico_wf_documentos` AFTER INSERT ON `mos_documentos`
 FOR EACH ROW BEGIN
 /*guarda historico al insertar un doc*/
          DECLARE etapa text;  
@@ -129,7 +129,13 @@ FOR EACH ROW BEGIN
 			END IF;
 END;
 
-CREATE DEFINER=`root`@`localhost` TRIGGER `registra_mos_historico_wf_documentos_cambio` BEFORE UPDATE ON `mos_documentos`
+;;
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS `registra_mos_historico_wf_documentos_cambio`;
+
+DELIMITER ;;
+CREATE TRIGGER `registra_mos_historico_wf_documentos_cambio` BEFORE UPDATE ON `mos_documentos`
 FOR EACH ROW BEGIN
 /*guarda historico al modificar un doc si cambian los datos del wf*/
         DECLARE etapa text;  
@@ -150,3 +156,6 @@ FOR EACH ROW BEGIN
 				VALUES (NEW.IDDoc,CONCAT('ESTADO:',NEW.estado_workflow,' ',IFNULL(NEW.observacion_rechazo,''),',cambio a ',etapa),NEW.id_usuario_workflow);
 			END IF;
 END;
+
+;;
+DELIMITER ;

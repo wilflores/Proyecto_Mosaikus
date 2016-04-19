@@ -191,13 +191,18 @@
                                           <input type="checkbox" name="SelectAcc" id="SelectAcc" value="15" class="checkbox-mos-col" checked="checked">   &nbsp;
                                       </label>
                                   </div>
-                            </div>--><div class="checkbox">
-                                  
-                                  
-                                      <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="21" class="checkbox-mos-col" >   &nbsp;
-                                      {N_OBSERVACION}</label>
-                                  
+                            </div>-->
+                            <div class="checkbox">                                                                    
+                                <label >
+                                    <input type="checkbox" name="SelectAcc" id="SelectAcc" value="22" checked="checked" class="checkbox-mos-col" >   &nbsp;
+                                    {N_ETAPA_WORKFLOW}
+                                </label>                                  
+                            </div>
+                            <div class="checkbox">                                                                    
+                                <label >
+                                    <input type="checkbox" name="SelectAcc" id="SelectAcc" value="22"  class="checkbox-mos-col" >   &nbsp;
+                                    {N_OBSERVACION}
+                                </label>                                  
                             </div><!--<div class="checkbox">
                                   <label for="SelectAcc" class="col-md-9 control-label">{N_MUESTRA_DOC}</label>
                                   <div class="col-md-3">      

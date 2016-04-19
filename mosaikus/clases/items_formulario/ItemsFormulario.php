@@ -222,6 +222,7 @@
                     $parametros['pag'] = 1;
                 $reg_por_pagina = 1000;//getenv("PAGINACION");
                 if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
+                $reg_por_pagina = 1000;
                 $this->listarItemsFormulario($parametros, $parametros['pag'], $reg_por_pagina);
                 $data=$this->dbl->data;
                 /*PARA cargar los items en el textarea de documentos*/

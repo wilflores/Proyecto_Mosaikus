@@ -24,7 +24,22 @@
                 $this->parametros = $this->dbl->query($sql, array());
             }
 
-
+            /**
+        * Activa los nodos donde se tiene acceso
+        */
+       public    function cargar_acceso_nodos($parametros){
+           if (strlen($parametros[cod_link])>0){
+               if(!class_exists('mos_acceso')){
+                   import("clases.mos_acceso.mos_acceso");
+               }
+               $acceso = new mos_acceso();
+               $data_ids_acceso = $acceso->obtenerArbolEstructura($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo]);
+               //print_r($data_ids_acceso);
+               foreach ($data_ids_acceso as $value) {
+                   $this->id_org_acceso[$value[id]] = $value;
+               }                                            
+           }
+       }
      
 
              public function verArbolProcesos($id){
@@ -124,27 +139,41 @@
 //                    $sql .= " order by $atr[corder] $atr[sorder] ";
 //                    $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";*/
                     $atr = $this->dbl->corregir_parametros($atr);
-                    $sql_left = $sql_col_left = $sql_order = "";
+                    $sql_left = $sql_col_left = $sql_order = $sql_where = "";
                     $k = 1;                    
                     for($k=2;$k<=$atr[niveles]+1;$k++) {
                         if ($k==2){
                             $sql_left .= "mos_arbol_procesos a$k ";  
                             $sql_order = "a$k.id_organizacion,a$k.title";
-                            $sql_col_left .= ",a$k.id_organizacion id_1,a$k.id id_$k, a$k.title nombre_$k";    
+                            $sql_col_left .= ",a$k.id_organizacion id_1,a$k.id id_$k, a$k.title nombre_$k";   
+                            $sql_where .= " AND a$k.id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ") ";
+                            
                         }
                         else{
-                            $sql_left.= " LEFT JOIN mos_arbol_procesos a$k on a$k.parent_id = a".($k-1).".id ";
+                            $sql_left.= " LEFT JOIN mos_arbol_procesos a$k on a$k.parent_id = a".($k-1).".id   ";
                             $sql_order .= ",a$k.title";
                             $sql_col_left .= ",a$k.id id_$k, a$k.title nombre_$k";  
                         }
                                               
                     }
                     
+                    $id_org = -1;
+                    if ((strlen($atr["b-id_organizacion"])>0) && ($atr["b-id_organizacion"] != "2")){     
+                        if(!class_exists('ArbolOrganizacional')){
+                            import('clases.organizacion.ArbolOrganizacional');
+                        }
+                        
+                        $ao = new ArbolOrganizacional();
+                        $id_org = $ao->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
+                        $sql_where .= " AND a2.id_organizacion IN (". $id_org . ")";
+                    }
+                    
+                    
                     $sql = "select 1 $sql_col_left
                         from $sql_left
-                                where NOT a2.id_organizacion IS NULL AND a2.parent_id = ". $atr["b-id_organizacion"] . ""
+                                where NOT a2.id_organizacion IS NULL $sql_where "
                             . " ORDER BY $sql_order";
-                   //echo $sql;
+                   //   echo $sql;
                     $this->operacion($sql, $atr);
              }
              
@@ -651,7 +680,12 @@
                     $k++;
                 }
                 $parametros["b-id_organizacion"] = 2;
+                if (count($this->id_org_acceso) <= 0){
+                    $this->cargar_acceso_nodos($parametros);
+                }
                 $grid = $this->verListaArbolProcesosReporte($parametros);
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
@@ -659,6 +693,7 @@
                 $contenido[TITULO_TABLA] = $grid['titulo'];
                 
                 $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['FECHA'] = date('d/m/Y');
                 $contenido['OPCIONES_BUSQUEDA'] = " <option value='campo'>campo</option>";
                 $contenido['JS_NUEVO'] = 'nuevo_ArbolProcesos();';
                 $contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;ArbolProcesos';
@@ -875,10 +910,21 @@
  
                 public function buscar($parametros)
             {
-                $grid = $this->verListaArbolProcesos($parametros);                
+                if (strlen($parametros['b-id_organizacion'])== 0)
+                    $parametros['b-id_organizacion'] = 2;   
+                if (count($this->id_org_acceso) <= 0){
+                    $this->cargar_acceso_nodos($parametros);
+                }
+                $grid = $this->verListaArbolProcesosReporte($parametros);                
+                $html = '<table class="table table-report  ">
+                      <thead>
+                      <tr>'.$grid[titulo].'</tr>
+                      </thead>
+                      <tbody>'.$grid[tabla].'</tbody>
+                    </table>';
                 $objResponse = new xajaxResponse();
-                $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
-                $objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
+                $objResponse->addAssign('grid',"innerHTML",$html);
+                //$objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
                           
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 return $objResponse;

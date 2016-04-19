@@ -47,7 +47,8 @@ function MuestraFormulario(id){
         array = new XArray();
         array.setObjeto('Registros','indexRegistros');
         array.addParametro('titulo',$('#desc-mod-act').html());
-    
+        array.addParametro('modo',document.getElementById('modo').value);
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
         array.addParametro('id',id);
         array.addParametro('import','clases.registros.Registros');
         xajax_Loading(array.getArray());

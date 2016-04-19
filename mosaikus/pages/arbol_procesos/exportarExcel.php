@@ -16,8 +16,12 @@
             import('clases.arbol_procesos.ArbolProcesos');
             $pagina = new ArbolProcesos();
             
-            $html = $pagina->verListaArbolProcesosReporte(array());
-            
+            $params['b-id_organizacion'] = $_GET['b-id_organizacion'];
+            $params[cod_link] = $_GET[cod_link];
+            $params[modo] = $_GET[modo];
+            $pagina->cargar_acceso_nodos($params);
+            $html = $pagina->verListaArbolProcesosReporte($params);
+            //echo 1;
             $fichero_texto = fopen ("dist/css/style_export_excel.css", "r");
             $contenido_fichero = fread($fichero_texto, filesize("dist/css/style_export_excel.css"));
 
@@ -43,7 +47,7 @@
             <tr>
                 <td style="border: 0px solid #ddd;">Árbol de Procesos<br/></td>
                 <td colspan="3" style="border: 0px solid #ddd;">&nbsp;</td>
-                <td style="border: 0px solid #ddd;"><img class="img-responsive" src="<?php echo PATH_TO_IMG . 'logo_empresa/11_logo_empresa_report.png'; ?>"></td>
+                <td style="border: 0px solid #ddd;"><img class="img-responsive" src="<?php echo PATH_TO_IMG . 'logo_empresa/'.$_SESSION[CookIdEmpresa].'_logo_empresa_report.png'; ?>"></td>
             </tr>
             <tr>
                 <td style="border: 0px solid #ddd;">Fecha: <?php echo date('d/m/Y'); ?></td>
@@ -57,11 +61,12 @@
                     <table class="table table-report  ">
                       <thead>
                       <tr>
-                        <th style="width: 450px;">PROCESO</th>
+                           <?php echo $html[titulo]; ?>
+                        <!--<th style="width: 450px;">PROCESO</th>
                         <th style="width: 450px;">SUB - PROCESO</th>
                         <th style="width: 450px;">SUB - PROCESO</th>
                         <th style="width: 450px;">SUB - PROCESO</th>
-
+-->
 
                       </tr>
                       </thead>

@@ -11,11 +11,17 @@
 	import('clases.arbol_procesos.ArbolProcesos');
 
 	$pagina = new ArbolProcesos();
-        $tabla = $pagina->verListaArbolProcesosReporte(array());
+        
+        $params['b-id_organizacion'] = $_GET['b-id_organizacion'];
+        $params[cod_link] = $_GET[cod_link];
+        $params[modo] = $_GET[modo];
+        $pagina->cargar_acceso_nodos($params);
+        $tabla = $pagina->verListaArbolProcesosReporte($params);
 	$template = new Template();
         $template->PATH = PATH_TO_TEMPLATES.'arbol_procesos/';
         $contenido_1 = array();
         $contenido_1[TABLA] = $tabla[tabla];
+        $contenido_1[TITULO] = $tabla[titulo];
         $contenido_1['HOME'] = HOME;
         $contenido_1[FECHA] = date('d/m/Y');
         $contenido_1['N_PAG'] = '{PAGENO}/{nbpg}';

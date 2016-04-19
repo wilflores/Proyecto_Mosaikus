@@ -55,10 +55,7 @@
                     <table class="table table-report  ">
                       <thead>
                       <tr>
-                          <th style="width: 25%">PROCESO</th>
-                        <th style="width: 25%">SUB - PROCESO</th>
-                        <th style="width: 25%">SUB - PROCESO</th>
-                        <th style="width: 25%">SUB - PROCESO</th>
+                         {TITULO}
 
 
                       </tr>

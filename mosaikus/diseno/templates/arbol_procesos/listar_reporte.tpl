@@ -11,6 +11,8 @@
                         </a>
                       <form id="busquedaFrm" > 
                           <input id="b-id_organizacion" name="b-id_organizacion" type="hidden"/>
+                          <input type="hidden" name="cod_link" id="cod_link" value="{COD_LINK}"/>
+                                        <input type="hidden" name="modo" id="modo" value="{MODO}"/>
                       </form>
                         <!--
                         <div class="input-group">
@@ -69,7 +71,7 @@
                     </div>
             </div>
             
-            <div class="report-body">                    
+            <div class="report-body"  id="grid">                    
 
                     <table class="table table-report  ">
                       <thead>
@@ -99,7 +101,7 @@
                 <div class="report-actions">
                     <ul class="nav">
                         <li><i class="icon icon-transmision cursor-pointer" onclick="exportarExcel();"></i></li>
-                        <li><i class="icon icon-view-document cursor-pointer" onclick="reporte_ao_pdf();"></i></li>
+                        <li><i class="icon icon-alert-print cursor-pointer" onclick="reporte_ao_pdf();"></i></li>
                         <!--<li><i class="glyphicon glyphicon-print"></i></li>
                         <li><i class="glyphicon glyphicon-print"></i></li>-->
 

@@ -40,7 +40,7 @@
                     
                     $encryt = new EnDecryptText();                                
                     $pagina = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
-                    $sql = 'Select descripcion,nombre_link FROM mos_link_portal WHERE cod_link = ' . $parametros['id_menu_opcion'];
+                    $sql = 'Select descripcion,nombre_link,cod_link FROM mos_link_portal WHERE cod_link = ' . $parametros['id_menu_opcion'];
                     //$pagina->conectar();
                     //$params['p_id']= $parametros['id_menu_opcion'];
                     //$val = $pagina->exe("util_sp_menu_con_id", $params);                    
@@ -54,7 +54,8 @@
                         $parametros['objeto'] = $datos_clase[0];
                         $parametros['metodo'] = $datos_clase[1];
                         $parametros['nombre_modulo'] = $datos[nombre_link];                        
-                        
+                        $parametros['cod_link'] = $datos[cod_link]; 
+                        $parametros['modo'] = 'Portal';
                     }
                 }
                 //print_r($val);

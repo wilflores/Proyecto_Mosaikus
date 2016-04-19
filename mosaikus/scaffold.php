@@ -65,8 +65,8 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                      $campos_form_colums .="<div class=\"checkbox\">                                  
                                      
                                       <label >
-                                          {N_".strtoupper($fila['Field'])."}<input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
-                                      </label>
+                                          <input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
+                                      {N_".strtoupper($fila['Field'])."}</label>
                                   
                             </div>";
                      
@@ -95,8 +95,8 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                      $campos_form_colums .="<div class=\"checkbox\">
                                       
                                       <label >
-                                          {N_".strtoupper($fila['Field'])."}<input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
-                                      </label>
+                                          <input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
+                                      {N_".strtoupper($fila['Field'])."}</label>
                                   
                             </div>";
                      
@@ -127,8 +127,8 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                      $campos_form_colums .="<div class=\"checkbox\">
                                   
                                       <label >
-                                          {N_".strtoupper($fila['Field'])."}<input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
-                                      </label>
+                                          <input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
+                                      {N_".strtoupper($fila['Field'])."}</label>
                                   
                             </div>";
                     $filtro_listar .= "             if (strlen(\$atr['b-".$fila['Field']."-desde'])>0)                        
@@ -161,8 +161,8 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                      $campos_form_colums .="<div class=\"checkbox\">
                                     
                                       <label >
-                                          {N_".strtoupper($fila['Field'])."}<input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
-                                      </label>
+                                          <input type=\"checkbox\" name=\"SelectAcc\" id=\"SelectAcc\" value=\"".($columnas - 1) ."\" class=\"checkbox-mos-col\" checked=\"checked\">   &nbsp;
+                                      {N_".strtoupper($fila['Field'])."}</label>
                                   
                             </div>";
                      $filtro_listar .= "             if (strlen(\$atr[\"b-".$fila['Field']."\"])>0)
@@ -200,12 +200,20 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
         private \$parametros;
         private \$nombres_columnas;
         private \$placeholder;
+        private \$id_org_acceso;
+        private \$id_org_acceso_explicito;
+        private \$per_crear;
+        private \$per_editar;
+        private \$per_eliminar;
+        
             
             public function $nombre_clase(){
                 parent::__construct();
                 \$this->asigna_script('$nombre_fisico/$nombre_fisico.js');                                             
                 \$this->dbl = new Mysql(\$this->encryt->Decrypt_Text(\$_SESSION[BaseDato]), \$this->encryt->Decrypt_Text(\$_SESSION[LoginBD]), \$this->encryt->Decrypt_Text(\$_SESSION[PwdBD]) );
                 \$this->parametros = \$this->nombres_columnas = \$this->placeholder = array();
+                \$this->id_org_acceso = \$this->id_org_acceso_explicito = array();
+                \$this->per_crear = \$this->per_editar = \$this->per_eliminar = 'N';
                 \$this->contenido = array();
             }
 
@@ -237,6 +245,104 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 
             }
 
+            /**
+            * Activa los nodos donde se tiene acceso
+            */
+           public function cargar_acceso_nodos(\$parametros){
+               if (strlen(\$parametros[cod_link])>0){
+                   if(!class_exists('mos_acceso')){
+                       import(\"clases.mos_acceso.mos_acceso\");
+                   }
+                   \$acceso = new mos_acceso();
+                   \$data_ids_acceso = \$acceso->obtenerArbolEstructura(\$_SESSION[CookIdUsuario],\$parametros[cod_link],\$parametros[modo]);                   
+                   foreach (\$data_ids_acceso as \$value) {
+                       \$this->id_org_acceso[\$value[id]] = \$value;
+                   }                                            
+               }
+           }
+
+           /**
+            * Activa los nodos donde se tiene acceso
+            */
+           private function cargar_acceso_nodos_explicito(\$parametros){
+               if (strlen(\$parametros[cod_link])>0){
+                   if(!class_exists('mos_acceso')){
+                       import(\"clases.mos_acceso.mos_acceso\");
+                   }
+                   \$acceso = new mos_acceso();
+                   \$data_ids_acceso = \$acceso->obtenerNodosArbol(\$_SESSION[CookIdUsuario],\$parametros[cod_link],\$parametros[modo]);                   
+                   foreach (\$data_ids_acceso as \$value) {
+                       \$this->id_org_acceso_explicito[\$value[id]] = \$value;
+                   }                                            
+               }
+           }
+           
+            /**
+             * Busca los permisos que tiene el usuario en el modulo
+             */
+            private function cargar_permisos(\$parametros){
+                if (strlen(\$parametros[cod_link])>0){
+                    if(!class_exists('mos_acceso')){
+                        import(\"clases.mos_acceso.mos_acceso\");
+                    }
+                    \$acceso = new mos_acceso();
+                    \$data_permisos = \$acceso->obtenerPermisosModulo(\$_SESSION[CookIdUsuario],\$parametros[cod_link],\$parametros['b-id_organizacion']);                    
+                    foreach (\$data_permisos as \$value) {
+                        if (\$value[nuevo] == 'S'){
+                            \$this->per_crear =  'S';
+                            break;
+                        }
+                    }                                               
+                    foreach (\$data_permisos as \$value) {
+                        if (\$value[modificar] == 'S'){
+                            \$this->per_editar =  'S';
+                            break;
+                        }
+                    } 
+                    foreach (\$data_permisos as \$value) {
+                        if (\$value[eliminar] == 'S'){
+                            \$this->per_eliminar =  'S';
+                            break;
+                        }
+                    } 
+                }
+            }
+            
+            public function colum_admin(\$tupla)
+            {
+                \$html = \"&nbsp;\";
+                if (strlen(\$tupla[id_registro])<=0){
+                    if(\$this->per_editar == 'S'){
+                        \$html .= '<a onclick=\"javascript:editar$nombre_clase(\''.\$tupla[id].'\' );\">
+                                    <i style=\"cursor:pointer\" class=\"icon icon-edit\"  title=\"Editar $nombre_clase\" style=\"cursor:pointer\"></i>
+                                </a>';
+                    }                
+                    if(\$this->per_eliminar == 'S'){
+                        \$html .= '<a onclick=\"javascript:eliminar$nombre_clase(\''.\$tupla[id].'\');;\">
+                                    <i style=\"cursor:pointer\" class=\"icon icon-remove\" title=\"Eliminar $nombre_clase\" style=\"cursor:pointer\"></i>
+                                </a>';
+                    }
+                }
+                return \$html;
+            }
+            
+            public function colum_admin_arbol(\$tupla)
+            {                
+                if (\$this->id_org_acceso[\$tupla[id_organizacion]][modificar] == 'S')
+                {                    
+                    \$html = \"<a href=\\\"#\\\" onclick=\\\"javascript:editar$nombre_clase('\". \$tupla[id] . \"');\\\"  title=\\\"Editar $nombre_clase\\\">                            
+                                <i class=\\\"icon icon-edit\\\"></i>
+                            </a>\";
+                }
+                if (\$this->id_org_acceso[\$tupla[id_organizacion]][eliminar] == 'S')
+                {
+                    \$html .= '<a href=\\\"#\\\" onclick=\\\"javascript:eliminar$nombre_clase(\''. \$tupla[id] . '\');\\\" title=\\\"Eliminar $nombre_clase\\\">
+                            <i class=\\\"icon icon-remove\\\"></i>
+
+                        </a>'; 
+                }
+                return \$html;
+            }
 
     ";
     $end_basico="}";
@@ -317,6 +423,16 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
             public function ingresar$nombre_clase(\$atr){
                 try {
                     \$atr = \$this->dbl->corregir_parametros(\$atr);
+                    /*Carga Acceso segun el arbol*/
+                    if (count(\$this->id_org_acceso_explicito) <= 0){
+                        \$this->cargar_acceso_nodos_explicito(\$atr);
+                    }                    
+                    /*Valida Restriccion*/
+                    if (!isset(\$this->id_org_acceso_explicito[\$atr[id_organizacion]]))
+                        return '- Acceso denegado para registrar persona en el &aacute;rea seleccionada.';
+                    if (!((\$this->id_org_acceso_explicito[\$atr[id_organizacion]][nuevo]== 'S') || (\$this->id_org_acceso_explicito[\$atr[id_organizacion]][modificar] == S)))
+                        return '- Acceso denegado para registrar persona en el &aacute;rea ' . \$this->id_org_acceso_explicito[\$atr[id_organizacion]][title] . '.';
+
                     \$sql = \"INSERT INTO $tabla($sql_insertar_nombres)
                             VALUES(
                                 $sql_insertar_valores
@@ -325,8 +441,11 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                     /*
                     \$this->registraTransaccion('Insertar','Ingreso el $tabla ' . \$atr[descripcion_ano], '$tabla');
                       */
+                    \$sql = \"SELECT MAX(id) ultimo FROM $tabla\"; 
+                    \$this->operacion(\$sql, \$atr);
+                    \$id_new = \$this->dbl->data[0][0];
                     \$nuevo = \"$campos_log_new\";
-                    \$this->registraTransaccionLog(18,\$nuevo,'', '');
+                    \$this->registraTransaccionLog(18,\$nuevo,'', \$id_new);
                     return \"El $tabla '\$atr[descripcion_ano]' ha sido ingresado con exito\";
                 } catch(Exception \$e) {
                         \$error = \$e->getMessage();                     
@@ -336,10 +455,10 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                     }
             }
             
-            public function registraTransaccionLog(\$accion,\$descr, \$tabla, \$id = ''){
+            public function registraTransaccionLog(\$accion,\$descr, \$tabla, \$id = 'NULL'){
                 session_name(\"mosaikus\");
                 session_start();
-                \$sql = \"INSERT INTO mos_log(codigo_accion, fecha_hora, accion, anterior, realizo, ip) VALUES ('\$accion','\".date('Y-m-d G:h:s').\"','\$descr', '\$tabla','\$_SESSION[CookIdUsuario]','\$_SERVER[REMOTE_ADDR]')\";            
+                \$sql = \"INSERT INTO mos_log(codigo_accion, fecha_hora, accion, anterior, realizo, ip, id_registro) VALUES ('\$accion','\".date('Y-m-d G:h:s').\"','\$descr', '\$tabla','\$_SESSION[CookIdUsuario]','\$_SERVER[REMOTE_ADDR]',\$id)\";            
                 \$this->dbl->insert_update(\$sql);
 
                 return true;
@@ -347,7 +466,17 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
 
             public function modificar$nombre_clase(\$atr){
                 try {
-                    \$atr = \$this->dbl->corregir_parametros(\$atr);
+                    \$atr = \$this->dbl->corregir_parametros(\$atr);                    
+                    /*Carga Acceso segun el arbol*/
+                    if (count(\$this->id_org_acceso_explicito) <= 0){
+                        \$this->cargar_acceso_nodos_explicito(\$atr);
+                    }                    
+                    /*Valida Restriccion*/
+                    if (!isset(\$this->id_org_acceso_explicito[\$atr[id_organizacion]]))
+                        return '- Acceso denegado para registrar persona en el &aacute;rea seleccionada.';
+                    if (!((\$this->id_org_acceso_explicito[\$atr[id_organizacion]][nuevo]== 'S') || (\$this->id_org_acceso_explicito[\$atr[id_organizacion]][modificar] == S)))
+                        return '- Acceso denegado para registrar persona en el &aacute;rea ' . \$this->id_org_acceso_explicito[\$atr[id_organizacion]][title] . '.';
+
                     \$sql = \"UPDATE $tabla SET                            
                                     $sql_modificar
                             WHERE  id = \$atr[id]\";      
@@ -355,7 +484,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                     \$this->dbl->insert_update(\$sql);
                     \$nuevo = \"$campos_log_new\";
                     \$anterior = \"$campos_log_ant\";
-                    \$this->registraTransaccionLog(19,\$nuevo,\$anterior, '');
+                    \$this->registraTransaccionLog(19,\$nuevo,\$anterior, $atr[id]);
                     /*
                     \$this->registraTransaccion('Modificar','Modifico el $nombre_clase ' . \$atr[descripcion_ano], '$tabla');
                     */
@@ -380,13 +509,31 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                         where t1.cod_categoria='3' and t1.cod_parametro='\$value[cod_parametro]' ) AS p\$k ON p\$k.id_registro = p.cod_emp \"; 
                         \$sql_col_left .= \",p\$k.nom_detalle p\$k \";
                         \$k++;
+                    }
+                    
+                    if (count(\$this->id_org_acceso) <= 0){
+                        \$this->cargar_acceso_nodos(\$atr);
                     }*/
+                    
                     \$sql = \"SELECT COUNT(*) total_registros
                          FROM $tabla 
                          WHERE 1 = 1 \";
+                    if (strlen(\$atr['b-filtro-sencillo'])>0){
+                        \$sql .= \" AND ((upper(id_personal) like '\" . strtoupper(\$atr[\"b-filtro-sencillo\"]) . \"%')\";
+                        \$sql .= \" OR (1 = 1\";
+                        \$nombre_supervisor = explode(' ', \$atr[\"b-filtro-sencillo\"]);                                                  
+                        foreach (\$nombre_supervisor as \$supervisor_aux) {
+                           \$sql .= \" AND (upper(concat(nombres, ' ', apellido_paterno, ' ' , apellido_materno)) like '%\" . strtoupper(\$supervisor_aux) . \"%') \";
+                        } 
+                        \$sql .= \" ) \";
+                        \$sql .= \" OR (upper(c.descripcion) like '%\" . strtoupper(\$atr[\"b-filtro-sencillo\"]) . \"%'))\";
+                    }
                     if (strlen(\$atr[valor])>0)
                         \$sql .= \" AND upper(\$atr[campo]) like '%\" . strtoupper(\$atr[valor]) . \"%'\";      
                     $filtro_listar
+                    if (count(\$this->id_org_acceso)>0){                            
+                        \$sql .= \" AND id_organizacion IN (\". implode(',', array_keys(\$this->id_org_acceso)) . \")\";
+                    }
                     \$total_registros = \$this->dbl->query(\$sql, \$atr);
                     \$this->total_registros = \$total_registros[0][total_registros];   
             
@@ -394,6 +541,16 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                                      \$sql_col_left
                             FROM $tabla \$sql_left
                             WHERE 1 = 1 \";
+                    if (strlen(\$atr['b-filtro-sencillo'])>0){
+                        \$sql .= \" AND ((upper(id_personal) like '\" . strtoupper(\$atr[\"b-filtro-sencillo\"]) . \"%')\";
+                        \$sql .= \" OR (1 = 1\";
+                        \$nombre_supervisor = explode(' ', \$atr[\"b-filtro-sencillo\"]);                                                  
+                        foreach (\$nombre_supervisor as \$supervisor_aux) {
+                           \$sql .= \" AND (upper(concat(nombres, ' ', apellido_paterno, ' ' , apellido_materno)) like '%\" . strtoupper(\$supervisor_aux) . \"%') \";
+                        } 
+                        \$sql .= \" ) \";
+                        \$sql .= \" OR (upper(c.descripcion) like '%\" . strtoupper(\$atr[\"b-filtro-sencillo\"]) . \"%'))\";
+                    }
                     if (strlen(\$atr[valor])>0)
                         \$sql .= \" AND upper(\$atr[campo]) like '%\" . strtoupper(\$atr[valor]) . \"%'\";
                     $filtro_listar
@@ -404,7 +561,10 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
              public function eliminar$nombre_clase(\$atr){
                     try {
                         \$atr = \$this->dbl->corregir_parametros(\$atr);
+                        \$val = \$this->ver$nombre_clase(\$atr[id]);
                         \$respuesta = \$this->dbl->delete(\"$tabla\", \"id = \" . \$atr[id]);
+                        \$nuevo = \"$campos_log_ant\";
+                        \$this->registraTransaccionLog(86,\$nuevo,'', \$atr[id]);
                         return \"ha sido eliminada con exito\";
                     } catch(Exception \$e) {
                         \$error = \$e->getMessage();                     
@@ -418,6 +578,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
     $index = "
             public function index$nombre_clase(\$parametros)
             {
+                \$contenido[TITULO_MODULO] = \$parametros[nombre_modulo];
                 if(!class_exists('Template')){
                     import(\"clases.interfaz.Template\");
                 }
@@ -442,8 +603,11 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                             </div>';
                     \$k++;
                 }
+                \$this->cargar_permisos(\$parametros);
                 \$grid = \$this->verLista$nombre_clase(\$parametros);
                 \$contenido['CORDER'] = \$parametros['corder'];
+                \$contenido['MODO'] = \$parametros['modo'];
+                \$contenido['COD_LINK'] = \$parametros['cod_link'];
                 \$contenido['SORDER'] = \$parametros['sorder'];
                 \$contenido['MOSTRAR_COL'] = \$parametros['mostrar-col'];
                 \$contenido['TABLA'] = \$grid['tabla'];
@@ -453,7 +617,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 \$contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;$nombre_clase';
                 \$contenido['TABLA'] = \$grid['tabla'];
                 \$contenido['PAGINADO'] = \$grid['paginado'];
-                \$contenido['PERMISO_INGRESAR'] = \$_SESSION[CookN] == 'S' ? '' : 'display:none;';
+                \$contenido['PERMISO_INGRESAR'] = \$this->per_crear == 'S' ? '' : 'display:none;';
 
                 \$template = new Template();
                 \$template->PATH = PATH_TO_TEMPLATES.'$nombre_fisico/';
@@ -493,7 +657,10 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 \$objResponse->addAssign('modulo_actual',\"value\",\"$nombre_fisico\");
                 \$objResponse->addIncludeScript(PATH_TO_JS . '$nombre_fisico/$nombre_fisico.js');
                 \$objResponse->addScript(\"\$('#MustraCargando').hide();\");
-                \$objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
+                \$objResponse->addScript('PanelOperator.initPanels(\"\");
+                        ScrollBar.initScroll();
+                        init_filtro_rapido();
+                        init_filtro_ao_simple();');
                 return \$objResponse;
             }
         ";
@@ -665,7 +832,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 \$objResponse->addScript(\"\$('#MustraCargando').hide();\"); 
                 \$objResponse->addScript(\"$('#btn-guardar' ).html('Guardar');
                                         $( '#btn-guardar' ).prop( 'disabled', false );\");
-                        );
+                        
                 return \$objResponse;
             }
     ";
@@ -728,6 +895,8 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
     $buscar = "
                 public function buscar(\$parametros)
             {
+                /*Permisos en caso de que no se use el arbol organizacional*/
+                \$this->cargar_permisos(\$parametros);
                 \$grid = \$this->verLista$nombre_clase(\$parametros);                
                 \$objResponse = new xajaxResponse();
                 \$objResponse->addAssign('grid',\"innerHTML\",\$grid[tabla]);
@@ -769,19 +938,19 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
 
                 \$func= array();
 
-                \$columna_funcion = 0;
+                \$columna_funcion = -1;
                 /*if (strrpos(\$parametros['permiso'], '1') > 0){
                     
                     \$columna_funcion = $columnas;
                 }
                 if (\$parametros['permiso'][1] == \"1\")
                     array_push(\$func,array('nombre'=> 'ver$nombre_clase','imagen'=> \"<img style='cursor:pointer' src='diseno/images/find.png' title='Ver $nombre_clase'>\"));
-                */
+                
                 if(\$_SESSION[CookM] == 'S')//if (\$parametros['permiso'][2] == \"1\")
                     array_push(\$func,array('nombre'=> 'editar$nombre_clase','imagen'=> \"<img style='cursor:pointer' src='diseno/images/ico_modificar.png' title='Editar $nombre_clase'>\"));
                 if(\$_SESSION[CookE] == 'S')//if (\$parametros['permiso'][3] == \"1\")
                     array_push(\$func,array('nombre'=> 'eliminar$nombre_clase','imagen'=> \"<img style='cursor:pointer' src='diseno/images/ico_eliminar.png' title='Eliminar $nombre_clase'>\"));
-               
+               */
                 \$config=array(array(\"width\"=>\"10%\", \"ValorEtiqueta\"=>\"&nbsp;\"));
                 \$grid->setPaginado(\$reg_por_pagina, \$this->total_registros);
                 \$array_columns =  explode('-', \$parametros['mostrar-col']);
@@ -805,14 +974,17 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                             break;
                     }
                 }
+                \$grid->setParent(\$this);
                 \$grid->SetTitulosTablaMSKS(\"td-titulo-tabla-row\", \$config);
+                \$grid->setFuncion(\"id\", \"colum_admin\");
                 //\$grid->setFuncion(\"en_proceso_inscripcion\", \"enProcesoInscripcion\");
                 //\$grid->setAligns(1,\"center\");
                 //\$grid->hidden = array(0 => true);
     
                 \$grid->setDataMSKS(\"td-table-data\", \$data, \$func,\$columna_funcion, \$parametros['pag'] );
                 \$out['tabla']= \$grid->armarTabla();
-                if ((\$parametros['pag'] != 1)  || (\$this->total_registros >= \$reg_por_pagina)){
+                //if ((\$parametros['pag'] != 1)  || (\$this->total_registros >= \$reg_por_pagina))
+                {
                     \$out['paginado']=\$grid->setPaginadohtmlMSKS(\"verPagina\", \"document\");
                 }
                 return \$out;
@@ -827,6 +999,9 @@ $grilla_excel="
             \$this->listar$nombre_clase(\$parametros, 1, 100000);
             \$data=\$this->dbl->data;
 
+            if (count(\$this->nombres_columnas) <= 0){
+                        \$this->cargar_nombres_columnas();
+                }
              \$grid->SetConfiguracion(\"tbl$nombre_clase\", \"width='100%' align ='center' border='1' cellspacing='0' cellpadding='0'\");
                 \$config_col=array(
                  $titulos_grilla_excel
