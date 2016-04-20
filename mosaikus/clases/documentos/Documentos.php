@@ -1300,7 +1300,7 @@
                                 $filtro_ao
                             WHERE muestra_doc='S' " ;                    
                                                                                                                 
-                            if(($_SESSION[SuperUser]!='S')&&(isset($parametros[terceros]))){
+                            if(($_SESSION[SuperUser]!='S')&&(isset($atr[terceros]))){
                                 $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
                                 $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_revision' and d.estado_workflow='OK') or ";    
                                 $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK') ";    
@@ -1400,7 +1400,7 @@
                     if (strlen($atr["b-aprobo"])>0)
                         $sql .= " AND d.aprobo = '". $atr["b-aprobo"] . "'";
                     /*Acceso a los documentos segun el arbol, no aplica para el administrador de documentos*/
-                    if ((!isset($parametros[terceros]))){                            
+                    if ((!isset($atr[terceros]))){                            
                         //$sql .= " AND id_organizacion IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")";                        
                         $sql .= " AND  d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . "))"; 
                     }
@@ -1456,7 +1456,7 @@
                             $sql_left
                                 $filtro_ao
                             WHERE muestra_doc='S' ";
-                            if(($_SESSION[SuperUser]!='S')&&(isset($parametros[terceros]))){
+                            if(($_SESSION[SuperUser]!='S')&&(isset($atr[terceros]))){
                                 $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
                                 $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_revision' and d.estado_workflow='OK') or ";    
                                 $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK') ";    
@@ -1565,13 +1565,14 @@
                                                     where valor in (".$atr["nodosp"].") and tipo='12')";
                     
                     /*Acceso a los documentos segun el arbol, no aplica para el administrador de documentos*/
-                    if ((!isset($parametros[terceros]))){                            
+                    if ((!isset($atr[terceros]))){                            
                         //$sql .= " AND id_organizacion IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")";                        
                         $sql .= " AND  d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . "))"; 
                     }
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
-                    //  echo $sql;
+                    //print_r($atr);
+                      //echo $sql;
                     $this->operacion($sql, $atr);
              }
              

@@ -196,7 +196,7 @@
                         AND mos_l.cod_link = $modulo
                     ";
                 if (strlen($visualiza_tercero) > 0){
-                    $sql .= " AND mos_p.visualizar_terceros = 'N' ";
+                    $sql .= " AND mos_p.visualizar_terceros = 'S' ";
                 }
             }
             else

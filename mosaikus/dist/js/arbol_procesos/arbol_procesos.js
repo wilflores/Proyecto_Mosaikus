@@ -159,6 +159,7 @@ function demo_cerrar_ao(){
     }
     
     function reporte_ao_pdf(){
-         window.open('pages/arbol_procesos/reporte_ap_pdf.php?','_blank');
+        var params = getForm('busquedaFrm'); ;
+         window.open('pages/arbol_procesos/reporte_ap_pdf.php?'+params,'_blank');
     }
     
