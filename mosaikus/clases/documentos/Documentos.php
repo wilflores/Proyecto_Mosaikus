@@ -334,12 +334,15 @@
              * Activa los nodos donde se tiene explicitamente acceso
              */
             private function cargar_acceso_nodos($parametros){
+              //  echo $_SESSION[CookIdUsuario];
+                //print_r($parametros);
                 if (strlen($parametros[cod_link])>0){
                     if(!class_exists('mos_acceso')){
                         import("clases.mos_acceso.mos_acceso");
                     }
                     $acceso = new mos_acceso();
                     $data_ids_acceso = $acceso->obtenerNodosArbol($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo],$parametros[terceros]);
+                   //print_r($data_ids_acceso);
                     foreach ($data_ids_acceso as $value) {
                         $this->id_org_acceso[$value[id]] = $value;
                     }                                            
@@ -350,12 +353,11 @@
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->placeholder[$value[nombre_campo]] = $value[placeholder];
-                }
-                
+                }                
             }
             public function verWFemail($id){
                 $atr=array();
-                $sql = "select email, nombres, apellido_paterno,etapa_workflow, estado_workflow, observacion_rechazo 
+                $sql = "select mos_personal.email, mos_personal.nombres, mos_personal.apellido_paterno,etapa_workflow, estado_workflow, observacion_rechazo, IFNULL(recibe_notificaciones,'N') recibe_notificaciones 
                         from mos_personal inner join 
                         (
                                 SELECT
@@ -377,10 +379,12 @@
                                 mos_documentos.estado_workflow,
                                 mos_documentos.observacion_rechazo
                                 FROM
-                                mos_documentos
+                                mos_documentos 
                                 where IDDoc=$id
                         ) as wf
-                        on mos_personal.cod_emp= id_persona;"; 
+                        on mos_personal.cod_emp= id_persona inner join mos_usuario usu
+                        on mos_personal.email = usu.email
+                        ;"; 
                 //echo $sql;
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
@@ -1265,7 +1269,7 @@
         
              public function listarDocumentos($atr, $pag, $registros_x_pagina){
                  // HABILIYAR LA COLUMNA ESYAD0
-                    //print_r($atr);
+                   // print_r($atr);
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
                     if (count($this->parametros) <= 0){
@@ -1288,7 +1292,7 @@
                     if (count($this->id_org_acceso) <= 0){
                         $this->cargar_acceso_nodos($atr);                    
                     }
-                    
+                    //print_r($this->id_org_acceso);
                     $sql = "SELECT COUNT(*) total_registros
                          FROM mos_documentos  d
                                 left join mos_personal p on d.elaboro=p.cod_emp
@@ -1304,7 +1308,9 @@
                                 $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
                                 $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_revision' and d.estado_workflow='OK') or ";    
                                 $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK') ";    
-                                $sql .= " OR  d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")))"; 
+                                if (count($this->id_org_acceso))
+                                    $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
+                                $sql .= ")";
                             }
                             //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
                     if (strlen($atr['b-filtro-sencillo'])>0){
@@ -1402,6 +1408,9 @@
                     /*Acceso a los documentos segun el arbol, no aplica para el administrador de documentos*/
                     if ((!isset($atr[terceros]))){                            
                         //$sql .= " AND id_organizacion IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")";                        
+                       // 
+                       $sql .= " AND d.etapa_workflow ='estado_aprobado' "; 
+                       if (count($this->id_org_acceso))
                         $sql .= " AND  d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . "))"; 
                     }
                     
@@ -1430,7 +1439,9 @@
                                     ,DATE_FORMAT(fecha_revision, '%d/%m/%Y') fecha_rev
                                     ,CASE d.vigencia WHEN 'S' Then 'Si' ELSE 'No' END vigencia
                                     ,dao.arbol_organizacional arbol_organizacional
-                                    ,d.etapa_workflow
+                                    ,(SELECT mos_nombres_campos.texto FROM mos_nombres_campos
+                                    WHERE mos_nombres_campos.nombre_campo = d.etapa_workflow AND mos_nombres_campos.modulo = 6
+                                    ) etapa_workflow
                                     -- ,id_filial                                    
                                     -- ,id_usuario
                                     ,d.observacion
@@ -1460,7 +1471,9 @@
                                 $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
                                 $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_revision' and d.estado_workflow='OK') or ";    
                                 $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK') ";    
-                                $sql .= " OR  d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")))"; 
+                                if (count($this->id_org_acceso))
+                                    $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
+                                $sql .= ")";
                             }
                             //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
                     if (strlen($atr['b-filtro-sencillo'])>0){
@@ -1566,13 +1579,14 @@
                     
                     /*Acceso a los documentos segun el arbol, no aplica para el administrador de documentos*/
                     if ((!isset($atr[terceros]))){                            
-                        //$sql .= " AND id_organizacion IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")";                        
+                       $sql .= " AND d.etapa_workflow ='estado_aprobado' "; 
+                       if (count($this->id_org_acceso))
                         $sql .= " AND  d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . "))"; 
                     }
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //print_r($atr);
-                      //echo $sql;
+                     // echo $sql;
                     $this->operacion($sql, $atr);
              }
              
@@ -3071,11 +3085,11 @@
                         //ENVIAR EMAIL SI ES GUARDAR Y NOTIFICAR
                         if($parametros['notificar']=='si'){
                             $correowf = $this->verWFemail($parametros[id]);
-                            if($correowf[email]!=''){
+                            if($correowf[email]!='' && $correowf[recibe_notificaciones]=='S'){
                                 $this->cargar_nombres_columnas();
                                 $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                                 $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
-                                //$correowf[email] = 'azambrano75@gmail.com';
+                               // $correowf[email] = 'azambrano75@gmail.com';
                                 $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                                 $ut_tool = new ut_Tool();
                                 $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
@@ -3731,11 +3745,11 @@
                         if($parametros['notificar']=='si'){
                             $correowf = $this->verWFemail($parametros[id]);
                            // print_r($correowf);
-                            if($correowf[email]!=''){
+                            if($correowf[email]!=''&& $correowf[recibe_notificaciones]=='S'){
                                 $this->cargar_nombres_columnas();
                                 $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                                 $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
-                                //$correowf[email] = 'azambrano75@gmail.com';
+                               // $correowf[email] = 'azambrano75@gmail.com';
                                 $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                                 $ut_tool = new ut_Tool();
                                 $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
@@ -3872,7 +3886,7 @@
  
             public function buscar($parametros)
             {   $parametros['email_usuario']= $_SESSION['CookEmail'];
-
+                $parametros[terceros] = 'S';
                 $grid = $this->verListaDocumentos($parametros);                
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
@@ -4277,7 +4291,6 @@
             public function buscar_reporte($parametros)
             {   ///print_r($parametros);
                 /*Para visualizar los documentos de terceros*/
-                $parametros[terceros] = 'S';
                 $grid = $this->verListaDocumentosReporte($parametros);
                 $objResponse = new xajaxResponse();
                 
@@ -4363,14 +4376,14 @@
                 if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
                         $correowf = $this->verWFemail($parametros[id]);
                         //echo $correowf[email];
-                        if($correowf[email]!=''){
+                        if($correowf[email]!='' && $correowf[recibe_notificaciones]=='S'){
                             $this->cargar_nombres_columnas();
                             $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                             $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
                             if($correowf[estado_workflow]=='RECHAZADO'){
                                 $cuerpo .= 'Rechazado por:<br><span style="color:red">'.$correowf[observacion_rechazo].'</span>';
                             }
-                            //$correowf[email] = 'azambrano75@gmail.com';
+                           // $correowf[email] = 'azambrano75@gmail.com';
                             $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                             $ut_tool = new ut_Tool();
                             //echo $cuerpo;
