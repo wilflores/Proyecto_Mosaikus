@@ -24,6 +24,9 @@
             array = new XArray();
             array.setObjeto('WorkflowDocumentos','crear');
             array.addParametro('import','clases.workflow_documentos.WorkflowDocumentos');
+            array.addParametro('modo',document.getElementById('modo').value);            
+            array.addParametro('cod_link',document.getElementById('cod_link').value);
+            
             xajax_Loading(array.getArray());
     }
 
