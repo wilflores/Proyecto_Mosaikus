@@ -159,3 +159,9 @@ END;
 
 ;;
 DELIMITER ;
+
+/****************************************/
+/*cambio del 20-04*/
+/****************************************/
+ALTER TABLE `mos_usuario`
+ADD COLUMN `recibe_notificaciones`  varchar(1) NULL AFTER `cedula`;
