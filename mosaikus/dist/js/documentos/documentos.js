@@ -242,10 +242,10 @@ function cargar_autocompletado(){
 
     function validar(doc){
         if($('#idFormulario').isValid()) {
-            var iframe = document.getElementById("iframearbol");
-            iframe.contentWindow.submitMe();
+            //var iframe = document.getElementById("iframearbol");
+            //iframe.contentWindow.submitMe();
 
-            var _TxtIdNodos = document.getElementById("nodos").value = iframe.contentWindow.document.getElementById('jsfields').value;
+            var _TxtIdNodos = document.getElementById("nodos").value;
             if (_TxtIdNodos == ''){
                 VerMensaje('error','Debe Ingresar el Arbol Organizacional');
                 return;
