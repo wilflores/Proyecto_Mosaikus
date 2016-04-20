@@ -7,6 +7,7 @@
         private $parametros;
         private $nombres_columnas;
         private $placeholder;
+        private $id_org_acceso;
             
             public function WorkflowDocumentos(){
                 parent::__construct();
@@ -43,21 +44,31 @@
                 }
                 
             }
-
-
-     
-
-             public function verWorkflowDocumentos($id){
+            /**
+             * Activa los nodos donde se tiene explicitamente acceso
+             */
+            private function cargar_acceso_nodos($parametros){
+                if (strlen($parametros[cod_link])>0){
+                    if(!class_exists('mos_acceso')){
+                        import("clases.mos_acceso.mos_acceso");
+                    }
+                    $acceso = new mos_acceso();
+                    $data_ids_acceso = $acceso->obtenerNodosArbol($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo]);
+                    foreach ($data_ids_acceso as $value) {
+                        $this->id_org_acceso[$value[id]] = $value;
+                    }                                            
+                }
+            }            
+            public function verWorkflowDocumentos($id){
                 $atr=array();
                 $sql = "SELECT id
-,id_personal_responsable
-,email_responsable
-,id_personal_revisa
-,email_revisa
-,id_personal_aprueba
-,email_aprueba
-
-                         FROM mos_workflow_documentos 
+                        ,id_personal_responsable
+                        ,email_responsable
+                        ,id_personal_revisa
+                        ,email_revisa
+                        ,id_personal_aprueba
+                        ,email_aprueba
+                        FROM mos_workflow_documentos 
                          WHERE id = $id "; 
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
@@ -95,6 +106,31 @@
 
                 return true;
             }
+        public function colum_admin($tupla)
+        {   //print_r($this->id_org_acceso);
+            //echo $tupla[id_organizacion];
+            //if($_SESSION[CookM] == 'S')
+            //AGARRAR EL ID_ORG DE LA PERSONA QUE ELABORA PARA ESTAS ACCIONES
+     
+            if ($this->id_org_acceso[$tupla[id_organizacion]][modificar] == 'S')
+            {
+                //<img title=\"Modificar Documento $tupla[nombre_doc]\" src=\"diseno/images/ico_modificar.png\" style=\"cursor:pointer\">
+                $html = "<a href=\"#\" onclick=\"javascript:editarWorkflowDocumentos('". $tupla[cod_emp] . "');\"  title=\"Editar Personas\">                            
+                            <i class=\"icon icon-edit\"></i>
+                        </a>";
+            }
+            //if($_SESSION[CookE] == 'S')
+            if ($this->id_org_acceso[$tupla[id_organizacion]][eliminar] == 'S')
+            {
+                //<img title="Eliminar '.$tupla[nombre_doc].'" src="diseno/images/ico_eliminar.png" style="cursor:pointer">
+                $html .= '<a href="#" onclick="javascript:eliminarWorkflowDocumentos(\''. $tupla[cod_emp] . '\');" title="Eliminar Personas">
+                        <i class="icon icon-remove"></i>
+                        
+                    </a>'; 
+            }
+            return $html;
+            
+        }
 
             public function modificarWorkflowDocumentos($atr){
                 try {
@@ -154,7 +190,9 @@
 
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
-            
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);
+                    }            
                     $sql = "SELECT wf.id
                                 ,CONCAT(CONCAT(UPPER(LEFT(perso_resp.apellido_paterno, 1)), LOWER(SUBSTRING(perso_resp.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_resp.apellido_materno, 1)), LOWER(SUBSTRING(perso_resp.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_resp.nombres, 1)), LOWER(SUBSTRING(perso_resp.nombres, 2))))  id_personal_responsable
                                 ,email_responsable
@@ -162,6 +200,7 @@
                                 ,email_revisa
                                 ,CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) id_personal_aprueba
                                 ,email_aprueba
+                                ,perso_resp.id_organizacion
                                      $sql_col_left
                             FROM mos_workflow_documentos AS wf
                             INNER JOIN mos_personal AS perso_resp ON wf.id_personal_responsable = perso_resp.cod_emp
@@ -219,7 +258,9 @@
 
                 $grid->SetConfiguracionMSKS("tblWorkflowDocumentos", "");
                 $config_col=array(
-               array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id], "Id", $parametros)),     
+               //array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_personal], "id_personal", $parametros,90)), 
+               array("width"=>"5%", "ValorEtiqueta"=>"<div style='width:50px'>&nbsp;</div>"),                   
+                    //array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id], "&nbsp;", $parametros,90)),     
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_personal_responsable], "id_personal_responsable", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[email_responsable], "email_responsable", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_personal_revisa], "id_personal_revisa", $parametros)),
@@ -238,20 +279,22 @@
 
                 $func= array();
 
-                $columna_funcion = 0;
+                $columna_funcion = -1;
                 /*if (strrpos($parametros['permiso'], '1') > 0){
                     
                     $columna_funcion = 8;
                 }
                 if ($parametros['permiso'][1] == "1")
                     array_push($func,array('nombre'=> 'verWorkflowDocumentos','imagen'=> "<img style='cursor:pointer' src='diseno/images/find.png' title='Ver WorkflowDocumentos'>"));
-                */
+                
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                     array_push($func,array('nombre'=> 'editarWorkflowDocumentos','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-edit\"  title='Editar WorkflowDocumentos'></i>"));
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
                     array_push($func,array('nombre'=> 'eliminarWorkflowDocumentos','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\"  title='Eliminar WorkflowDocumentos'></i>"));
-               
-                $config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
+               */
+                //$config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
+                $config=array();
+                
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
                 $array_columns =  explode('-', $parametros['mostrar-col']);
                 for($i=0;$i<count($config_col);$i++){
@@ -274,7 +317,10 @@
                             break;
                     }
                 }
+                $grid->setParent($this);
+                $grid->setFuncion("id", "colum_admin");
                 $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
+                $grid->hidden[7]= true;
                 //$grid->setFuncion("en_proceso_inscripcion", "enProcesoInscripcion");
                 //$grid->setAligns(1,"center");
                 //$grid->hidden = array(0 => true);
@@ -351,7 +397,7 @@
                 if ($parametros['corder'] == null) $parametros['corder']="id";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="2-3-4-5-6-7"; 
+                    $parametros['mostrar-col']="0-2-3-4-5-6-7"; 
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */               
@@ -381,7 +427,9 @@
                 $contenido['TABLA'] = $grid['tabla'];
                 $contenido['PAGINADO'] = $grid['paginado'];
                 $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
-
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];
+                
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'workflow_documentos/';
                 if (count($this->nombres_columnas) <= 0){
@@ -444,23 +492,31 @@
                 }
                 foreach ( $this->placeholder as $key => $value) {
                     $contenido_1["P_" . strtoupper($key)] =  $value;
-                }     
+                }    
+
+                if (count($this->id_org_acceso) <= 0){
+                    $this->cargar_acceso_nodos($parametros);                    
+                }                
+                
                 $contenido_1[ID_PERSONAL_RESPONSABLE] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
-                                                                            FROM mos_personal p WHERE interno = 1 and elaboro = 'S'"
+                                                                            FROM mos_personal p WHERE interno = 1 and elaboro = 'S'
+                                                                            AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                 $contenido_1[ID_PERSONAL_REVISA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
-                                                                            FROM mos_personal p WHERE interno = 1 and reviso = 'S'"
+                                                                            FROM mos_personal p WHERE interno = 1 and reviso = 'S'
+                                                                            AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                 $contenido_1[ID_PERSONAL_APRUEBA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
-                                                                            FROM mos_personal p WHERE interno = 1 and aprobo = 'S'"
+                                                                            FROM mos_personal p WHERE interno = 1 and aprobo = 'S'
+                                                                            AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                 
