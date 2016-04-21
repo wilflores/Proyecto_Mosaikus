@@ -98,11 +98,11 @@
                              </div>                                                                    
                              
                                 <div class="form-group">
-                                    <label for="elaboro" class="col-md-5 control-label">{N_ELABORO}</label>                                                
-                                    <div class="col-md-10">                                              
-                                      <select id="elaboro" name="elaboro" data-validation="required">
+                                    <label for="elaboro" class="col-md-6 control-label">{N_ID_WORKFLOW_DOCUMENTO}</label>                                                
+                                    <div class="col-md-14">                                              
+                                      <select {COMBOWFHABILITADO} id="id_workflow_documento" name="id_workflow_documento" data-validation="required">
                                         <option selected="" value="">-- No Asignado --</option>
-                                        {ELABORO}
+                                        {ID_WORKFLOW_DOCUMENTO}
                                      </select>
                                   </div>   
                                 </div>
@@ -129,9 +129,10 @@
             <div class="form-group">
                     <div class="col-lg-offset-2 col-lg-10">                        
                         
-                        <button type="button" class="btn btn-primary" onClick="validar_ver(document);" id="btn-guardar">{DESC_OPERACION}</button>            
+                        <button type="button" class="btn btn-primary" onClick="document.getElementById('notificar').value='si';validar_ver(document);" id="btn-guardar">{DESC_OPERACION}</button>      
+                        
                         <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">Cancelar</button>
-
+                        <input type="hidden" id="notificar"  name="notificar"  value="">
                         <input type="hidden" id="opc" name="opc" value="{OPC}">
                         <input type="hidden" id="id"  name="id"  value="{ID}">
                     </div>
