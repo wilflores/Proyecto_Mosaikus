@@ -1160,8 +1160,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $objResponse = new xajaxResponse();
-                unset ($parametros['opc']);
-             
+                unset ($parametros['opc']);         
 
                 $validator = new FormValidator();
                 
