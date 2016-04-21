@@ -1351,7 +1351,7 @@
                                 if (count($this->id_org_acceso))
                                     $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
                                 if (count($this->id_org_acceso_todos_nivel))
-                                    $sql .= " OR ( d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
+                                    $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
                                 $sql .= ")";
                             }
                             //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
@@ -1517,7 +1517,7 @@
                                 if (count($this->id_org_acceso))
                                     $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
                                 if (count($this->id_org_acceso_todos_nivel))
-                                    $sql .= " OR ( d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
+                                    $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
                                 
                                 $sql .= ")";
                             }
