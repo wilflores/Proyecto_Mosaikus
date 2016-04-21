@@ -1330,9 +1330,9 @@
                     if (count($this->id_org_acceso_todos_nivel) <= 0){
                         $this->cargar_acceso_nodos_todos_nivel($atr);                    
                     }
-                    print_r($this->id_org_acceso);
-                    echo 'aqui';
-                    print_r($this->id_org_acceso_todos_nivel);
+                   // print_r($this->id_org_acceso);
+                   // echo 'aqui';
+                   // print_r($this->id_org_acceso_todos_nivel);
                     $sql = "SELECT COUNT(*) total_registros
                          FROM mos_documentos  d
                                 left join mos_personal p on d.elaboro=p.cod_emp
@@ -1350,6 +1350,8 @@
                                 $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK') ";    
                                 if (count($this->id_org_acceso))
                                     $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
+                                if (count($this->id_org_acceso_todos_nivel))
+                                    $sql .= " OR ( d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
                                 $sql .= ")";
                             }
                             //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
@@ -1450,6 +1452,7 @@
                         //$sql .= " AND id_organizacion IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")";                        
                        // 
                        $sql .= " AND d.etapa_workflow ='estado_aprobado' "; 
+                       
                        if (count($this->id_org_acceso))
                         $sql .= " AND  d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . "))"; 
                     }
@@ -1513,6 +1516,9 @@
                                 $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK') ";    
                                 if (count($this->id_org_acceso))
                                     $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
+                                if (count($this->id_org_acceso_todos_nivel))
+                                    $sql .= " OR ( d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
+                                
                                 $sql .= ")";
                             }
                             //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
