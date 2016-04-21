@@ -302,6 +302,7 @@
         public $nombres_columnas;
         private $placeholder;
         private $id_org_acceso;
+        private $id_org_acceso_todos_nivel;
         
             public function Documentos(){
                 parent::__construct();
@@ -347,7 +348,20 @@
                         $this->id_org_acceso[$value[id]] = $value;
                     }                                            
                 }
-            }            
+            }  
+       public function cargar_acceso_nodos_todos_nivel($parametros){
+           if (strlen($parametros[cod_link])>0){
+               if(!class_exists('mos_acceso')){
+                   import("clases.mos_acceso.mos_acceso");
+               }
+               $acceso = new mos_acceso();
+               $data_ids_acceso = $acceso->obtenerArbolEstructura($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo]);
+               //print_r($data_ids_acceso);
+               foreach ($data_ids_acceso as $value) {
+                   $this->id_org_acceso_todos_nivel[$value[id]] = $value;
+               }                                            
+           }
+       }            
             private function cargar_placeholder(){
                 $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE modulo = 6";
                 $nombres_campos = $this->dbl->query($sql, array());
@@ -1313,7 +1327,12 @@
                     if (count($this->id_org_acceso) <= 0){
                         $this->cargar_acceso_nodos($atr);                    
                     }
-                    //print_r($this->id_org_acceso);
+                    if (count($this->id_org_acceso_todos_nivel) <= 0){
+                        $this->cargar_acceso_nodos_todos_nivel($atr);                    
+                    }
+                    print_r($this->id_org_acceso);
+                    echo 'aqui';
+                    print_r($this->id_org_acceso_todos_nivel);
                     $sql = "SELECT COUNT(*) total_registros
                          FROM mos_documentos  d
                                 left join mos_personal p on d.elaboro=p.cod_emp
