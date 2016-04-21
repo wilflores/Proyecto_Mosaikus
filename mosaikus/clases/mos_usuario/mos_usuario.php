@@ -1,5 +1,4 @@
 <?php
-
  import("clases.interfaz.Pagina");        
         class mos_usuario extends Pagina{
         private $templates;
@@ -121,7 +120,7 @@
                       */
                     $nuevo = "Id Usuario: \'$atr[id_usuario]\', Nombres: \'$atr[nombres]\', Apellido Paterno: \'$atr[apellido_paterno]\', Apellido Materno: \'$atr[apellido_materno]\', Telefono: \'$atr[telefono]\', Fecha Creacion: \'$atr[fecha_creacion]\', Fecha Expi: \'$atr[fecha_expi]\', Vigencia: \'$atr[vigencia]\', Super Usuario: \'$atr[super_usuario]\', Email: \'$atr[email]\', Password 1: \'$atr[password_1]\', Cedula: \'$atr[cedula]\', ";
                     $this->registraTransaccionLog(21,$nuevo,'', '');
-                    return "El mos_usuario '$atr[nombres]' ha sido ingresado con exito";
+                    return "El usuario '$atr[nombres]' ha sido ingresado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
                         if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
@@ -155,7 +154,7 @@
                     /*
                     $this->registraTransaccion('Modificar','Modifico el mos_usuario ' . $atr[descripcion_ano], 'mos_usuario');
                     */
-                    return "El mos_usuario '$atr[nombres]' ha sido actualizado con exito";
+                    return "El usuario '$atr[nombres]' ha sido actualizado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
                         if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
@@ -1038,8 +1037,9 @@
                 $objResponse->addScript("$('#MustraCargando').hide();"); 
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
-                          });");$objResponse->addScript("$('#fecha_creacion').datepicker();");
-$objResponse->addScript("$('#fecha_expi').datepicker();");
+                          });");
+                $objResponse->addScript("$('#fecha_creacion').datepicker();");
+            $objResponse->addScript("$('#fecha_expi').datepicker({changeMonth: true,yearRange: '-100:+0',changeYear: true});");
    return $objResponse;
             }
      
@@ -1119,6 +1119,9 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
             $contenido_1['PASSWORD_1'] = ($val["password_1"]);
             $contenido_1['CEDULA'] = ($val["cedula"]);
 
+            $contenido_1[SUPER_USUARIO] = $val["super_usuario"] == 'S' ? 'checked="checked"' : '';
+            $contenido_1[CHECKED_VIGENCIA] = $val["vigencia"] == 'S' ? 'checked="checked"' : '';
+            
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
                 $template->setTemplate("formulario");
@@ -1156,8 +1159,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $objResponse = new xajaxResponse();
-                unset ($parametros['opc']);
-             
+                unset ($parametros['opc']);         
 
                 $validator = new FormValidator();
                 
@@ -1168,7 +1170,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
                                 $mensaje.="- $inp_err <br/>";
                         }
                          $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
-                }else{
+                }else{                    
                     $parametros["fecha_creacion"] = formatear_fecha($parametros["fecha_creacion"]);
                     $parametros["fecha_expi"] = formatear_fecha($parametros["fecha_expi"]);
 
