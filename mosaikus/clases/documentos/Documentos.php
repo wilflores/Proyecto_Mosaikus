@@ -4222,9 +4222,9 @@
                 $item_histo .="</table>";
                 //$item_histo='sakdsjasd askdj aksdjn askdjnasdk jas dkajsdn kajsdn askdjn';
                 $cuadro_historico = '.. <br/>
-                    <a href="#" tok="' .$parametros[id]. '-doc" class="ver-mas">
+                    <a href="#" tok="' .$parametros[id]. '-doc-hist" class="ver-mas">
                         <i class="glyphicon glyphicon-search" href="#search"></i> Ver Historial
-                        <input type="hidden" id="ver-mas-' .$parametros[id]. '-doc" value="'.$item_histo.'"/>
+                        <input type="hidden" id="ver-mas-' .$parametros[id]. '-doc-hist" value="'.$item_histo.'"/>
                     </a>';
                 $contenido_1['VERHISTO']=$cuadro_historico;
                 //EL USUARIO ES QUIEN REVISA
