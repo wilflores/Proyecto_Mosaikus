@@ -1172,8 +1172,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
                                 $mensaje.="- $inp_err <br/>";
                         }
                          $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
-                }else{
-                    
+                }else{                    
                     $parametros["fecha_creacion"] = formatear_fecha($parametros["fecha_creacion"]);
                     $parametros["fecha_expi"] = formatear_fecha($parametros["fecha_expi"]);
 
