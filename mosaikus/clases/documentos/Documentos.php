@@ -1058,12 +1058,30 @@
                     $atr[doc_visualiza] = $doc_ver;
                     $atr[id_filial] = $_SESSION[CookFilial];
                     //
-                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo,publico)
-                            SELECT $atr[IDDoc],Codigo_doc,nombre_doc,version+1,'$atr[fecha]',descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,'$atr[observacion]',estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,$atr[elaboro],aprobo,publico
+                    if($atr[notificar]=='si'){
+                        if($atr[reviso]=='NULL'){
+                            $atr[etapa_workflow]="'estado_pendiente_aprobacion'";
+                        }
+                        else{
+                            $atr[etapa_workflow]="'estado_pendiente_revision'";
+                        }
+                        $atr[estado_workflow]="'OK'";
+                        $atr[id_usuario_workflow]=$atr[id_usuario];
+                        }  
+                    else {
+                        $atr[etapa_workflow]='NULL';
+                        $atr[estado_workflow]='NULL';
+                        $atr[id_usuario_workflow]=$atr[id_usuario];
+                    }
+                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo,publico, id_workflow_documento,etapa_workflow,estado_workflow,id_usuario_workflow)
+                            SELECT $atr[IDDoc],Codigo_doc,nombre_doc,version+1,'$atr[fecha]',descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,'$atr[observacion]',estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,$atr[reviso],$atr[elaboro],$atr[aprobo],publico,
+                                    $atr[id_workflow_documento],$atr[etapa_workflow],$atr[estado_workflow],$atr[id_usuario_workflow]
                             FROM mos_documentos
-                            WHERE IDDoc = $atr[id]                                                           
+                            WHERE IDDoc = $atr[id];
+                                
                                 ";
-                    //echo $sql;
+                   // echo $sql;
+                    //die;
                     //echo $sql; $atr[IDDoc],'$atr[Codigo_doc]','$atr[nombre_doc]',$atr[version],'$atr[fecha]','$atr[descripcion]','$atr[palabras_claves]','$atr[formulario]','$atr[vigencia]','$atr[doc_fisico]','$atr[contentType]',$atr[id_filial],'$atr[nom_visualiza]','$atr[doc_visualiza]','$atr[contentType_visualiza]',$atr[id_usuario],'$atr[observacion]','$atr[estrucorg]','$atr[arbproc]','$atr[apli_reg_estrorg]','$atr[apli_reg_arbproc]','$atr[workflow]',$atr[semaforo],$atr[v_meses],$atr[reviso],$atr[elaboro],$atr[aprobo]
                     $this->dbl->insert_update($sql);
                     $sql = "UPDATE mos_documentos SET doc_fisico='$atr[doc_fisico]',contentType='$atr[contentType]', nom_visualiza='$atr[nom_visualiza]',doc_visualiza='$atr[doc_visualiza]',contentType_visualiza='$atr[contentType_visualiza]' "
@@ -1145,7 +1163,7 @@
             }
 
             public function modificarDocumentos($atr,$archivo){
-
+                //print_r($atr);
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
                     $atr[doc_visualiza] = $archivo;                    
@@ -1202,26 +1220,29 @@
                     if (strlen($atr[aprobo])== 0){
                         $atr[aprobo] = "NULL";                     
                     }
-                    if($atr[notificar]=='si'){
-                        if($atr[reviso]=='NULL'){
-                            $atr[etapa_workflow]="'estado_pendiente_aprobacion'";
-                        }
-                        else{
-                            $atr[etapa_workflow]="'estado_pendiente_revision'";
-                        }
-                        $sql_wf = ", id_workflow_documento=$atr[id_workflow_documento],
-                                    id_usuario_workflow=$atr[id_usuario],
-                                   etapa_workflow=$atr[etapa_workflow],
-                                   observacion_rechazo=null,
-                                   estado_workflow='OK'";
-                    }else
-                    {   
-                        $sql_wf = ", id_workflow_documento=$atr[id_workflow_documento],
-                                    id_usuario_workflow=$atr[id_usuario],
-                                   etapa_workflow=NULL,
-                                   observacion_rechazo=null,
-                                   estado_workflow=NULL";
-                    }  
+                    $val = $this->verDocumentos($atr[id]);
+                    if(!($val[etapa_workflow]=='estado_aprobado' && $val[estado_workflow]=='OK')){
+                        if($atr[notificar]=='si'){
+                            if($atr[reviso]=='NULL'){
+                                $atr[etapa_workflow]="'estado_pendiente_aprobacion'";
+                            }
+                            else{
+                                $atr[etapa_workflow]="'estado_pendiente_revision'";
+                            }
+                            $sql_wf = ", id_workflow_documento=$atr[id_workflow_documento],
+                                        id_usuario_workflow=$atr[id_usuario],
+                                       etapa_workflow=$atr[etapa_workflow],
+                                       observacion_rechazo=null,
+                                       estado_workflow='OK'";
+                        }else
+                        {   
+                            $sql_wf = ", id_workflow_documento=$atr[id_workflow_documento],
+                                        id_usuario_workflow=$atr[id_usuario],
+                                       etapa_workflow=NULL,
+                                       observacion_rechazo=null,
+                                       estado_workflow=NULL";
+                        }                      
+                    }
                     //echo $sql_wf;
                     //die;
                     $sql = "UPDATE mos_documentos SET                            
@@ -1230,7 +1251,7 @@
                             . ",apli_reg_estrorg = '$atr[apli_reg_estrorg]',apli_reg_arbproc = '$atr[apli_reg_arbproc]',workflow = '$atr[workflow]',semaforo = $atr[semaforo],v_meses = $atr[v_meses],reviso = $atr[reviso],elaboro = $atr[elaboro],aprobo = $atr[aprobo]
                                ,publico = '$atr[publico]' $sql_wf
                             WHERE  IDDoc = $atr[id]";      
-                   // echo $sql;
+                   //echo $sql;
                    // die;
                     $val = $this->verDocumentos($atr[id]);
                    
@@ -2461,7 +2482,8 @@
                                         array = new XArray();
                                         array.setObjeto('Registros','indexRegistrosListado');
                                         array.addParametro('titulo',$('#desc-mod-act').html());
-
+                                        array.addParametro('modo',document.getElementById('modo').value);
+                                       array.addParametro('cod_link',document.getElementById('cod_link').value);
                                         array.addParametro('id',id);
                                         array.addParametro('import','clases.registros.Registros');
                                         xajax_Loading(array.getArray());                                
@@ -2883,11 +2905,34 @@
                     $contenido_1["P_" . strtoupper($key)] =  $value;
                 }                     
                 $val = $this->verDocumentos($parametros[id]); 
-                $contenido_1['ELABORO'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE elaboro = 'S'"
-                                                                    , 'cod_emp'
-                                                                    , 'nombres', $val['elaboro']);
+                if($_SESSION[SuperUser]=='S'){
+                    $sql="SELECT wf.id,
+                            CONCAT('".$this->nombres_columnas[elaboro]."=>', 
+                            CONCAT(CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_materno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2)))) 
+                            ,' | ".$this->nombres_columnas[reviso]."=>', 
+                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
+                            ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            FROM mos_workflow_documentos AS wf
+                            left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
+                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
+                }
+                else
+                {
+                    $sql="SELECT wf.id,
+                            CONCAT('".$this->nombres_columnas[reviso]."=>', 
+                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))),'N/A') 
+                            ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            FROM mos_workflow_documentos AS wf
+                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                    WHERE wf.id_personal_responsable='".$_SESSION['CookCodEmp']."'";
+                    
+                }
+                //echo $sql;
+                $contenido_1['ID_WORKFLOW_DOCUMENTO'] = $ut_tool->OptionsCombo($sql
+                                                                    , 'id'
+                                                                    , 'wf', $val['id_workflow_documento']);
                 
                 $contenido_1[NOMBRE_DOC_AUX] = $val["Codigo_doc"].'-'.$val["nombre_doc"].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
                 $contenido_1[REVISION] = $this->verDocumentosRevisionSiguiente($parametros[id],$val[version]);
@@ -3169,9 +3214,18 @@
                 unset ($parametros['opc']);
                 //unset ($parametros['id']);
                 $parametros['id_usuario']= $_SESSION['CookIdUsuario'];
-
+                $val = $this->verDocumentos($parametros['id']);
                 $validator = new FormValidator();
-                
+                //print_r($val);
+                if(($val["etapa_workflow"]=='estado_pendiente_revision') || ($val["etapa_workflow"]=='estado_pendiente_aprobacion')){
+                    $mensaje='No se puede crear una version de un documento que tiene Flujo de Trabajo activo';
+                    $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
+                    $objResponse->addScript("$('#MustraCargando').hide();"); 
+                    $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                                            $( '#btn-guardar' ).prop( 'disabled', false );");
+                    return $objResponse;                    
+                }
+                //die;
                 if(!$validator->ValidateForm($parametros)){
                         $error_hash = $validator->GetErrors();
                         $mensaje="";
@@ -3211,9 +3265,22 @@
                     }
                     if (!isset($parametros[vigencia])) $parametros[vigencia] = 'N';
                     if (!isset($parametros[formulario])) $parametros[formulario] = 'N';
-                    
-                    $respuesta = $this->ingresarDocumentosVersion($parametros,$archivo,$doc_vis);
 
+                    if($parametros["id_workflow_documento"]!=''){
+                        import("clases.workflow_documentos.WorkflowDocumentos");
+                        $wf = new WorkflowDocumentos();
+                        $datoswf = $wf->verWorkflowDocumentos($parametros["id_workflow_documento"]);
+                        //reviso,elaboro,aprobo
+                        $parametros['reviso']=$datoswf['id_personal_revisa'];
+                        $parametros['elaboro']=$datoswf['id_personal_responsable'];
+                        $parametros['aprobo']=$datoswf['id_personal_aprueba'];
+                        
+                    }
+                  //  print_r($parametros);
+                    $respuesta = $this->ingresarDocumentosVersion($parametros,$archivo,$doc_vis);
+                   // echo($respuesta);
+                        
+                    
                     //if (preg_match("/ha sido ingresado con exito/",$respuesta ) == true) {
                     if (strlen($respuesta ) < 10 ) {
                         if (count($this->parametros) <= 0){
@@ -3227,7 +3294,19 @@
                                 $this->ingresarParametro($params);
                             //$this->ingresarParametro($params);
                         }
-                        
+                        //ENVIAR EMAIL SI ES GUARDAR Y NOTIFICAR
+                        if($parametros['notificar']=='si'){
+                            $correowf = $this->verWFemail($params[id_registro]);
+                            if($correowf[email]!='' && $correowf[recibe_notificaciones]=='S'){
+                                $this->cargar_nombres_columnas();
+                                $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
+                                $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
+                                //$correowf[email] = 'azambrano75@gmail.com';
+                                $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
+                                $ut_tool = new ut_Tool();
+                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
+                            } 
+                        }                        
                         
                         $objResponse->addScriptCall("MostrarContenido");
                         $objResponse->addScriptCall('VerMensaje','exito',"El Documentos '$parametros[nombre_doc]' ha sido ingresado con exito");
@@ -3364,6 +3443,7 @@
                     $ids[] = $i;
                 }
                // echo $_SESSION['CookCodEmp'].'-'.$_SESSION[SuperUser];
+                
                 $contenido_1['V_MESES'] = $ut_tool->combo_array("v_meses", $desc, $ids,false,$val["v_meses"],false,false,false,false,'display:inline;width:70px');
                 if($_SESSION[SuperUser]=='S'){
                     $sql="SELECT wf.id,
@@ -3609,7 +3689,8 @@
                 $template->setTemplate("formulario_editar");
                 //$template->setVars($contenido_1);
                 //print_r($val);
-               // echo $_SESSION['CookEmail'];
+                if($val["etapa_workflow"]=='estado_aprobado' && $val["estado_workflow"]=='OK')
+                    $contenido_1['COMBOWFHABILITADO'] = ' disabled ';
                 if($val["etapa_workflow"]=='' && $val["estado_workflow"]=='')
                     $contenido_1['VERNOTIFICAR'] = '';
                 else{
@@ -3646,6 +3727,7 @@
                 $objResponse->addScript("$('#tabs-hv-2').tab();"
                         . "$('#tabs-hv-2 a:first').tab('show');");
                 $objResponse->addScript("$js");
+                $objResponse->addScript("$jswf");
                 $objResponse->addScript("$js_din");
                 //$objResponse->addScript("$('#fecha').datepicker();");
                 return $objResponse;
