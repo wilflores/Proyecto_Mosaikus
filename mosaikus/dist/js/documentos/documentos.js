@@ -250,6 +250,7 @@ function cargar_autocompletado(){
                 VerMensaje('error','Debe Ingresar el Arbol Organizacional');
                 return;
             }
+            
             if (($('#nombre_doc_vis').val().length > 0)){                
                 /*VALIDAR QUE EL NOMBRE DEL DOC VIS SEA EL MISMO QUE EL DOC FUENTE*/
                 var nombre_doc = $('#Codigo_doc').val() + '-' + $('#nombre_doc').val() + '-V' + $('#version').val();                
@@ -262,9 +263,10 @@ function cargar_autocompletado(){
                     }
                 }
             }
-            
-    //        $( "#btn-guardar" ).html('Procesando..');
-    //        $( "#btn-guardar" ).prop( "disabled", true );
+            if(document.getElementById('id_workflow_documento').disabled)
+                document.getElementById('id_workflow_documento').disabled=false;
+            $( "#btn-guardar" ).html('Procesando..');
+            $( "#btn-guardar" ).prop( "disabled", true );
             array = new XArray();
             if (doc.getElementById("opc").value == "new")
                 array.setObjeto('Documentos','guardar');
