@@ -1,6 +1,4 @@
 
-
-
 function r_init_filtrar(){
         document.getElementById('contenido-aux').style.display='';
         document.getElementById('contenido-form-aux').style.display='none';
@@ -47,6 +45,7 @@ function r_init_filtrar(){
     
 function r_exportarExcel(){
     var params =  getForm('r-busquedaFrm');
+    params = params + '&modo='+$('#modo').val()+ '&cod_link='+$('#cod_link').val();
     //window.open('pages/' +  document.getElementById("modulo_actual").value + '/exportarExcel.php?campo='+document.getElementById("campo").value + '&valor=' + document.getElementById("valor").value + '&corder=' + document.getElementById("corder").value + '&sorder=' + document.getElementById("sorder").value,null,'toolbar=no, location=no, menubar=no, width=600,height=400');
     window.open('pages/registros/exportarExcel.php?'+params,null,'toolbar=no, location=no, menubar=no, width=600,height=400');
 }
@@ -68,6 +67,8 @@ function r_marcar_desmarcar_checked_columns(checked){
             array = new XArray();
             array.setObjeto('Registros','crear');
             array.addParametro('import','clases.registros.Registros');
+            array.addParametro('modo',document.getElementById('modo').value);
+            array.addParametro('cod_link',document.getElementById('cod_link').value);
             xajax_Loading(array.getArray());
     }
     
@@ -133,6 +134,8 @@ function r_marcar_desmarcar_checked_columns(checked){
                     array.setObjeto('Registros','actualizar');
                 array.addParametro('permiso',document.getElementById('permiso_modulo').value);
                 array.getForm('r-idFormulario');
+                array.addParametro('modo',document.getElementById('modo').value);
+                array.addParametro('cod_link',document.getElementById('cod_link').value);
                 array.addParametro('import','clases.registros.Registros');
                 xajax_Loading(array.getArray());
             }else{
@@ -148,6 +151,8 @@ function r_marcar_desmarcar_checked_columns(checked){
         array.setObjeto('Registros','editar');
         array.addParametro('id',id);
         array.addParametro('import','clases.registros.Registros');
+        array.addParametro('modo',document.getElementById('modo').value);
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
         xajax_Loading(array.getArray());
     }
 
@@ -201,6 +206,8 @@ function r_marcar_desmarcar_checked_columns(checked){
         //array.addParametro('sorder',document.getElementById('r-sorder').value);
         //array.addParametro('mostrar-col',document.getElementById('r-mostrar-col').value);
         array.addParametro('permiso',document.getElementById('permiso_modulo').value);
+        array.addParametro('modo',document.getElementById('modo').value);
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
         array.addParametro('pag',pag);
         array.setObjeto('Registros','buscar');
         array.addParametro('import','clases.registros.Registros');
@@ -306,7 +313,70 @@ function r_marcar_desmarcar_checked_columns(checked){
             CargaComboCargo(nodos,obj[b]);
         }
         }
+        /*Carga de Arbol de Procesos*/
+        var obj = new Array;
+        for(b=0;b<a.length;b++){
+            if(a[b].type=="hidden"){
+                if (a[b].name.substring(0, 7) == 'nodosp_'){
+                    obj[i]=a[b].name.substring(7);                    
+                   // alert('valor='+a[b].value);
+                    i++;
+                }
+            }
+        }        
+        var combo, newOption;
+        if(obj.length>0){
+            for(b=0;b<obj.length;b++){
+                CargarAP(nodos,obj[b]);
+            }
+        }
     }
+    
+    
+    function CargarAP(nodos,i){
+        if (nodos == ''){
+            $("#div-ap-"+i).html('<div id="div-ap-'+i+'-n">Seleccione un &Aacute;rea para cargar el &Aacute;rbol de Procesos</div>');
+            $('#nodosp_'+i).val('');   
+        }
+        else
+        {
+            $("#div-ap-"+i).html('<div id="div-ap-'+i+'-n"></div>');
+            $('#div-ap-'+i+'-n')
+                .jstree({
+                        'core' : {
+                                'data' : {
+                                        'url' : 'clases/arbol_procesos/server.php?id_ao='+nodos,                                        
+                                        'data' : function (node) {
+                                                return { 'id' : node.id };
+                                        }
+                                },
+                                'check_callback' : true,
+                                'themes' : {
+                                        'responsive' : false
+                                }
+                        },
+                        'force_text' : true,                        
+                        'checkbox':{
+                            three_state : false,
+                                cascade : 'down'
+                        },
+                        'plugins' : ['search', 'types','checkbox']
+                });
+            $('#div-ap-'+i+'-n').on('changed.jstree', function (e, data) {
+                if (data.selected.length > 0){                                       
+                    var id = '';
+                    for(k=0;k<data.selected.length;k++){                        
+                        id = id + data.selected[k] + ',';
+                    }
+                    id = id.substr(0,id.length-1);
+                    $('#nodosp_'+i).val(id);
+                }
+                else
+                    $('#nodosp_'+i).val('');               
+            });
+        }
+    }
+    
     function CargaComboCargo(nodos,i){
         array = new XArray();
         array.setObjeto('Registros','ComboCargoOrg');

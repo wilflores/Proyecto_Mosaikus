@@ -1327,9 +1327,13 @@
             //echo $sql;
             $data = $this->dbl->query($sql);
             if (count($data)==0) return array();
+            if (isset($parametros[MarcarNodosP])) 
+                $parametros[MarcarNodosP] = explode(',',$parametros[MarcarNodosP]);
+            else
+                $parametros[MarcarNodosP] = array();
             $data_hijo = '';
             foreach ($data as $value) {
-                $result = $this->AdminMuestraHijos($value[id]); 
+                $result = $this->AdminMuestraHijos($value[id],$parametros); 
                 if (is_array($data_hijo)){
                     $data_hijo = array_merge($data_hijo,$result);
                 }
@@ -1348,13 +1352,17 @@
          * 
          * @param int $contar Plus para contar el numero de registros hijos en el arbol
          */
-	public function AdminMuestraHijos($id){
+	public function AdminMuestraHijos($id,$parametros=array()){
 		
                 $items = array();
                 $sql="select * from mos_arbol_procesos
 				Where id = $id";
                 $data = $this->dbl->query($sql, $atr);
-                $items[0] = array(id=>$data[0][id], text=>$data[0][title], "state" => array("opened" => true ));
+                if (isset($parametros[MarcarNodosP]) && (in_array($data[0][id], $parametros[MarcarNodosP])))
+                     $items[0] = array(id=>$data[0][id], text=>$data[0][title], "state" => array("opened" => true,"selected" => true ));
+                else
+                    $items[0] = array(id=>$data[0][id], text=>$data[0][title], "state" => array("opened" => true ));
+                
                 
                 $sql="select * from mos_arbol_procesos
 				Where parent_id = $id";
@@ -1366,7 +1374,7 @@
                 $data_hijo= '';
 		$cabecera = "<ul>";
                 foreach ($data as $arr) {//data-jstree='{ \"type\" : \"rojo\" }'                    
-                    $result = $this->AdminMuestraHijos($arr[id]);                    	
+                    $result = $this->AdminMuestraHijos($arr[id],$parametros);                    	
                     if (is_array($data_hijo)){
                         $data_hijo = array_merge($data_hijo,$result);
                     }

@@ -22,6 +22,11 @@
         private $parametros;
         private $nombres_columnas;
         private $placeholder;
+        private $id_org_acceso;
+        private $per_crear;
+        private $per_editar;
+        private $per_eliminar;
+        private $colummas_arbol;
             
             public function Registros(){
                 parent::__construct();
@@ -29,7 +34,172 @@
                 $this->dbl = new Mysql($this->encryt->Decrypt_Text($_SESSION[BaseDato]), $this->encryt->Decrypt_Text($_SESSION[LoginBD]), $this->encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $this->parametros = $this->nombres_columnas = $this->placeholder = $this->funciones = array();
                 $this->contenido = array();
+                $this->id_org_acceso = array();
+                $this->colummas_arbol = array();
+                $this->per_crear = $this->per_editar = $this->per_eliminar = 'N';
             }
+            
+            public function colum_admin($tupla)
+            {
+                /*Si tiene activo campos tipo persona o tipo arbol*/
+                //print_r($this->colummas_arbol);
+                if (count($this->colummas_arbol)>0){
+                    $editar = false;
+                    foreach ($this->colummas_arbol as $value) {
+                        $organizacion = array();
+                        if(strpos($tupla[$value],',')){    
+                            $organizacion = explode(",", $tupla[$value]);
+                        }
+                        else{
+                            $organizacion[] = $tupla[$value]; 
+                            if (strlen($tupla[$value])<=0){
+                                if ($_SESSION[SuperUser] == 'S'){
+                                    $editar = true;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        
+                        //print_r($organizacion);
+                        foreach ($organizacion as $value_2) {
+                            if (isset($this->id_org_acceso[$value_2])){
+                                if(($this->id_org_acceso[$value_2][modificar]=='S'))
+                                    $editar = true;
+                            } else{
+                                $editar = false;
+                                break;
+                            }
+                        }
+                        if (!($editar == true))
+                            break;
+                        
+                    }
+                    if ($editar == true)
+                    {                    
+                        $html = "<a href=\"#\" onclick=\"javascript:editarRegistros('". $tupla[idRegistro] . "');\"  title=\"Editar Registros\">                            
+                                    <i class=\"icon icon-edit\"></i>
+                                </a>";
+                    }
+                    $editar = false;
+                    foreach ($this->colummas_arbol as $value) {
+                        $organizacion = array();
+                        if(strpos($tupla[$value],',')){    
+                            $organizacion = explode(",", $tupla[$value]);
+                        }
+                        else{
+                            $organizacion[] = $tupla[$value];  
+                            if (strlen($tupla[$value])<=0){
+                                if ($_SESSION[SuperUser] == 'S'){
+                                    $editar = true;
+                                    break;
+                                }
+                            }
+                        }
+                        foreach ($organizacion as $value_2) {
+                            if (isset($this->id_org_acceso[$value_2])){
+                                if(($this->id_org_acceso[$value_2][eliminar]=='S'))
+                                    $editar = true;
+                            } else{
+                                $editar = false;
+                                break;
+                            }
+                        }
+                        if (!($editar == true))
+                            break;
+                        
+                    }
+                    if ($editar == true)
+                    {
+                        $html .= '<a href="#" onclick="javascript:eliminarRegistros(\''. $tupla[idRegistro] . '\');" title="Eliminar Registros">
+                                <i class="icon icon-remove"></i>
+
+                            </a>'; 
+                    }
+                }
+                else{
+                    /*Validacion sencilla segun rol asignado al usuario en el modulo de registros*/
+                    if ($this->editar == 'S')
+                    {                    
+                        $html = "<a href=\"#\" onclick=\"javascript:editarRegistros('". $tupla[idRegistro] . "');\"  title=\"Editar Registros\">                            
+                                    <i class=\"icon icon-edit\"></i>
+                                </a>";
+                    }
+                    if ($this->eliminar == 'S')
+                    {
+                        $html .= '<a href="#" onclick="javascript:eliminarRegistros(\''. $tupla[idRegistro] . '\');" title="Eliminar Registros">
+                                <i class="icon icon-remove"></i>
+
+                            </a>'; 
+                    }
+                }
+               return $html;
+
+            }
+            
+            /**
+             * Busca los permisos que tiene el usuario en el modulo
+             */
+            private function cargar_permisos_simple($parametros){
+                if (strlen($parametros[cod_link])>0){
+                    if(!class_exists('mos_acceso')){
+                        import("clases.mos_acceso.mos_acceso");
+                    }
+                    $acceso = new mos_acceso();
+                    $data_permisos = $acceso->obtenerPermisosModulo($_SESSION[CookIdUsuario],$parametros[cod_link]);                    
+                    foreach ($data_permisos as $value) {
+                        if ($value[nuevo] == 'S'){
+                            $this->per_crear =  'S';
+                            break;
+                        }
+                    }                                               
+                    foreach ($data_permisos as $value) {
+                        if ($value[modificar] == 'S'){
+                            $this->per_editar =  'S';
+                            break;
+                        }
+                    } 
+                    foreach ($data_permisos as $value) {
+                        if ($value[eliminar] == 'S'){
+                            $this->per_eliminar =  'S';
+                            break;
+                        }
+                    } 
+                }
+            }
+            
+            /**
+             * Devuelve si el usuario tiene permiso de crear personas
+             * @param array $parametros 
+             * @return string
+             */
+            private function permiso_crear($parametros){
+                if (count($this->id_org_acceso) <= 0){
+                    $this->cargar_acceso_nodos($parametros);
+                }                
+                foreach ($this->id_org_acceso as $value) {
+                    if ($value[nuevo] == 'S'){
+                        return 'S';
+                    }
+                }                
+                return 'N';
+            }
+            
+            /**
+             * Activa los nodos donde se tiene explicitamente acceso
+             */
+            private function cargar_acceso_nodos($parametros){
+                if (strlen($parametros[cod_link])>0){
+                    if(!class_exists('mos_acceso')){
+                        import("clases.mos_acceso.mos_acceso");
+                    }
+                    $acceso = new mos_acceso();
+                    $data_ids_acceso = $acceso->obtenerNodosArbol($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo],$parametros[terceros]);
+                    foreach ($data_ids_acceso as $value) {
+                        $this->id_org_acceso[$value[id]] = $value;
+                    }                                            
+                }
+            }    
 
             private function operacion($sp, $atr){
                 $param=array();
@@ -260,6 +430,35 @@
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0]['cant'];
             }
+    
+        public function BuscaProceso($tupla)
+        {
+            //$encryt = new EnDecryptText();
+            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            $OrgNom = "";
+                if (strlen($tupla[id_organizacion]) > 0) {                                           
+                        $Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_arbol_procesos where id in ($tupla[id_organizacion])";
+                        //echo $Consulta3;
+                        $Resp3 = $this->dbl->query($Consulta3,array());
+
+                        foreach ($Resp3 as $Fila3) 
+                        {
+                                if($Fila3[organizacion_padre]==2)
+                                {
+                                        $OrgNom.=($Fila3[identificacion]);
+                                        return($OrgNom);                                        
+                                }
+                                else
+                                {
+                                        $OrgNom .= $this->BuscaProceso(array('id_organizacion' => $Fila3[organizacion_padre])) . ' -> ' . ($Fila3[identificacion]);
+                                }
+                        }
+                }
+                else
+                    $OrgNom .= $_SESSION[CookNomEmpresa];
+                return $OrgNom;
+
+        }
  function BuscaProcesoExcel($tupla,$key)
         {   //print_r($tupla);
             //echo $tupla[id_unico]
@@ -273,7 +472,7 @@
                         //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
                         foreach ($reg_arbol as $value) 
                         {                                                        
-                            $Nivls .= BuscaProceso(array('id_organizacion' => $value))."<br />";
+                            $Nivls .= $this->BuscaProceso(array('id_organizacion' => $value))."<br />";
                         }
                         if($Nivls!='')
                                 $Nivls=substr($Nivls,0,strlen($Nivls)-6);
@@ -327,7 +526,7 @@ function semaforoExcel($tupla,$key)
             //echo $tupla[id_unico]
             if($tupla[$key]!=''){
                 $reg_arbol =  explode(',',$tupla[$key]);
-                $encryt = new EnDecryptText();
+                //$encryt = new EnDecryptText();
                 //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $Nivls = "";
                 //print_r($reg_arbol);
@@ -335,7 +534,7 @@ function semaforoExcel($tupla,$key)
                         //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
                         foreach ($reg_arbol as $value) 
                         {                                                        
-                            $Nivls .= BuscaOrganizacional(array('id_organizacion' => $value))."<br />";
+                            $Nivls .= $this->BuscaOrganizacional(array('id_organizacion' => $value),'id_organizacion')."<br />";
                         }
                         if($Nivls!='')
                                 $Nivls=substr($Nivls,0,strlen($Nivls)-6);
@@ -355,7 +554,7 @@ function semaforoExcel($tupla,$key)
             //echo $tupla[id_unico]
             if($tupla[$key]!=''){
                 $reg_arbol =  explode(',',$tupla[$key]);
-                $encryt = new EnDecryptText();
+                //$encryt = new EnDecryptText();
                 //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $Nivls = "";
                 //print_r($reg_arbol);
@@ -363,7 +562,7 @@ function semaforoExcel($tupla,$key)
                         //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
                         foreach ($reg_arbol as $value) 
                         {                                                        
-                            $Nivls .= BuscaOrganizacional(array('id_organizacion' => $value))."<br /><br />";
+                            $Nivls .= $this->BuscaOrganizacional(array('id_organizacion' => $value))."<br /><br />";
                         }
                         if($Nivls!='')
                                 $Nivls=substr($Nivls,0,strlen($Nivls)-6);
@@ -400,25 +599,25 @@ function semaforoExcel($tupla,$key)
             return $Nivls;
 
         }
-function BuscaOrganizacional($tupla)
+function BuscaOrganizacional($tupla,$key='id_organizacion')
         {
-            $encryt = new EnDecryptText();
-            $dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            //$encryt = new EnDecryptText();
+            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
             $OrgNom = "";
-                if (strlen($tupla[id_organizacion]) > 0) {                                           
-                        $Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
-                        $Resp3 = $dbl->query($Consulta3,array());
+                if (strlen($tupla[$key]) > 0) {                                           
+                        $Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[$key])";
+                        $Resp3 = $this->dbl->query($Consulta3,array());
 
                         foreach ($Resp3 as $Fila3) 
                         {
-                                if($Fila3[organizacion_padre]==1)
+                                if($Fila3[organizacion_padre]==2)
                                 {
                                         $OrgNom.=($Fila3[identificacion]);
                                         return($OrgNom);                                        
                                 }
                                 else
                                 {
-                                        $OrgNom .= BuscaOrganizacional(array('id_organizacion' => $Fila3[organizacion_padre])) . ' -> ' . ($Fila3[identificacion]);
+                                        $OrgNom .= $this->BuscaOrganizacional(array('id_organizacion' => $Fila3[organizacion_padre]),'id_organizacion') . ' -> ' . ($Fila3[identificacion]);
                                 }
                         }
                 }
@@ -441,7 +640,7 @@ function BuscaOrganizacional($tupla)
                         //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
                         foreach ($reg_arbol as $value) 
                         {                                                        
-                            $Nivls .= BuscaProceso(array('id_organizacion' => $value))."<br /><br />";
+                            $Nivls .= $this->BuscaProceso(array('id_organizacion' => $value))."<br /><br />";
                         }
                         if($Nivls!='')
                                 $Nivls=substr($Nivls,0,strlen($Nivls)-6);
@@ -643,13 +842,19 @@ function BuscaOrganizacional($tupla)
                         return $error; 
                     }
             }
+            
+            
+            
              public function listarRegistros($atr, $pag, $registros_x_pagina){
                 // print_r($atr);
                     $atr = $this->dbl->corregir_parametros($atr);
-                    $sql_left = $sql_col_left = "";
+                    $sql_left = $sql_col_left = $sql_filtro_acceso = "" ;
                      if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                     }                    
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);                    
+                    }
                     $k = 1;   
                     //id_unico,IDDoc,Nombre,tipo,valores
                     if(!class_exists('Personas')){
@@ -658,11 +863,15 @@ function BuscaOrganizacional($tupla)
                     $personal = new Personas();
                     foreach ($this->parametros as $value) {
                         //,CONCAT(CONCAT(UPPER(LEFT(ap.nombres, 1)), LOWER(SUBSTRING(ap.nombres, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_paterno, 1)), LOWER(SUBSTRING(ap.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_materno, 1)), LOWER(SUBSTRING(ap.apellido_materno, 2)))) aprobo
-                        if ($value[tipo]== '6'){//-- , t1.Nombre as nom_detalle                             
-                            if ($registros_x_pagina == 100000){
-                                if (count($personal->campos_activos) <= 0){
-                                    $personal->cargar_campos_activos();
-                                }
+                        if ($value[tipo]== '6'){//-- , t1.Nombre as nom_detalle   
+                            /*Filtro acceso segun el nodo*/
+                            $sql_filtro_acceso .= " AND p$k.id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
+                            $this->colummas_arbol[] = "id_organizacion_p$k";
+                            //echo $sql_filtro_acceso;
+//                            if ($registros_x_pagina == 100000){
+//                                if (count($personal->campos_activos) <= 0){
+//                                    $personal->cargar_campos_activos();
+//                                }
 
                                 $sql_left .= " LEFT JOIN(select t1.idRegistro
                                 , t1.Nombre as nom_detalle_aux
@@ -689,37 +898,22 @@ function BuscaOrganizacional($tupla)
                                 LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo
                                 where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
                                 $sql_col_left .= ",p$k.nom_detalle p$k"
-                                        . ",p$k.id_personal"
-                                        . ",p$k.id_organizacion"
-                                        . ",p$k.cargo";
-//                                if ($personal->campos_activos[fecha_nacimiento][0] == '1')
-//                                        $sql_col_left .= ",p$k.fecha_nacimiento";
-//                                if ($personal->campos_activos[genero][0] == '1')
-//                                    $sql_col_left .= ",p$k.genero";
-//                                $sql_col_left .= ",p$k.workflow
-//                                ,p$k.vigencia
-//                                ,p$k.email
-//                                ,p$k.relator
-//                                ,p$k.reviso
-//                                ,p$k.elaboro
-//                                ,p$k.aprobo
-//                                ,p$k.extranjero";
-//                                if ($personal->campos_activos[fecha_ingreso][0] == '1')
-//                                    $sql_col_left .= ",p$k.fecha_ingreso";
-//                                if ($personal->campos_activos[fecha_egreso][0] == '1')
-//                                    $sql_col_left .= ",p$k.fecha_egreso ";
-                            }   
-                            else{
-                                $sql_left .= " LEFT JOIN(select t1.idRegistro
-                                , t1.Nombre as nom_detalle_aux
-                                , p.id_organizacion
-                                ,CONCAT(initcap(p.nombres), ' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle
-                                -- ,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle 
-                                from mos_registro_formulario t1
-                                inner join mos_personal p on p.cod_emp = CAST(t1.Nombre AS UNSIGNED)
-                                where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
-                                $sql_col_left .= ",p$k.nom_detalle p$k ";
-                            }
+                                        . ",p$k.id_personal id_personal_p$k"
+                                        . ",p$k.id_organizacion id_organizacion_p$k"
+                                        . ",p$k.cargo cargo_p$k";
+                                $this->funciones["id_organizacion_p$k"] = 'BuscaOrganizacional';  
+//                            }   
+//                            else{
+//                                $sql_left .= " LEFT JOIN(select t1.idRegistro
+//                                , t1.Nombre as nom_detalle_aux
+//                                , p.id_organizacion
+//                                ,CONCAT(initcap(p.nombres), ' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle
+//                                -- ,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle 
+//                                from mos_registro_formulario t1
+//                                inner join mos_personal p on p.cod_emp = CAST(t1.Nombre AS UNSIGNED)
+//                                where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
+//                                $sql_col_left .= ",p$k.nom_detalle p$k ";
+//                            }
                             
                         }
                         else if ($value[tipo]== '10'){
@@ -773,7 +967,26 @@ function BuscaOrganizacional($tupla)
                             else
                                 $this->funciones["p$k"] = 'BuscaOrganizacionalExcel';                                 
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
-                        }
+                            /*Para la validacion de botones editar y eliminar*/
+                            $this->colummas_arbol[] = "p$k";
+                            /*Restriccion para ver solamente informacion asignada segun el arbol*/
+                            if($_SESSION[SuperUser] == 'S'){
+                                $sql_left .= " INNER JOIN(
+                                    select t1.idRegistro from mos_registro_item t1
+                                    where id_unico= $value[id_unico] AND t1.valor IN (". implode(',', array_keys($this->id_org_acceso)) . ") group by t1.idRegistro"
+                                        . " UNION all 
+                                    select idRegistro
+                                    from 
+                                    mos_registro 
+                                    where IDDoc = $_SESSION[IDDoc] AND not idRegistro in (select  idRegistro from mos_registro_item where id_unico= $value[id_unico])
+                                    group by idRegistro "
+                                        . ") AS p_temp$k ON p_temp$k.idRegistro = r.idRegistro "; 
+
+                            }else{
+                                $sql_left .= " INNER JOIN(select t1.idRegistro from mos_registro_item t1
+                                where id_unico= $value[id_unico] AND t1.valor IN (". implode(',', array_keys($this->id_org_acceso)) . ") group by t1.idRegistro) AS p_temp$k ON p_temp$k.idRegistro = r.idRegistro "; 
+                            }
+                                                    }
                         else if ($value[tipo]== '12'){
                             $sql_left .= " LEFT JOIN(select t1.idRegistro, GROUP_CONCAT(t1.valor) as nom_detalle from mos_registro_item t1
                             where id_unico= $value[id_unico] group by t1.idRegistro ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
@@ -854,7 +1067,10 @@ function BuscaOrganizacional($tupla)
                         $sql .= " AND id_procesos = '". $atr["b-id_procesos"] . "'";
                     if (strlen($atr["b-id_organizacion"])>0)
                         $sql .= " AND id_organizacion = '". $atr["b-id_organizacion"] . "'";
-                    $k = 1;   
+                    $k = 1; 
+                    
+                    /*Filtro de personas y ao segun nivel de acceso de la persona*/
+                    $sql .= $sql_filtro_acceso;
                     //id_unico,IDDoc,Nombre,tipo,valores
                     /*
                       $ids = array('7','8','9','1','2','3','5','6');
@@ -1051,6 +1267,8 @@ function BuscaOrganizacional($tupla)
                         $sql .= " AND id_procesos = '". $atr["b-id_procesos"] . "'";
                     if (strlen($atr["b-id_organizacion"])>0)
                         $sql .= " AND id_organizacion = '". $atr["b-id_organizacion"] . "'";
+                    /*Filtro de personas y ao segun nivel de acceso de la persona*/
+                    $sql .= $sql_filtro_acceso;
                     //id_unico,IDDoc,Nombre,tipo,valores
                     /*
                       $ids = array('7','8','9','1','2','3','5','6');
@@ -1170,7 +1388,7 @@ function BuscaOrganizacional($tupla)
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                    //print_r($atr);
-                 // echo $sql;
+                   //echo $sql;
                     $this->operacion($sql, $atr);
              }
              public function eliminarRegistros($atr){
@@ -1227,66 +1445,96 @@ function BuscaOrganizacional($tupla)
                 }
                 $k = 1;
                 //print_r($this->parametros);
+                if(!class_exists('Personas')){
+                    import("clases.personas.Personas");
+                }
+                $personal = new Personas();
+                $bandera_permisos_arbol = false;
                 foreach ($this->parametros as $value) {   
                     switch ($value[tipo]) {
                         case 'Seleccion Simple':
                         case '7':
                             $ancho = 5;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                             break;
                         case 'Seleccion Multiple':
                         case '8':
-                            $ancho = 5;                            
+                            $ancho = 5;   
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                             break;
                         case 'Combo':
                             $ancho = 7;
                         case '9':
                             $ancho = 7;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                             break;
                         case 'Texto':
                         case '1':
                              $ancho = 10;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                             break;
                         case 'Numerico':
                         case '2':
                              $ancho = 3;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                             break;
                         case '3':
                         case 'Fecha':
                               $ancho = 2;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                             break;
                         case '5':
                         case 'Rut':
-                              $ancho = 5;                           
+                              $ancho = 5;     
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                             break;
                         case 'Persona':
                         case '6':
                                 $ancho = 15;
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                                $bandera_permisos_arbol = true;
+                                if (count($personal->nombres_columnas) <= 0){
+                                    $personal->cargar_nombres_columnas();
+                                }
+                                if (count($personal->campos_activos) <= 0){
+                                        $personal->cargar_campos_activos();
+                                }
+                                /*Columnas del ID, area y cargo de la persona*/
+                                array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_personal], ENT_QUOTES, "UTF-8"))));   
+                                array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion], ENT_QUOTES, "UTF-8")))); 
+                                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo], ENT_QUOTES, "UTF-8"))));                                
+                                $k++;$k++;$k++;
                             break;
                         case '10':
                                 $ancho = 2;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                                 break;
                         case '11':
                                 $ancho = 5;
+                                $bandera_permisos_arbol = true;
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                                 break;
                         case '12':
                                 $ancho = 5;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                                 break;
                         case '13':
                                 $ancho = 5;                                                            
-                                array_push($config_col,array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro('Vigencia', "edop$k", $parametros,'r_link_titulos')));            
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro('Vigencia', "edop$k", $parametros,'r_link_titulos')));            
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                                 //$k++;
                                 break;
                             
 
                         default:
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                             break;
-                    }
-                        array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                    }                        
                    // print_r($value);
                     $k++;
                 }
 
-                $func= array();
+                $func= array('funcion'=> 'colum_admin');
 
                 $columna_funcion = 0;
                 /*if (strrpos($parametros['permiso'], '1') > 0){
@@ -1295,15 +1543,15 @@ function BuscaOrganizacional($tupla)
                 }
                 if ($parametros['permiso'][1] == "1")
                     array_push($func,array('nombre'=> 'verRegistros','imagen'=> "<img style='cursor:pointer' src='diseno/images/find.png' title='Ver Registros'>"));
-                */
+                
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                     array_push($func,array('nombre'=> 'editarRegistros','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-edit\"  title='Editar Registros'></i>"));
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
                     array_push($func,array('nombre'=> 'eliminarRegistros','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\"  title='Eliminar Registros'></i>"));
-               
+               */
                 $config=array(array("width"=>"5%", "ValorEtiqueta"=>"<div style='width:50px;'>&nbsp;</div>"));
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
-                $array_columns =  explode('-', $parametros['mostrar-col']);
+                $array_columns =  explode('-', $parametros['mostrar-col']);                
                 for($i=0;$i<count($config_col);$i++){
                     switch ($i) {                                             
 //                        case 1:
@@ -1333,7 +1581,9 @@ function BuscaOrganizacional($tupla)
                     $grid->setFuncion($key, $value);
                 }
                 //$grid->hidden = array(0 => true);
-    
+                if (!($bandera_permisos_arbol==true)){
+                    $this->cargar_permisos_simple($parametros);
+                }
                 $grid->setDataMSKS("td-table-data", $data, $func,$columna_funcion, $parametros['pag'] );
                 $out['tabla']= $grid->armarTabla();
                 //if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina))
@@ -1376,60 +1626,89 @@ function BuscaOrganizacional($tupla)
                 if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 }
+                if(!class_exists('Personas')){
+                    import("clases.personas.Personas");
+                }
+                $personal = new Personas();
                 $k = 1;
                 foreach ($this->parametros as $value) {   
                     switch ($value[tipo]) {
                         case 'Seleccion Simple':
                         case '7':
                             $ancho = 5;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                             break;
                         case 'Seleccion Multiple':
                         case '8':
-                            $ancho = 5;                            
+                            $ancho = 5;    
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                             break;
                         case 'Combo':
                             $ancho = 7;
                         case '9':
                             $ancho = 7;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                             break;
                         case 'Texto':
                         case '1':
                              $ancho = 10;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                             break;
                         case 'Numerico':
                         case '2':
                              $ancho = 3;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                             break;
                         case '3':
                         case 'Fecha':
                               $ancho = 2;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                             break;
                         case '5':
                         case 'Rut':
-                              $ancho = 5;                           
+                              $ancho = 5;   
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                             break;
                         case 'Persona':
                         case '6':
                                 $ancho = 15;
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));                            
+                                if (count($personal->nombres_columnas) <= 0){
+                                    $personal->cargar_nombres_columnas();
+                                }
+                                if (count($personal->campos_activos) <= 0){
+                                        $personal->cargar_campos_activos();
+                                }
+                                /*Columnas del ID, area y cargo de la persona*/
+                                array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_personal], ENT_QUOTES, "UTF-8"))));   
+                                array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion], ENT_QUOTES, "UTF-8")))); 
+                                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo], ENT_QUOTES, "UTF-8"))));                                
+                                $k++;$k++;$k++;
+
                             break;
                         case '10':
                                 $ancho = 2;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                                 break;
                         case '11':
                                 $ancho = 5;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                                 break;
                         case '12':
                                 $ancho = 5;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                                 break;    
                         case '13':
                                 $ancho = 5;                                                            
                                 array_push($config_col,array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro('Vigencia', "edop$k", $parametros,'r_link_titulos')));            
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                                 //$k++;
                                 break;
                         default:
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                             break;
                     }
-                    array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
+                    
                     $k++;
                 }
 
@@ -1668,6 +1947,41 @@ function BuscaOrganizacional($tupla)
                             </div>';
                         $k++;
                     }
+                    else if ($value[tipo] == 6){
+                        $parametros['mostrar-col'] .= "-$k";
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+                                       
+                                      <label >
+                                          <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                      ' . $value[Nombre] . '</label>
+                                  
+                            </div>';
+                        $k++;
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                          ID ' . $value[Nombre] . ' </label>
+
+                                </div>';
+                        $k++;
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                          Área ' . $value[Nombre] . ' </label>
+
+                                </div>';
+                        $k++;
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                          Cargo ' . $value[Nombre] . ' </label>
+
+                                </div>';
+                        $k++;
+                    }
                     else{
                         $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
@@ -1686,40 +2000,19 @@ function BuscaOrganizacional($tupla)
                 $html = '';
                 $js='';
                 $i = 1;
-                //aquiiiiiiiiiiiiii
-                foreach ($campos_din as $value) {//Nombre,tipo,valores col-md-24
-                //echo $value[tipo];
+                /*PARA COMPROBAR TIPO DE PERMISOS A UTILIZAR, SIMPLE O DE ARBOL*/
+                $bandera_permisos_arbol = false;
+                foreach ($campos_din as $value) {               
                     if ($value[tipo]!='11' && $value[tipo]!='12')
                         $html .= '<div class="form-group"><label>' . $value[Nombre] . '</label>';                                       
                     switch ($value[tipo]) {
                         case 'Seleccion Simple':
                         case '7':
-//                             //$cadenas = split("<br />", $value[valores]) ;
-//                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
-//                            $cadenas = array();
-//                            foreach ($items_campo as $value_item) {
-//                                $cadenas[$value_item[id]] = $value_item[descripcion];
-//                            }
-//                            $valores_actuales = split("<br/>", $value[valor]) ;
-//                            $html = substr($html, 0, strlen($html)-39-strlen($value[Nombre]));
-//                            $html .= '<div class="form-group" style="margin-bottom: 0px;"><label>' . $value[Nombre] . '</label>';  
-//                            $html .= '</div><div class="form-group">
-//                                        <label class="checkbox-inline" style="padding-top: 0px; padding-left: 0px;">';
-//                            foreach ($cadenas as $valores) {
-//                               
-//                                $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="radio-inline">
-//                                            <input '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="radio" value="' . $valores . '" name="p' . $i . '" id="p' . $i . '"> '. $valores . ' 
-//                                          ';
-//                                
-//                                //$html .= '<input type="radio" class="form-box" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' value="' . $valores . '" size="20" name="campo_' . $i . '" id="campo_' . $i . '">'. $valores;
-//                            }
-//                            $html .= '</label>';
                             $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
                             $cadenas = array();
                             foreach ($items_campo as $value_item) {
                                 $cadenas[$value_item[id]] = $value_item[descripcion];
                             }
-                            //$html .= '<select id="campo_' . $i . '" name="campo_' . $i . '" class="form-box"><option value="">Seleccione</option>';
                             $html .= '                                             
                                                       <select class="form-control" name="p' . $i . '" id="p' . $i . '" >
                                                         <option selected="" value="">-- Todos --</option>';
@@ -1848,6 +2141,7 @@ function BuscaOrganizacional($tupla)
                                             allowClear: true
                                           }); ';
                                 $html .= '</select>';
+                                $bandera_permisos_arbol = true;
                             break;
                         case 'Cargo':
                         case '14':
@@ -1858,6 +2152,7 @@ function BuscaOrganizacional($tupla)
                         case '12':
                             break;
                         case '11':
+                            $bandera_permisos_arbol = true;
                             break;
                                 
                         default:
@@ -1893,7 +2188,15 @@ function BuscaOrganizacional($tupla)
                 $contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;Registros';
                 $contenido['TABLA'] = $grid['tabla'];
                 $contenido['PAGINADO'] = $grid['paginado'];
-                $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
+                IF ($bandera_permisos_arbol == true){                    
+                    $contenido['PERMISO_INGRESAR'] = $this->permiso_crear($parametros) == 'S' ? '' : 'display:none;';
+                }
+                else{
+                    $this->cargar_permisos_simple($parametros);
+                    $contenido['PERMISO_INGRESAR'] = $this->crear == 'S' ? '' : 'display:none;';
+                }
+                
+                
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'registros/';
@@ -1922,6 +2225,8 @@ function BuscaOrganizacional($tupla)
                 if ($this->DocTieneArbolRegistros('11')>0){
                     import('clases.organizacion.ArbolOrganizacional');
                     $ao = new ArbolOrganizacional();
+                    $paramreg['cod_link'] = $parametros['cod_link'];                
+                    $paramreg['modo'] = $parametros['modo'];
                     $paramreg['opcion']='reg';
                     $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(4,$paramreg);
                     $contenido[ARBOLFILTRO]='organizacional';
@@ -1930,6 +2235,8 @@ function BuscaOrganizacional($tupla)
                     if ($this->DocTieneCampo('6')>0){
                         import('clases.organizacion.ArbolOrganizacional');
                         $ao = new ArbolOrganizacional();
+                        $paramreg['cod_link'] = $parametros['cod_link'];                
+                        $paramreg['modo'] = $parametros['modo'];
                         $paramreg['opcion']='reg';
                         $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(6,$paramreg);
                         $contenido[ARBOLFILTRO]='persona';
@@ -2005,6 +2312,40 @@ function BuscaOrganizacional($tupla)
                                       ' . $value[Nombre] . '</label>
                                   
                             </div>';
+                        $k++;
+                    }else if ($value[tipo] == 6){
+                        $parametros['mostrar-col'] .= "-$k";
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+                                       
+                                      <label >
+                                          <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                      ' . $value[Nombre] . '</label>
+                                  
+                            </div>';
+                        $k++;
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                          ID ' . $value[Nombre] . ' </label>
+
+                                </div>';
+                        $k++;
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                          Área ' . $value[Nombre] . ' </label>
+
+                                </div>';
+                        $k++;
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                          Cargo ' . $value[Nombre] . ' </label>
+
+                                </div>';
                         $k++;
                     }
                     else{
@@ -2247,6 +2588,8 @@ function BuscaOrganizacional($tupla)
                     import('clases.organizacion.ArbolOrganizacional');
                     $ao = new ArbolOrganizacional();
                     $paramreg['opcion']='reg';
+                    $paramreg['cod_link'] = $parametros['cod_link'];                
+                    $paramreg['modo'] = $parametros['modo'];
                     $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(4,$paramreg);
                     $contenido[ARBOLFILTRO]='organizacional';
                 }else
@@ -2255,6 +2598,8 @@ function BuscaOrganizacional($tupla)
                         import('clases.organizacion.ArbolOrganizacional');
                         $ao = new ArbolOrganizacional();
                         $paramreg['opcion']='reg';
+                        $paramreg['cod_link'] = $parametros['cod_link'];                
+                        $paramreg['modo'] = $parametros['modo'];
                         $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(6,$paramreg);
                         $contenido[ARBOLFILTRO]='persona';
                     }
@@ -2376,7 +2721,7 @@ function BuscaOrganizacional($tupla)
                             break;
                         case 'Texto':
                         case '1':
-                                $html .= '<div class="col-md-10">';
+                                $html .= '<div class="col-md-11">';
                                 $html .= '<input type="text" data-validation="required" class="form-control" value="'. $value[valor] .'" name="campo_' . $i . '" id="campo_' . $i . '">';
                                 $html .= '</div>';
                             break;
@@ -2405,12 +2750,16 @@ function BuscaOrganizacional($tupla)
                             break;
                         case 'Persona':
                         case '6':
-                                $html .= '<div class="col-md-10">                                              
+                                if (count($this->id_org_acceso) <= 0){
+                                    $this->cargar_acceso_nodos($parametros);                    
+                                }
+                                $html .= '<div class="col-md-11">                                              
                                                       <select name="campo_' . $i . '" id="campo_' . $i . '" data-validation="required">
                                                         <option selected="" value="">-- Seleccione --</option>';
                                 $html .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(id_personal, ' - ',CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE interno = 1"
+                                                                            FROM mos_personal p WHERE interno = 1
+                                                                            AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                                 $js .= '$( "#campo_' . $i . '" ).select2({
@@ -2420,7 +2769,7 @@ function BuscaOrganizacional($tupla)
                                 $html .= '</select></div>';
                                 break;
                         case '10':
-                            $html .= '<div class="col-md-10">'
+                            $html .= '<div class="col-md-11">'
                                 . '<label for="campo-'.$value[cod_parametro].'" class="col-md-'.$col_lab.' control-label">' . $value[espanol] . '</label>'; 
                             $html .= '<label class="radio-inline" style="color:white;">
                                             <input '. (((count($desc_valores_params)== 0) || ($desc_valores_params[$value[cod_parametro]] == '1'))? 'checked' : '') .' type="radio" value="1" name="campo_' . $i . '" id="campo_' . $i . '"> <img src="diseno/images/verde.png" /> 
@@ -2434,22 +2783,62 @@ function BuscaOrganizacional($tupla)
                             $html .= '</div>';
                             break;
                         case '11':
-                                $html .= '<div class="col-md-11">';
+                                $html .= '<div class="col-md-11" style="max-height: 350px;overflow-y: scroll;">';
                                 //$html .= '<input type="hidden" value="" name="nodos_'.$i.'" id="nodos_'.$i.'"/>
+                                import('clases.organizacion.ArbolOrganizacional');
+                                $ao = new ArbolOrganizacional();
+                                $html_arbol = $ao->MuestraPadre(0, $parametros);
+                                //echo $html_arbol;
                                 $html .= '<input type="hidden" value="" name="nodosreg" id="nodosreg"/>
-                                        <iframe id="iframearbol_'.$i.'" src="pages/cargo/prueba_arbolV4.php?funcion=MarcarNodos('.$i.')&IDReg=" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
+                                        <div id="div-ao-'.$i.'" class="jstree-container">
+                                            <ul class="jstree">
+                                                '.$html_arbol.'
+                                            </ul>
+                                        </div>
+                                        <!--<iframe id="iframearbol_'.$i.'" src="pages/cargo/prueba_arbolV4.php?funcion=MarcarNodos('.$i.')&IDReg=" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>-->';
                                 $html .= '</div>';
                                 $campos_arbol_o .=$i.',';
+                                $js .= "$('#div-ao-$i').jstree(
+                                                {
+                                                    'checkbox':{
+                                                        three_state : false,
+                                                            cascade : 'down'
+                                                    },
+                                                    'plugins': ['search', 'types','checkbox']
+                                                }
+                                            );
+                                        $('#div-ao-$i').on('changed.jstree', function (e, data) {
+                                            if (data.selected.length > 0){
+                                                var arr;
+                                                var id = '';
+                                                for(i=0;i<data.selected.length;i++){
+                                                    arr = data.selected[i].split('_');
+                                                    id = id + arr[1] + ',';
+                                                }
+                                                id = id.substr(0,id.length-1);
+                                                $('#nodosreg').val(id);
+                                            }
+                                            else
+                                                $('#nodosreg').val('');
+                                            VerificarCargo($('#nodosreg').val());
+                                        });
+                                        $('#div-ao-$i').jstree(true).open_all();  ";
                                 break;
                         case '12':
-                                $html .= '<div class="col-md-12">';
+                                $html .= '<div class="col-md-11"  style="max-height: 350px;overflow-y: scroll;">';
                                 $html .= '<input type="hidden" value="" name="nodosp_'.$i.'" id="nodosp_'.$i.'"/>
-                                        <iframe id="iframearbolp_'.$i.'" src="pages/cargo/arbol_procesoV4.php?funcion=MarcarNodosP('.$i.')&IDReg=" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
+                                        <div id="div-ap-'.$i.'">
+                                            <div id="div-ap-'.$i.'-n" class="jstree-container">
+                                                Seleccione un &Aacute;rea para cargar el &Aacute;rbol de Procesos
+                                            </div>
+                                        </div>
+                                        <!--<iframe id="iframearbolp_'.$i.'" src="pages/cargo/arbol_procesoV4.php?funcion=MarcarNodosP('.$i.')&IDReg=" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>-->';
                                 $html .= '</div>';  
                                 $campos_arbol_p .=$i.',';
+                                
                             break;
                         case '13':
-                                $html .= '<div class="col-md-13">';
+                                $html .= '<div class="col-md-11">';
                                 $html .= '<input type="text" style="width: 120px;" placeholder="dd/mm/yyyy" data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
                                 $html .= '</div>';
                                 $js .= "$('#campo_$i').datepicker({
@@ -2461,7 +2850,7 @@ function BuscaOrganizacional($tupla)
                         case '14':
                             $cadenas = split("<br />", $value[valores]) ;
                             $html .= '<input type="hidden" name="campo_cargo_' . $i . '" id="campo_cargo_' . $i . '" value="' . $i . '" />';    
-                            $html .= '<div class="col-md-10" id="col-md-10-'.$i.'">                                              
+                            $html .= '<div class="col-md-11" id="col-md-10-'.$i.'">                                              
                                                       <select class="form-control" name="campo_' . $i . '[]" id="campo_' . $i . '" data-validation="required" multiple>
                                                         <option selected="" value="">-- Marque en el arbol y Seleccione --</option>';
                             $html .= '</select></div>';
@@ -2523,10 +2912,53 @@ function BuscaOrganizacional($tupla)
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $objResponse = new xajaxResponse();
+                $objResponse->addScript("$('#MustraCargando').hide();"); 
+                $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                                        $( '#btn-guardar' ).prop( 'disabled', false );");
                 unset ($parametros['opc']);
                 unset ($parametros['id']);
                 $parametros['id_usuario']= $_SESSION['CookIdUsuario'];
                // print_r($parametros);
+                
+                for ($i = 1; $i <= 20; $i++) {
+                    if (isset($parametros['nombre_' . $i]) == true){
+                        if ($parametros["tipo_dato_$i"] == '11'){
+                            /*Carga Acceso segun el arbol*/
+                            if (count($this->id_org_acceso) <= 0){
+                                $this->cargar_acceso_nodos($parametros);
+                            }
+                            //***********************************
+                            //para validar que los nodos seleccionados
+                            //tenga permisos
+                            $organizacion = array();
+                            if(strpos($parametros["nodosreg"],',')){    
+                                $organizacion = explode(",", $parametros["nodosreg"]);
+                            }
+                            else{
+                                $organizacion[] = $parametros["nodosreg"];                    
+                            }                    
+                            foreach ($organizacion as $value) {
+                                if (isset($this->id_org_acceso[$value])){
+                                    if(!($this->id_org_acceso[$value][nuevo]=='S' || $this->id_org_acceso[$value][modificar]=='S'))
+                                        $areas .= $this->id_org_acceso[$value][title].',';
+                                } else{
+                                    $areas='break';
+                                    break;
+                                }
+                            }
+                            /*Valida Restriccion*/
+                            if ($areas=='break'){
+                                $objResponse->addScriptCall('VerMensaje','error',utf8_encode('- Acceso denegado para registrar Documentos en el &aacute;rea seleccionada.'));
+                                return $objResponse;
+                            }
+                            if ($areas!='break' && $areas!='' ){
+                                $objResponse->addScriptCall('VerMensaje','error',utf8_encode('- Acceso denegado para registrar Documentos en el &aacute;rea ' . $areas . '.'));                           
+                                return $objResponse;                                           
+                            }                   
+                                        
+                        }
+                    }
+                }
                 $validator = new FormValidator();
                 
                 if(!$validator->ValidateForm($parametros)){
@@ -2537,6 +2969,7 @@ function BuscaOrganizacional($tupla)
                         }
                          $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
                 }else{
+                    
                     $archivo = '';
                     if((isset($parametros[filename]))&& ($parametros[filename] !=''))
                     {
@@ -2613,9 +3046,7 @@ function BuscaOrganizacional($tupla)
                         $objResponse->addScriptCall('VerMensaje','error',$respuesta);
                 }
                           
-                $objResponse->addScript("$('#MustraCargando').hide();"); 
-                 $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
-                                        $( '#btn-guardar' ).prop( 'disabled', false );");
+                
                 return $objResponse;
             }
      
@@ -2653,7 +3084,7 @@ function BuscaOrganizacional($tupla)
                 $contenido_1['ID_PROCESOS'] = $val["id_procesos"];
                 $contenido_1['ID_ORGANIZACION'] = $val["id_organizacion"];
                 
-                $campos_din = $this->verValoresCamposDinamicos($val["idRegistro"]);
+                $campos_din = $this->verValoresCamposDinamicos($val["idRegistro"]);                
                 $html = '';
                 $js='';
                 $i = 1;
@@ -2756,12 +3187,16 @@ function BuscaOrganizacional($tupla)
                             break;
                         case 'Persona':
                         case '6':
+                                if (count($this->id_org_acceso) <= 0){
+                                    $this->cargar_acceso_nodos($parametros);                    
+                                }
                                 $html .= '<div class="col-md-10">                                              
                                                       <select name="campo_' . $i . '" id="campo_' . $i . '" data-validation="required">
                                                         <option selected="" value="">-- Seleccione --</option>';
                                 $html .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(id_personal, ' - ',CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE interno = 1"
+                                                                            FROM mos_personal p WHERE interno = 1
+                                                                            AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                                 $js .= '$( "#campo_' . $i . '" ).select2({
@@ -2771,7 +3206,7 @@ function BuscaOrganizacional($tupla)
                                 $html .= '</select></div>';
                                 break;
                         case '10':
-                            $html .= '<div class="col-md-10">'
+                            $html .= '<div class="col-md-11">'
                                 . '<label for="campo-'.$value[cod_parametro].'" class="col-md-'.$col_lab.' control-label">' . $value[espanol] . '</label>'; 
                             $html .= '<label class="radio-inline" style="color:white;">
                                             <input '. (($value[valor] == '1')? 'checked' : '') .' type="radio" value="1" name="campo_' . $i . '" id="campo_' . $i . '"> <img src="diseno/images/verde.png" /> 
@@ -2786,22 +3221,113 @@ function BuscaOrganizacional($tupla)
                             break;
                         
                         case '11':
-                                $html .= '<div class="col-md-11">';
+                                $html .= '<div class="col-md-11" style="max-height: 350px;overflow-y: scroll;">';
+                                import('clases.organizacion.ArbolOrganizacional');
+                                $ao = new ArbolOrganizacional();
+                                
+                                //$organizacion = array();
+                                //if(strpos($val[id_organizacion],',')){    
+                               //         $organizacion = explode(",", $val[id_organizacion]);
+                               //     }
+                               //     else{
+                               //         $organizacion[] = $val[id_organizacion];                    
+                               //     }
+                                $parametros[nodos_seleccionados] = explode(",", $value[valor]) ;;
+                                $html_arbol = $ao->MuestraPadre(0, $parametros);
                                 //$html .= '<input type="hidden" value="'.$this->verArbol($value[id_unico],$value[idRegistro]).'" name="nodos_'.$i.'" id="nodos_'.$i.'"/>
-                                $html .= '<input type="hidden" value="'.$this->verArbol($value[id_unico],$value[idRegistro]).'" name="nodosreg" id="nodosreg"/>
-                                        <iframe id="iframearbol_'.$i.'" src="pages/cargo/prueba_arbolV4.php?IDUnico='.$value[id_unico].'&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
+                                $html .= '<input type="hidden" value="" name="nodosreg" id="nodosreg"/>
+                                        <input type="hidden" id="cargar_cargo" name="cargar_cargo" value="0">
+                                        <div id="div-ao-'.$i.'" class="jstree-container">
+                                            <ul class="jstree">
+                                                '.$html_arbol.'
+                                            </ul>
+                                        </div>
+                                        <!--<iframe id="iframearbol_'.$i.'" src="pages/cargo/prueba_arbolV4.php?IDUnico='.$value[id_unico].'&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>-->';
                                 $html .= '</div>';  
                                 $campos_arbol_o .=$i.',';
-                            break;
+                                $js .= "$('#div-ao-$i').jstree(
+                                                {
+                                                    'checkbox':{
+                                                        three_state : false,
+                                                            cascade : 'down'
+                                                    },
+                                                    'plugins': ['search', 'types','checkbox']
+                                                }
+                                            );
+                                        $('#div-ao-$i').on('changed.jstree', function (e, data) {
+                                            if (data.selected.length > 0){
+                                                var arr;
+                                                var id = '';
+                                                for(i=0;i<data.selected.length;i++){
+                                                    arr = data.selected[i].split('_');
+                                                    id = id + arr[1] + ',';
+                                                }
+                                                id = id.substr(0,id.length-1);
+                                                $('#nodosreg').val(id);
+                                            }
+                                            else
+                                                $('#nodosreg').val('');
+                                            if ($('#cargar_cargo').val() == '1')
+                                                VerificarCargo($('#nodosreg').val());
+                                            else
+                                                $('#cargar_cargo').val('1');                                                                                 
+                                        });
+                                        $('#div-ao-$i').jstree(true).open_all();  ";
+                            break;/*else{
+                                                       */
                         case '12':
-                                $html .= '<div class="col-md-12">';
-                                $html .= '<input type="hidden" value="'.$this->verArbolP($value[id_unico],$value[idRegistro]).'" name="nodosp_'.$i.'" id="nodosp_'.$i.'"/>
-                                        <iframe id="iframearbolp_'.$i.'" src="pages/cargo/arbol_procesoV4.php?funcion=MarcarNodosP('.$i.')&IDUnico='.$value[id_unico].'&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
+                            /*DATOS SELECCIONADOS ARBOL ORGANIZACIONAL*/
+                                $sql = 'select GROUP_CONCAT(valor) valor 
+                                                from mos_registro_item t1 
+                                                where tipo=11 and idRegistro ='.$val["idRegistro"];                           
+                                $this->operacion($sql, $atr);
+                                $seleccionados = $this->dbl->data[0][valor];  
+                                $html .= '<div class="col-md-11" style="max-height: 350px;overflow-y: scroll;">';//'.$this->verArbolP($value[id_unico],$value[idRegistro]).'
+                                $html .= '<input type="hidden" value="" name="nodosp_'.$i.'" id="nodosp_'.$i.'"/>
+                                        <div id="div-ap-'.$i.'">
+                                            <div id="div-ap-'.$i.'-n" class="jstree-container">
+                                                Seleccione un &Aacute;rea para cargar el &Aacute;rbol de Procesos
+                                            </div>
+                                        </div>
+                                        <!--<iframe id="iframearbolp_'.$i.'" src="pages/cargo/arbol_procesoV4.php?funcion=MarcarNodosP('.$i.')&IDUnico='.$value[id_unico].'&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>-->';
                                 $html .= '</div>';   
                                 $campos_arbol_p .=$i.',';
+                                $js .= "$('#div-ap-$i-n')
+                                            .jstree({
+                                                    'core' : {
+                                                            'data' : {
+                                                                    'url' : 'clases/arbol_procesos/server.php?id_ao=$seleccionados&MarcarNodosP=$value[valor]',                                        
+                                                                    'data' : function (node) {
+                                                                            return { 'id' : node.id };
+                                                                    }
+                                                            },
+                                                            'check_callback' : true,
+                                                            'themes' : {
+                                                                    'responsive' : false
+                                                            }
+                                                    },
+                                                    'force_text' : true,                        
+                                                    'checkbox':{
+                                                        three_state : false,
+                                                            cascade : 'down'
+                                                    },
+                                                    'plugins' : ['search', 'types','checkbox']
+                                            });
+                                        $('#div-ap-$i-n').on('changed.jstree', function (e, data) {
+                                            if (data.selected.length > 0){                                       
+                                                var id = '';
+                                                for(k=0;k<data.selected.length;k++){                        
+                                                    id = id + data.selected[k] + ',';
+                                                }
+                                                id = id.substr(0,id.length-1);
+                                                $('#nodosp_$i').val(id);
+                                            }
+                                            else
+                                                $('#nodosp_$i').val('');               
+                                        });";
                             break;
                         case '13':
-                                $html .= '<div class="col-md-13">';
+                                $html .= '<div class="col-md-11">';
                                 $html .= '<input type="text" style="width: 120px;" placeholder="dd/mm/yyyy"  data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
                                 $html .= '</div>';
                                 $js .= "$('#campo_$i').datepicker({
@@ -2814,10 +3340,10 @@ function BuscaOrganizacional($tupla)
                         case '14':
                                 $sql = 'select GROUP_CONCAT(valor) valor 
                                                 from mos_registro_item t1 
-                                                where id_unico='.$value[id_unico].' and idRegistro ='.$value[idRegistro];
+                                                where id_unico='.$value[id_unico].' and idRegistro ='.$val["idRegistro"];
                                 $this->operacion($sql, $atr);
                                 $seleccionados = $this->dbl->data[0][valor];                                
-                                $html .= '<div class="col-md-10" id="col-md-10-'.$i.'">  ';                                            
+                                $html .= '<div class="col-md-11" id="col-md-10-'.$i.'">  ';                                            
                                 $sql = 'SELECT DISTINCT
                                         mos_cargo.cod_cargo id,
                                         mos_cargo.descripcion,
@@ -2827,13 +3353,14 @@ function BuscaOrganizacional($tupla)
                                         INNER JOIN mos_cargo ON mos_cargo.cod_cargo = mos_cargo_estrorg_arbolproc.cod_cargo
                                         left join (select valor 
                                                 from mos_registro_item t1 
-                                                where id_unico='.$value[id_unico].' and idRegistro ='.$value[idRegistro].') cargos_reg
+                                                where id_unico='.$value[id_unico].' and idRegistro ='.$val["idRegistro"].') cargos_reg
                                         on mos_cargo.cod_cargo = cargos_reg.valor
                                         where mos_cargo_estrorg_arbolproc.id in (select valor
                                                                                 from mos_registro_item 
-                                                                                where tipo=11 and idRegistro ='.$value[idRegistro].')
-                                                                            order by mos_cargo.descripcion';
-                               // echo $sql;
+                                                                                where tipo=11 and idRegistro ='.$val["idRegistro"].')
+                                                                            order by mos_cargo.descripcion';                                
+                                $combosemp = '';
+                                
                                 $combosemp .= $ut_tool->OptionsComboMultiple($sql, 'id', 'descripcion','valor');      
                                 $html .= '<input type="hidden" name="campo_cargo_' . $i . '" id="campo_cargo_' . $i . '" value="' . $i . '" />';    
                                 $html .= '<input type="hidden" name="sel_cargo_' . $i . '" id="sel_cargo_' . $i . '" value="' .$seleccionados. '" />';
@@ -2906,9 +3433,51 @@ function BuscaOrganizacional($tupla)
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $objResponse = new xajaxResponse();
+                $objResponse->addScript("$('#MustraCargando').hide();"); 
+                 $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                                        $( '#btn-guardar' ).prop( 'disabled', false );");
                 unset ($parametros['opc']);
                 $parametros['id_usuario']= $_SESSION['USERID'];
-
+                for ($i = 1; $i <= 20; $i++) {
+                    if (isset($parametros['nombre_' . $i]) == true){
+                        if ($parametros["tipo_dato_$i"] == '11'){
+                            /*Carga Acceso segun el arbol*/
+                            if (count($this->id_org_acceso) <= 0){
+                                $this->cargar_acceso_nodos($parametros);
+                            }
+                            //print_r($this->id_org_acceso);
+                            //***********************************
+                            //para validar que los nodos seleccionados
+                            //tenga permisos
+                            $organizacion = array();
+                            if(strpos($parametros["nodosreg"],',')){    
+                                $organizacion = explode(",", $parametros["nodosreg"]);
+                            }
+                            else{
+                                $organizacion[] = $parametros["nodosreg"];                    
+                            }                    
+                            foreach ($organizacion as $value) {
+                                if (isset($this->id_org_acceso[$value])){
+                                    if(!($this->id_org_acceso[$value][nuevo]=='S' || $this->id_org_acceso[$value][modificar]=='S'))
+                                        $areas .= $this->id_org_acceso[$value][title].',';
+                                } else{
+                                    $areas='break';
+                                    break;
+                                }
+                            }
+                            /*Valida Restriccion*/
+                            if ($areas=='break'){
+                                $objResponse->addScriptCall('VerMensaje','error',utf8_encode('- Acceso denegado para registrar Documentos en el &aacute;rea seleccionada.'));
+                                return $objResponse;
+                            }
+                            if ($areas!='break' && $areas!='' ){
+                                $objResponse->addScriptCall('VerMensaje','error',utf8_encode('- Acceso denegado para registrar Documentos en el &aacute;rea ' . $areas . '.'));                           
+                                return $objResponse;                                           
+                            }                   
+                                        
+                        }
+                    }
+                }
                 $validator = new FormValidator();
                 
                 if(!$validator->ValidateForm($parametros)){
@@ -2982,9 +3551,7 @@ function BuscaOrganizacional($tupla)
                         $objResponse->addScriptCall('VerMensaje','error',$respuesta);
                 }
                           
-                $objResponse->addScript("$('#MustraCargando').hide();"); 
-                 $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
-                                        $( '#btn-guardar' ).prop( 'disabled', false );");
+                
                 return $objResponse;
             }
      

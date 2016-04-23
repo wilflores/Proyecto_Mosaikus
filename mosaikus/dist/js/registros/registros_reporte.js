@@ -1,4 +1,3 @@
-
 function init_tabla_reporte_reg(){
     $('#tblRegistros > tbody > tr').addClass('cursor-pointer');
     $('#tblRegistros > tbody > tr').on('click', function (event) {
@@ -70,6 +69,7 @@ function r_init_filtrar_reporte(){
     
 function r_exportarExcel(){
     var params =  getForm('r-busquedaFrm');
+    params = params + '&modo='+$('#modo').val()+ '&cod_link='+$('#cod_link').val();
     //window.open('pages/' +  document.getElementById("modulo_actual").value + '/exportarExcel.php?campo='+document.getElementById("campo").value + '&valor=' + document.getElementById("valor").value + '&corder=' + document.getElementById("corder").value + '&sorder=' + document.getElementById("sorder").value,null,'toolbar=no, location=no, menubar=no, width=600,height=400');
     window.open('pages/registros/exportarExcel.php?'+params,null,'toolbar=no, location=no, menubar=no, width=600,height=400');
 }
@@ -106,6 +106,8 @@ function verPagina_aux(pag,doc){
         array.addParametro('pag',pag);
         array.setObjeto('Registros','buscar_reporte');
         array.addParametro('import','clases.registros.Registros');
+        array.addParametro('modo',document.getElementById('modo').value);
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
         $('#MustraCargando').show();
         xajax_Loading(array.getArray());
     }
