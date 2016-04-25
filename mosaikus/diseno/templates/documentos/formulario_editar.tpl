@@ -311,7 +311,7 @@
         <div class="col-lg-offset-2 col-lg-50">
             <!--<input class="button save" name="guardar" type="button" value="{DESC_OPERACION}" onClick="validar(document);">-->
             <button type="button" class="btn btn-primary" onClick="validar(document);" id="btn-guardar">{DESC_OPERACION}</button>
-            <button type="button" {VERNOTIFICAR} class="btn btn-primary" onClick="document.getElementById('notificar').value='si';validar(document);" id="btn-guardar">{DESC_OPERACION_NOTIFICAR}</button>
+            <button type="button" {VERNOTIFICAR} class="btn btn-primary" onClick="document.getElementById('notificar').value='si';validar(document);" id="btn-guardar-not">{DESC_OPERACION_NOTIFICAR}</button>
             
             <!--<input class="button " type="button" value="Cancelar" onclick="funcion_volver('{PAGINA_VOLVER}');">-->
             <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">Cancelar</button>

@@ -8401,6 +8401,8 @@ button.close {
 .icon-user {
   background-position: -10px -127px; }
 
+
+
 /************************************/
 .icon-radio {
   background-position: -48px -10px; }
@@ -8423,6 +8425,9 @@ button.close {
 
 .icon-search-white {
   background-position: -86px -86px; }
+
+.icon-user-document {
+  background-position: -86px -127px; }
 
 /******************************************/
 .icon-back {

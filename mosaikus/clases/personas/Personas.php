@@ -275,13 +275,16 @@
                     $val = $this->verPersonas($atr[id]);
                     $this->dbl->insert_update($sql);
                     if ($atr[fecha_ingreso] != 'NULL'){
-                        $atr[fecha_ingreso] = "\\" . substr($atr[fecha_ingreso], 0, strlen($atr[fecha_ingreso])-1) . "\\";
+                        $atr[fecha_ingreso] = "\\" . substr($atr[fecha_ingreso], 0, strlen($atr[fecha_ingreso])-1) . "\'";
                     }
                     if ($atr[fecha_egreso] != 'NULL'){
                         $atr[fecha_egreso] = "\\" . substr($atr[fecha_egreso], 0, strlen($atr[fecha_egreso])-1)  . "\'";
                     }
                     if ($atr[fecha_nacimiento] != 'NULL'){
                         $atr[fecha_nacimiento] = "\\" . substr($atr[fecha_nacimiento], 0, strlen($atr[fecha_nacimiento])-1)  . "\'";
+                    }
+                    if ($atr[email] != 'NULL'){
+                        $atr[email] = "\\" . substr($atr[email], 0, strlen($atr[email])-1)  . "\'";
                     }
                     $nuevo = "Rut: \'$atr[id_personal]\',Nombres: \'$atr[nombres]\', Apellido Paterno: \'$atr[apellido_paterno]\', Apellido Materno: \'$atr[apellido_materno]\', Genero: \'$atr[genero]\', Fecha Nacimiento: $atr[fecha_nacimiento], Vigencia: \'$atr[vigencia]\', Interno: \'$atr[interno]\', Id Organizacion: $atr[id_organizacion], Cargo: $atr[cod_cargo], Workflow: \'$atr[workflow]\', Email: $atr[email], Relator: \'$atr[relator]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Extranjero: \'$atr[extranjero]\'";
                     $anterior = "Rut: \'$val[id_personal]\',Nombres: \'$val[nombres]\', Apellido Paterno: \'$val[apellido_paterno]\', Apellido Materno: \'$val[apellido_materno]\', Genero: \'$val[genero]\', Fecha Nacimiento: \'$val[fecha_nacimiento]\', Vigencia: \'$val[vigencia]\', Interno: \'$val[interno]\', Id Organizacion: $val[id_organizacion], Cargo: $val[cod_cargo], Workflow: \'$val[workflow]\', Email: \'$val[email]\', Relator: \'$val[relator]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\', Extranjero: \'$val[extranjero]\'";

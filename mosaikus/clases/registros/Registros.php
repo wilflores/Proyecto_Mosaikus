@@ -3249,11 +3249,17 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                                 {
                                                     'checkbox':{
                                                         three_state : false,
-                                                            cascade : 'down'
+                                                            cascade : ''
                                                     },
                                                     'plugins': ['search', 'types','checkbox']
                                                 }
                                             );
+                                        $('#div-ao-$i').on('select_node.jstree', function (e, data) {
+                                            if(data.event) { data.instance.select_node(data.node.children_d); }
+                                        });
+                                        $('#div-ao-$i').on('deselect_node.jstree', function (e, data) {
+                                            if(data.event) { data.instance.deselect_node(data.node.children_d); }
+                                        });
                                         $('#div-ao-$i').on('changed.jstree', function (e, data) {
                                             if (data.selected.length > 0){
                                                 var arr;
@@ -3309,10 +3315,16 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                                     'force_text' : true,                        
                                                     'checkbox':{
                                                         three_state : false,
-                                                            cascade : 'down'
+                                                            cascade : ''
                                                     },
                                                     'plugins' : ['search', 'types','checkbox']
                                             });
+                                        $('#div-ao-$i-n').on('select_node.jstree', function (e, data) {
+                                            if(data.event) { data.instance.select_node(data.node.children_d); }
+                                        });
+                                        $('#div-ao-$i-n').on('deselect_node.jstree', function (e, data) {
+                                            if(data.event) { data.instance.deselect_node(data.node.children_d); }
+                                        });
                                         $('#div-ap-$i-n').on('changed.jstree', function (e, data) {
                                             if (data.selected.length > 0){                                       
                                                 var id = '';

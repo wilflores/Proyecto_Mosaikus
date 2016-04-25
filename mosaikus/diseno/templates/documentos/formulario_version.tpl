@@ -17,14 +17,14 @@
         <li><a href="#hv-red" data-toggle="tab">Versión </a></li>
         <li><a href="#hv-blue" data-toggle="tab">Versiones Anteriores</a></li>                
     </ul>        
-    <div id="my-tab-content" class="tab-content">
+    <div id="my-tab-content" style="padding-right: 5%;" class="tab-content">
         <div class="tab-pane active" id="hv-red">
             
             <form id="idFormulario" class="form-horizontal form-horizontal-red" role="form">
     
                             <div class="form-group">
                                 <label for="archivo" class="col-md-5 control-label">Agregar Nueva Versión Documento</label>
-                                <div class="col-md-10">
+                                <div class="col-md-12">
                                     <p class="form-control-static" style="">
                                         <!--<img src="{PAHT_TO_IMG}adjunto.png">-->
                                         <input type="text" class="form-control" readonly="readonly" value="{NOMBRE_DOC_AUX}">
@@ -35,14 +35,21 @@
                              </div>
                             <div class="form-group" id="tabla_fileUpload"  style="{CSS_TABLA_FILEUPLOAD}">
                                     <label for="archivo" class="col-md-5 control-label">{N_DOC_FISICO}</label>
-                                    <div class="col-md-10">
-                                        <input type="file" style="" value="{ARCHIVO}" id="fileUpload2" name="fileUpload2" onchange="cargar_archivo_ver();" data-validation="required"/>
+                                    <div class="col-md-12">
+                                        <input type="file"  accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.presentation, application/vnd.ms-excel" value="{ARCHIVO}" id="fileUpload2" name="fileUpload2" onchange="cargar_archivo_ver();" data-validation="required"/>
                                         <input type="hidden" id="estado_actual" name="estado_actual">
                                         <input type="hidden" id="filename" name="filename" value="{FILENAME}">
                                         <input type="hidden" id="tamano" name="tamano" value="{TAMANO}">
                                         <input type="hidden" id="tipo_doc" name="tipo_doc" value="{TIPO_DOC}">
                                         <input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
-                                        <div id="estado" style="display:none;color:white;"><img src="{PAHT_TO_IMG}loading3.gif">Cargando</div>
+                                        <div id="estado" style="display:none;color:white;">
+                                            <!--<img src="{PAHT_TO_IMG}loading3.gif">Cargando-->
+                                            <div class="progress" style="width: 250px;">
+                                                <div class="progress-bar" id="estado-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;">
+                                                  0%
+                                                </div>
+                                            </div>
+                                        </div>
                                         <!--<input type="hidden" class="form-control" value="{DOC_FISICO}" id="doc_fisico" name="doc_fisico" placeholder="{N_DOC_FISICO}"  data-validation="required"/>
                                         <input type="hidden" class="form-control" value="{CONTENTTYPE}" id="contentType" name="contentType" placeholder="{N_CONTENTTYPE}" data-validation="required"/>
                                         -->
@@ -51,7 +58,7 @@
                              </div>
                              <div class="form-group" id="info_archivo_adjunto"  style="display:none;">
                                     <label for="archivo" class="col-md-5 control-label">{N_DOC_FISICO}</label>
-                                    <div class="col-md-10">
+                                    <div class="col-md-12">
                                         <p class="form-control-static" style="">
                                             <!--<img src="{PAHT_TO_IMG}adjunto.png">-->
                                             <input type="text" class="form-control" style="width: 250px;display: inline;" id="info_nombre">
@@ -66,24 +73,31 @@
                              </div>
                             <div class="form-group" id="tabla_fileUpload_vis"  style="{CSS_TABLA_FILEUPLOAD_VIS}">
                                     <label for="archivo" class="col-md-5 control-label">{N_NOM_VISUALIZA}</label>
-                                    <div class="col-md-10">
-                                        <input type="file" style="" value="{ARCHIVO}" id="fileUpload2_vis" name="fileUpload2_vis" onchange="cargar_archivo_vis();"/>
+                                    <div class="col-md-12">
+                                        <input type="file" style="" accept="application/pdf" value="{ARCHIVO}" id="fileUpload2_vis" name="fileUpload2_vis" onchange="cargar_archivo_vis();"/>
                                         <input type="hidden" id="estado_actual_vis" name="estado_actual_vis">
                                         <input type="hidden" id="filename_vis" name="filename_vis" value="{FILENAME}">
                                         <input type="hidden" id="tamano_vis" name="tamano_vis" value="{TAMANO}">
                                         <input type="hidden" id="tipo_doc_vis" name="tipo_doc_vis" value="{TIPO_DOC}">
                                         <input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
-                                        <div id="estado_vis" style="display:none;"><img src="{PAHT_TO_IMG}loading3.gif">Cargando</div>
+                                        <div id="estado_vis" style="display:none;">
+                                            <!--<img src="{PAHT_TO_IMG}loading3.gif">Cargando-->
+                                            <div class="progress" style="width: 250px;">
+                                                <div class="progress-bar" id="estado-vis-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;">
+                                                  0%
+                                                </div>
+                                            </div>
+                                        </div>
                                         <!--<input type="hidden" class="form-control" value="{NOM_VISUALIZA}" id="nom_visualiza" name="nom_visualiza" placeholder="{N_NOM_VISUALIZA}" data-validation="required"/>
                                         <input type="hidden" class="form-control" value="{DOC_VISUALIZA}" id="doc_visualiza" name="doc_visualiza" placeholder="{N_DOC_VISUALIZA}"  data-validation="required"/>
                                         <input type="hidden" class="form-control" value="{CONTENTTYPE_VISUALIZA}" id="contentType_visualiza" name="contentType_visualiza" placeholder="{N_CONTENTTYPE_VISUALIZA}" data-validation="required"/>
                                         -->
                                   </div> 
-                                  <span class="help-block" style="font-size: small;">(*) Código-Nombre archivo-Versión.Extension</span>
+                                  <span class="help-block" style="font-size: small;">(*) Código-Nombre archivo-Versión.PDF</span>
                              </div>
                              <div class="form-group" id="info_archivo_adjunto_vis"  style="display:none;">
                                     <label for="archivo" class="col-md-5 control-label">{N_NOM_VISUALIZA}</label>
-                                    <div class="col-md-10">
+                                    <div class="col-md-12">
                                         <p class="form-control-static" style="">
                                             <!--<img src="{PAHT_TO_IMG}adjunto.png">-->
                                             <input type="text" class="form-control" style="width: 250px;display: inline;" id="info_nombre_vis">
@@ -94,12 +108,12 @@
                                             </a>
                                         </p>                      
                                   </div>  
-                                  <span class="help-block" style="font-size: small;">(*) Código-Nombre archivo-Versión.Extension</span>
+                                  <span class="help-block" style="font-size: small;">(*) Código-Nombre archivo-Versión.PDF</span>
                              </div>                                                                    
                              
                                 <div class="form-group">
-                                    <label for="elaboro" class="col-md-6 control-label">{N_ID_WORKFLOW_DOCUMENTO}</label>                                                
-                                    <div class="col-md-14">                                              
+                                    <label for="elaboro" class="col-md-5 control-label">{N_ID_WORKFLOW_DOCUMENTO}</label>                                                
+                                    <div class="col-md-12">                                              
                                       <select {COMBOWFHABILITADO} id="id_workflow_documento" name="id_workflow_documento" data-validation="required">
                                         <option selected="" value="">-- No Asignado --</option>
                                         {ID_WORKFLOW_DOCUMENTO}
@@ -109,7 +123,7 @@
                                      
                                 <div class="form-group">
                                         <label for="fecha" class="col-md-5 control-label">{N_FECHA}</label>
-                                        <div class="col-md-10">
+                                        <div class="col-md-12">
                                             <input type="text" class="form-control" style="width: 120px;" value="{FECHA}" id="fecha" name="fecha" placeholder="{N_FECHA}"  data-validation="required"/>
                                             <input type="hidden" class="form-control" value="{VERSION}" id="version" name="version"/>
                                             <input type="hidden" class="form-control" value="{CODIGO_DOC}" id="Codigo_doc" name="Codigo_doc" placeholder="{N_CODIGO_DOC}" data-validation="required"/>
@@ -120,7 +134,7 @@
                                 </div>
                                 <div class="form-group">
                                         <label for="observacion" class="col-md-5 control-label">{N_OBSERVACION_REV}</label>
-                                        <div class="col-md-10">
+                                        <div class="col-md-12">
                                             <textarea class="form-control" data-validation="required" rows="3" id="observacion" name="observacion" >{OBSERVACION}</textarea>                                                                                    
                                       </div>                                
                                   </div>                                                               

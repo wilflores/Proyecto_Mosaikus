@@ -272,5 +272,27 @@ ADD COLUMN `peso`  int NULL DEFAULT 0 AFTER `descripcion_larga`;
 ALTER TABLE `mos_documentos_formulario_items_temp`
 ADD COLUMN `orden`  int NULL AFTER `peso`;
 
+-- nuevo 22-04-2016
+ALTER TABLE `mos_historico_wf_documentos`
+MODIFY COLUMN `id`  int(11) NOT NULL AUTO_INCREMENT FIRST ;
 
+ALTER TABLE `mos_historico_wf_documentos`
+MODIFY COLUMN `fecha_registro`  timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER `IDDoc`;
+
+
+
+update mos_documentos
+set mos_documentos.etapa_workflow='estado_aprobado',
+mos_documentos.estado_workflow='OK',
+mos_documentos.fecha_estado_workflow=CURRENT_TIMESTAMP(),
+mos_documentos.id_usuario_workflow= elaboro;
+
+-- correo unico
+ALTER TABLE `mos_usuario`
+DROP INDEX `ind05` ,
+ADD UNIQUE INDEX `ind05` (`email`) USING BTREE ;
+
+UPDATE `mos_link` SET `nombre_link`='Administrador de Perfiles' WHERE (`cod_link`='66');
+UPDATE `mos_link` SET `nombre_link`='Perfiles Especialistas' WHERE (`cod_link`='80');
+UPDATE `mos_link` SET `nombre_link`='Perfiles Portal' WHERE (`cod_link`='81');
 

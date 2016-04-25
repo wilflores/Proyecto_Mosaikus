@@ -775,24 +775,56 @@
                             <i class=\"icon icon-edit\"></i>
                         </a>";
                 } 
-           else{
-                if(strpos($tupla[arbol_organizacional],',')){
-                    if(($tupla[cod_elabora]==$_SESSION['CookCodEmp'])&&($this->id_org_acceso[$tupla[arbol_organizacional]][modificar] == 'S')){
-                     $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
-                                 <i class=\"icon icon-edit\"></i>
-                             </a>";
+           else{               
+                    if(($tupla[cod_elabora]==$_SESSION['CookCodEmp'])){
+                        $editar = false;                        
+                        $organizacion = array();
+                        if(strpos($tupla[arbol_organizacional],',')){    
+                            $organizacion = explode(",", $tupla[arbol_organizacional]);
+                        }
+                        else{
+                            $organizacion[] = $tupla[arbol_organizacional];                                 
+                        }
+                        /*SE VALIDA QUE PUEDE EDITAR EN TODAS LAS AREAS*/
+                        foreach ($organizacion as $value_2) {
+                            if (isset($this->id_org_acceso[$value_2])){
+                                if(($this->id_org_acceso[$value_2][modificar]=='S'))
+                                    $editar = true;
+                            } else{
+                                $editar = false;
+                                break;
+                            }
+                        }
+                        if (($editar == true))                                                       
+                            $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
+                                <i class=\"icon icon-edit\"></i>
+                            </a>";
                      }
-                }
+                
                 else{
-                    
-                     if (array_key_exists($tupla[arbol_organizacional], $this->id_org_acceso)){
-                         if ($this->id_org_acceso[$tupla[arbol_organizacional]][modificar_terceros] == 'S')
-                          {
-                          $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
-                                      <i class=\"icon icon-edit\"></i>
-                                  </a>";
-                          }
+                    $editar = false;                        
+                    $organizacion = array();
+                    if(strpos($tupla[arbol_organizacional],',')){    
+                        $organizacion = explode(",", $tupla[arbol_organizacional]);
                     }
+                    else{
+                        $organizacion[] = $tupla[arbol_organizacional];                                 
+                    }
+                    /*SE VALIDA QUE PUEDE EDITAR EN TODAS LAS AREAS*/
+                    foreach ($organizacion as $value_2) {
+                        if (isset($this->id_org_acceso[$value_2])){
+                            if(($this->id_org_acceso[$value_2][modificar_terceros]=='S'))
+                                $editar = true;
+                        } else{
+                            $editar = false;
+                            break;
+                        }
+                    }
+                    if (($editar == true))                                                       
+                        $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
+                            <i class=\"icon icon-edit\"></i>
+                        </a>";
+                     
                 }
             }
            //********** ELIMINAR **********
@@ -804,40 +836,51 @@
            else{
                 if(strpos($tupla[arbol_organizacional],',')){
                     if($tupla[cod_elabora]==$_SESSION['CookCodEmp']){
-                        $html .= '<a href="#" onclick="javascript:eliminarDocumentos(\''. $tupla[IDDoc] . '\');" title="Eliminar '.$tupla[nombre_doc].'">
-                        <i class="icon icon-remove"></i>                        
-                        </a>';
-                     }
-                }
-                else{
-                     if (array_key_exists($tupla[arbol_organizacional], $this->id_org_acceso)){
-                         if (($tupla[cod_elabora]==$_SESSION['CookCodEmp']) && ($this->id_org_acceso[$tupla[arbol_organizacional]][eliminar] == 'S'))
-                          {
-                          $html .= '<a href="#" onclick="javascript:eliminarDocumentos(\''. $tupla[IDDoc] . '\');" title="Eliminar '.$tupla[nombre_doc].'">
+                        
+                        $editar = false;                        
+                        $organizacion = array();
+                        if(strpos($tupla[arbol_organizacional],',')){    
+                            $organizacion = explode(",", $tupla[arbol_organizacional]);
+                        }
+                        else{
+                            $organizacion[] = $tupla[arbol_organizacional];                                 
+                        }
+                        /*SE VALIDA QUE PUEDE ELIMINAR EN TODAS LAS AREAS*/
+                        foreach ($organizacion as $value_2) {
+                            if (isset($this->id_org_acceso[$value_2])){
+                                if(($this->id_org_acceso[$value_2][eliminar]=='S'))
+                                    $editar = true;
+                            } else{
+                                $editar = false;
+                                break;
+                            }
+                        }
+                        if (($editar == true)) 
+                            $html .= '<a href="#" onclick="javascript:eliminarDocumentos(\''. $tupla[IDDoc] . '\');" title="Eliminar '.$tupla[nombre_doc].'">
                             <i class="icon icon-remove"></i>                        
                             </a>';
-                          }
-                    }
-                }
+                     }
+                }                
             }
             
-            if ($_SESSION[CookN] == 'S'){
+            //if ($_SESSION[CookN] == 'S')
+            {
                 //<img title="Crear Versión '.$tupla[nombre_doc].'" src="diseno/images/ticket_ver.png" style="cursor:pointer">
                 $html .= '<a href="#" onclick="javascript:crearVersionDocumentos(\''. $tupla[IDDoc] . '\');" title="Crear Versión '.$tupla[nombre_doc].'">                        
                             <i class="icon icon-v"></i>
                     </a>'; 
             }
-            if ($_SESSION[CookN] == 'S'){
+            //if ($_SESSION[CookN] == 'S')
+            {
                 //<img title="Crear Revisión '.$tupla[nombre_doc].'" src="diseno/images/ticket_rev.png" style="cursor:pointer">
                 $html .= '<a href="#" onclick="javascript:crearRevisionDocumentos(\''. $tupla[IDDoc] . '\');" title="Crear Revisión '.$tupla[nombre_doc].'" >                        
                             <i class="icon icon-r"></i>
                     </a>'; 
-            }
-            
+            }            
             if($tupla[cod_elabora]==$_SESSION['CookCodEmp'] ||$tupla[cod_revisa]==$_SESSION['CookCodEmp'] || $tupla[cod_aprueba]==$_SESSION['CookCodEmp']){
                 //<img title="Crear Revisión '.$tupla[nombre_doc].'" src="diseno/images/ticket_rev.png" style="cursor:pointer">
                 $html .= '<a href="#" onclick="javascript:verWorkFlow(\''. $tupla[IDDoc] . '\');" title="Ver Flujo de Trabajo '.$tupla[nombre_doc].'" >                        
-                            <i class="icon  icon-document"></i>
+                            <i class="icon icon-user-document"></i>
                     </a>'; 
             }
             //array_push($func,array('nombre'=> 'verWorkFlow','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_nuevo.png' title='Ver Flujo de Trabajo'>"));
@@ -1052,7 +1095,7 @@
                     $this->registraTransaccion('Insertar','Ingreso el mos_documentos ' . $atr[descripcion_ano], 'mos_documentos');
                       */
                     $nuevo = "IDDoc: \'$atr[IDDoc]\', Codigo Doc: \'$atr[Codigo_doc]\', Nombre Doc: \'$atr[nombre_doc]\', Version: \'$atr[version]\', Fecha: \'$atr[fecha]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', ContentType: \'$atr[contentType]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza]\', ContentType Visualiza: \'$atr[contentType_visualiza]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Publico: \'$atr[publico]\'";
-                    $this->registraTransaccionLog(1,$nuevo,'', '');
+                    $this->registraTransaccionLog(1,$nuevo,'', '',$atr[IDDoc]);
                     return $atr[IDDoc];
                     return "El mos_documentos '$atr[descripcion_ano]' ha sido ingresado con exito";
                 } catch(Exception $e) {
@@ -1130,7 +1173,7 @@
                     $this->registraTransaccion('Insertar','Ingreso el mos_documentos ' . $atr[descripcion_ano], 'mos_documentos');
                       */
                     $nuevo = "IDDoc: \'$atr[IDDoc]\', Codigo Doc: \'$atr[Codigo_doc]\', Nombre Doc: \'$atr[nombre_doc]\', Version: \'$atr[version]\', Fecha: \'$atr[fecha]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', ContentType: \'$atr[contentType]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza]\', ContentType Visualiza: \'$atr[contentType_visualiza]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', ";
-                    $this->registraTransaccionLog(1,$nuevo,'', '');
+                    $this->registraTransaccionLog(4,$nuevo,'', '',$atr[id]);
                     return $atr[IDDoc];
                     return "El mos_documentos '$atr[descripcion_ano]' ha sido ingresado con exito";
                 } catch(Exception $e) {
@@ -1157,7 +1200,7 @@
                     $this->registraTransaccion('Insertar','Ingreso el mos_documentos ' . $atr[descripcion_ano], 'mos_documentos');
                       */
                     $nuevo = "IDDoc: \'$atr[IDDoc]\', Codigo Doc: \'$atr[Codigo_doc]\', Nombre Doc: \'$atr[nombre_doc]\', Version: \'$atr[version]\', Fecha: \'$atr[fecha]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', ContentType: \'$atr[contentType]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza]\', ContentType Visualiza: \'$atr[contentType_visualiza]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', ";
-                    $this->registraTransaccionLog(1,$nuevo,'', '');
+                    $this->registraTransaccionLog(5,$nuevo,'', '',$atr[id]);
                     return "La revision ha sido ingresada con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
@@ -1167,10 +1210,10 @@
                     }
             }
             
-            public function registraTransaccionLog($accion,$descr, $tabla, $id = ''){
+            public function registraTransaccionLog($accion,$descr, $tabla, $id = 'NULL'){
                 session_name("mosaikus");
                 session_start();
-                $sql = "INSERT INTO mos_log(codigo_accion, fecha_hora, accion, anterior, realizo, ip) VALUES ('$accion','".date('Y-m-d G:h:s')."','$descr', '$tabla','$_SESSION[CookIdUsuario]','$_SERVER[REMOTE_ADDR]')";            
+                $sql = "INSERT INTO mos_log(codigo_accion, fecha_hora, accion, anterior, realizo, ip, id_registro) VALUES ('$accion','".date('Y-m-d G:h:s')."','$descr', '$tabla','$_SESSION[CookIdUsuario]','$_SERVER[REMOTE_ADDR]',$id)";            
                 $this->dbl->insert_update($sql);
 
                 return true;
@@ -1234,6 +1277,9 @@
                     if (strlen($atr[aprobo])== 0){
                         $atr[aprobo] = "NULL";                     
                     }
+                    if (strlen($atr[elaboro])== 0){
+                        $atr[elaboro] = "elaboro";                     
+                    }
                     $val = $this->verDocumentos($atr[id]);
                     if(!($val[etapa_workflow]=='estado_aprobado' && $val[estado_workflow]=='OK')){
                         if($atr[notificar]=='si'){
@@ -1272,7 +1318,7 @@
                     $this->dbl->insert_update($sql);
                     $nuevo = "IDDoc: \'$atr[IDDoc]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza_aux]\',ContentType Visualiza: \'$atr[contentType_visualiza_aux]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Publico: \'$atr[publico]\'";
                     $anterior = "IDDoc: \'$val[IDDoc]\', Codigo Doc: \'$val[Codigo_doc]\', Nombre Doc: \'$val[nombre_doc]\', Version: \'$val[version]\', Fecha: \'$val[fecha]\', Descripcion: \'$val[descripcion]\', Palabras Claves: \'$val[palabras_claves]\', Formulario: \'$val[formulario]\', Vigencia: \'$val[vigencia]\', ContentType: \'$val[contentType]\', Id Filial: \'$val[id_filial]\', Nom Visualiza: \'$val[nom_visualiza]\', ContentType Visualiza: \'$val[contentType_visualiza]\', Id Usuario: \'$val[id_usuario]\', Observacion: \'$val[observacion]\', Muestra Doc: \'$val[muestra_doc]\', Estrucorg: \'$val[estrucorg]\', Arbproc: \'$val[arbproc]\', Apli Reg Estrorg: \'$val[apli_reg_estrorg]\', Apli Reg Arbproc: \'$val[apli_reg_arbproc]\', Workflow: \'$val[workflow]\', Semaforo: \'$val[semaforo]\', V Meses: \'$val[v_meses]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\', Publico: \'$val[publico]\' ";
-                    $this->registraTransaccionLog(2,$nuevo,$anterior, '');
+                    $this->registraTransaccionLog(2,$nuevo,$anterior, '',$atr[id]);
                     /*
                     $this->registraTransaccion('Modificar','Modifico el Documentos ' . $atr[descripcion_ano], 'mos_documentos');
                     */
@@ -1346,8 +1392,8 @@
                                                                                                                 
                             if(($_SESSION[SuperUser]!='S')&&(isset($atr[terceros]))){
                                 $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
-                                $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_revision' and d.estado_workflow='OK') or ";    
-                                $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK') ";    
+                                $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
+                                $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";    
                                 if (count($this->id_org_acceso))
                                     $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
                                 if (count($this->id_org_acceso_todos_nivel))
@@ -1512,8 +1558,8 @@
                             WHERE muestra_doc='S' ";
                             if(($_SESSION[SuperUser]!='S')&&(isset($atr[terceros]))){
                                 $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
-                                $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_revision' and d.estado_workflow='OK') or ";    
-                                $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and d.etapa_workflow='estado_pendiente_aprobacion' and d.estado_workflow='OK') ";    
+                                $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
+                                $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";    
                                 if (count($this->id_org_acceso))
                                     $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
                                 if (count($this->id_org_acceso_todos_nivel))
@@ -1744,7 +1790,7 @@
                             $this->dbl->insert_update($sql);
                         }
                         $nuevo = "IDDoc: \'$atr[id]\'";
-                        $this->registraTransaccionLog(3,$nuevo,'', '');
+                        $this->registraTransaccionLog(3,$nuevo,'', '',$atr[id]);
                         
                         return "ha sido eliminada con exito";
                     } catch(Exception $e) {
@@ -1770,7 +1816,7 @@
                     
                     $nuevo = "Id usuario wf: \'$atr[id_usuario_workflow]\', etapa_workflow = \'$atr[etapa]\', estado wf: \'$atr[estado_workflow]\', ";
                     $anterior = "Id usuario wf: \'$val[id_usuario_workflow]\', etapa_workflow = \'$val[etapa_workflow]\', estado wf: \'$val[estado_workflow]\',  ";
-                    $this->registraTransaccionLog(49,$nuevo,$anterior, '');
+                    $this->registraTransaccionLog(6,$nuevo,$anterior, '',$atr[id]);
                     /*
                     $this->registraTransaccion('Modificar','Modifico el WorkflowDocumentos ' . $atr[descripcion_ano], 'mos_workflow_documentos');
                     */
@@ -3077,7 +3123,9 @@
                         $objResponse->addScriptCall('VerMensaje','error','Debe agregar un campo "Arbol Organizacional" si define un campo "Cargo"');
                         $objResponse->addScript("$('#MustraCargando').hide();"); 
                         $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
-                        $( '#btn-guardar' ).prop( 'disabled', false );");                        
+                        $( '#btn-guardar' ).prop( 'disabled', false );
+                        $('#btn-guardar-not' ).html('Guardar y Notificar');
+                        $( '#btn-guardar-not' ).prop( 'disabled', false );");                        
                         return $objResponse;
                     }
                 }
@@ -3085,7 +3133,9 @@
                     $objResponse->addScriptCall('VerMensaje','error','No puede definir mas de un campo "Arbol Organizacional"');
                     $objResponse->addScript("$('#MustraCargando').hide();"); 
                     $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
-                    $( '#btn-guardar' ).prop( 'disabled', false );");                     
+                        $( '#btn-guardar' ).prop( 'disabled', false );
+                        $('#btn-guardar-not' ).html('Guardar y Notificar');
+                        $( '#btn-guardar-not' ).prop( 'disabled', false );");                    
                     return $objResponse;
                 }  
                 //FIN DE NUEVA VALIDACION DE ARBOL Y CARGO
@@ -3227,7 +3277,9 @@
                           
                 $objResponse->addScript("$('#MustraCargando').hide();"); 
                 $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
-                                        $( '#btn-guardar' ).prop( 'disabled', false );");
+                        $( '#btn-guardar' ).prop( 'disabled', false );
+                        $('#btn-guardar-not' ).html('Guardar y Notificar');
+                        $( '#btn-guardar-not' ).prop( 'disabled', false );");      
                 return $objResponse;
             }
             

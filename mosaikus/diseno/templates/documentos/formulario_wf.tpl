@@ -26,9 +26,9 @@
                 <div class="panel-title col-xs-24" id="div-titulo-for">
                     {TITULO_FORMULARIO}  {VERHISTO}
                     <br>
-                    <button  {MOSTRARCAMBIAR} type="button" class="btn btn-default" onclick="CambiarEstadoWF('OK','{ETAPANUEVA}',{IDDOC});">{TITULOESTADO}</button>
-                    <button {MOSTRARRECHAZAR} type="button" class="btn btn-default" onclick="$('#myModal-observacion-rechazo').modal('show');">Rechazar</button>
-                    <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">Volver</button>
+                    <button  {MOSTRARCAMBIAR} type="button" class="btn btn-default" onclick="CambiarEstadoWF('OK','{ETAPANUEVA}',{IDDOC});"><i class="glyphicon glyphicon-ok"></i> &nbsp;{TITULOESTADO}</button>
+                    <button {MOSTRARRECHAZAR} type="button" class="btn btn-default" onclick="$('#myModal-observacion-rechazo').modal('show');"><i class="glyphicon glyphicon-remove"></i> &nbsp;Rechazar</button>
+                    <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');"><i class="glyphicon glyphicon-chevron-left"></i> Volver</button>
                 </div>
 
             </div>

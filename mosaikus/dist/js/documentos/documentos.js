@@ -267,6 +267,7 @@ function cargar_autocompletado(){
                 document.getElementById('id_workflow_documento').disabled=false;
             $( "#btn-guardar" ).html('Procesando..');
             $( "#btn-guardar" ).prop( "disabled", true );
+            $( "#btn-guardar-not" ).prop( "disabled", true );
             array = new XArray();
             if (doc.getElementById("opc").value == "new")
                 array.setObjeto('Documentos','guardar');
@@ -641,16 +642,22 @@ function RechazarWF(estado,etapa,id){
             array.addParametro('import','clases.documentos.Documentos');
             xajax_Loading(array.getArray());
     }    
-function ao_multiple(){
+function ao_multiple(){    
     $('#div-ao-form').jstree(
             {
                 "checkbox":{
                     three_state : false,
-                        cascade : 'down'
+                        cascade : ''
                 },
                 "plugins": ["search", "types","checkbox"]
             }
         );
+    $("#div-ao-form").on("select_node.jstree", function (e, data) {
+        if(data.event) { data.instance.select_node(data.node.children_d); }
+    });
+    $("#div-ao-form").on("deselect_node.jstree", function (e, data) {
+        if(data.event) { data.instance.deselect_node(data.node.children_d); }
+    });
     $('#div-ao-form').on("changed.jstree", function (e, data) {
         if (data.selected.length > 0){
             var arr;
@@ -665,6 +672,6 @@ function ao_multiple(){
         else
             $('#nodos').val('');
     });
-    $('#div-ao-form').jstree(true).open_all();               
+//    $('#div-ao-form').jstree(true).open_all();               
         
 }    
