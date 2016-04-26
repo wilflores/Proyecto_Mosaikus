@@ -1055,7 +1055,7 @@
        /**
         * Activa los nodos donde se tiene acceso
         */
-       private function cargar_acceso_nodos_explicito($parametros){
+       public function cargar_acceso_nodos_explicito($parametros){
            if (strlen($parametros[cod_link])>0){
                if(!class_exists('mos_acceso')){
                    import("clases.mos_acceso.mos_acceso");
@@ -1104,7 +1104,7 @@
                                 $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
                                     . "FROM mos_documentos_estrorg_arbolproc eao "
                                     . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
-                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arrP[id]) . ")  AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' "
+                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arrP[id]) . ")  AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' and d.etapa_workflow = 'estado_aprobado'"
                                     . " ";                                
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
@@ -1115,7 +1115,7 @@
                                 $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
                                     . "FROM mos_documentos_estrorg_arbolproc eao "
                                     . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
-                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arrP[id]) . ")  AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' AND formulario = 'S' "
+                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arrP[id]) . ")  AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' AND formulario = 'S'  and d.etapa_workflow = 'estado_aprobado'"
                                     . " ";                                
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
@@ -1246,7 +1246,7 @@
                                 $sql = "SELECT COUNT(*) total "
                                     . "FROM mos_documentos_estrorg_arbolproc eao "
                                     . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
-                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arr[id]) . ")   AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S'";
+                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arr[id]) . ")   AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S'  and d.etapa_workflow = 'estado_aprobado'";
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
                                 $extra .= "<a href=\"#\" class=\"$select_aux\">".($arr[title])." (". ($contador) .")</a>";
@@ -1255,7 +1255,7 @@
                                 $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
                                     . "FROM mos_documentos_estrorg_arbolproc eao "
                                     . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
-                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arr[id]) . ")  AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' AND formulario = 'S' "
+                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arr[id]) . ")  AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' AND formulario = 'S'  and d.etapa_workflow = 'estado_aprobado'"
                                     . " ";                                
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
