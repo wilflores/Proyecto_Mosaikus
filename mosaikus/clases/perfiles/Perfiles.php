@@ -657,8 +657,7 @@
 //                    if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
                         $arr = explode(",", $parametros[nodos]);
                         $params[cod_perfil] = $parametros[cod_perfil];
-                        $params[descripcion_perfil] = $parametros[descripcion_perfil];
-                        
+                        $params[descripcion_perfil] = $parametros[descripcion_perfil];                        
                         $this->eliminarMenuArbol($parametros);
                         foreach($arr as $temp){
                                 $params[id] = $temp;
