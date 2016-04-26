@@ -23,14 +23,24 @@
         </div>
         <div class="panel-heading">
             <div class="row">
-                <div class="panel-title col-xs-24" id="div-titulo-for">
+                <div class="panel-title col-xs-20" id="div-titulo-for">
                     {TITULO_FORMULARIO}  {VERHISTO}
                     <br>
                     <button  {MOSTRARCAMBIAR} type="button" class="btn btn-default" onclick="CambiarEstadoWF('OK','{ETAPANUEVA}',{IDDOC});"><i class="glyphicon glyphicon-ok"></i> &nbsp;{TITULOESTADO}</button>
                     <button {MOSTRARRECHAZAR} type="button" class="btn btn-default" onclick="$('#myModal-observacion-rechazo').modal('show');"><i class="glyphicon glyphicon-remove"></i> &nbsp;Rechazar</button>
-                    <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');"><i class="glyphicon glyphicon-chevron-left"></i> Volver</button>
+                    <!--<button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');"><i class="glyphicon glyphicon-chevron-left"></i> Volver</button>-->
                 </div>
+                <div class="panel-actions col-xs-4">
+                    <ul class="navbar">                                          
 
+                      <li class="">
+                        <a href="#contenido"  onClick="MostrarContenido();">
+                          <i class="glyphicon glyphicon-menu-left"></i>
+                          <span>Volver</span>
+                        </a>
+                      </li>
+                    </ul>
+                </div>
             </div>
         </div>
         <div class="row">

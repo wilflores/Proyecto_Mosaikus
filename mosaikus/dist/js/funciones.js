@@ -292,7 +292,8 @@ function init_filtro_ao_multiple(checkbox_cascade){
                 admin_ap();
             }
         }
-        //verPagina(1,document);
+        else
+           verPagina(1,document);
         //console.log(data.selected);
     });
 }

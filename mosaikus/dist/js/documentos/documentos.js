@@ -236,6 +236,8 @@ function cargar_autocompletado(){
             array = new XArray();
             array.setObjeto('Documentos','crear_version');
             array.addParametro('id',id);
+            array.addParametro('modo',document.getElementById('modo').value);
+            array.addParametro('cod_link',document.getElementById('cod_link').value);
             array.addParametro('import','clases.documentos.Documentos');
             xajax_Loading(array.getArray());
     }

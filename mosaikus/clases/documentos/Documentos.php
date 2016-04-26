@@ -2,14 +2,14 @@
         function archivo($tupla)
         {
             //<img class=\"SinBorde\" src=\"diseno/images/archivoVer.png\">
-            $html = "<a target=\"_blank\" title=\"Ver Documento Fuente\" href=\"pages/documentos/descargar_archivo.php?id=$tupla[IDDoc]&token=" . md5($tupla[IDDoc]) ."\">
+            $html = "<a target=\"_blank\" title=\"Ver Documento Fuente\" href=\"pages/documentos/descargar_archivo.php?id=$tupla[IDDoc]&token=" . md5($tupla[IDDoc]) ."&des=1\">
                             
                             <i class=\"icon icon-download\"></i>
                         </a>";
             $html = '';
             if (strlen($tupla[nom_visualiza])>0){
                 //<img class=\"SinBorde\" title=\"Ver Documento PDF\" src=\"diseno/images/pdf.png\">
-                $html .= "<a target=\"_blank\"  title=\"Ver Documento PDF\" href=\"pages/documentos/descargar_archivo_pdf.php?id=$tupla[IDDoc]&token=" . md5($tupla[IDDoc]) ."\">
+                $html .= "<a target=\"_blank\"  title=\"Ver Documento PDF\" href=\"pages/documentos/descargar_archivo_pdf.php?id=$tupla[IDDoc]&token=" . md5($tupla[IDDoc]) ."&des=1\">
                             <i class=\"icon icon-view-document\"></i>
                         </a>";                
                 return $html;
@@ -502,14 +502,14 @@
         public   function archivo($tupla)
         {
             //<img class=\"SinBorde\" src=\"diseno/images/archivoVer.png\">
-            $html = "<a target=\"_blank\" title=\"Ver Documento Fuente\" href=\"pages/documentos/descargar_archivo.php?id=$tupla[IDDoc]&token=" . md5($tupla[IDDoc]) ."\">
+            $html = "<a target=\"_blank\" title=\"Ver Documento Fuente\" href=\"pages/documentos/descargar_archivo.php?id=$tupla[IDDoc]&token=" . md5($tupla[IDDoc]) ."&des=1\">
                             
                             <i class=\"icon icon-download\"></i>
                         </a>";
             $html = '';
             if (strlen($tupla[nom_visualiza])>0){
                 //<img class=\"SinBorde\" title=\"Ver Documento PDF\" src=\"diseno/images/pdf.png\">
-                $html .= "<a target=\"_blank\"  title=\"Ver Documento PDF\" href=\"pages/documentos/descargar_archivo_pdf.php?id=$tupla[IDDoc]&token=" . md5($tupla[IDDoc]) ."\">
+                $html .= "<a target=\"_blank\"  title=\"Ver Documento PDF\" href=\"pages/documentos/descargar_archivo_pdf.php?id=$tupla[IDDoc]&token=" . md5($tupla[IDDoc]) ."&des=1\">
                             <i class=\"icon icon-view-document\"></i>
                         </a>";                
                 return $html;
@@ -1366,7 +1366,8 @@
                     }
                     $filtro_ao ='';
                     if ((strlen($atr["b-id_organizacion"])>0) && ($atr["b-id_organizacion"] != "2")){                             
-                        $id_org = $this->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
+                        //$id_org = $this->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
+                        $id_org = ($atr["b-id_organizacion"]);
                         $filtro_ao .= " INNER JOIN ("
                                 . " select IDDoc from mos_documentos_estrorg_arbolproc where id_organizacion_proceso in (". $id_org . ") GROUP BY IDDoc) as ao ON ao.IDDoc = d.IDDoc ";//" AND id_organizacion IN (". $id_org . ")";
                     }
@@ -2076,7 +2077,8 @@
 //                        case 2:
                           case 20:
                               
-                              if ((in_array($i, $array_columns))&&(strlen($parametros['b-id_organizacion'])<=0))
+                              if ((in_array($i, $array_columns))&&((strlen($parametros['b-id_organizacion'])==0)|| (strpos($parametros['b-id_organizacion'],','))))
+                                  
                                   array_push($config,$config_col[$i]);
                               else                                
                                 $grid->hidden[$i] = true;
@@ -2365,7 +2367,7 @@
                                         PanelOperator.initPanels("");
                                         ScrollBar.initScroll();
                                         init_filtro_rapido();
-                                        init_filtro_ao_simple();');
+                                        init_filtro_ao_multiple();');
                 
                 /*Js init_tabla*/
                 $objResponse->addScript("$('.ver-mas').on('click', function (event) {
@@ -2526,7 +2528,7 @@
                                         PanelOperator.showSearch("");
 
                                         init_filtro_rapido();
-                                        init_filtro_ao_simple();
+                                        init_filtro_ao_multiple();
                                         PanelOperator.resize();');
                 /* JS init_tabla_reporte*/
                 $objResponse->addScript("$('.ver-documento').on('click', function (event) {
@@ -2712,7 +2714,7 @@
                                             PanelOperator.showSearch("");
 
                                             init_filtro_rapido();
-                                            init_filtro_ao_simple();
+                                            init_filtro_ao_multiple();
                                             PanelOperator.resize();');
                 $objResponse->addScript("$('#tblDocumentos > tbody > tr').addClass('cursor-pointer');
                                         $('#tblDocumentos > tbody > tr').on('click', function (event) {
@@ -2894,33 +2896,136 @@
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
-                
+                $val = $this->verDocumentos($parametros[id]); 
                 $ut_tool = new ut_Tool();
                 $contenido_1   = array();
+                /*Carga Acceso segun el arbol*/
+                if (count($this->id_org_acceso) <= 0){
+                    $this->cargar_acceso_nodos($atr);
+                }
+                $editar = false;
+                if($_SESSION[SuperUser]=='S'){
+                    $editar = true;
+                }
+                else if(($val[elaboro]==$_SESSION['CookCodEmp'])){
+                        $editar = false;                        
+                        $organizacion = array();
+                        if(strpos($val[id_organizacion],',')){    
+                            $organizacion = explode(",", $val[id_organizacion]);
+                        }
+                        else{
+                            $organizacion[] = $val[id_organizacion];                                 
+                        }
+                        /*SE VALIDA QUE PUEDE EDITAR EN TODAS LAS AREAS*/
+                        foreach ($organizacion as $value_2) {
+                            if (isset($this->id_org_acceso[$value_2])){
+                                if(($this->id_org_acceso[$value_2][crear]=='S'))
+                                    $editar = true;
+                            } else{
+                                $editar = false;
+                                break;
+                            }
+                        }                        
+                     }
+                
+                else{
+                    $editar = false;                        
+                    $organizacion = array();
+                    if(strpos($val[id_organizacion],',')){    
+                        $organizacion = explode(",", $val[id_organizacion]);
+                    }
+                    else{
+                        $organizacion[] = $val[id_organizacion];                                 
+                    }
+                    /*SE VALIDA QUE PUEDE EDITAR EN TODAS LAS AREAS*/
+                    foreach ($organizacion as $value_2) {
+                        if (isset($this->id_org_acceso[$value_2])){
+                            if(($this->id_org_acceso[$value_2][modificar_terceros]=='S'))
+                                $editar = true;
+                        } else{
+                            $editar = false;
+                            break;
+                        }
+                    }
+                }
                 if (count($this->nombres_columnas) <= 0){
-                        $this->cargar_nombres_columnas();
+                    $this->cargar_nombres_columnas();
                 }
-                foreach ( $this->nombres_columnas as $key => $value) {
-                    $contenido_1["N_" . strtoupper($key)] =  $value;
-                }                
-                if (count($this->placeholder) <= 0){
-                        $this->cargar_placeholder();
-                }
-                foreach ( $this->placeholder as $key => $value) {
-                    $contenido_1["P_" . strtoupper($key)] =  $value;
-                }                     
-                $val = $this->verDocumentos($parametros[id]); 
-                $contenido_1['ELABORO'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE elaboro = 'S'"
-                                                                    , 'cod_emp'
-                                                                    , 'nombres', $val['elaboro']);
                 
-                $contenido_1[NOMBRE_DOC] = $val["Codigo_doc"].'-'.$val["nombre_doc"].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
-                $contenido_1[REVISION] = $this->verDocumentosRevisionSiguiente($parametros[id],$val[version]);
-                $contenido_1[FECHA] = date('d/m/Y');
-                $contenido_1['VERSION'] = $val["version"];
+               if ($editar === true){
+                    foreach ( $this->nombres_columnas as $key => $value) {
+                        $contenido_1["N_" . strtoupper($key)] =  $value;
+                    }                
+                    if (count($this->placeholder) <= 0){
+                            $this->cargar_placeholder();
+                    }
+                    foreach ( $this->placeholder as $key => $value) {
+                        $contenido_1["P_" . strtoupper($key)] =  $value;
+                    }                     
+
+                    $contenido_1['ELABORO'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
+                                                                            CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
+                                                                                FROM mos_personal p WHERE elaboro = 'S'"
+                                                                        , 'cod_emp'
+                                                                        , 'nombres', $val['elaboro']);
+
+                    $contenido_1[NOMBRE_DOC] = $val["Codigo_doc"].'-'.$val["nombre_doc"].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                    $contenido_1[REVISION] = $this->verDocumentosRevisionSiguiente($parametros[id],$val[version]);
+                    $contenido_1[FECHA] = date('d/m/Y');
+                    $contenido_1['VERSION'] = $val["version"];
+               }
+               
+               $sql = "SELECT d.IDDoc                                                                        
+                                    ,Codigo_doc 
+                                    ,nombre_doc
+                                    ,version
+                                    ,revision
+                                    ,DATE_FORMAT(fecha, '%d/%m/%Y') fecha 
+                                    ,contentType
+                                    ,nom_visualiza 
+                                    ,contentType_visualiza 
+                                    ,r.observacion
+                            FROM mos_documentos d
+                            inner JOIN mos_documento_revision r on r.IDDoc = d.IDDoc
+                            WHERE Codigo_doc='$val[Codigo_doc]' "
+                        . "order by version desc, revision desc ";
+                $data = $this->dbl->query($sql, array());
+                $grid= new DataGrid();
+                $grid->SetConfiguracionMSKS("tblDocumentos", "");
+                $config=array(
+//htmlentities(
+               //array( "width"=>"1%","ValorEtiqueta"=>"ID"),     
+               array( "width"=>"3%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[Codigo_doc], ENT_QUOTES, "UTF-8")),     
+               array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[nombre_doc], ENT_QUOTES, "UTF-8")),     
+               
+               array( "width"=>"2%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[version], ENT_QUOTES, "UTF-8")),
+                    array( "width"=>"2%","ValorEtiqueta"=>"Revisi&oacute;n"),  
+                    array( "width"=>"5%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[fecha], ENT_QUOTES, "UTF-8")),         
+               array( "width"=>"2%","ValorEtiqueta"=>"Archivos"),                                                    
+               //array( "width"=>"8%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[contentType_visualiza], ENT_QUOTES, "UTF-8")),                
+               //array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[elaboro], ENT_QUOTES, "UTF-8")),
+               array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[observacion_rev], ENT_QUOTES, "UTF-8")),                                                                   
+                );      
                 
+                $func= array();
+
+                $columna_funcion = -1;
+                               
+                
+                $grid->hidden[0] = $grid->hidden[6] =  $grid->hidden[8] = true;                
+                $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
+                
+                $grid->setFuncion("nom_visualiza", "archivo");
+                $grid->setFuncion("Codigo_doc", "codigo_doc");
+                $grid->setFuncion("version", "version");
+                
+                $grid->setAligns(1,"center");
+                $grid->setAligns(6,"center");
+                //$grid->hidden = array(0 => true);
+    
+                $grid->setDataMSKS("td-table-data", $data);
+                $contenido_1['TABLA']= $grid->armarTabla();
+               
                 //$contenido_1[CSS_TABLA_FILEUPLOAD_VIS] = $contenido_1[CSS_TABLA_FILEUPLOAD] = 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'documentos/';
@@ -2951,6 +3056,14 @@
                                 placeholder: 'Selecione el revisor',
                                 allowClear: true
                               });");
+                if ($editar === true){
+                    $objResponse->addScript("$('#tabs-hv').tab();"
+                        . "$('#tabs-hv a:last').tab('show');");
+                }
+                else{
+                    $objResponse->addScript("$('#tabs-hv').tab();$('#tabs-hv a:last').tab('show');");
+                    $objResponse->addScript ("$('.nav-tabs a[href=\"#hv-red\"]').hide();");
+                }
                 $objResponse->addScript("$('#fecha').datepicker();");
                 return $objResponse;
             }
@@ -2963,54 +3076,107 @@
                 
                 $ut_tool = new ut_Tool();
                 $contenido_1   = array();
-                if (count($this->nombres_columnas) <= 0){
-                        $this->cargar_nombres_columnas();
-                }
-                foreach ( $this->nombres_columnas as $key => $value) {
-                    $contenido_1["N_" . strtoupper($key)] =  $value;
-                }                
-                if (count($this->placeholder) <= 0){
-                        $this->cargar_placeholder();
-                }
-                foreach ( $this->placeholder as $key => $value) {
-                    $contenido_1["P_" . strtoupper($key)] =  $value;
-                }                     
+                                 
                 $val = $this->verDocumentos($parametros[id]); 
+                /*Carga Acceso segun el arbol*/
+                if (count($this->id_org_acceso) <= 0){
+                    $this->cargar_acceso_nodos($atr);
+                }
+                $editar = false;
                 if($_SESSION[SuperUser]=='S'){
-                    $sql="SELECT wf.id,
-                            CONCAT('".$this->nombres_columnas[elaboro]."=>', 
-                            CONCAT(CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_materno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2)))) 
-                            ,' | ".$this->nombres_columnas[reviso]."=>', 
-                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
-                            ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
-                            FROM mos_workflow_documentos AS wf
-                            left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
-                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
+                    $editar = true;
                 }
-                else
-                {
-                    $sql="SELECT wf.id,
-                            CONCAT('".$this->nombres_columnas[reviso]."=>', 
-                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))),'N/A') 
-                            ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
-                            FROM mos_workflow_documentos AS wf
-                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
-                    WHERE wf.id_personal_responsable='".$_SESSION['CookCodEmp']."'";
-                    
-                }
-                //echo $sql;
-                $contenido_1['ID_WORKFLOW_DOCUMENTO'] = $ut_tool->OptionsCombo($sql
-                                                                    , 'id'
-                                                                    , 'wf', $val['id_workflow_documento']);
+                else if(($val[elaboro]==$_SESSION['CookCodEmp'])){
+                        $editar = false;                        
+                        $organizacion = array();
+                        if(strpos($val[id_organizacion],',')){    
+                            $organizacion = explode(",", $val[id_organizacion]);
+                        }
+                        else{
+                            $organizacion[] = $val[id_organizacion];                                 
+                        }
+                        /*SE VALIDA QUE PUEDE EDITAR EN TODAS LAS AREAS*/
+                        foreach ($organizacion as $value_2) {
+                            if (isset($this->id_org_acceso[$value_2])){
+                                if(($this->id_org_acceso[$value_2][crear]=='S'))
+                                    $editar = true;
+                            } else{
+                                $editar = false;
+                                break;
+                            }
+                        }                        
+                     }
                 
-                $contenido_1[NOMBRE_DOC_AUX] = $val["Codigo_doc"].'-'.$val["nombre_doc"].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
-                $contenido_1[REVISION] = $this->verDocumentosRevisionSiguiente($parametros[id],$val[version]);
-                $contenido_1[FECHA] = date('d/m/Y');
-                $contenido_1['VERSION'] = $val["version"]+1;
-                $contenido_1['CODIGO_DOC'] = ($val["Codigo_doc"]);
-                $contenido_1['NOMBRE_DOC'] = ($val["nombre_doc"]);
+                else{
+                    $editar = false;                        
+                    $organizacion = array();
+                    if(strpos($val[id_organizacion],',')){    
+                        $organizacion = explode(",", $val[id_organizacion]);
+                    }
+                    else{
+                        $organizacion[] = $val[id_organizacion];                                 
+                    }
+                    /*SE VALIDA QUE PUEDE EDITAR EN TODAS LAS AREAS*/
+                    foreach ($organizacion as $value_2) {
+                        if (isset($this->id_org_acceso[$value_2])){
+                            if(($this->id_org_acceso[$value_2][modificar_terceros]=='S'))
+                                $editar = true;
+                        } else{
+                            $editar = false;
+                            break;
+                        }
+                    }
+                }
+                if (count($this->nombres_columnas) <= 0){
+                    $this->cargar_nombres_columnas();
+                }
+                if ($editar === true){
+                    
+                    foreach ( $this->nombres_columnas as $key => $value) {
+                        $contenido_1["N_" . strtoupper($key)] =  $value;
+                    }                
+                    if (count($this->placeholder) <= 0){
+                            $this->cargar_placeholder();
+                    }
+                    foreach ( $this->placeholder as $key => $value) {
+                        $contenido_1["P_" . strtoupper($key)] =  $value;
+                    }    
+                    if($_SESSION[SuperUser]=='S'){
+                        $sql="SELECT wf.id,
+                                CONCAT('".$this->nombres_columnas[elaboro]."=>', 
+                                CONCAT(CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_materno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2)))) 
+                                ,' | ".$this->nombres_columnas[reviso]."=>', 
+                                IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
+                                ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                                FROM mos_workflow_documentos AS wf
+                                left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
+                                left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                                INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
+                    }
+                    else
+                    {
+                        $sql="SELECT wf.id,
+                                CONCAT('".$this->nombres_columnas[reviso]."=>', 
+                                IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))),'N/A') 
+                                ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                                FROM mos_workflow_documentos AS wf
+                                left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                                INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                        WHERE wf.id_personal_responsable='".$_SESSION['CookCodEmp']."'";
+
+                    }
+                    //echo $sql;
+                    $contenido_1['ID_WORKFLOW_DOCUMENTO'] = $ut_tool->OptionsCombo($sql
+                                                                        , 'id'
+                                                                        , 'wf', $val['id_workflow_documento']);
+
+                    $contenido_1[NOMBRE_DOC_AUX] = $val["Codigo_doc"].'-'.$val["nombre_doc"].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                    $contenido_1[REVISION] = $this->verDocumentosRevisionSiguiente($parametros[id],$val[version]);
+                    $contenido_1[FECHA] = date('d/m/Y');
+                    $contenido_1['VERSION'] = $val["version"]+1;
+                    $contenido_1['CODIGO_DOC'] = ($val["Codigo_doc"]);
+                    $contenido_1['NOMBRE_DOC'] = ($val["nombre_doc"]);
+                }
                 $sql = "SELECT d.IDDoc                                                                        
                                     ,Codigo_doc 
                                     ,nombre_doc
@@ -3088,8 +3254,14 @@
                                 placeholder: 'Selecione el revisor',
                                 allowClear: true
                               });");
-                $objResponse->addScript("$('#tabs-hv').tab();"
-                        . "$('#tabs-hv a:first').tab('show');");
+                if ($editar === true){
+                    $objResponse->addScript("$('#tabs-hv').tab();"
+                        . "$('#tabs-hv a:last').tab('show');");
+                }
+                else{
+                    $objResponse->addScript("$('#tabs-hv').tab();$('#tabs-hv a:last').tab('show');");
+                    $objResponse->addScript ("$('.nav-tabs a[href=\"#hv-red\"]').hide();");
+                }
                 $objResponse->addScript("$('#fecha').datepicker();");
                 return $objResponse;
             }
@@ -4409,7 +4581,7 @@
                 $html = '<div style="height:700px;" class="content-panel panel">
                 <div class="content">
                   <div class="row" style="height:700px;">
-                        <iframe src="http://docs.google.com/gview?url='.$ruta_doc.'&embedded=true" style="height:100%;width:100%;" frameborder="0"></iframe>
+                        <iframe src="http://docs.google.com/gview?url='.$ruta_doc.'&embedded=true" style="height:90%;width:100%;" frameborder="0"></iframe>
                   </div>
 
                 </div>
@@ -4454,7 +4626,7 @@
                 $objResponse = new xajaxResponse();
                 
                 $objResponse->addScript("limpiar_titulo();");
-                if (strlen($parametros['b-id_organizacion'])>0){
+                if ((strlen($parametros['b-id_organizacion'])>0)&&(!strpos($parametros['b-id_organizacion'],','))){
                     //echo BuscaOrganizacional(array('id_organizacion' => $parametros['b-id_organizacion']));
                     $objResponse->addScript("$('#div-titulo-mod').html($('#div-titulo-mod').html() + '<br>' + '". BuscaOrganizacional(array('id_organizacion' => $parametros['b-id_organizacion'])). "');");
                 }

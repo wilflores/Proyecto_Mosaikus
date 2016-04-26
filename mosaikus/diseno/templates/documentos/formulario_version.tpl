@@ -1,21 +1,31 @@
 <div id="main-content" class="panel-container col-xs-24 ">
               <div class="content-panel panel">
                   <div class="content">
-                              <div class="panel-heading">
-            <div class="row">
-                <div class="panel-title col-xs-12" id="div-titulo-for">
-                    Nueva Versión                    
-                </div>                
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="panel-title col-xs-19" id="div-titulo-for">
+                                            Versiones del Documento
+                                        </div>                
+                                        <div class="panel-actions col-xs-4">
+                                            <ul class="navbar">                                          
 
-            </div>
-        </div>
+                                              <li class="">
+                                                <a href="#contenido"  onClick="MostrarContenido();">
+                                                  <i class="glyphicon glyphicon-menu-left"></i>
+                                                  <span>Volver</span>
+                                                </a>
+                                              </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
 
 <div class="row">
     <div class="col-xs-24">
 <div class="tabs"> 
     <ul id="tabs-hv" class="nav nav-tabs" data-tabs="tabs">
-        <li><a href="#hv-red" data-toggle="tab">Versión </a></li>
-        <li><a href="#hv-blue" data-toggle="tab">Versiones Anteriores</a></li>                
+        <li><a href="#hv-red" data-toggle="tab">Crear Versión </a></li>
+        <li><a href="#hv-blue" data-toggle="tab">Histórico de Versiones</a></li>                
     </ul>        
     <div id="my-tab-content" style="padding-right: 5%;" class="tab-content">
         <div class="tab-pane active" id="hv-red">
