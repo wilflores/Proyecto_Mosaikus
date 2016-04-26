@@ -44,14 +44,15 @@
             }
             
             public function ingresarMenuArbol($atr){
-                try {                    
+                try {     
+                    
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql = "INSERT INTO mos_link_por_perfil(cod_perfil,cod_link)
                             VALUES(
                                 $atr[cod_perfil],$atr[id]
                                 )";
                     $this->dbl->insert_update($sql);
-                    return "El Perfil '$atr[cod_perfil]' ha sido ingresado con exito";
+                    return "El Perfil '$atr[descripcion_perfil]' ha sido ingresado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
                         if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
@@ -656,10 +657,11 @@
 //                    if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
                         $arr = explode(",", $parametros[nodos]);
                         $params[cod_perfil] = $parametros[cod_perfil];
+                        $params[descripcion_perfil] = $parametros[descripcion_perfil];                        
                         $this->eliminarMenuArbol($parametros);
                         foreach($arr as $temp){
                                 $params[id] = $temp;
-                                $this->ingresarMenuArbol($params);
+                                $respuesta = $this->ingresarMenuArbol($params);
                         }
                         $objResponse->addScriptCall("MostrarContenido");
                         $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
