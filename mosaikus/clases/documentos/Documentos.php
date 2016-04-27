@@ -601,7 +601,7 @@
 
                         foreach ($Resp3 as $Fila3) 
                         {
-                                if(($Fila3[organizacion_padre]==2)||($Fila3[level] == $this->nivel_area))
+                                if(($Fila3[organizacion_padre]==2)||($Fila3[organizacion_padre]==1)||($Fila3[level] == $this->nivel_area))
                                 {
                                         $OrgNom.=($Fila3[identificacion]);
                                         return($OrgNom);                                        
@@ -793,7 +793,26 @@
            //if($_SESSION[CookM] == 'S')            
            //**********EDITAR **********
            if($_SESSION[SuperUser] == 'S'){
-                $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
+                $editar = false;                        
+                $organizacion = array();
+                if(strpos($tupla[arbol_organizacional],',')){    
+                    $organizacion = explode(",", $tupla[arbol_organizacional]);
+                }
+                else{
+                    $organizacion[] = $tupla[arbol_organizacional];                                 
+                }
+                /*SE VALIDA QUE PUEDE EDITAR EN TODAS LAS AREAS*/
+                foreach ($organizacion as $value_2) {
+                    if (isset($this->id_org_acceso[$value_2])){
+                        //if(($this->id_org_acceso[$value_2][modificar]=='S'))
+                            $editar = true;
+                    } else{
+                        $editar = false;
+                        break;
+                    }
+                }
+                if (($editar == true))
+                    $html = "<a href=\"#\" onclick=\"javascript:editarDocumentos('". $tupla[IDDoc] . "');\"  title=\"Modificar Documento $tupla[nombre_doc]\">                            
                             <i class=\"icon icon-edit\"></i>
                         </a>";
                 } 
@@ -851,7 +870,26 @@
             }
            //********** ELIMINAR **********
            if($_SESSION[SuperUser] == 'S'){
-                $html .= '<a href="#" onclick="javascript:eliminarDocumentos(\''. $tupla[IDDoc] . '\');" title="Eliminar '.$tupla[nombre_doc].'">
+                $editar = false;                        
+                $organizacion = array();
+                if(strpos($tupla[arbol_organizacional],',')){    
+                    $organizacion = explode(",", $tupla[arbol_organizacional]);
+                }
+                else{
+                    $organizacion[] = $tupla[arbol_organizacional];                                 
+                }
+                /*SE VALIDA QUE PUEDE EDITAR EN TODAS LAS AREAS*/
+                foreach ($organizacion as $value_2) {
+                    if (isset($this->id_org_acceso[$value_2])){
+                        //if(($this->id_org_acceso[$value_2][eliminar]=='S'))
+                            $editar = true;
+                    } else{
+                        $editar = false;
+                        break;
+                    }
+                }
+                if (($editar == true))
+                    $html .= '<a href="#" onclick="javascript:eliminarDocumentos(\''. $tupla[IDDoc] . '\');" title="Eliminar '.$tupla[nombre_doc].'">
                         <i class="icon icon-remove"></i>                        
                     </a>'; 
                 } 
@@ -1394,12 +1432,12 @@
                     foreach ($this->parametros as $value) {
                         $sql_left .= " LEFT JOIN(select t1.id_registro, t2.descripcion as nom_detalle from mos_parametro_modulos t1
                                 inner join mos_parametro_det t2 on t1.cod_categoria=t2.cod_categoria and t1.cod_parametro=t2.cod_parametro and t1.cod_parametro_det=t2.cod_parametro_det
-                        where t1.cod_categoria='1' and t1.cod_parametro='$value[cod_parametro]' ) AS p$k ON p$k.id_registro = p.cod_emp "; 
+                        where t1.cod_categoria='1' and t1.cod_parametro='$value[cod_parametro]' ) AS p$k ON p$k.id_registro = d.IDDoc "; 
                         $sql_col_left .= ",p$k.nom_detalle p$k ";
                         $k++;
                     }
                     $filtro_ao ='';
-                    if ((strlen($atr["b-id_organizacion"])>0) && ($atr["b-id_organizacion"] != "2")){                             
+                    if ((strlen($atr["b-id_organizacion"])>0)){                             
                         //$id_org = $this->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
                         $id_org = ($atr["b-id_organizacion"]);
                         $filtro_ao .= " INNER JOIN ("
@@ -1411,7 +1449,7 @@
                     if (count($this->id_org_acceso_todos_nivel) <= 0){
                         $this->cargar_acceso_nodos_todos_nivel($atr);                    
                     }
-                   // print_r($this->id_org_acceso);
+                   // print_r($this->id_org_acceso_todos_nivel);
                    // echo 'aqui';
                    // print_r($this->id_org_acceso_todos_nivel);
                     $sql = "SELECT COUNT(*) total_registros
@@ -1433,8 +1471,8 @@
                                 if (strlen($atr["b-flujo-trabajo"])== 0){
                                     if (count($this->id_org_acceso))
                                         $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
-                                    if (count($this->id_org_acceso_todos_nivel))
-                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
+                                    if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-publico"])>0))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))) . ")) )"; 
                                 }
                                 $sql .= ")";
                             }
@@ -1453,9 +1491,9 @@
 
                                     if (count($this->id_org_acceso))
                                         $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
-                                    if (count($this->id_org_acceso_todos_nivel))
-                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
-                                     $sql .= ")";
+                                    if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-publico"])>0))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))) . ")) )"; 
+                                    $sql .= ")";
                                 }
                             }
                             //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
@@ -1499,18 +1537,18 @@
                     if (strlen($atr["b-formulario"])>0)
                                 $sql .= " AND upper(formulario) like '%" . strtoupper($atr["b-formulario"]) . "%'";
                     if (strlen($atr["b-vigencia"])>0)
-                        $sql .= " AND upper(vigencia) like '%" . strtoupper($atr["b-vigencia"]) . "%'";
-                    if (strlen($atr["b-publico"])>0){
-                        if (strlen($atr["b-privado"])>0){
-                            
-                        }
-                        else
-                            
-                            $sql .= " AND publico = 'S'";
-                    }
-                    else
-                    if (strlen($atr["b-privado"])>0)
-                        $sql .= " AND publico = 'N'";
+                        $sql .= " AND (d.vigencia) = '" . ($atr["b-vigencia"]) . "'";
+//                    if (strlen($atr["b-publico"])>0){
+//                        if (strlen($atr["b-privado"])>0){
+//                            
+//                        }
+//                        else
+//                            
+//                            $sql .= " AND publico = 'S'";
+//                    }
+//                    else
+//                    if (strlen($atr["b-privado"])>0)
+//                        $sql .= " AND publico = 'N'";
                     if (strlen($atr["b-doc_fisico"])>0)
                         $sql .= " AND doc_fisico = '". $atr["b-doc_fisico"] . "'";
                     if (strlen($atr["b-contentType"])>0)
@@ -1553,12 +1591,13 @@
                         $sql .= " AND d.aprobo = '". $atr["b-aprobo"] . "'";
                     /*Acceso a los documentos segun el arbol, no aplica para el administrador de documentos*/
                     if ((!isset($atr[terceros]))){                            
-                        //$sql .= " AND id_organizacion IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")";                        
-                       // 
                        $sql .= " AND d.etapa_workflow ='estado_aprobado' "; 
                        
-                       if (count($this->id_org_acceso))
-                        $sql .= " AND  d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . "))"; 
+                       $sql .= " AND  (d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . "))"; 
+                       if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-publico"])>0))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))) . ")) )"; 
+                                                                      
+                       $sql .= ")";
                     }
                     
                     $total_registros = $this->dbl->query($sql, $atr);
@@ -1589,7 +1628,7 @@
                                     ,(SELECT mos_nombres_campos.texto FROM mos_nombres_campos
                                     WHERE mos_nombres_campos.nombre_campo = d.etapa_workflow AND mos_nombres_campos.modulo = 6
                                     ) etapa_workflow
-                                    -- ,id_filial                                    
+                                     ,CASE d.publico WHEN 'S' Then 'Si' ELSE 'No' END publico                                    
                                     -- ,id_usuario
                                     ,d.observacion
                                     -- ,muestra_doc
@@ -1622,8 +1661,9 @@
                                 if (strlen($atr["b-flujo-trabajo"])== 0){
                                     if (count($this->id_org_acceso))
                                         $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
-                                    if (count($this->id_org_acceso_todos_nivel))
-                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
+                                    /*DOCUMENTOS PUBLICOS*/
+                                    if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-publico"])>0))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S'  and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))) . ")) )"; 
                                 }
                                 $sql .= ")";
                             }
@@ -1642,8 +1682,8 @@
 
                                     if (count($this->id_org_acceso))
                                         $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
-                                    if (count($this->id_org_acceso_todos_nivel))
-                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
+                                    if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-publico"])>0))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))) . ")) )"; 
                                      $sql .= ")";
                                 }
                             }
@@ -1688,18 +1728,18 @@
                     if (strlen($atr["b-formulario"])>0)
                                 $sql .= " AND upper(formulario) like '%" . strtoupper($atr["b-formulario"]) . "%'";
                     if (strlen($atr["b-vigencia"])>0)
-                        $sql .= " AND upper(vigencia) like '%" . strtoupper($atr["b-vigencia"]) . "%'";
-                    if (strlen($atr["b-publico"])>0){
-                        if (strlen($atr["b-privado"])>0){
-                            
-                        }
-                        else
-                            
-                            $sql .= " AND publico = 'S'";
-                    }
-                    else
-                    if (strlen($atr["b-privado"])>0)
-                        $sql .= " AND publico = 'N'";
+                        $sql .= " AND (d.vigencia) = '" . ($atr["b-vigencia"]) . "'";
+//                    if (strlen($atr["b-publico"])>0){
+//                        if (strlen($atr["b-privado"])>0){
+//                            
+//                        }
+//                        else
+//                            
+//                            $sql .= " AND publico = 'S'";
+//                    }
+//                    else
+//                    if (strlen($atr["b-privado"])>0)
+//                        $sql .= " AND publico = 'N'";
                     if (strlen($atr["b-doc_fisico"])>0)
                         $sql .= " AND doc_fisico = '". $atr["b-doc_fisico"] . "'";
                     if (strlen($atr["b-contentType"])>0)
@@ -1752,11 +1792,16 @@
                     /*Acceso a los documentos segun el arbol, no aplica para el administrador de documentos*/
                     if ((!isset($atr[terceros]))){                            
                        $sql .= " AND d.etapa_workflow ='estado_aprobado' "; 
-                       if (count($this->id_org_acceso))
-                        $sql .= " AND  d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . "))"; 
+                       
+                       $sql .= " AND  (d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . "))"; 
+                       if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-publico"])>0))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))) . ")) )"; 
+                                                                      
+                       $sql .= ")";
                     }
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                    //print_r(array_keys($this->id_org_acceso));
                     //print_r($atr);
                     //  echo $sql;
                     $this->operacion($sql, $atr);
@@ -1950,8 +1995,9 @@
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos("Fecha de Revisión", "fecha_revision", $parametros)),  
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[palabras_claves], "palabras_claves", $parametros)),               
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),
-               array( "width"=>"20%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[arbproc], "arbproc", $parametros)),     
+               array( "width"=>"20%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[arbproc], "arbproc", $parametros, 150,40)),     
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[etapa_workflow], "etapa_workflow", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[publico], "publico", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[observacion], "observacion", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[doc_fisico], "doc_fisico", $parametros)),               
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_filial], "id_filial", $parametros)),               
@@ -2101,6 +2147,7 @@
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),
                array( "width"=>"15%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[arbproc], "arbproc", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[etapa_workflow], "etapa_workflow", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[publico], "publico", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[observacion], "observacion", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[doc_fisico], "doc_fisico", $parametros)),               
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_filial], "id_filial", $parametros)),               
@@ -2114,11 +2161,13 @@
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apli_reg_estrorg], "apli_reg_estrorg", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apli_reg_arbproc], "apli_reg_arbproc", $parametros)),
                array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
-                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
                array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
                array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
                     array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
                     array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    //array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    //array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
                
                
                
@@ -2242,6 +2291,8 @@
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[palabras_claves], "palabras_claves", $parametros)),               
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),
                array( "width"=>"15%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[arbproc], "arbproc", $parametros)),     
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[etapa_workflow], "etapa_workflow", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[publico], "publico", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[observacion], "observacion", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[doc_fisico], "doc_fisico", $parametros)),               
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_filial], "id_filial", $parametros)),               
@@ -2255,6 +2306,13 @@
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apli_reg_estrorg], "apli_reg_estrorg", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apli_reg_arbproc], "apli_reg_arbproc", $parametros)),
                array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+               array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+               array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    //array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+                    //array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
                
                
                
@@ -2334,7 +2392,7 @@
                         $this->cargar_parametros();
                 }
                 $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
-                $k = 29;
+                $k = 30;
                 $contenido[PARAMETROS_OTROS] = "";
                 foreach ($this->parametros as $value) {                    
                     //$parametros['mostrar-col'] .= "-$k";
@@ -2350,6 +2408,7 @@
                 /*Para visualizar los documentos de terceros*/
                 //if ($_SESSION[SuperUser]!='S')
                 $parametros[terceros] = 'S';
+                $parametros["b-publico"] = 'S';
                 $this->get_min_nivel_area($parametros);
                 $grid = $this->verListaDocumentos($parametros);
                 
@@ -2529,7 +2588,7 @@
                 if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 }
-                $k = 23;
+                $k = 30;
                 $contenido[PARAMETROS_OTROS] = "";
                 foreach ($this->parametros as $value) {                    
                     //$parametros['mostrar-col'] .= "-$k";
@@ -2542,6 +2601,9 @@
                             ';
                     $k++;
                 }
+                /*FILTRA LOS DOCUMENTOS QUE ESTAN VIGENTES*/
+                $parametros["b-vigencia"] = 'S';
+                $parametros["b-publico"] = 'S';
                 $grid = $this->verListaDocumentosReporte($parametros);
                 $contenido['MODO'] = $parametros['modo'];
                 $contenido['COD_LINK'] = $parametros['cod_link'];  
@@ -2582,6 +2644,7 @@
                         <iframe id="iframearbolP" src="pages/cargo/arbol_proceso_registros.php" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>';
                 
                 $ao = new ArbolOrganizacional();
+                $ao->cargar_acceso_nodos_explicito($parametros);
                 $contenido[DIV_ARBOL_ORGANIZACIONAL] = $ao->jstree_ao(2,$parametros);
 
                 $template = new Template();
@@ -2722,7 +2785,7 @@
                 if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 }
-                $k = 23;
+                $k = 30;
                 $contenido[PARAMETROS_OTROS] = "";
                 foreach ($this->parametros as $value) {                    
                     //$parametros['mostrar-col'] .= "-$k";
@@ -2735,6 +2798,9 @@
                             ';
                     $k++;
                 }
+                /*FILTRA LOS DOCUMENTOS QUE ESTAN VIGENTES*/
+                $parametros["b-vigencia"] = 'S';
+                $parametros["b-publico"] = 'S';
                 $grid = $this->verListaDocumentosReporte($parametros);
                 $contenido['MODO'] = $parametros['modo'];
                 $contenido['COD_LINK'] = $parametros['cod_link'];  
@@ -2770,6 +2836,7 @@
 
 
                 $ao = new ArbolOrganizacional();
+                $ao->cargar_acceso_nodos_explicito($parametros);
                 $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(1,$parametros);
 
                 $template = new Template();
@@ -3026,11 +3093,29 @@
                 $contenido_1   = array();
                 /*Carga Acceso segun el arbol*/
                 if (count($this->id_org_acceso) <= 0){
-                    $this->cargar_acceso_nodos($atr);
+                    $this->cargar_acceso_nodos($parametros);
                 }
                 $editar = false;
                 if($_SESSION[SuperUser]=='S'){
                     $editar = true;
+                    $editar = false;                        
+                    $organizacion = array();
+                    if(strpos($val[id_organizacion],',')){    
+                        $organizacion = explode(",", $val[id_organizacion]);
+                    }
+                    else{
+                        $organizacion[] = $val[id_organizacion];                                 
+                    }
+                    /*SE VALIDA QUE PUEDE EDITAR EN TODAS LAS AREAS*/
+                    foreach ($organizacion as $value_2) {
+                        if (isset($this->id_org_acceso[$value_2])){
+                            //if(($this->id_org_acceso[$value_2][crear]=='S'))
+                                $editar = true;
+                        } else{
+                            $editar = false;
+                            break;
+                        }
+                    }       
                 }
                 else if(($val[elaboro]==$_SESSION['CookCodEmp'])){
                         $editar = false;                        
@@ -3209,11 +3294,28 @@
                 $val = $this->verDocumentos($parametros[id]); 
                 /*Carga Acceso segun el arbol*/
                 if (count($this->id_org_acceso) <= 0){
-                    $this->cargar_acceso_nodos($atr);
+                    $this->cargar_acceso_nodos($parametros);
                 }
                 $editar = false;
                 if($_SESSION[SuperUser]=='S'){
-                    $editar = true;
+                    $editar = false;                        
+                    $organizacion = array();
+                    if(strpos($val[id_organizacion],',')){    
+                        $organizacion = explode(",", $val[id_organizacion]);
+                    }
+                    else{
+                        $organizacion[] = $val[id_organizacion];                                 
+                    }
+                    /*SE VALIDA QUE PUEDE EDITAR EN TODAS LAS AREAS*/
+                    foreach ($organizacion as $value_2) {
+                        if (isset($this->id_org_acceso[$value_2])){
+                            //if(($this->id_org_acceso[$value_2][crear]=='S'))
+                                $editar = true;
+                        } else{
+                            $editar = false;
+                            break;
+                        }
+                    }       
                 }
                 else if(($val[elaboro]==$_SESSION['CookCodEmp'])){
                         $editar = false;                        
@@ -4801,7 +4903,9 @@
             }            
             public function buscar_reporte($parametros)
             {   ///print_r($parametros);
-                /*Para visualizar los documentos de terceros*/
+                
+                /*FILTRA LOS DOCUMENTOS QUE ESTAN VIGENTES*/
+                $parametros["b-vigencia"] = 'S';
                 $grid = $this->verListaDocumentosReporte($parametros);
                 $objResponse = new xajaxResponse();
                 

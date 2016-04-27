@@ -1104,8 +1104,13 @@
                                 $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
                                     . "FROM mos_documentos_estrorg_arbolproc eao "
                                     . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
-                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arrP[id]) . ")  AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' and d.etapa_workflow = 'estado_aprobado'"
-                                    . " ";                                
+                                    . "WHERE tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' and d.etapa_workflow = 'estado_aprobado'"
+                                    . " ";   
+                                $sql .= " AND (eao.id_organizacion_proceso IN (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
+                                if ($parametros["b-publico"] == 'S')
+                                    $sql .= " OR (eao.id_organizacion_proceso IN (".implode(',', array_keys($this->id_org_acceso)).") AND d.publico = 'S' )";
+                                $sql .= ")";
+                                //echo $sql . ' <br>';
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
@@ -1115,8 +1120,12 @@
                                 $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
                                     . "FROM mos_documentos_estrorg_arbolproc eao "
                                     . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
-                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arrP[id]) . ")  AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' AND formulario = 'S'  and d.etapa_workflow = 'estado_aprobado'"
-                                    . " ";                                
+                                    . "WHERE tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' AND formulario = 'S'  and d.etapa_workflow = 'estado_aprobado'"
+                                    . " "; 
+                                $sql .= " AND (eao.id_organizacion_proceso IN (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
+                                if ($parametros["b-publico"] == 'S')
+                                    $sql .= " OR (eao.id_organizacion_proceso IN (".implode(',', array_keys($this->id_org_acceso)).") AND d.publico = 'S' )";
+                                $sql .= ")";
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
@@ -1183,7 +1192,7 @@
                                     if (count($this->id_org_acceso_explicito)>0)
                                        $sql .= " and id_organizacion in (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
                                 
-                                echo $sql;
+                                //echo $sql;
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador='';
                                 $contador=$data_aux[0][cant];
@@ -1197,7 +1206,7 @@
                                         and id_organizacion in (".$arrP[id].")";
                                     if (count($this->id_org_acceso_explicito)>0)
                                        $sql .= " and id_organizacion in (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
-                                echo $sql;
+                                //echo $sql;
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador_uni='';
                                 $contador_uni=$data_aux[0][cant];
@@ -1255,6 +1264,10 @@
                                     . "FROM mos_documentos_estrorg_arbolproc eao "
                                     . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
                                     . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arr[id]) . ")   AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S'  and d.etapa_workflow = 'estado_aprobado'";
+                                $sql .= " AND (eao.id_organizacion_proceso IN (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
+                                if ($parametros["b-publico"] == 'S')
+                                    $sql .= " OR (eao.id_organizacion_proceso IN (".implode(',', array_keys($this->id_org_acceso)).") AND d.publico = 'S' )";
+                                $sql .= ")";
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
                                 $extra .= "<a href=\"#\" class=\"$select_aux\">".($arr[title])." (". ($contador) .")</a>";
@@ -1264,7 +1277,11 @@
                                     . "FROM mos_documentos_estrorg_arbolproc eao "
                                     . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
                                     . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arr[id]) . ")  AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' AND formulario = 'S'  and d.etapa_workflow = 'estado_aprobado'"
-                                    . " ";                                
+                                    . " ";     
+                                $sql .= " AND (eao.id_organizacion_proceso IN (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
+                                if ($parametros["b-publico"] == 'S')
+                                    $sql .= " OR (eao.id_organizacion_proceso IN (".implode(',', array_keys($this->id_org_acceso)).") AND d.publico = 'S' )";
+                                $sql .= ")";
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";

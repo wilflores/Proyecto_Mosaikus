@@ -21,9 +21,9 @@ function validar_perfil($ruta='../../login.php'){
 
  }
  
- function link_titulos($titulo, $valor, $parametros,$ancho=0){
+ function link_titulos($titulo, $valor, $parametros,$ancho=0,$alto=20){
      if ($ancho>0)
-         $html = "<div onclick=\"link_titulos('$valor');\" style='cursor:pointer;width:".$ancho."px;height: 20px;'>" .  htmlentities($titulo, ENT_QUOTES, "UTF-8")  . "</div>";     
+         $html = "<div onclick=\"link_titulos('$valor');\" style='cursor:pointer;width:".$ancho."px;height: ".$alto."px;'>" .  htmlentities($titulo, ENT_QUOTES, "UTF-8")  . "</div>";     
      else
         $html = "<div onclick=\"link_titulos('$valor');\" style='cursor:pointer;display:inline;'>" .  htmlentities($titulo, ENT_QUOTES, "UTF-8")  . "</div>";     
      if ($parametros[corder] == $valor) {

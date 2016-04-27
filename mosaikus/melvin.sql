@@ -296,3 +296,6 @@ UPDATE `mos_link` SET `nombre_link`='Administrador de Perfiles' WHERE (`cod_link
 UPDATE `mos_link` SET `nombre_link`='Perfiles Especialistas' WHERE (`cod_link`='80');
 UPDATE `mos_link` SET `nombre_link`='Perfiles Portal' WHERE (`cod_link`='81');
 
+ALTER TABLE `mos_documentos`
+MODIFY COLUMN `observacion`  text NULL AFTER `id_usuario`;
+

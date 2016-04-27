@@ -90,10 +90,10 @@
                             </div>   
                             <div class="form-group">                                                                
                                 <label class="checkbox-inline"> 
-                                    <input type="checkbox" id="b-publico" name="b-publico" value="S"> Documento {N_PUBLICO} </label>  
-                                    <br>
+                                    <input type="checkbox" id="b-publico" name="b-publico" checked="checked" value="S"> Documento {N_PUBLICO} </label>  
+                                    <!--<br>
                                     <label class="checkbox-inline"> 
-                                    <input type="checkbox" id="b-privado" name="b-privado" value="N"> Documento Privado </label> 
+                                    <input type="checkbox" id="b-privado" name="b-privado" value="N"> Documento Privado </label> -->
                             </div>   
 <!--<div class="form-group">
                                   <label for="vigencia" class="col-md-2 control-label">{N_VIGENCIA}</label>

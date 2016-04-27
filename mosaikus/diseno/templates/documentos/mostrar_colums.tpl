@@ -134,14 +134,14 @@
                                           <input type="checkbox" name="SelectAcc" id="SelectAcc" value="6" class="checkbox-mos-col" checked="checked">   &nbsp;
                                       </label>
                                   </div>
-                            </div><div class="form-group">
-                                  <label for="SelectAcc" class="col-md-9 control-label">{N_VIGENCIA}</label>
-                                  <div class="col-md-3">      
+                            </div>--><div class="checkbox">
+                                  
+                                 
                                       <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="19" class="checkbox-mos-col" checked="checked">   &nbsp;
-                                      </label>
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="19" class="checkbox-mos-col" >   &nbsp;
+                                      {N_VIGENCIA}</label>
                                   </div>
-                            </div>-->
+                            
                                   <div class="checkbox">
                                   
                                   
@@ -194,13 +194,20 @@
                             </div>-->
                             <div class="checkbox">                                                                    
                                 <label >
-                                    <input type="checkbox" name="SelectAcc" id="SelectAcc" value="22" checked="checked" class="checkbox-mos-col" >   &nbsp;
+                                    <input type="checkbox" name="SelectAcc" id="SelectAcc" value="21" checked="checked" class="checkbox-mos-col" >   &nbsp;
                                     {N_ETAPA_WORKFLOW}
                                 </label>                                  
                             </div>
+                                <div class="checkbox">
+                                  
+                                 
+                                      <label >
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="22" class="checkbox-mos-col" >   &nbsp;
+                                      {N_PUBLICO}</label>
+                                  </div>
                             <div class="checkbox">                                                                    
                                 <label >
-                                    <input type="checkbox" name="SelectAcc" id="SelectAcc" value="22"  class="checkbox-mos-col" >   &nbsp;
+                                    <input type="checkbox" name="SelectAcc" id="SelectAcc" value="23"  class="checkbox-mos-col" >   &nbsp;
                                     {N_OBSERVACION}
                                 </label>                                  
                             </div><!--<div class="checkbox">

@@ -193,9 +193,16 @@
                                   </div>
                             </div>--><div class="checkbox">
                                   
+                                 
+                                      <label >
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="22" class="checkbox-mos-col" >   &nbsp;
+                                      {N_PUBLICO}</label>
+                                  </div>
+                                  <div class="checkbox">
+                                  
                                   
                                       <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="21" class="checkbox-mos-col" >   &nbsp;
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="23" class="checkbox-mos-col" >   &nbsp;
                                       {N_OBSERVACION}</label>
                                   
                             </div><!--<div class="checkbox">
