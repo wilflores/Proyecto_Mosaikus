@@ -1159,7 +1159,10 @@
                                         WHERE
                                         IDDoc= ".$_SESSION[IDDoc]." and 
                                         valor in (".$this->BuscaOrgNivelHijos($arrP[id]).")
-                                        and tipo = 11;";
+                                        and tipo = 11 ";
+                                    if (count($this->id_org_acceso_explicito)>0)
+                                       $sql .= " and valor in (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
+                                   // echo $sql;
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador='';
                                 $contador=$data_aux[0][cant];
@@ -1167,29 +1170,34 @@
                                 $cuerpo .= "<a href=\"#\" class=\"$select_aux\">".($arrP[title])." (". ($contador). ")</a>";
                                 break;
                             case 6:
-                                $sql = "select IFNULL(COUNT(cod_emp),0) cant 
-                                        from mos_personal
-                                        where cod_emp in 
-                                        (SELECT 
-                                        nombre
+                                //FALTA AQUIIIIIIIIIII
+                                //// los registros de los empleados de las areas donde tiene permisos
+                                $sql = "SELECT 
+                                        count(idRegistro) cant
                                         FROM
-                                        mos_registro_formulario
+                                        mos_registro_formulario reg inner join mos_personal per on
+                                        reg.Nombre = per.cod_emp
                                         WHERE
-                                        mos_registro_formulario.IDDoc = ".$_SESSION[IDDoc]." and tipo=6)
-                                        and id_organizacion in (".$this->BuscaOrgNivelHijos($arrP[id]).");";
+                                        reg.IDDoc = ".$_SESSION[IDDoc]." and tipo=6
+                                        and id_organizacion in (".$this->BuscaOrgNivelHijos($arrP[id]).")";
+                                    if (count($this->id_org_acceso_explicito)>0)
+                                       $sql .= " and id_organizacion in (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
+                                
+                                echo $sql;
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador='';
                                 $contador=$data_aux[0][cant];
-                                $sql = "select IFNULL(COUNT(cod_emp),0) cant 
-                                        from mos_personal
-                                        where cod_emp in 
-                                        (SELECT 
-                                        nombre
+                                $sql = "SELECT 
+                                        count(idRegistro) cant
                                         FROM
-                                        mos_registro_formulario
+                                        mos_registro_formulario reg inner join mos_personal per on
+                                        reg.Nombre = per.cod_emp
                                         WHERE
-                                        mos_registro_formulario.IDDoc = ".$_SESSION[IDDoc]." and tipo=6)
-                                        and id_organizacion in (".$arrP[id].");";
+                                        reg.IDDoc = ".$_SESSION[IDDoc]." and tipo=6
+                                        and id_organizacion in (".$arrP[id].")";
+                                    if (count($this->id_org_acceso_explicito)>0)
+                                       $sql .= " and id_organizacion in (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
+                                echo $sql;
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador_uni='';
                                 $contador_uni=$data_aux[0][cant];
