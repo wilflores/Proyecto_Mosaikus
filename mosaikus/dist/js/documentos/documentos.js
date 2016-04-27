@@ -243,6 +243,12 @@ function cargar_autocompletado(){
     }
 
     function validar(doc){
+        
+        if ($('#estado_actual').length > 0){
+            if (!($('#estado_actual').val() == -1)){
+                $('#fileUpload2').attr('data-validation',"required");
+            }
+        }
         if($('#idFormulario').isValid()) {
             //var iframe = document.getElementById("iframearbol");
             //iframe.contentWindow.submitMe();
@@ -256,7 +262,7 @@ function cargar_autocompletado(){
             if (($('#nombre_doc_vis').val().length > 0)){                
                 /*VALIDAR QUE EL NOMBRE DEL DOC VIS SEA EL MISMO QUE EL DOC FUENTE*/
                 var nombre_doc = $('#Codigo_doc').val() + '-' + $('#nombre_doc').val() + '-V' + $('#version').val();                
-                if ($('#nombre_doc_vis').val() != nombre_doc){
+                if (($('#nombre_doc_vis').val() != nombre_doc)&&($('#estado_actual_vis').val()!=-1)){
                     if(!confirm("El nombre del documento de visualización, no corresponde con el nombre del documento fuente, este sera renombrado con \""+nombre_doc + "\"\n¿Desea Continuar?")){
                         return;
                     }
@@ -391,6 +397,8 @@ function cargar_autocompletado(){
         document.getElementById('fileUpload2').value = '';
         document.getElementById('tabla_fileUpload').style.display = '';
         document.getElementById('estado_actual').value = '';
+        document.getElementById('filename').value = '';
+        
     }
     
     function cargar_archivo_otro(){
@@ -467,6 +475,43 @@ function cargar_autocompletado(){
                 VerMensaje('error','El archivo excede el tamaño permitido en este sitio, Tamaño máximo del archivo a subir: 3MB');
                 $('#fileUpload2_vis').val('');
                 return;
+            }
+            var nombres_aux = fileInput.files[0].name.split('-');
+            if(nombres_aux.length!=3){
+                if (!confirm('El documento seleccionado, tiene un nombre diferente al esperado, sera renombrado a ' + 
+                        $('#Codigo_doc').val() + '-' + $('#nombre_doc').val() + '-V'+$('#version').val()+'\n ¿Deseas continuar?')){
+                        $('#fileUpload2').val('');
+                    return;
+                }
+            }
+            else{
+                var codigo = nombres_aux[0].replace(' ', '');
+                var version = nombres_aux[2].replace(' ', '');
+                version = version.replace('V', '');
+                version = version.substring(0,version.lastIndexOf('.')-1);
+                if (nombres_aux[1] != $('#nombre_doc').val()){
+                    if (!confirm('El documento seleccionado, tiene un nombre diferente al esperado, sera renombrado a ' + 
+                            $('#Codigo_doc').val() + '-' + $('#nombre_doc').val() + '-V'+$('#version').val()+'\n ¿Deseas continuar?')){
+                            $('#fileUpload2').val('');
+                        return;
+                    }
+                }
+                else
+                if (codigo != $('#Codigo_doc').val()){
+                    if (!confirm('El documento seleccionado, tiene un nombre diferente al esperado, sera renombrado a ' + 
+                            $('#Codigo_doc').val() + '-' + $('#nombre_doc').val() + '-V'+$('#version').val()+'\n ¿Deseas continuar?')){
+                            $('#fileUpload2').val('');
+                        return;
+                    }
+                }
+                else
+                if (version != $('#version').val()){
+                    if (!confirm('El documento seleccionado, tiene un nombre diferente al esperado, sera renombrado a ' + 
+                            $('#Codigo_doc').val() + '-' + $('#nombre_doc').val() + '-V'+$('#version').val()+'\n ¿Deseas continuar?')){
+                            $('#fileUpload2').val('');
+                        return;
+                    }
+                }
             }
             formData.append('fileUpload',fileInput.files[0]);
             

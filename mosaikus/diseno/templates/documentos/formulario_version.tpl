@@ -53,16 +53,12 @@
                                         <input type="hidden" id="tipo_doc" name="tipo_doc" value="{TIPO_DOC}">
                                         <input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
                                         <div id="estado" style="display:none;color:white;">
-                                            <!--<img src="{PAHT_TO_IMG}loading3.gif">Cargando-->
                                             <div class="progress" style="width: 250px;">
                                                 <div class="progress-bar" id="estado-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;">
                                                   0%
                                                 </div>
                                             </div>
                                         </div>
-                                        <!--<input type="hidden" class="form-control" value="{DOC_FISICO}" id="doc_fisico" name="doc_fisico" placeholder="{N_DOC_FISICO}"  data-validation="required"/>
-                                        <input type="hidden" class="form-control" value="{CONTENTTYPE}" id="contentType" name="contentType" placeholder="{N_CONTENTTYPE}" data-validation="required"/>
-                                        -->
                                   </div>     
                                   <span class="help-block" style="font-size: small;">(*) Código-Nombre archivo-Versión.Extension</span>
                              </div>
@@ -70,9 +66,7 @@
                                     <label for="archivo" class="col-md-5 control-label">{N_DOC_FISICO}</label>
                                     <div class="col-md-12">
                                         <p class="form-control-static" style="">
-                                            <!--<img src="{PAHT_TO_IMG}adjunto.png">-->
-                                            <input type="text" class="form-control" style="width: 250px;display: inline;" id="info_nombre">
-                                            <!--<span id="info_nombre" style="display:inline;">{TXT_OTRO_METODO}&nbsp;</span>-->
+                                            <input type="text" class="form-control" readonly="readonly" style="width: 250px;display: inline;" id="info_nombre">
                                             <a href="#" onclick="cancelar_archivo_otro();">
                                                 (<img src="{PAHT_TO_IMG}delete.png" width="12" height="12">
                                                 Eliminar)
@@ -110,7 +104,7 @@
                                     <div class="col-md-12">
                                         <p class="form-control-static" style="">
                                             <!--<img src="{PAHT_TO_IMG}adjunto.png">-->
-                                            <input type="text" class="form-control" style="width: 250px;display: inline;" id="info_nombre_vis">
+                                            <input type="text" readonly="readonly" class="form-control" style="width: 250px;display: inline;" id="info_nombre_vis">
                                             <!--<span id="info_nombre" style="display:inline;">{TXT_OTRO_METODO}&nbsp;</span>-->
                                             <a href="#" onclick="cancelar_archivo_vis();">
                                                 (<img src="{PAHT_TO_IMG}delete.png" width="12" height="12">

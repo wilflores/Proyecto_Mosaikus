@@ -71,45 +71,45 @@ function CambiaSinAcento($Texto)
                     $tamano = filesize(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($_FILES['fileUpload']['name']));
                     $tamano_visual = number_format($tamano/ 1024, 2);
                     $nombres_aux = explode('-', $nombre);
-                    if (count($nombres_aux) != 3){
-                        $funcion = '- Documento no contiene formato apropiado: <br /> Código-Nombre archivo-Versión.Extension';
-                        $exito = 0;
-                        unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($_FILES['fileUpload']['name']));
-                        break;
-                    }
+//                    if (count($nombres_aux) != 3){
+//                        $funcion = '- Documento no contiene formato apropiado: <br /> Código-Nombre archivo-Versión.Extension';
+//                        $exito = 0;
+//                        unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($_FILES['fileUpload']['name']));
+//                        break;
+//                    }
                     $nombre_doc = str_replace('', '', $nombres_aux[1]);
                     $codigo_doc = str_replace(' ', '', $nombres_aux[0]);
                     $version_doc = str_replace(' ', '', $nombres_aux[2]);
                     $version_doc = str_replace('V', '', strtoupper($version_doc));
                     $version_doc = substr($version_doc, 0, strpos($version_doc, '.'));
                    
-                    if ($nombre_doc == ''){
-                        $funcion = '- Documento no contiene nombre.';
-                        $exito = 0;
-                        unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($_FILES['fileUpload']['name']));
-                        break;
-                    }
-                    if ($_POST[nombre_doc] != $nombre_doc){
-                        $funcion = '- Nombre de archivo no coincide con el nombre del documento existente.';
-                        //'-C&oacute;digo archivo no coincide con c&oacute;digo documento existente.<br />'
-                        $exito = 0;
-                        unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($_FILES['fileUpload']['name']));
-                        break;
-                    }
-                    if ($_POST[codigo_doc] != $codigo_doc){
-                        $funcion = '- C&oacute;digo archivo no coincide con c&oacute;digo documento existente.';
-                        //'<br />'
-                        $exito = 0;
-                        unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($_FILES['fileUpload']['name']));
-                        break;
-                    }
-                    if ($version_doc != ($_POST[version]) ){
-                        $funcion = '- Versi&oacute;n documento debe ser consecutiva a la actual: ' . $_POST[version];
-                        //'-C&oacute;digo archivo no coincide con c&oacute;digo documento existente.<br />'
-                        $exito = 0;
-                        unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($_FILES['fileUpload']['name']));
-                        break;
-                    }
+//                    if ($nombre_doc == ''){
+//                        $funcion = '- Documento no contiene nombre.';
+//                        $exito = 0;
+//                        unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($_FILES['fileUpload']['name']));
+//                        break;
+//                    }
+//                    if ($_POST[nombre_doc] != $nombre_doc){
+//                        $funcion = '- Nombre de archivo no coincide con el nombre del documento existente.';
+//                        //'-C&oacute;digo archivo no coincide con c&oacute;digo documento existente.<br />'
+//                        $exito = 0;
+//                        unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($_FILES['fileUpload']['name']));
+//                        break;
+//                    }
+//                    if ($_POST[codigo_doc] != $codigo_doc){
+//                        $funcion = '- C&oacute;digo archivo no coincide con c&oacute;digo documento existente.';
+//                        //'<br />'
+//                        $exito = 0;
+//                        unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($_FILES['fileUpload']['name']));
+//                        break;
+//                    }
+//                    if ($version_doc != ($_POST[version]) ){
+//                        $funcion = '- Versi&oacute;n documento debe ser consecutiva a la actual: ' . $_POST[version];
+//                        //'-C&oacute;digo archivo no coincide con c&oacute;digo documento existente.<br />'
+//                        $exito = 0;
+//                        unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($_FILES['fileUpload']['name']));
+//                        break;
+//                    }
                 }
                 break;
             default:  //echo $type;
@@ -150,7 +150,7 @@ function CambiaSinAcento($Texto)
                 
 //$nombre . " ($tamano_visual Kb)"           
             
-            $items[]= array('exito' => 1, 'nombre_doc' => $nombre_doc, 'codigo_doc' => $codigo_doc, 'version_doc' => $version_doc, 'info_nombre'=> $codigo_doc.'-'.$nombre_doc.'-V'.  str_pad($version_doc, 2, "0", STR_PAD_LEFT), 'filename' => $nombre, 'tamano' => $tamano, 'tipo' => $tipo, 'estado_actual' => 2);
+            $items[]= array('exito' => 1, 'nombre_doc' => $nombre_doc, 'codigo_doc' => $codigo_doc, 'version_doc' => $version_doc, 'info_nombre'=> $_POST[codigo_doc].'-'.$_POST[nombre_doc].'-V'.  str_pad($_POST[version], 2, "0", STR_PAD_LEFT), 'filename' => $nombre, 'tamano' => $tamano, 'tipo' => $tipo, 'estado_actual' => 2);
         }
         else
             $items[]= array('exito' => 2, 'msj' => $funcion);//"El archivo $type tiene un formato no permitido para el documento");

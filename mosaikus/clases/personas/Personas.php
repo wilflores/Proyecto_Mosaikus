@@ -124,6 +124,17 @@
                 return $this->dbl->data[0];
             }
             
+            public function verAreaPersonas($id){
+                $atr=array();
+                $sql = "SELECT 
+                            id_organizacion                                                        
+                         FROM mos_personal p                        
+                         WHERE cod_emp = $id "; 
+                //echo $sql;
+                $this->operacion($sql, $atr);
+                return $this->dbl->data[0][0];
+            }
+            
             private function codigo_siguiente(){
                 $sql = "SELECT MAX(cod_emp) total_registros
                          FROM mos_personal";

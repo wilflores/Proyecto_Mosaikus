@@ -303,6 +303,7 @@
         private $placeholder;
         private $id_org_acceso;
         private $id_org_acceso_todos_nivel;
+        private $nivel_area; // guarda el nivel menor donde el usaurio tiene acceso
         
             public function Documentos(){
                 parent::__construct();
@@ -311,11 +312,29 @@
                 $this->parametros = $this->nombres_columnas = $this->placeholder = array();
                 $this->contenido = array();
                 $this->id_org_acceso = array();
+                $this->nivel_area = 2;
             }
 
             private function operacion($sp, $atr){
                 $param=array();
                 $this->dbl->data = $this->dbl->query($sp, $param);
+            }
+            
+            /**
+             * carga el nivel mas bajo donde el usuario tiene acceso
+             * @param array $atr
+             */
+            private function get_min_nivel_area($atr){
+                unset($atr[terceros]);
+                if (count($this->id_org_acceso) <= 0){
+                    $this->cargar_acceso_nodos($atr);                    
+                }
+                //print_r($atr);
+                $sql = "select min(level) nivel from mos_organizacion where id IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
+                //echo $sql;
+                $data = $this->dbl->query($sql);
+                $this->nivel_area = $data[0][nivel];
+                //echo     $this->nivel_area;
             }
             
             private function cargar_parametros(){
@@ -342,6 +361,9 @@
                         import("clases.mos_acceso.mos_acceso");
                     }
                     $acceso = new mos_acceso();
+                    if ($_SESSION[SuperUser]=='S')
+                        unset($parametros[terceros]);
+                        
                     $data_ids_acceso = $acceso->obtenerNodosArbol($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo],$parametros[terceros]);
                    //print_r($data_ids_acceso);
                     foreach ($data_ids_acceso as $value) {
@@ -574,12 +596,12 @@
         {
                 $OrgNom = "";
                 if (strlen($tupla[id_organizacion]) > 0) {                                           
-                        $Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                        $Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion, level from mos_organizacion where id in ($tupla[id_organizacion])";
                         $Resp3 = $this->dbl->query($Consulta3,array());
 
                         foreach ($Resp3 as $Fila3) 
                         {
-                                if($Fila3[organizacion_padre]==2)
+                                if(($Fila3[organizacion_padre]==2)||($Fila3[level] == $this->nivel_area))
                                 {
                                         $OrgNom.=($Fila3[identificacion]);
                                         return($OrgNom);                                        
@@ -1070,7 +1092,7 @@
                     $atr[doc_visualiza] = $doc_ver;
                     $atr[id_filial] = $_SESSION[CookFilial];
                     if($atr[notificar]=='si'){
-                        if($atr[reviso]==''){
+                        if($atr[reviso]=='NULL'){
                             $atr[etapa_workflow]="'estado_pendiente_aprobacion'";
                         }
                         else{
@@ -1095,7 +1117,7 @@
                     $this->registraTransaccion('Insertar','Ingreso el mos_documentos ' . $atr[descripcion_ano], 'mos_documentos');
                       */
                     $nuevo = "IDDoc: \'$atr[IDDoc]\', Codigo Doc: \'$atr[Codigo_doc]\', Nombre Doc: \'$atr[nombre_doc]\', Version: \'$atr[version]\', Fecha: \'$atr[fecha]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', ContentType: \'$atr[contentType]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza]\', ContentType Visualiza: \'$atr[contentType_visualiza]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Publico: \'$atr[publico]\'";
-                    $this->registraTransaccionLog(1,$nuevo,'', '',$atr[IDDoc]);
+                    $this->registraTransaccionLog(1,$nuevo,'', $atr[IDDoc]);
                     return $atr[IDDoc];
                     return "El mos_documentos '$atr[descripcion_ano]' ha sido ingresado con exito";
                 } catch(Exception $e) {
@@ -1115,6 +1137,12 @@
                     $atr[doc_visualiza] = $doc_ver;
                     $atr[id_filial] = $_SESSION[CookFilial];
                     //
+                    if (strlen($atr[reviso])== 0){
+                        $atr[reviso] = "NULL";                     
+                    }                    
+                    if (strlen($atr[aprobo])== 0){
+                        $atr[aprobo] = "NULL";                     
+                    }  
                     if($atr[notificar]=='si'){
                         if($atr[reviso]=='NULL'){
                             $atr[etapa_workflow]="'estado_pendiente_aprobacion'";
@@ -1173,7 +1201,7 @@
                     $this->registraTransaccion('Insertar','Ingreso el mos_documentos ' . $atr[descripcion_ano], 'mos_documentos');
                       */
                     $nuevo = "IDDoc: \'$atr[IDDoc]\', Codigo Doc: \'$atr[Codigo_doc]\', Nombre Doc: \'$atr[nombre_doc]\', Version: \'$atr[version]\', Fecha: \'$atr[fecha]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', ContentType: \'$atr[contentType]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza]\', ContentType Visualiza: \'$atr[contentType_visualiza]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', ";
-                    $this->registraTransaccionLog(4,$nuevo,'', '',$atr[id]);
+                    $this->registraTransaccionLog(4,$nuevo,'', $atr[id]);
                     return $atr[IDDoc];
                     return "El mos_documentos '$atr[descripcion_ano]' ha sido ingresado con exito";
                 } catch(Exception $e) {
@@ -1200,7 +1228,7 @@
                     $this->registraTransaccion('Insertar','Ingreso el mos_documentos ' . $atr[descripcion_ano], 'mos_documentos');
                       */
                     $nuevo = "IDDoc: \'$atr[IDDoc]\', Codigo Doc: \'$atr[Codigo_doc]\', Nombre Doc: \'$atr[nombre_doc]\', Version: \'$atr[version]\', Fecha: \'$atr[fecha]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', ContentType: \'$atr[contentType]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza]\', ContentType Visualiza: \'$atr[contentType_visualiza]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', ";
-                    $this->registraTransaccionLog(5,$nuevo,'', '',$atr[id]);
+                    $this->registraTransaccionLog(5,$nuevo,'', $atr[id]);
                     return "La revision ha sido ingresada con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
@@ -1219,11 +1247,17 @@
                 return true;
             }
 
-            public function modificarDocumentos($atr,$archivo){
+            public function modificarDocumentos($atr,$archivo,$doc_ver){
                 //print_r($atr);
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
-                    $atr[doc_visualiza] = $archivo;                    
+                    $atr[doc_fisico] = $archivo;
+                    $atr[doc_visualiza] = $doc_ver;    
+                    $sql_doc_fisico ='';
+                    if (strlen($atr[doc_fisico])>= 0){
+                        $sql_doc_fisico .= ",doc_fisico = '$atr[doc_fisico]', contentType = '$atr[contentType]'";
+                                         
+                    }                    
                     if (strlen($atr[doc_visualiza])== 0){
                         $atr[doc_visualiza] = "doc_visualiza";
                         $atr[contentType_visualiza] = "contentType_visualiza";
@@ -1282,11 +1316,11 @@
                     }
                     $val = $this->verDocumentos($atr[id]);
                     if(!($val[etapa_workflow]=='estado_aprobado' && $val[estado_workflow]=='OK')){
-                        if($atr[notificar]=='si'){
-                            if($atr[reviso]=='NULL'){
+                        if($atr[notificar]=='si'){                            
+                            if($atr[reviso]=='NULL'){                                
                                 $atr[etapa_workflow]="'estado_pendiente_aprobacion'";
                             }
-                            else{
+                            else{                                
                                 $atr[etapa_workflow]="'estado_pendiente_revision'";
                             }
                             $sql_wf = ", id_workflow_documento=$atr[id_workflow_documento],
@@ -1309,7 +1343,7 @@
                                     descripcion = '$atr[descripcion]',palabras_claves = '$atr[palabras_claves]',formulario = '$atr[formulario]',vigencia = '$atr[vigencia]'"
                             . ",nom_visualiza = $atr[nom_visualiza],doc_visualiza = $atr[doc_visualiza],contentType_visualiza = $atr[contentType_visualiza],id_usuario = $atr[id_usuario],observacion = '$atr[observacion]',estrucorg = '$atr[estrucorg]',arbproc = '$atr[arbproc]'"
                             . ",apli_reg_estrorg = '$atr[apli_reg_estrorg]',apli_reg_arbproc = '$atr[apli_reg_arbproc]',workflow = '$atr[workflow]',semaforo = $atr[semaforo],v_meses = $atr[v_meses],reviso = $atr[reviso],elaboro = $atr[elaboro],aprobo = $atr[aprobo]
-                               ,publico = '$atr[publico]' $sql_wf
+                               ,publico = '$atr[publico]' $sql_wf $sql_doc_fisico
                             WHERE  IDDoc = $atr[id]";      
                    //echo $sql;
                    // die;
@@ -1318,7 +1352,7 @@
                     $this->dbl->insert_update($sql);
                     $nuevo = "IDDoc: \'$atr[IDDoc]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza_aux]\',ContentType Visualiza: \'$atr[contentType_visualiza_aux]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Publico: \'$atr[publico]\'";
                     $anterior = "IDDoc: \'$val[IDDoc]\', Codigo Doc: \'$val[Codigo_doc]\', Nombre Doc: \'$val[nombre_doc]\', Version: \'$val[version]\', Fecha: \'$val[fecha]\', Descripcion: \'$val[descripcion]\', Palabras Claves: \'$val[palabras_claves]\', Formulario: \'$val[formulario]\', Vigencia: \'$val[vigencia]\', ContentType: \'$val[contentType]\', Id Filial: \'$val[id_filial]\', Nom Visualiza: \'$val[nom_visualiza]\', ContentType Visualiza: \'$val[contentType_visualiza]\', Id Usuario: \'$val[id_usuario]\', Observacion: \'$val[observacion]\', Muestra Doc: \'$val[muestra_doc]\', Estrucorg: \'$val[estrucorg]\', Arbproc: \'$val[arbproc]\', Apli Reg Estrorg: \'$val[apli_reg_estrorg]\', Apli Reg Arbproc: \'$val[apli_reg_arbproc]\', Workflow: \'$val[workflow]\', Semaforo: \'$val[semaforo]\', V Meses: \'$val[v_meses]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\', Publico: \'$val[publico]\' ";
-                    $this->registraTransaccionLog(2,$nuevo,$anterior, '',$atr[id]);
+                    $this->registraTransaccionLog(2,$nuevo,$anterior, $atr[id]);
                     /*
                     $this->registraTransaccion('Modificar','Modifico el Documentos ' . $atr[descripcion_ano], 'mos_documentos');
                     */
@@ -1395,11 +1429,34 @@
                                 $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
                                 $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
                                 $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";    
-                                if (count($this->id_org_acceso))
-                                    $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
-                                if (count($this->id_org_acceso_todos_nivel))
-                                    $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
+                                /*SI NO ESTA EL FILTRO VER SOLO FLUJO DE TRABAJO*/
+                                if (strlen($atr["b-flujo-trabajo"])== 0){
+                                    if (count($this->id_org_acceso))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
+                                    if (count($this->id_org_acceso_todos_nivel))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
+                                }
                                 $sql .= ")";
+                            }
+                            if (($_SESSION[SuperUser]=='S')){
+                                /*SI NO ESTA EL FILTRO VER SOLO FLUJO DE TRABAJO*/    
+                                if ((strlen($atr["b-flujo-trabajo"])>= 0)&&(($atr["b-flujo-trabajo"])== '1')){
+                                    $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
+                                    $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
+                                    $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";                                                                                                
+                                    $sql .= ")";
+                                }
+                                else{
+                                    $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
+                                    $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
+                                    $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";    
+
+                                    if (count($this->id_org_acceso))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
+                                    if (count($this->id_org_acceso_todos_nivel))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
+                                     $sql .= ")";
+                                }
                             }
                             //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
                     if (strlen($atr['b-filtro-sencillo'])>0){
@@ -1561,12 +1618,34 @@
                                 $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
                                 $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
                                 $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";    
-                                if (count($this->id_org_acceso))
-                                    $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
-                                if (count($this->id_org_acceso_todos_nivel))
-                                    $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
-                                
+                                /*SI NO ESTA EL FILTRO VER SOLO FLUJO DE TRABAJO*/                                
+                                if (strlen($atr["b-flujo-trabajo"])== 0){
+                                    if (count($this->id_org_acceso))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
+                                    if (count($this->id_org_acceso_todos_nivel))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
+                                }
                                 $sql .= ")";
+                            }
+                            if (($_SESSION[SuperUser]=='S')){
+                                /*SI NO ESTA EL FILTRO VER SOLO FLUJO DE TRABAJO*/    
+                                if ((strlen($atr["b-flujo-trabajo"])>= 0)&&(($atr["b-flujo-trabajo"])== '1')){
+                                    $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
+                                    $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
+                                    $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";                                                                                                
+                                    $sql .= ")";
+                                }
+                                else{
+                                    $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
+                                    $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
+                                    $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";    
+
+                                    if (count($this->id_org_acceso))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
+                                    if (count($this->id_org_acceso_todos_nivel))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso_todos_nivel)) . ")) )"; 
+                                     $sql .= ")";
+                                }
                             }
                             //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
                     if (strlen($atr['b-filtro-sencillo'])>0){
@@ -1679,7 +1758,7 @@
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //print_r($atr);
-                     // echo $sql;
+                    //  echo $sql;
                     $this->operacion($sql, $atr);
              }
              
@@ -1791,7 +1870,7 @@
                             $this->dbl->insert_update($sql);
                         }
                         $nuevo = "IDDoc: \'$atr[id]\'";
-                        $this->registraTransaccionLog(3,$nuevo,'', '',$atr[id]);
+                        $this->registraTransaccionLog(3,$nuevo,'',$atr[id]);
                         
                         return "ha sido eliminada con exito";
                     } catch(Exception $e) {
@@ -1817,7 +1896,7 @@
                     
                     $nuevo = "Id usuario wf: \'$atr[id_usuario_workflow]\', etapa_workflow = \'$atr[etapa]\', estado wf: \'$atr[estado_workflow]\', ";
                     $anterior = "Id usuario wf: \'$val[id_usuario_workflow]\', etapa_workflow = \'$val[etapa_workflow]\', estado wf: \'$val[estado_workflow]\',  ";
-                    $this->registraTransaccionLog(6,$nuevo,$anterior, '',$atr[id]);
+                    $this->registraTransaccionLog(6,$nuevo,$anterior, $atr[id]);
                     /*
                     $this->registraTransaccion('Modificar','Modifico el WorkflowDocumentos ' . $atr[descripcion_ano], 'mos_workflow_documentos');
                     */
@@ -2269,7 +2348,9 @@
                 }
                 $parametros['email_usuario']= $_SESSION['CookEmail'];
                 /*Para visualizar los documentos de terceros*/
+                //if ($_SESSION[SuperUser]!='S')
                 $parametros[terceros] = 'S';
+                $this->get_min_nivel_area($parametros);
                 $grid = $this->verListaDocumentos($parametros);
                 
                 $contenido['MODO'] = $parametros['modo'];
@@ -2302,6 +2383,49 @@
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val['cod_emp_relator']);
 
+                /*HTML FILTRO RAPIDO FLUJO TRABAJO*/
+                $contenido[FILTRO_OTROS_CAMPOS] = '<br/><div class="form-group">                                                                
+                                <label class="checkbox-inline"> 
+                                    <input type="checkbox" id="b-mi-flujo-trabajo" name="b-mi-flujo-trabaj" value="S"> Mi Flujo de Trabajo </label>';                            
+                /*JS Busqueda Filtro Rapido*/
+                $js_flujo = "$('#b-mi-flujo-trabajo').on('change', function (event) {
+                                /*event.preventDefault();
+                                var id = $(this).attr('tok');*/
+                                 if( $(this).is(':checked') ){
+                                    $('#b-flujo-trabajo').val('1');
+                                    verPagina(1,document);
+                                    /*alert('El checkbox con valor ' + $(this).val() + ' ha sido seleccionado');*/
+                                } else {
+                                    $('#b-flujo-trabajo').val('');
+                                    verPagina(1,document);
+                                    /*alert('El checkbox con valor ' + $(this).val() + ' ha sido deseleccionado');*/
+                                }
+                            });
+                            ";
+                /*VALIDAMOS QUE EL USUARIO CONECTADO ESTE REGISTRADO COMO PERSONAL*/
+                if ($_SESSION['CookCodEmp'] <> ''){
+                    if(!class_exists('Personas')){
+                        import("clases.personas.Personas");
+                    }
+                    $p = new Personas();
+                    $id_ao = $p->verAreaPersonas($_SESSION['CookCodEmp']);
+                    $contenido[FILTRO_OTROS_CAMPOS] .= '<br>
+                                    <label class="checkbox-inline"> 
+                                    <input type="checkbox" id="b-mi-nivel" name="b-mi-nivel" value="N"> Mi Nivel </label>';
+                            
+                    $js_flujo .= "
+                            $('#b-mi-nivel').on('change', function (event) {
+                                /*event.preventDefault();
+                                var id = $(this).attr('tok');*/
+                                 if( $(this).is(':checked') ){
+                                    $('#div-ao').jstree(true).select_node('phtml_$id_ao');                                    
+                                } else {
+                                     $('#div-ao').jstree(true).deselect_node('phtml_$id_ao');  
+                                }
+                            });";
+                }
+                $contenido[FILTRO_OTROS_CAMPOS] .= '</div>';
+                
                 import('clases.organizacion.ArbolOrganizacional');
 
 
@@ -2368,6 +2492,7 @@
                                         ScrollBar.initScroll();
                                         init_filtro_rapido();
                                         init_filtro_ao_multiple();');
+                $objResponse->addScript($js_flujo);
                 
                 /*Js init_tabla*/
                 $objResponse->addScript("$('.ver-mas').on('click', function (event) {
@@ -2963,9 +3088,13 @@
                         $contenido_1["P_" . strtoupper($key)] =  $value;
                     }                     
 
+                    if(!($_SESSION[SuperUser]=='S')){
+                        $sql_filtro=" AND cod_emp = " . $_SESSION['CookCodEmp'];
+                    }     
+                    else $sql_filtro = '';
                     $contenido_1['ELABORO'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                             CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                                FROM mos_personal p WHERE elaboro = 'S'"
+                                                                                FROM mos_personal p WHERE elaboro = 'S' $sql_filtro"
                                                                         , 'cod_emp'
                                                                         , 'nombres', $val['elaboro']);
 
@@ -3467,7 +3596,7 @@
                 $validator = new FormValidator();
                 //print_r($val);
                 if(($val["etapa_workflow"]=='estado_pendiente_revision') || ($val["etapa_workflow"]=='estado_pendiente_aprobacion')){
-                    $mensaje='No se puede crear una version de un documento que tiene Flujo de Trabajo activo';
+                    $mensaje='No se puede crear una versi&oacute;n del documento porque tiene Flujo de Trabajo activo';
                     $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
                     $objResponse->addScript("$('#MustraCargando').hide();"); 
                     $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
@@ -3579,7 +3708,17 @@
                 //unset ($parametros['id']);
                 $parametros['id_usuario']= $_SESSION['CookIdUsuario'];
 
+                $val = $this->verDocumentos($parametros['id']);
                 $validator = new FormValidator();
+                //print_r($val);
+                if(($val["etapa_workflow"]=='estado_pendiente_revision') || ($val["etapa_workflow"]=='estado_pendiente_aprobacion')){
+                    $mensaje='No se puede crear una revisi&oacute;n del documento porque tiene Flujo de Trabajo activo';
+                    $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
+                    $objResponse->addScript("$('#MustraCargando').hide();"); 
+                    $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                                            $( '#btn-guardar' ).prop( 'disabled', false );");
+                    return $objResponse;                    
+                }
                 
                 if(!$validator->ValidateForm($parametros)){
                         $error_hash = $validator->GetErrors();
@@ -3761,21 +3900,44 @@
                 $contenido_1[OTROS_CAMPOS] = $array[html];
                 $js_din = $array[js];
                 $template = new Template();
+                $js_cambiar_archivos = '';
                 $template->PATH = PATH_TO_TEMPLATES.'documentos/';
-                if (strlen($val["nom_visualiza"])>0){
+                if ((($val[estado_workflow] != '') && ($val[estado_workflow] != 'RECHAZADO')) ||($val[etapa_workflow] == 'estado_aprobado') ){
                     $contenido_1['DOC_VIS'] ='<div class="form-group" id="info_archivo_adjunto_vis">
                                     <label for="archivo" class="col-md-4 control-label">'. $contenido_1[N_NOM_VISUALIZA].'</label>
                                     <div class="col-md-10">
                                         <p class="form-control-static" style="">                                            
-                                            <input type="text" class="form-control" style="width: 250px;display: inline;" readonly="readonly" id="info_nombre_vis" value="'.$val["nom_visualiza"].'">                                             
+                                            <input type="text" class="form-control" style="display: inline;" readonly="readonly" id="info_nombre_vis" value="'.$val["nom_visualiza"].'">                                             
                                         </p>                      
                                   </div>  
                                   <span class="help-block" style="font-size: small;">(*) Código-Nombre archivo-Versión.PDF</span>
                              </div>';
+                    $contenido_1['DOC_FUENTE'] = '<div class="form-group" id="info_archivo_adjunto">
+                                    <label for="archivo" class="col-md-4 control-label">'. $contenido_1[N_DOC_FISICO].'</label>
+                                    <div class="col-md-10">
+                                        <p class="form-control-static" style="">
+                                            <input type="text" class="form-control" style="display: inline;" id="info_nombre" readonly="readonly" name="info_nombre" value="'.$contenido_1[NOMBRE_DOC_AUX].'">
+                                        </p>                      
+                                  </div>         
+                                  <span class="help-block" style="font-size: small;">(*) Código-Nombre archivo-Versión.Extension</span>
+                             </div>';
                 }  else {
-                    $template->setTemplate("cargar_doc_vis");
+                    if ((strlen($val["nom_visualiza"])>0)){
+                        $contenido_1[NOMBRE_DOC_VIS] = $contenido_1[NOMBRE_DOC_AUX]; 
+                        $template->setTemplate("cargar_doc_vis");
+                        $template->setVars($contenido_1);
+                        $contenido_1['DOC_VIS'] = $template->show();
+                        $js_cambiar_archivos = "$('#tabla_fileUpload_vis').hide();$('#info_archivo_adjunto_vis').show();";
+                    }
+                    else{
+                        $template->setTemplate("cargar_doc_vis");
+                        $template->setVars($contenido_1);
+                        $contenido_1['DOC_VIS'] = $template->show();
+                    }
+                    
+                    $template->setTemplate("cargar_doc_fuente");
                     $template->setVars($contenido_1);
-                    $contenido_1['DOC_VIS'] = $template->show();
+                    $contenido_1['DOC_FUENTE'] = $template->show();
                 }
                 
                 $this->listarCamposFormulario($parametros);
@@ -3784,7 +3946,7 @@
                 $item = "";
                 $js = "";
                 $i = 0;
-                $contenido_1['TOK_NEW'] = time();
+                $contenido_1['TOK_NEW'] = time();// quitar el rut
                 $ids = array('7','8','9','1','2','3','5','6','10','11','12','13','14');
                 $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo', 'Árbol Organizacional', 'Árbol Procesos','Vigencia','Cargo');
                 
@@ -3978,6 +4140,7 @@
                 $objResponse->addScript("$js");
                 $objResponse->addScript("$jswf");
                 $objResponse->addScript("$js_din");
+                $objResponse->addScript($js_cambiar_archivos);
                 //$objResponse->addScript("$('#fecha').datepicker();");
                 return $objResponse;
             }
@@ -3990,8 +4153,7 @@
                 $objResponse = new xajaxResponse();
                 unset ($parametros['opc']);
                 $parametros['id_usuario']= $_SESSION['CookIdUsuario'];
-
-                $validator = new FormValidator();
+                
                 //NUEVA VALIDACION DE ARBOL Y CARGO
                 $validator = new FormValidator();
                 $tiene_arbol=0;
@@ -4033,6 +4195,21 @@
                          $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
                 }else{
                     $parametros["fecha"] = formatear_fecha($parametros["fecha"]);
+                    $archivo = '';
+                    //print_r($parametros);
+                    //exit();
+                    if((isset($parametros[filename]))&& ($parametros[filename] !=''))
+                    {
+                            //$Archivo=CambiaSinAcento(str_replace('~~',' ',utf8_encode($Adjunto)));
+                            $tamanio=filesize(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($parametros['filename']));
+                            $fp = fopen(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($parametros['filename']), "rb");
+                            $archivo = fread($fp, $tamanio);
+                            $archivo = addslashes($archivo);
+                            fclose($fp);
+                            
+                            $parametros[contentType] = $parametros[tipo_doc];//'application/pdf';                                                                
+                           
+                    }
                     $doc_vis = '';
                     if((isset($parametros[filename_vis]))&& ($parametros[filename_vis] !=''))
                     {
@@ -4065,9 +4242,9 @@
                         $parametros['reviso']=$datoswf['id_personal_revisa'];
                         $parametros['elaboro']=$datoswf['id_personal_responsable'];
                         $parametros['aprobo']=$datoswf['id_personal_aprueba'];
-                    }
+                    }        
                     
-                    $respuesta = $this->modificarDocumentos($parametros,$doc_vis);
+                    $respuesta = $this->modificarDocumentos($parametros,$archivo,$doc_vis);
 
                     if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {  
                         //print_r($parametros);
@@ -4217,7 +4394,10 @@
  
             public function buscar($parametros)
             {   $parametros['email_usuario']= $_SESSION['CookEmail'];
+                
                 $parametros[terceros] = 'S';
+                $parametros[terceros] = 'S';
+                $this->get_min_nivel_area($parametros);
                 $grid = $this->verListaDocumentos($parametros);                
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);

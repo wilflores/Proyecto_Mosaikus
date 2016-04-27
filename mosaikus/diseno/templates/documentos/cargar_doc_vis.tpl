@@ -3,7 +3,7 @@
                                     <label for="archivo" class="col-md-4 control-label">{N_NOM_VISUALIZA}</label>
                                     <div class="col-md-10">
                                         <input type="file" style="" value="{ARCHIVO}"accept="application/pdf" id="fileUpload2_vis" name="fileUpload2_vis" onchange="cargar_archivo_vis();"/>
-                                        <input type="hidden" id="estado_actual_vis" name="estado_actual_vis">
+                                        <input type="hidden" id="estado_actual_vis" name="estado_actual_vis" value="-1">
                                         <input type="hidden" id="filename_vis" name="filename_vis" value="{FILENAME}">
                                         <input type="hidden" id="tamano_vis" name="tamano_vis" value="{TAMANO}">
                                         <input type="hidden" id="tipo_doc_vis" name="tipo_doc_vis" value="{TIPO_DOC}">
@@ -24,7 +24,7 @@
                                     <label for="archivo" class="col-md-4 control-label">{N_NOM_VISUALIZA}</label>
                                     <div class="col-md-10">
                                         <p class="form-control-static" style="">                                            
-                                            <input type="text" class="form-control" style="width: 250px;display: inline;" readonly="readonly" id="info_nombre_vis">                                            
+                                            <input type="text" value="{NOMBRE_DOC_VIS}" class="form-control" style="width: 250px;display: inline;" readonly="readonly" id="info_nombre_vis">                                            
                                             <a href="#" onclick="cancelar_archivo_vis();">
                                                 (<img src="{PAHT_TO_IMG}delete.png" width="12" height="12">
                                                 Eliminar)

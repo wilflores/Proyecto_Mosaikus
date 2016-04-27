@@ -43,6 +43,7 @@
                                           
                                         <input type="hidden" name="mostrar-col" id="mostrar-col" value="{MOSTRAR_COL}" />
                                         <input type="hidden" id="b-filtro-sencillo" name="b-filtro-sencillo"/>
+                                        <input type="hidden" id="b-flujo-trabajo" name="b-flujo-trabajo"/>
                                         <!--<input type="hidden" name="reg_por_pag" id="reg_por_pag" value="12"/>-->
                                         <input type="hidden" name="corder" id="corder" value="{CORDER}"/>
                                         <input type="hidden" name="sorder" id="sorder" value="{SORDER}"/>
@@ -65,6 +66,7 @@
                             <input type="text" class="form-control" id="b-filtro" name="b-filtro" placeholder="Filtrar Listado">
                             <span class="input-group-addon cursor-pointer" id="btn-filtro"><span class="glyphicon glyphicon-search"></span></span>
                         </div>
+                        {FILTRO_OTROS_CAMPOS}
                         <div  class="table-container scrollable">
                             {DIV_ARBOL_ORGANIZACIONAL}
                             <br>

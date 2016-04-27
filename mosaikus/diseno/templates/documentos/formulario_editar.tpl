@@ -38,18 +38,9 @@
                                         <div class="col-md-2">
                                           
                                       </div>                                
-                                  </div>-->                            
-                             <div class="form-group" id="info_archivo_adjunto">
-                                    <label for="archivo" class="col-md-4 control-label">{N_DOC_FISICO}</label>
-                                    <div class="col-md-10">
-                                        <p class="form-control-static" style="">
-                                            <!--<img src="{PAHT_TO_IMG}adjunto.png">-->
-                                            <input type="text" class="form-control" style="width: 250px;display: inline;" id="info_nombre" readonly="readonly" name="info_nombre" value="{NOMBRE_DOC_AUX}">
-                                            <!--<span id="info_nombre" style="display:inline;">{TXT_OTRO_METODO}&nbsp;</span>-->                                            
-                                        </p>                      
-                                  </div>         
-                                  <span class="help-block" style="font-size: small;">(*) Código-Nombre archivo-Versión.Extension</span>
-                             </div>
+                                  </div>-->         
+                             {DOC_FUENTE}
+                             
 <!--<div class="form-group">
                                         <label for="doc_fisico" class="col-md-6 control-label">{N_DOC_FISICO}</label>
                                         <div class="col-md-6">
