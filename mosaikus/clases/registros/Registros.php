@@ -2578,6 +2578,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     $paramreg['opcion']='reg';
                     $paramreg['cod_link'] = $parametros['cod_link'];                
                     $paramreg['modo'] = $parametros['modo'];
+                    $ao->cargar_acceso_nodos_explicito($parametros);
                     $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(4,$paramreg);
                     $contenido[ARBOLFILTRO]='organizacional';
                 }else
@@ -2588,6 +2589,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         $paramreg['opcion']='reg';
                         $paramreg['cod_link'] = $parametros['cod_link'];                
                         $paramreg['modo'] = $parametros['modo'];
+                        $ao->cargar_acceso_nodos_explicito($parametros);
                         $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(6,$paramreg);
                         $contenido[ARBOLFILTRO]='persona';
                     }
