@@ -876,23 +876,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 $sql_left .= " LEFT JOIN(select t1.idRegistro
                                 , t1.Nombre as nom_detalle_aux
                                 ,p.id_organizacion
-                                ,p.id_personal,c.descripcion cargo
-                                
-                                -- ,DATE_FORMAT(p.fecha_nacimiento, '%d/%m/%Y') fecha_nacimiento
-                                -- ,CASE p.genero WHEN 1 THEN 'Masculino' ELSE 'Femenino' END genero
-                                -- ,CASE p.workflow  when 'S' then 'Si' Else 'No' END workflow
-                                -- ,p.vigencia
-                                -- ,CASE p.interno   when 1 then 'Si' Else 'No' END interno                                                                                                                                                                             
-                                -- ,p.email
-                                -- ,CASE p.relator  when 'S' then 'Si' Else 'No' END relator
-                                -- ,CASE p.reviso when 'S' then 'Si' Else 'No' END reviso
-                                -- ,CASE p.elaboro when 'S' then 'Si' Else 'No' END elaboro
-                                -- ,CASE p.aprobo  when 'S' then 'Si' Else 'No' END aprobo
-                                -- ,p.extranjero
-                                -- ,DATE_FORMAT(p.fecha_ingreso, '%d/%m/%Y') fecha_ingreso
-                                -- ,DATE_FORMAT(p.fecha_egreso, '%d/%m/%Y') fecha_egreso
+                                ,p.id_personal,c.descripcion cargo                                
                                 ,CONCAT(initcap(p.nombres), ' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle
-                                -- ,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle 
                                 from mos_registro_formulario t1
                                 inner join mos_personal p on p.cod_emp = CAST(t1.Nombre AS UNSIGNED)
                                 LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo
@@ -1139,7 +1124,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                     $sql .= " AND p$k.nom_detalle = '". $atr["p$k"] . "'";
                                 } 
                                 if (strlen($atr["b-id_organizacion-reg"])>0 && $atr["b-arbol-filtro"]=='persona'){
-                                    $sql .= " AND p$k.id_organizacion like '%". $atr["b-id_organizacion-reg"] . "%'";
+                                    $sql .= " AND p$k.id_organizacion in (". $atr["b-id_organizacion-reg"] . ")";
                                 } 
                                 break;
                             case '1':
@@ -1150,7 +1135,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 break;
                             case '11':
                                 if (strlen($atr["b-id_organizacion-reg"])>0 && $atr["b-arbol-filtro"]=='organizacional'){
-                                    $sql .= " AND p$k.nom_detalle like '%". $atr["b-id_organizacion-reg"] . "%'";
+                                    $sql .= " AND p$k.nom_detalle in (". $atr["b-id_organizacion-reg"] . ")";
                                 } 
                                 break;
                             case '12':
@@ -1324,12 +1309,12 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                     $sql .= " AND p$k.nom_detalle = '". $atr["p$k"] . "'";
                                 }
                                 if (strlen($atr["b-id_organizacion-reg"])>0 && $atr["b-arbol-filtro"]=='persona'){
-                                    $sql .= " AND p$k.id_organizacion like '%". $atr["b-id_organizacion-reg"] . "%'";
+                                    $sql .= " AND p$k.id_organizacion in (". $atr["b-id_organizacion-reg"] . ")";
                                 } 
                                 break;
                             case '11':
                                 if (strlen($atr["b-id_organizacion-reg"])>0 && $atr["b-arbol-filtro"]=='organizacional'){
-                                    $sql .= " AND p$k.nom_detalle like '%". $atr["b-id_organizacion-reg"] . "%'";
+                                    $sql .= " AND p$k.nom_detalle in (". $atr["b-id_organizacion-reg"] . ")";
                                 } 
                                 break;
                             case '12':
@@ -1388,7 +1373,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                    //print_r($atr);
-                   //echo $sql;
+                    //echo $sql;
                     $this->operacion($sql, $atr);
              }
              public function eliminarRegistros($atr){
@@ -2222,12 +2207,13 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $template->setVars($contenido);
                 $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
-                if ($this->DocTieneArbolRegistros('11')>0){
+                if ($this->DocTieneArbolRegistros('19')>0){
                     import('clases.organizacion.ArbolOrganizacional');
                     $ao = new ArbolOrganizacional();
                     $paramreg['cod_link'] = $parametros['cod_link'];                
                     $paramreg['modo'] = $parametros['modo'];
                     $paramreg['opcion']='reg';
+                    $ao->cargar_acceso_nodos_explicito($parametros);
                     $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(4,$paramreg);
                     $contenido[ARBOLFILTRO]='organizacional';
                 }else
@@ -2238,6 +2224,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         $paramreg['cod_link'] = $parametros['cod_link'];                
                         $paramreg['modo'] = $parametros['modo'];
                         $paramreg['opcion']='reg';
+                        $ao->cargar_acceso_nodos_explicito($parametros);
+                        // los registros de los empleados de las areas donde tiene permisos
                         $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(6,$paramreg);
                         $contenido[ARBOLFILTRO]='persona';
                     }
@@ -2256,8 +2244,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 //$objResponse->addAssign('modulo_actual',"value","registros");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'registros/registros.js');
                 $objResponse->addScript("$('#MustraCargando').hide();");
-                $objResponse->addScript("init_filtro_ao_simple_reg();");
-                
+                //$objResponse->addScript("init_filtro_ao_simple_reg();");
+                $objResponse->addScript("init_filtro_ao_multiple_reg();");
                 $objResponse->addScript($js);
                 /*Js init_tabla*/
                 $objResponse->addScript("$('.ver-mas').on('click', function (event) {
