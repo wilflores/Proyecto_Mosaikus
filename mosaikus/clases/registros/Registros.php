@@ -2207,7 +2207,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $template->setVars($contenido);
                 $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
-                if ($this->DocTieneArbolRegistros('19')>0){
+                if ($this->DocTieneArbolRegistros('11')>0){
                     import('clases.organizacion.ArbolOrganizacional');
                     $ao = new ArbolOrganizacional();
                     $paramreg['cod_link'] = $parametros['cod_link'];                
@@ -2594,12 +2594,12 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         $contenido[ARBOLFILTRO]='persona';
                     }
                 }
-                if ($this->DocTieneArbolRegistros('12')>0){
-                    import('clases.arbol_procesos.ArbolProcesos');
-                    $ap = new ArbolProcesos();
-                    $paramreg['opcion']='reg';
-                    $contenido[DIV_ARBOL_PROCESO] =  $ap->jstree_ap(4,$paramreg);
-                }
+//                if ($this->DocTieneArbolRegistros('12')>0){
+//                    import('clases.arbol_procesos.ArbolProcesos');
+//                    $ap = new ArbolProcesos();
+//                    $paramreg['opcion']='reg';
+//                    $contenido[DIV_ARBOL_PROCESO] =  $ap->jstree_ap(4,$paramreg);
+//                }
                 $template->setTemplate("listar_volver");
                 $template->setVars($contenido);
                 //$this->contenido['CONTENIDO']  = $template->show();
@@ -2616,8 +2616,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 //$objResponse->addAssign('modulo_actual',"value","registros");
                 
                 $objResponse->addScript("$('#MustraCargando').hide();");
-                $objResponse->addScript("init_filtro_ao_simple_reg();");
-                $objResponse->addScript("init_filtro_ap_simple_reg();");
+                $objResponse->addScript("init_filtro_ao_multiple_reg();");
+                //$objResponse->addScript("init_filtro_ap_simple_reg();");
                 $objResponse->addScript($js);
                 
                 $objResponse->addScript('setTimeout(function(){ r_init_filtrar_reporte(); }, 500);');

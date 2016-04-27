@@ -325,6 +325,7 @@
              * @param array $atr
              */
             private function get_min_nivel_area($atr){
+                $tercero_aux = $atr[terceros];
                 unset($atr[terceros]);
                 if (count($this->id_org_acceso) <= 0){
                     $this->cargar_acceso_nodos($atr);                    
@@ -334,6 +335,9 @@
                 //echo $sql;
                 $data = $this->dbl->query($sql);
                 $this->nivel_area = $data[0][nivel];
+                $atr[terceros] = $tercero_aux;
+                $this->id_org_acceso = array();
+                $this->cargar_acceso_nodos($atr);
                 //echo     $this->nivel_area;
             }
             
@@ -360,10 +364,9 @@
                     if(!class_exists('mos_acceso')){
                         import("clases.mos_acceso.mos_acceso");
                     }
-                    $acceso = new mos_acceso();
+                    $acceso = new mos_acceso();                    
                     if ($_SESSION[SuperUser]=='S')
-                        unset($parametros[terceros]);
-                        
+                        unset($parametros[terceros]);                    
                     $data_ids_acceso = $acceso->obtenerNodosArbol($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo],$parametros[terceros]);
                    //print_r($data_ids_acceso);
                     foreach ($data_ids_acceso as $value) {
@@ -2408,8 +2411,9 @@
                 /*Para visualizar los documentos de terceros*/
                 //if ($_SESSION[SuperUser]!='S')
                 $parametros[terceros] = 'S';
+                $this->get_min_nivel_area($parametros);                
                 $parametros["b-publico"] = 'S';
-                $this->get_min_nivel_area($parametros);
+                
                 $grid = $this->verListaDocumentos($parametros);
                 
                 $contenido['MODO'] = $parametros['modo'];
