@@ -297,6 +297,46 @@ function init_filtro_ao_multiple(checkbox_cascade){
         //console.log(data.selected);
     });
 }
+function init_filtro_ao_multiple_reg(checkbox_cascade){
+    $('#div-ao-reg').jstree(
+            {
+//                "types": {
+//                    "verde": {
+//                        "icon": "diseno/images/verde.png"
+//                    },
+//                    "rojo": {
+//                        "icon": "diseno/images/rojo.png"
+//                    }
+//                },
+                "checkbox":{
+                    three_state : false,
+                        cascade : 'down'
+                },
+                "plugins": ["search", "types","checkbox"]
+            }
+        );
+    $('#div-ao-reg').on("changed.jstree", function (e, data) {
+        if (data.selected.length > 0){
+            //console.log($("#divtree").jstree("get_selected").text());
+            var arr;
+            var id = '';
+            for(i=0;i<data.selected.length;i++){
+                arr = data.selected[i].split("_");
+                id = id + arr[1] + ',';
+            }
+            id = id.substr(0,id.length-1);
+            //alert(id);
+            $('#b-id_organizacion-reg').val(id);
+            //alert($('#b-id_organizacion-reg'));
+        }
+        else
+            $('#b-id_organizacion-reg').val('');
+    
+        
+           verPagina_aux(1,document);
+        //console.log(data.selected);
+    });
+}
 function init_filtro_ao_simple_reg(){
     //alert(111);
     $('#div-ao-reg').jstree();
