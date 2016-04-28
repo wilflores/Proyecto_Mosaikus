@@ -115,7 +115,7 @@
             if ($this->id_org_acceso[$tupla[id_organizacion]][modificar] == 'S')
             {
                 //<img title=\"Modificar Documento $tupla[nombre_doc]\" src=\"diseno/images/ico_modificar.png\" style=\"cursor:pointer\">
-                $html = "<a href=\"#\" onclick=\"javascript:editarWorkflowDocumentos('". $tupla[cod_emp] . "');\"  title=\"Editar Personas\">                            
+                $html = "<a href=\"#\" onclick=\"javascript:editarWorkflowDocumentos('". $tupla[id] . "');\"  title=\"Editar Personas\">                            
                             <i class=\"icon icon-edit\"></i>
                         </a>";
             }
@@ -123,7 +123,7 @@
             if ($this->id_org_acceso[$tupla[id_organizacion]][eliminar] == 'S')
             {
                 //<img title="Eliminar '.$tupla[nombre_doc].'" src="diseno/images/ico_eliminar.png" style="cursor:pointer">
-                $html .= '<a href="#" onclick="javascript:eliminarWorkflowDocumentos(\''. $tupla[cod_emp] . '\');" title="Eliminar Personas">
+                $html .= '<a href="#" onclick="javascript:eliminarWorkflowDocumentos(\''. $tupla[id] . '\');" title="Eliminar Personas">
                         <i class="icon icon-remove"></i>
                         
                     </a>'; 
@@ -593,7 +593,7 @@
      
  
             public function editar($parametros)
-            {
+            {  
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
