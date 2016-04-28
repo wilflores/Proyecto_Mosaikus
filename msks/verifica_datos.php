@@ -216,6 +216,11 @@
                                         $_SESSION[CookN]=$data[0]['nuevo'];
                                         $_SESSION[CookM]=$data[0]['modificar'];
                                         $_SESSION[CookE]=$data[0]['eliminar'];                                
+                                        
+                                        $_SESSION[CookN]='S';
+                                        $_SESSION[CookM]='S';
+                                        $_SESSION[CookE]='S';                                
+
                                 }
                                 
 				//session_register("CookNomEmpresaGeneral");
