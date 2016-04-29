@@ -142,11 +142,17 @@
                 try {
                     
                     $atr = $this->dbl->corregir_parametros($atr);
+                    $val = $this->vermos_usuario($atr[id_usuario]);
+                    if($val[password_1]== $atr[password_1]){
+                        $pass = $val[password_1];
+                    }else{
+                        $pass = md5($atr[password_1]);
+                    }
                     $sql = "UPDATE mos_usuario SET                            
-                                    nombres = '$atr[nombres]',apellido_paterno = '$atr[apellido_paterno]',apellido_materno = '$atr[apellido_materno]',telefono = '$atr[telefono]',fecha_expi = '$atr[fecha_expi]',vigencia = '$atr[vigencia]',super_usuario = '$atr[super_usuario]',email = '$atr[email]',password_1 = '$atr[password_1]',cedula = '$atr[cedula]'
+                                    nombres = '$atr[nombres]',apellido_paterno = '$atr[apellido_paterno]',apellido_materno = '$atr[apellido_materno]',telefono = '$atr[telefono]',fecha_expi = '$atr[fecha_expi]',vigencia = '$atr[vigencia]',super_usuario = '$atr[super_usuario]',email = '$atr[email]',password_1 = '$pass',cedula = '$atr[cedula]'
                             WHERE  id_usuario = $atr[id_usuario]"; 
                     
-                    $val = $this->vermos_usuario($atr[id]);
+                    
                     $this->dbl->insert_update($sql);
                     $nuevo = "Id Usuario: \'$atr[id_usuario]\', Nombres: \'$atr[nombres]\', Apellido Paterno: \'$atr[apellido_paterno]\', Apellido Materno: \'$atr[apellido_materno]\', Telefono: \'$atr[telefono]\', Fecha Creacion: \'$atr[fecha_creacion]\', Fecha Expi: \'$atr[fecha_expi]\', Vigencia: \'$atr[vigencia]\', Super Usuario: \'$atr[super_usuario]\', Email: \'$atr[email]\', Password 1: \'$atr[password_1]\', Cedula: \'$atr[cedula]\', ";
                     $anterior = "Id Usuario: \'$val[id_usuario]\', Nombres: \'$val[nombres]\', Apellido Paterno: \'$val[apellido_paterno]\', Apellido Materno: \'$val[apellido_materno]\', Telefono: \'$val[telefono]\', Fecha Creacion: \'$val[fecha_creacion]\', Fecha Expi: \'$val[fecha_expi]\', Vigencia: \'$val[vigencia]\', Super Usuario: \'$val[super_usuario]\', Email: \'$val[email]\', Password 1: \'$val[password_1]\', Cedula: \'$val[cedula]\', ";
@@ -367,7 +373,7 @@
                     $columna_funcion = 13;
                 }*/
                 if ($_SESSION[CookM] == 'S')
-                    array_push($func,array('nombre'=> 'vermos_usuario','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-view-document\" title='Ver Usuario'></i>"));                
+                    //array_push($func,array('nombre'=> 'vermos_usuario','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-view-document\" title='Ver Usuario'></i>"));                
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                     array_push($func,array('nombre'=> 'editarmos_usuario','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-edit\" title='Editar Usuario'></i>"));
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
@@ -1337,9 +1343,18 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
         return $this->dbl->data;
     }    
 
+    public function eliminarHuerfanoEstrustura(){
+            $atr=array();
+            $sql = "DELETE FROM `mos_usuario_estructura` WHERE NOT id_usuario_filial IN (
+                SELECT id
+                FROM mos_usuario_filial
+                )";        
+            $this->operacion($sql, $atr);        
+    }
     public function eliminarPerfilesUsuario($atr){
            try {                   
                $respuesta = $this->dbl->delete("mos_usuario_filial", "id_usuario = $atr[id_usuario]");
+               
                return "ha sido eliminada con exito";
            } catch(Exception $e) {
                $error = $e->getMessage();                     
@@ -1351,7 +1366,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
 
     public function eliminarPerfilesEstructura($atr){
            try {   
-               
+        
                $respuesta = $this->dbl->delete("mos_usuario_estructura", "id_usuario_filial = $atr[id_filial]  AND portal = 'N'");
                return "ha sido eliminada con exito";
            } catch(Exception $e) {
@@ -1463,7 +1478,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
             
             $params[id_usuario] = $parametros[id_usuario];
             $params[id_filial] = $_SESSION[CookFilial]; 
-             
+             //deris
             $this->eliminarPerfilesUsuario($parametros);
             foreach($arr as $temp){
                  $params[cod_perfil] = $temp;
