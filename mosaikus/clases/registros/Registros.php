@@ -861,6 +861,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         import("clases.personas.Personas");
                     }
                     $personal = new Personas();
+                    //print_r($this->parametros);
                     foreach ($this->parametros as $value) {
                         //,CONCAT(CONCAT(UPPER(LEFT(ap.nombres, 1)), LOWER(SUBSTRING(ap.nombres, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_paterno, 1)), LOWER(SUBSTRING(ap.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_materno, 1)), LOWER(SUBSTRING(ap.apellido_materno, 2)))) aprobo
                         if ($value[tipo]== '6'){//-- , t1.Nombre as nom_detalle   
@@ -939,10 +940,31 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         }
 
                         else if ($value[tipo]== '14'){
-                            $sql_left .= " LEFT JOIN(select t1.idRegistro, GROUP_CONCAT(cargo.descripcion) as nom_detalle 
+                            if($registros_x_pagina==100000){
+                                $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','; ')";
+                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), ' ', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',','; ')";
+                            }
+                            else{
+                                $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','<br>')";
+                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), '&nbsp;', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),'&nbsp;', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',','<br>')";
+                            }
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, $campo_cargo as nom_detalle 
                             from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
                             where id_unico= $value[id_unico] group by t1.idRegistro) AS p$k ON p$k.idRegistro = r.idRegistro "; 
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
+                            //$clave= array_search(11, $this->parametros);
+                            //echo $clave;
+                            $sql_left .= "LEFT JOIN
+                            (select 
+                            t1.idRegistro, 
+                            $campo_cargo_perso cargo_perso
+                            from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
+                            inner join mos_registro_item ao on ao.idRegistro = t1.idRegistro and ao.tipo = 11
+                            inner JOIN mos_personal p on p.cod_cargo = t1.valor and p.id_organizacion = ao.valor
+                            where t1.id_unico = $value[id_unico] 
+                            group by t1.idRegistro) pn$k ON pn$k.idRegistro = r.idRegistro";
+                            $sql_col_left .= ",pn$k.cargo_perso pn$k ";
+                            
                         }
                         else if ($value[tipo]== '11'){
                             $sql_left .= " LEFT JOIN(select t1.idRegistro, GROUP_CONCAT(t1.valor) as nom_detalle from mos_registro_item t1
@@ -1509,6 +1531,12 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                                 //$k++;
                                 break;
+                        case '14':
+                                $ancho = 5;                                                            
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro('Personas en Cargo', "pn$k", $parametros,'r_link_titulos')));            
+                                $k++;
+                                break;
                             
 
                         default:
@@ -1689,6 +1717,13 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                                 //$k++;
                                 break;
+                        case '14':
+                                $ancho = 5;                                                            
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro('Personas en Cargo', "pn$k", $parametros,'r_link_titulos')));            
+                                $k++;
+                                break;
+                            
                         default:
                             array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));
                             break;
@@ -1912,6 +1947,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 } 
                 $k = 5;
                 $contenido[PARAMETROS_OTROS] = "";
+                //print_r($this->parametros);
                 foreach ($this->parametros as $value) {  
                     if ($value[tipo] == 13){
                         $parametros['mostrar-col'] .= "-$k";
@@ -1931,6 +1967,27 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                   
                             </div>';
                         $k++;
+                    }
+                    else if ($value[tipo] == 14){
+                       $parametros['mostrar-col'] .= "-$k";
+                       $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+                                      
+                                     <label >
+                                         <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                     ' . $value[Nombre] . '</label>
+                                 
+                           </div>';
+                       $k++;
+                         $parametros['mostrar-col'] .= "-$k";
+                       $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+                                      
+                                     <label >
+                                         <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                     ' . $value[Nombre] . ' Personal </label>
+                                 
+                           </div>';
+                       $k++;   
+                        
                     }
                     else if ($value[tipo] == 6){
                         $parametros['mostrar-col'] .= "-$k";
@@ -2301,7 +2358,29 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                   
                             </div>';
                         $k++;
-                    }else if ($value[tipo] == 6){
+                    }else if ($value[tipo] == 14){
+                       $parametros['mostrar-col'] .= "-$k";
+                       $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+                                      
+                                     <label >
+                                         <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                     ' . $value[Nombre] . '</label>
+                                 
+                           </div>';
+                       $k++;
+                         $parametros['mostrar-col'] .= "-$k";
+                       $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+                                      
+                                     <label >
+                                         <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                     ' . $value[Nombre] . ' Personal </label>
+                                 
+                           </div>';
+                       $k++;   
+                        
+                    }
+
+                    else if ($value[tipo] == 6){
                         $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
                                        
@@ -2841,8 +2920,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             $cadenas = split("<br />", $value[valores]) ;
                             $html .= '<input type="hidden" name="campo_cargo_' . $i . '" id="campo_cargo_' . $i . '" value="' . $i . '" />';    
                             $html .= '<div class="col-md-11" id="col-md-10-'.$i.'">                                              
-                                                      <select class="form-control" name="campo_' . $i . '[]" id="campo_' . $i . '" data-validation="required" multiple>
-                                                        <option selected="" value="">-- Marque en el arbol y Seleccione --</option>';
+                                                      <select size=7 class="form-control" name="campo_' . $i . '[]" id="campo_' . $i . '" data-validation="required" multiple>
+                                                        <option selected="" value="">-- Seleccione --</option>';
                             $html .= '</select></div>';
 
                             break;
@@ -3366,8 +3445,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 $combosemp .= $ut_tool->OptionsComboMultiple($sql, 'id', 'descripcion','valor');      
                                 $html .= '<input type="hidden" name="campo_cargo_' . $i . '" id="campo_cargo_' . $i . '" value="' . $i . '" />';    
                                 $html .= '<input type="hidden" name="sel_cargo_' . $i . '" id="sel_cargo_' . $i . '" value="' .$seleccionados. '" />';
-                                $html .="<select class='form-control' id=\"campo_".$i."\" name=\"campo_".$i."[]\"  data-validation=\"required\" multiple>
-                                            <option value=''>-- Marque en el arbol y Seleccione --</option>
+                                $html .="<select size=7 class='form-control' id=\"campo_".$i."\" name=\"campo_".$i."[]\"  data-validation=\"required\" multiple>
+                                            <option value=''>-- Seleccione --</option>
                                             ".$combosemp."
                                         </select>    ";
                                 $html .= '</select></div>';
@@ -3740,8 +3819,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
             //echo $sql;
             $combosemp .= $ut_tool->OptionsComboMultiple($sql, 'id', 'descripcion','valor');      
             $combo .= '<input type="hidden" name="campo_cargo_' . $parametros['i'] . '" id="campo_cargo_' . $parametros['i'] . '" value="' . $parametros['i'] . '" />';    
-            $combo .="<select onchange='ValidarSeleccion(this);' class='form-control' id=\"campo_".$parametros['i']."\" name=\"campo_".$parametros['i']."[]\"  data-validation=\"required\" multiple>
-                        <option value=''>-- Marque en el arbol y Seleccione --</option>
+            $combo .="<select size=7 onchange='ValidarSeleccion(this);' class='form-control' id=\"campo_".$parametros['i']."\" name=\"campo_".$parametros['i']."[]\"  data-validation=\"required\" multiple>
+                        <option value=''>-- Seleccione --</option>
                         ".$combosemp."
                     </select>    ";
             
@@ -3770,8 +3849,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
             //echo $sql;
             $combosemp .= $ut_tool->OptionsComboMultiple($sql, 'id', 'descripcion','valor');      
             $combo .= '<input type="hidden" name="campo_cargo_' . $parametros['i'] . '" id="campo_cargo_' . $parametros['i'] . '" value="' . $parametros['i'] . '" />';    
-            $combo .="<select onchange='ValidarSeleccion(this);' class='form-control' id=\"campo_".$parametros['i']."\" name=\"campo_".$parametros['i']."[]\"  data-validation=\"required\" multiple>
-                        <option value=''>-- Marque en el arbol y Seleccione --</option>
+            $combo .="<select size=7 onchange='ValidarSeleccion(this);' class='form-control' id=\"campo_".$parametros['i']."\" name=\"campo_".$parametros['i']."[]\"  data-validation=\"required\" multiple>
+                        <option value=''>-- Seleccione --</option>
                         ".$combosemp."
                     </select>    ";
             
