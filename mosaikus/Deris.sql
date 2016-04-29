@@ -100,7 +100,7 @@ AUTO_INCREMENT=7;
     INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('password_1', 'Password', '21', 'password_1');
     INSERT INTO `mos_nombres_campos` (nombre_campo,texto, modulo, placeholder) VALUES ('cedula', 'Cedula', '21', 'cedula');
 -- fin punto 1
---inicio punto 2
+-- inicio punto 2
     INSERT INTO `mos_link` VALUES ('80', 'Perfiles-indexPerfiles-clases.perfiles.Perfiles', 'Administrador de Perfiles', '66', '2', 'mos_perfil.php', '74', 'configuracion.png');
     INSERT INTO `mos_link` VALUES ('81', 'Perfiles_portal-indexPerfiles-clases.perfiles_portal.Perfiles_portal', 'Administrador de Perfiles Portal', '66', '2', 'mos_perfil_portal.php', '75', 'configuracion.png');
 -- fin punto 2
@@ -120,7 +120,7 @@ ALTER TABLE `mos_usuario_estructura`
 ADD COLUMN `portal`  char(1) NULL AFTER `cod_perfil`;
 -- fin tercera actualizacion
 
-INSERT INTO  `desarrollo`.`mos_link_por_perfil` (`cod_perfil` ,`cod_link`)VALUES ('1',  '10'), ('1',  '80'), ('1',  '81');
+INSERT INTO  `mos_link_por_perfil` (`cod_perfil` ,`cod_link`)VALUES ('1',  '10'), ('1',  '80'), ('1',  '81');
 
 ALTER TABLE `mos_perfil`
 MODIFY COLUMN `cod_perfil`  int(3) NOT NULL AUTO_INCREMENT FIRST ;

@@ -1471,7 +1471,8 @@
                                 $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
                                 $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";    
                                 /*SI NO ESTA EL FILTRO VER SOLO FLUJO DE TRABAJO*/
-                                if (strlen($atr["b-flujo-trabajo"])== 0){
+                                //if (strlen($atr["b-flujo-trabajo"])== 0)
+                                {
                                     if (count($this->id_org_acceso))
                                         $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
                                     if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-publico"])>0))
@@ -1481,24 +1482,31 @@
                             }
                             if (($_SESSION[SuperUser]=='S')){
                                 /*SI NO ESTA EL FILTRO VER SOLO FLUJO DE TRABAJO*/    
-                                if ((strlen($atr["b-flujo-trabajo"])>= 0)&&(($atr["b-flujo-trabajo"])== '1')){
-                                    $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
-                                    $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
-                                    $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";                                                                                                
-                                    $sql .= ")";
-                                }
-                                else{
+//                                if ((strlen($atr["b-flujo-trabajo"])>= 0)&&(($atr["b-flujo-trabajo"])== '1')){
+//                                    $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
+//                                    $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
+//                                    $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";                                                                                                
+//                                    $sql .= ")";
+//                                }
+//                                else{
                                     $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
                                     $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
                                     $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";    
 
                                     if (count($this->id_org_acceso))
-                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
+                                        $sql .= " OR ( d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
                                     if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-publico"])>0))
                                         $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))) . ")) )"; 
                                     $sql .= ")";
-                                }
+//                                }
                             }
+                    /*FILTRO VER SOLO FLUJO DE TRABAJO*/
+                    if (strlen($atr["b-flujo-trabajo"])> 0){
+                        $sql .= " and ((p.email='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' ) and d.estado_workflow='RECHAZADO') or ";
+                        $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' ) and d.estado_workflow='OK') or ";    
+                        $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' ) and d.estado_workflow='OK') )";    
+
+                    }
                             //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND (upper(Codigo_doc) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%' OR upper(nombre_doc) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
@@ -1661,7 +1669,8 @@
                                 $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
                                 $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";    
                                 /*SI NO ESTA EL FILTRO VER SOLO FLUJO DE TRABAJO*/                                
-                                if (strlen($atr["b-flujo-trabajo"])== 0){
+                                //if (strlen($atr["b-flujo-trabajo"])== 0)
+                                {
                                     if (count($this->id_org_acceso))
                                         $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
                                     /*DOCUMENTOS PUBLICOS*/
@@ -1672,24 +1681,31 @@
                             }
                             if (($_SESSION[SuperUser]=='S')){
                                 /*SI NO ESTA EL FILTRO VER SOLO FLUJO DE TRABAJO*/    
-                                if ((strlen($atr["b-flujo-trabajo"])>= 0)&&(($atr["b-flujo-trabajo"])== '1')){
-                                    $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
-                                    $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
-                                    $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";                                                                                                
-                                    $sql .= ")";
-                                }
-                                else{
+//                                if ((strlen($atr["b-flujo-trabajo"])>= 0)&&(($atr["b-flujo-trabajo"])== '1')){
+//                                    $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
+//                                    $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
+//                                    $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";                                                                                                
+//                                    $sql .= ")";
+//                                }
+//                                else{
                                     $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
                                     $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
                                     $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";    
 
                                     if (count($this->id_org_acceso))
-                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
+                                        $sql .= " OR ( d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ")) )"; 
                                     if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-publico"])>0))
                                         $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))) . ")) )"; 
                                      $sql .= ")";
-                                }
+//                                }
                             }
+                    /*FILTRO VER SOLO FLUJO DE TRABAJO*/
+                    if (strlen($atr["b-flujo-trabajo"])> 0){
+                        $sql .= " and ((p.email='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' ) and d.estado_workflow='RECHAZADO') or ";
+                        $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' ) and d.estado_workflow='OK') or ";    
+                        $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' ) and d.estado_workflow='OK') )";    
+
+                    }
                             //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND (upper(Codigo_doc) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%' OR upper(nombre_doc) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
@@ -2395,6 +2411,8 @@
                         $this->cargar_parametros();
                 }
                 $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
+                $contenido[TITULO_MODULO] .= '<br><label class="checkbox-inline"> 
+                                    <input type="checkbox" class="b-mi-flujo-trabajo" value="S"> Mi Flujo de Trabajo </label>';
                 $k = 30;
                 $contenido[PARAMETROS_OTROS] = "";
                 foreach ($this->parametros as $value) {                    
@@ -2449,9 +2467,9 @@
                 /*HTML FILTRO RAPIDO FLUJO TRABAJO*/
                 $contenido[FILTRO_OTROS_CAMPOS] = '<br/><div class="form-group">                                                                
                                 <label class="checkbox-inline"> 
-                                    <input type="checkbox" id="b-mi-flujo-trabajo" name="b-mi-flujo-trabaj" value="S"> Mi Flujo de Trabajo </label>';                            
+                                    <input type="checkbox" class="b-mi-flujo-trabajo" value="S"> Mi Flujo de Trabajo </label>';                            
                 /*JS Busqueda Filtro Rapido*/
-                $js_flujo = "$('#b-mi-flujo-trabajo').on('change', function (event) {
+                $js_flujo = "$('.b-mi-flujo-trabajo').on('change', function (event) {
                                 /*event.preventDefault();
                                 var id = $(this).attr('tok');*/
                                  if( $(this).is(':checked') ){

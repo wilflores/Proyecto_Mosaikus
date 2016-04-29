@@ -193,15 +193,6 @@
                                 </div>                                
                             </div>-->
                             <div class="form-group">
-                                            <label for="reviso" class="control-label">{N_REVISO}</label>                                            
-                                                                                        
-                                              <select id="b-reviso" name="b-reviso" >
-                                                <option selected="" value="">-- Seleccione --</option>
-                                                {REVISORES}
-                                             </select>
-                                                                          
-                                        </div>
-                                        <div class="form-group">
                                             <label for="elaboro" class="control-label">{N_ELABORO}</label>                                                
                                                                                          
                                               <select id="b-elaboro" name="b-elaboro" data-validation="required">
@@ -210,6 +201,16 @@
                                              </select>
                                             
                                         </div>
+                            <div class="form-group">
+                                            <label for="reviso" class="control-label">{N_REVISO}</label>                                            
+                                                                                        
+                                              <select id="b-reviso" name="b-reviso" >
+                                                <option selected="" value="">-- Seleccione --</option>
+                                                {REVISORES}
+                                             </select>
+                                                                          
+                                        </div>
+                                        
                                         <div class="form-group">
                                             <label for="aprobo" class="control-label">{N_APROBO}</label>
                                                                                        

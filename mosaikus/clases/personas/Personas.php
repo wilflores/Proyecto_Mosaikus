@@ -394,7 +394,8 @@
                                 $sql .= " AND upper(aprobo) like '%" . strtoupper($atr["b-aprobo"]) . "%'";
                     if (strlen($atr["b-extranjero"])>0)
                         $sql .= " AND upper(extranjero) like '%" . strtoupper($atr["b-extranjero"]) . "%'";
-                    if (count($this->id_org_acceso)>0){                            
+                    //if (count($this->id_org_acceso)>0)
+                    {                            
                         $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
                     }
                     
@@ -491,7 +492,8 @@
                                 $sql .= " AND upper(aprobo) like '%" . strtoupper($atr["b-aprobo"]) . "%'";
                     if (strlen($atr["b-extranjero"])>0)
                                 $sql .= " AND upper(extranjero) like '%" . strtoupper($atr["b-extranjero"]) . "%'";
-                    if (count($this->id_org_acceso)>0){                            
+                    //if (count($this->id_org_acceso)>0)
+                    {                            
                         $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
                     }
                     $sql .= " order by $atr[corder] $atr[sorder] ";

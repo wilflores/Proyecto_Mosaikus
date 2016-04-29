@@ -83,13 +83,15 @@
                                 )";
                     //echo $sql;
                     $this->dbl->insert_update($sql);
-                    
+                    $sql = "SELECT MAX(id) ultimo FROM mos_workflow_documentos"; 
+                    $this->operacion($sql, $atr);
+                    $id_new = $this->dbl->data[0][0];
                     /*
                     $this->registraTransaccion('Insertar','Ingreso el mos_workflow_documentos ' . $atr[descripcion_ano], 'mos_workflow_documentos');
                       */
                     $nuevo = "Id Personal Responsable: \'$atr[id_personal_responsable]\', Email Responsable: \'$atr[email_responsable]\', Id Personal Revisa: \'$atr[id_personal_revisa]\', Email Revisa: \'$atr[email_revisa]\', Id Personal Aprueba: \'$atr[id_personal_aprueba]\', Email Aprueba: \'$atr[email_aprueba]\', ";
-                    $this->registraTransaccionLog(18,$nuevo,'', '');
-                    return "El mos_workflow_documentos '$atr[descripcion_ano]' ha sido ingresado con exito";
+                    $this->registraTransaccionLog(81,$nuevo,'', $id_new);
+                    return "El Flujo de Trabajo ha sido ingresado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
                         if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
@@ -98,10 +100,10 @@
                     }
             }
             
-            public function registraTransaccionLog($accion,$descr, $tabla, $id = ''){
+            public function registraTransaccionLog($accion,$descr, $tabla, $id = 'NULL'){
                 session_name("mosaikus");
                 session_start();
-                $sql = "INSERT INTO mos_log(codigo_accion, fecha_hora, accion, anterior, realizo, ip) VALUES ('$accion','".date('Y-m-d G:h:s')."','$descr', '$tabla','$_SESSION[CookIdUsuario]','$_SERVER[REMOTE_ADDR]')";            
+                $sql = "INSERT INTO mos_log(codigo_accion, fecha_hora, accion, anterior, realizo, ip, id_registro) VALUES ('$accion','".date('Y-m-d G:h:s')."','$descr', '$tabla','$_SESSION[CookIdUsuario]','$_SERVER[REMOTE_ADDR]',$id)";            
                 $this->dbl->insert_update($sql);
 
                 return true;
@@ -143,11 +145,11 @@
                     $this->dbl->insert_update($sql);
                     $nuevo = "Id Personal Responsable: \'$atr[id_personal_responsable]\', Email Responsable: \'$atr[email_responsable]\', Id Personal Revisa: \'$atr[id_personal_revisa]\', Email Revisa: \'$atr[email_revisa]\', Id Personal Aprueba: \'$atr[id_personal_aprueba]\', Email Aprueba: \'$atr[email_aprueba]\', ";
                     $anterior = "Id Personal Responsable: \'$val[id_personal_responsable]\', Email Responsable: \'$val[email_responsable]\', Id Personal Revisa: \'$val[id_personal_revisa]\', Email Revisa: \'$val[email_revisa]\', Id Personal Aprueba: \'$val[id_personal_aprueba]\', Email Aprueba: \'$val[email_aprueba]\', ";
-                    $this->registraTransaccionLog(19,$nuevo,$anterior, '');
+                    $this->registraTransaccionLog(82,$nuevo,$anterior, $atr[id]);
                     /*
                     $this->registraTransaccion('Modificar','Modifico el WorkflowDocumentos ' . $atr[descripcion_ano], 'mos_workflow_documentos');
                     */
-                    return "El mos_workflow_documentos '$atr[descripcion_ano]' ha sido actualizado con exito";
+                    return "El Flujo de Trabajo ha sido actualizado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
                         if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
@@ -171,23 +173,102 @@
                         $k++;
                     }*/
                     $sql = "SELECT COUNT(*) total_registros
-                         FROM mos_workflow_documentos 
+                         FROM mos_workflow_documentos  AS wf
+                            INNER JOIN mos_personal AS perso_resp ON wf.id_personal_responsable = perso_resp.cod_emp
+                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
                          WHERE 1 = 1 ";
+                    if (strlen($atr['b-filtro-sencillo'])>0){
+                        //$sql .= " AND ((upper(id_personal) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
+                        $sql .= ' AND (';
+                        $sql .= "  (";
+                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);    
+                        $i = 0;
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                            if ($i > 0)
+                                $sql .= " AND (upper(concat(perso_resp.nombres, ' ', perso_resp.apellido_paterno, ' ' , perso_resp.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            else
+                                $sql .= " (upper(concat(perso_resp.nombres, ' ', perso_resp.apellido_paterno, ' ' , perso_resp.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            $i++;
+                        } 
+                        $sql .= " ) ";
+                        $sql .= " OR (";
+                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);    
+                        $i = 0;
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                            if ($i > 0)
+                                $sql .= " AND (upper(concat(perso_revisa.nombres, ' ', perso_revisa.apellido_paterno, ' ' , perso_revisa.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            else
+                                $sql .= " (upper(concat(perso_revisa.nombres, ' ', perso_revisa.apellido_paterno, ' ' , perso_revisa.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            $i++;
+                        } 
+                        $sql .= " ) ";
+                        $sql .= " OR (";
+                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);    
+                        $i = 0;
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                            if ($i > 0)
+                                $sql .= " AND (upper(concat(perso_aprueba.nombres, ' ', perso_aprueba.apellido_paterno, ' ' , perso_aprueba.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            else
+                                $sql .= " (upper(concat(perso_aprueba.nombres, ' ', perso_aprueba.apellido_paterno, ' ' , perso_aprueba.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            $i++;
+                        } 
+                        $sql .= " ) ";
+                        $sql .= " ) ";
+                        //$sql .= " OR (upper(c.descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
+                    }                   
                     if (strlen($atr[valor])>0)
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
-                    if (strlen($atr["b-id_personal_responsable"])>0)
-                        $sql .= " AND CONCAT(CONCAT(UPPER(LEFT(perso_resp.apellido_paterno, 1)), LOWER(SUBSTRING(perso_resp.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_resp.apellido_materno, 1)), LOWER(SUBSTRING(perso_resp.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_resp.nombres, 1)), LOWER(SUBSTRING(perso_resp.nombres, 2)))) like '%" . $atr["b-id_personal_responsable"] . "%'";
+                    if (strlen($atr["b-id_personal_responsable"])>0){
+                        //$sql .= " AND CONCAT(CONCAT(UPPER(LEFT(perso_resp.apellido_paterno, 1)), LOWER(SUBSTRING(perso_resp.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_resp.apellido_materno, 1)), LOWER(SUBSTRING(perso_resp.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_resp.nombres, 1)), LOWER(SUBSTRING(perso_resp.nombres, 2)))) like '%" . $atr["b-id_personal_responsable"] . "%'";
+                        $nombre_supervisor = explode(' ', $atr["b-id_personal_responsable"]);    
+                        $i = 0;
+                        $sql .= " AND (";
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                            if ($i > 0)
+                                $sql .= " AND (upper(concat(perso_resp.nombres, ' ', perso_resp.apellido_paterno, ' ' , perso_resp.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            else
+                                $sql .= " (upper(concat(perso_resp.nombres, ' ', perso_resp.apellido_paterno, ' ' , perso_resp.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            $i++;
+                        } 
+                        $sql .= " ) ";
+                    }
                     if (strlen($atr["b-email_responsable"])>0)
                                 $sql .= " AND upper(email_responsable) like '%" . strtoupper($atr["b-email_responsable"]) . "%'";
-                     if (strlen($atr["b-id_personal_revisa"])>0)
-                                $sql .= " AND CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) like '%" . $atr["b-id_personal_revisa"] . "%'";
+                     if (strlen($atr["b-id_personal_revisa"])>0){
+                        //$sql .= " AND CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) like '%" . $atr["b-id_personal_revisa"] . "%'";
+                        $nombre_supervisor = explode(' ', $atr["b-id_personal_revisa"]);    
+                        $i = 0;
+                        $sql .= " AND (";
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                            if ($i > 0)
+                                $sql .= " AND (upper(concat(perso_revisa.nombres, ' ', perso_revisa.apellido_paterno, ' ' , perso_revisa.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            else
+                                $sql .= " (upper(concat(perso_revisa.nombres, ' ', perso_revisa.apellido_paterno, ' ' , perso_revisa.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            $i++;
+                        } 
+                        $sql .= " ) ";
+                     }
                     if (strlen($atr["b-email_revisa"])>0)
                                 $sql .= " AND upper(email_revisa) like '%" . strtoupper($atr["b-email_revisa"]) . "%'";
-                     if (strlen($atr["b-id_personal_aprueba"])>0)
-                                $sql .= " AND CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) like '%" . $atr["b-id_personal_aprueba"] . "%'";
+                     if (strlen($atr["b-id_personal_aprueba"])>0){
+                                //$sql .= " AND CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) like '%" . $atr["b-id_personal_aprueba"] . "%'";
+                        $nombre_supervisor = explode(' ', $atr["b-id_personal_aprueba"]);    
+                        $i = 0;
+                        $sql .= " AND (";
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                            if ($i > 0)
+                                $sql .= " AND (upper(concat(perso_aprueba.nombres, ' ', perso_aprueba.apellido_paterno, ' ' , perso_aprueba.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            else
+                                $sql .= " (upper(concat(perso_aprueba.nombres, ' ', perso_aprueba.apellido_paterno, ' ' , perso_aprueba.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            $i++;
+                        } 
+                        $sql .= " ) ";
+                     }
                     if (strlen($atr["b-email_aprueba"])>0)
                             $sql .= " AND upper(email_aprueba) like '%" . strtoupper($atr["b-email_aprueba"]) . "%'";
 
+                    //echo $sql;
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
                     if (count($this->id_org_acceso) <= 0){
@@ -208,21 +289,95 @@
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
                             $sql_left
                             WHERE 1 = 1 ";
+                    if (strlen($atr['b-filtro-sencillo'])>0){
+                        //$sql .= " AND ((upper(id_personal) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
+                        $sql .= ' AND (';
+                        $sql .= "  (";
+                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);    
+                        $i = 0;
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                            if ($i > 0)
+                                $sql .= " AND (upper(concat(perso_resp.nombres, ' ', perso_resp.apellido_paterno, ' ' , perso_resp.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            else
+                                $sql .= " (upper(concat(perso_resp.nombres, ' ', perso_resp.apellido_paterno, ' ' , perso_resp.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            $i++;
+                        } 
+                        $sql .= " ) ";
+                        $sql .= " OR (";
+                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);    
+                        $i = 0;
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                            if ($i > 0)
+                                $sql .= " AND (upper(concat(perso_revisa.nombres, ' ', perso_revisa.apellido_paterno, ' ' , perso_revisa.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            else
+                                $sql .= " (upper(concat(perso_revisa.nombres, ' ', perso_revisa.apellido_paterno, ' ' , perso_revisa.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            $i++;
+                        } 
+                        $sql .= " ) ";
+                        $sql .= " OR (";
+                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);    
+                        $i = 0;
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                            if ($i > 0)
+                                $sql .= " AND (upper(concat(perso_aprueba.nombres, ' ', perso_aprueba.apellido_paterno, ' ' , perso_aprueba.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            else
+                                $sql .= " (upper(concat(perso_aprueba.nombres, ' ', perso_aprueba.apellido_paterno, ' ' , perso_aprueba.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            $i++;
+                        } 
+                        $sql .= " ) ";
+                        $sql .= " ) ";
+                        //$sql .= " OR (upper(c.descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
+                    } 
                     if (strlen($atr[valor])>0)
-                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
-                    if (strlen($atr["b-id_personal_responsable"])>0)
-                        $sql .= " AND CONCAT(CONCAT(UPPER(LEFT(perso_resp.apellido_paterno, 1)), LOWER(SUBSTRING(perso_resp.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_resp.apellido_materno, 1)), LOWER(SUBSTRING(perso_resp.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_resp.nombres, 1)), LOWER(SUBSTRING(perso_resp.nombres, 2)))) like '%" . $atr["b-id_personal_responsable"] . "%'";
+                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
+                    if (strlen($atr["b-id_personal_responsable"])>0){
+                        //$sql .= " AND CONCAT(CONCAT(UPPER(LEFT(perso_resp.apellido_paterno, 1)), LOWER(SUBSTRING(perso_resp.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_resp.apellido_materno, 1)), LOWER(SUBSTRING(perso_resp.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_resp.nombres, 1)), LOWER(SUBSTRING(perso_resp.nombres, 2)))) like '%" . $atr["b-id_personal_responsable"] . "%'";
+                        $nombre_supervisor = explode(' ', $atr["b-id_personal_responsable"]);    
+                        $i = 0;
+                        $sql .= " AND (";
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                            if ($i > 0)
+                                $sql .= " AND (upper(concat(perso_resp.nombres, ' ', perso_resp.apellido_paterno, ' ' , perso_resp.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            else
+                                $sql .= " (upper(concat(perso_resp.nombres, ' ', perso_resp.apellido_paterno, ' ' , perso_resp.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            $i++;
+                        } 
+                        $sql .= " ) ";
+                    }
                     if (strlen($atr["b-email_responsable"])>0)
                                 $sql .= " AND upper(email_responsable) like '%" . strtoupper($atr["b-email_responsable"]) . "%'";
-                     if (strlen($atr["b-id_personal_revisa"])>0)
-                                $sql .= " AND CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) like '%" . $atr["b-id_personal_revisa"] . "%'";
+                     if (strlen($atr["b-id_personal_revisa"])>0){
+                        //$sql .= " AND CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) like '%" . $atr["b-id_personal_revisa"] . "%'";
+                        $nombre_supervisor = explode(' ', $atr["b-id_personal_revisa"]);    
+                        $i = 0;
+                        $sql .= " AND (";
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                            if ($i > 0)
+                                $sql .= " AND (upper(concat(perso_revisa.nombres, ' ', perso_revisa.apellido_paterno, ' ' , perso_revisa.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            else
+                                $sql .= " (upper(concat(perso_revisa.nombres, ' ', perso_revisa.apellido_paterno, ' ' , perso_revisa.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            $i++;
+                        } 
+                        $sql .= " ) ";
+                     }
                     if (strlen($atr["b-email_revisa"])>0)
                                 $sql .= " AND upper(email_revisa) like '%" . strtoupper($atr["b-email_revisa"]) . "%'";
-                     if (strlen($atr["b-id_personal_aprueba"])>0)
-                                $sql .= " AND CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) like '%" . $atr["b-id_personal_aprueba"] . "%'";
+                     if (strlen($atr["b-id_personal_aprueba"])>0){
+                                //$sql .= " AND CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) like '%" . $atr["b-id_personal_aprueba"] . "%'";
+                        $nombre_supervisor = explode(' ', $atr["b-id_personal_aprueba"]);    
+                        $i = 0;
+                        $sql .= " AND (";
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                            if ($i > 0)
+                                $sql .= " AND (upper(concat(perso_aprueba.nombres, ' ', perso_aprueba.apellido_paterno, ' ' , perso_aprueba.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            else
+                                $sql .= " (upper(concat(perso_aprueba.nombres, ' ', perso_aprueba.apellido_paterno, ' ' , perso_aprueba.apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                            $i++;
+                        } 
+                        $sql .= " ) ";
+                     }
                     if (strlen($atr["b-email_aprueba"])>0)
                             $sql .= " AND upper(email_aprueba) like '%" . strtoupper($atr["b-email_aprueba"]) . "%'";
-
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //echo $sql;
@@ -231,7 +386,12 @@
              public function eliminarWorkflowDocumentos($atr){
                     try {
                         $atr = $this->dbl->corregir_parametros($atr);
+                        $val = $this->verWorkflowDocumentos($atr[id]);
+                                        
+                        $nuevo = "Id Personal Responsable: \'$val[id_personal_responsable]\', Email Responsable: \'$val[email_responsable]\', Id Personal Revisa: \'$val[id_personal_revisa]\', Email Revisa: \'$val[email_revisa]\', Id Personal Aprueba: \'$val[id_personal_aprueba]\', Email Aprueba: \'$val[email_aprueba]\', ";
+
                         $respuesta = $this->dbl->delete("mos_workflow_documentos", "id = " . $atr[id]);
+                        $this->registraTransaccionLog(83,$nuevo,'', $atr[id]);
                         return "ha sido eliminada con exito";
                     } catch(Exception $e) {
                         $error = $e->getMessage();                     

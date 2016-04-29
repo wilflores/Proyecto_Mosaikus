@@ -51,8 +51,8 @@
                 break;
             case 'masisa-cl-mc.mosaikus.cl':
             case 'www.masisa-cl-mc.mosaikus.cl':
-            case 'masisa-cl-mc.mosaikus.com':
-            case 'www.masisa-cl-mc.mosaikus.com':
+            case 'masisa.mosaikus.com':
+            case 'www.masisa.mosaikus.com':
                 $id_empresa = 8;
                 break;
             default:
