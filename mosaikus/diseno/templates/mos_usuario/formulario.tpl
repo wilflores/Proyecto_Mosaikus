@@ -22,20 +22,20 @@
 <div class="form-group">
                                         <label for="apellido_materno" class="col-md-4 control-label">{N_APELLIDO_MATERNO}</label>
                                         <div class="col-md-10">
-                                          <input type="text" class="form-control" value="{APELLIDO_MATERNO}" id="apellido_materno" name="apellido_materno" placeholder="{N_APELLIDO_MATERNO}" data-validation="required"/>
+                                          <input type="text" class="form-control" value="{APELLIDO_MATERNO}" id="apellido_materno" name="apellido_materno" placeholder="{N_APELLIDO_MATERNO}" />
                                       </div>                                
                                   </div>
 <div class="form-group">
                                         <label for="cedula" class="col-md-4 control-label">{N_CEDULA}</label>
                                         <div class="col-md-10">
-                                          <input type="text" class="form-control" value="{CEDULA}" id="cedula" name="cedula" placeholder="{N_CEDULA}" data-validation="required"/>
+                                          <input type="text" class="form-control" value="{CEDULA}" id="cedula" name="cedula" placeholder="{N_CEDULA}"/>
                                       </div>                                
                                   </div>
 
                                       <div class="form-group">
                                         <label for="telefono" class="col-md-4 control-label">{N_TELEFONO}</label>
                                         <div class="col-md-10">
-                                          <input type="text" class="form-control" value="{TELEFONO}" id="telefono" name="telefono" placeholder="{N_TELEFONO}" data-validation="required"/>
+                                          <input type="text" class="form-control" value="{TELEFONO}" id="telefono" name="telefono" placeholder="{N_TELEFONO}" />
                                       </div>                                
                                   </div>
 <!--<div class="form-group">
