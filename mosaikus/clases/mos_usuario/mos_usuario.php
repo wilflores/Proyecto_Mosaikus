@@ -115,9 +115,6 @@
                                 '$atr[nombres]','$atr[apellido_paterno]','$atr[apellido_materno]','$atr[telefono]','".date('Y-m-d G:h:s')."','$atr[fecha_expi]','$atr[vigencia]','$atr[super_usuario]','$atr[email]','".md5($atr[password_1])."','$atr[cedula]'
                                 )";
                     $this->dbl->insert_update($sql);
-                    /*
-                    $this->registraTransaccion('Insertar','Ingreso el mos_usuario ' . $atr[descripcion_ano], 'mos_usuario');
-                      */
                     $nuevo = "Id Usuario: \'$atr[id_usuario]\', Nombres: \'$atr[nombres]\', Apellido Paterno: \'$atr[apellido_paterno]\', Apellido Materno: \'$atr[apellido_materno]\', Telefono: \'$atr[telefono]\', Fecha Creacion: \'$atr[fecha_creacion]\', Fecha Expi: \'$atr[fecha_expi]\', Vigencia: \'$atr[vigencia]\', Super Usuario: \'$atr[super_usuario]\', Email: \'$atr[email]\', Password 1: \'$atr[password_1]\', Cedula: \'$atr[cedula]\', ";
                     $this->registraTransaccionLog(21,$nuevo,'', '');
                     return "El usuario '$atr[nombres]' ha sido ingresado con exito";
@@ -172,17 +169,6 @@
                 
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
-                    /* if (count($this->parametros) <= 0){
-                        $this->cargar_parametros();
-                    }                    
-                    $k = 1;                    
-                    foreach ($this->parametros as $value) {
-                        $sql_left .= " LEFT JOIN(select t1.id_registro, t2.descripcion as nom_detalle from mos_parametro_modulos t1
-                                inner join mos_parametro_det t2 on t1.cod_categoria=t2.cod_categoria and t1.cod_parametro=t2.cod_parametro and t1.cod_parametro_det=t2.cod_parametro_det
-                        where t1.cod_categoria='3' and t1.cod_parametro='$value[cod_parametro]' ) AS p$k ON p$k.id_registro = p.cod_emp "; 
-                        $sql_col_left .= ",p$k.nom_detalle p$k ";
-                        $k++;
-                    }*/
                     $sql = "SELECT COUNT(*) total_registros
                          FROM mos_usuario 
                          WHERE 1 = 1 ";

@@ -1,11 +1,3 @@
-<!--
-<div class="form-group">
-                                        <label for="id_usuario" class="col-md-4 control-label">{N_ID_USUARIO}</label>
-                                        <div class="col-md-10">
-                                          <input type="text" class="form-control" value="{ID_USUARIO}" id="id_usuario" name="id_usuario" placeholder="{N_ID_USUARIO}"  data-validation="required"/>
-                                      </div>                                
-</div>
--->                                      
 <div class="form-group">
                                         <label for="nombres" class="col-md-4 control-label">{N_NOMBRES}</label>
                                         <div class="col-md-10">
@@ -38,13 +30,6 @@
                                           <input type="text" class="form-control" value="{TELEFONO}" id="telefono" name="telefono" placeholder="{N_TELEFONO}" />
                                       </div>                                
                                   </div>
-<!--<div class="form-group">
-                                        <label for="fecha_creacion" class="col-md-4 control-label">{N_FECHA_CREACION}</label>
-                                        <div class="col-md-10">
-                                          <input type="text" class="form-control" style="width: 120px;" value="{FECHA_CREACION}" id="fecha_creacion" name="fecha_creacion" placeholder="dd/mm/yyyy"  data-validation="required"/>
-                                      </div>                                
-                                  </div>
--->
 <div class="form-group">
                                         <label for="vigencia" class="col-md-4 control-label">{N_VIGENCIA}</label>
                                         <label class="checkbox-inline" style="padding-top: 0px;">
