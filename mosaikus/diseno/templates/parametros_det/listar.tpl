@@ -15,8 +15,14 @@
                   <input type="text" class="form-control" value="{DESCRIPCION}" id="hv-descripcion" name="descripcion" placeholder="{N_DESCRIPCION}" data-validation="required"/>
               </div>                                
             </div>
+              <div class="form-group" style="{CSS_DESC_LARGA}"
+                <label class="col-md-4 control-label" >{N_DESCRIPCION_LARGA}</label>
+                <div class="col-md-10">
+                  <textarea class="form-control" id="hv-descripcion_larga" name="descripcion_larga" placeholder="{N_DESCRIPCION_LARGA}">{DESCRIPCION_LARGA}</textarea>
+              </div>                                
+            </div>
             <div class="form-group">
-                <label for="vigencia" class="col-md-4 control-label" style="color:black">{N_VIGENCIA}</label>
+                <label for="vigencia" class="col-md-4 control-label" >{N_VIGENCIA}</label>
                 <div class="col-md-10">
                     <label class="checkbox-inline" style="padding-top: 0px;">
                         <input type="checkbox" name="vigencia" id="hv-vigencia" value="S" checked="checked" {CHECKED_VIGENCIA}>   &nbsp;

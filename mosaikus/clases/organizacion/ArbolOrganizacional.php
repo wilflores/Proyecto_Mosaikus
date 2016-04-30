@@ -1340,30 +1340,34 @@
                                 $extra .= "<a href=\"#\" class=\"$select_aux\">".($arr[title])." (". ($contador). ")</a>";
                                 break;
                             case 6:
-                                $sql="select IFNULL(COUNT(cod_emp),0) cant 
-                                        from mos_personal
-                                        where cod_emp in 
-                                        (SELECT 
-                                        nombre
+                                $sql = "SELECT 
+                                        count(idRegistro) cant
                                         FROM
-                                        mos_registro_formulario
+                                        mos_registro_formulario reg inner join mos_personal per on
+                                        reg.Nombre = per.cod_emp
                                         WHERE
-                                        mos_registro_formulario.IDDoc = ".$_SESSION[IDDoc]." and tipo=6)
-                                        and id_organizacion in (".$this->BuscaOrgNivelHijos($arr[id]).");";  
+                                        reg.IDDoc = ".$_SESSION[IDDoc]." and tipo=6
+                                        and id_organizacion in (".$this->BuscaOrgNivelHijos($arr[id]).")";
+                                    //if (count($this->id_org_acceso_explicito)>0)
+                                       $sql .= " and id_organizacion in (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
+
+                                
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador='';
-                                $contador=$data_aux[0][cant];
-                                $sql="select IFNULL(COUNT(cod_emp),0) cant 
-                                        from mos_personal
-                                        where cod_emp in 
-                                        (SELECT 
-                                        nombre
+                                $contador=$data_aux[0][cant];                                                                
+                                $sql = "SELECT 
+                                        count(idRegistro) cant
                                         FROM
-                                        mos_registro_formulario
+                                        mos_registro_formulario reg inner join mos_personal per on
+                                        reg.Nombre = per.cod_emp
                                         WHERE
-                                        mos_registro_formulario.IDDoc = ".$_SESSION[IDDoc]." and tipo=6)
-                                        and id_organizacion in (".$arr[id].");";  
-                                $data_aux = $this->dbl->query($sql, $atr);
+                                        reg.IDDoc = ".$_SESSION[IDDoc]." and tipo=6
+                                        and id_organizacion in (".$arr[id].")";
+                                    //if (count($this->id_org_acceso_explicito)>0)
+                                       $sql .= " and id_organizacion in (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
+                                //echo $sql;
+                                $data_aux = $this->dbl->query($sql, $atr);                                
+                                
                                 $contador_uni='';
                                  $contador_uni=$data_aux[0][cant];
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";

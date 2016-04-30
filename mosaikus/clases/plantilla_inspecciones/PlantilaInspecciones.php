@@ -802,6 +802,7 @@
                                     array.addParametro("id",$("#cmb_din_"+id).val());
                                     array.addParametro("titulo",$("#nombre_din_"+id).val());
                                     array.addParametro("token", $("#tok_new_edit").val());
+                                    array.addParametro("desc_larga", 1);
                                     array.addParametro("import","clases.items_formulario.ItemsFormulario");
                                     xajax_Loading(array.getArray());
                                 }); ';
@@ -938,6 +939,7 @@
                                     $this->dbl->insert_update($sql);
                                     $sql = 'update mos_tipo_inspecciones_verificadores,mos_documentos_formulario_items_temp
                                             set mos_tipo_inspecciones_verificadores.verificador = mos_documentos_formulario_items_temp.descripcion,
+                                            mos_tipo_inspecciones_verificadores.desc_verificador = mos_documentos_formulario_items_temp.descripcion_larga,
                                             mos_tipo_inspecciones_verificadores.vigencia = mos_documentos_formulario_items_temp.vigencia,
                                             mos_tipo_inspecciones_verificadores.orden = mos_documentos_formulario_items_temp.orden
                                             where id_usuario = ' . $_SESSION['CookIdUsuario'] . ' and tok = ' . $parametros[tok_new_edit] . ' and mos_documentos_formulario_items_temp.fk_id_unico = ' . $parametros["cmb_din_$i"] . ' and mos_tipo_inspecciones_verificadores.id = mos_documentos_formulario_items_temp.fk_id_item and estado = 2';

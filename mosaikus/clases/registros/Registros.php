@@ -1510,14 +1510,14 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_personal], ENT_QUOTES, "UTF-8"))));   
                                 array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion], ENT_QUOTES, "UTF-8")))); 
                                 array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo], ENT_QUOTES, "UTF-8"))));                                
-                                $k++;$k++;$k++;
+                                //$k++;$k++;$k++;
                             break;
                         case '10':
                                 $ancho = 2;
                             array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                                 break;
                         case '11':
-                                $ancho = 5;
+                                $ancho = 10;
                                 $bandera_permisos_arbol = true;
                                 array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                                 break;
@@ -1535,7 +1535,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 $ancho = 5;                                                            
                                 array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                                 array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro('Personas en Cargo', "pn$k", $parametros,'r_link_titulos')));            
-                                $k++;
+                                //$k++;
                                 break;
                             
 
@@ -1696,7 +1696,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_personal], ENT_QUOTES, "UTF-8"))));   
                                 array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion], ENT_QUOTES, "UTF-8")))); 
                                 array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo], ENT_QUOTES, "UTF-8"))));                                
-                                $k++;$k++;$k++;
+                                //$k++;$k++;$k++;
 
                             break;
                         case '10':
@@ -1721,7 +1721,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 $ancho = 5;                                                            
                                 array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
                                 array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro('Personas en Cargo', "pn$k", $parametros,'r_link_titulos')));            
-                                $k++;
+                                //$k++;
                                 break;
                             
                         default:
@@ -1978,7 +1978,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                  
                            </div>';
                        $k++;
-                         $parametros['mostrar-col'] .= "-$k";
+                       //  $parametros['mostrar-col'] .= "-$k";
                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
                                       
                                      <label >
@@ -2299,7 +2299,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $objResponse->addAssign('contenido-aux',"innerHTML",$template->show());
                 $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);                
                 //$objResponse->addAssign('modulo_actual',"value","registros");
-                $objResponse->addIncludeScript(PATH_TO_JS . 'registros/registros.js');
+                $objResponse->addIncludeScript(PATH_TO_JS . 'registros/registros.js?'.rand());
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 //$objResponse->addScript("init_filtro_ao_simple_reg();");
                 $objResponse->addScript("init_filtro_ao_multiple_reg();");
@@ -2368,7 +2368,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                  
                            </div>';
                        $k++;
-                         $parametros['mostrar-col'] .= "-$k";
+                       //  $parametros['mostrar-col'] .= "-$k";
                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
                                       
                                      <label >
@@ -2687,7 +2687,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 if (isset($parametros['html']))
                     return $template->show();
                 $objResponse = new xajaxResponse();
-                $objResponse->addIncludeScript(PATH_TO_JS . 'registros/registros_reporte.js');
+                $objResponse->addIncludeScript(PATH_TO_JS . 'registros/registros_reporte.js?'.rand());
                 $objResponse->addAssign('desc-mod-act',"innerHTML","Registros - Documento [$val[Codigo_doc] - $val[nombre_doc]]");
                 $objResponse->addAssign('contenido-aux',"innerHTML",$template->show());
                 $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);

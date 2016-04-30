@@ -52,6 +52,7 @@
                 $sql = "SELECT id
                     ,fk_id_unico
                     ,descripcion
+                    ,descripcion_larga
                     ,vigencia
                     ,tipo
                     ,fk_id_item
@@ -65,9 +66,9 @@
                     session_name("$GLOBALS[SESSION]");
                     session_start();
                     $atr = $this->dbl->corregir_parametros($atr);
-                    $sql = "INSERT INTO mos_documentos_formulario_items_temp(fk_id_unico,descripcion,vigencia,estado,id_usuario,tok)
+                    $sql = "INSERT INTO mos_documentos_formulario_items_temp(fk_id_unico,descripcion,vigencia,estado,id_usuario,tok,descripcion_larga)
                             VALUES(
-                                $_SESSION[fk_id_unico],'$atr[descripcion]','$atr[vigencia]',1,$_SESSION[CookIdUsuario],$atr[token]
+                                $_SESSION[fk_id_unico],'$atr[descripcion]','$atr[vigencia]',1,$_SESSION[CookIdUsuario],$atr[token],'$atr[descripcion_larga]'
                                 )";
                     //echo $sql;
                     $this->dbl->insert_update($sql);
@@ -98,7 +99,7 @@
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql = "UPDATE mos_documentos_formulario_items_temp SET                            
-                                    descripcion = '$atr[descripcion]',vigencia = '$atr[vigencia]',estado = 2
+                                    descripcion = '$atr[descripcion]',descripcion_larga = '$atr[descripcion_larga]',vigencia = '$atr[vigencia]',estado = 2
                             WHERE  id = $atr[id]";      
                     //$val = $this->verItemsFormulario($atr[id]);
                     $this->dbl->insert_update($sql);
@@ -156,6 +157,7 @@
                     $sql = "SELECT id
                                 ,fk_id_unico
                                 ,descripcion
+                                ,descripcion_larga
                                 ,vigencia
                                 ,tipo
 
@@ -242,8 +244,9 @@
                 $config_col=array(
                 array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id], "id", $parametros)),    
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fk_id_unico], "fk_id_unico", $parametros)),
-               array( "width"=>"60%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[descripcion], "descripcion", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),
+               array( "width"=>"20%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[descripcion], "descripcion", $parametros)),
+                    array( "width"=>"40%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[descripcion_larga], "descripcion_larga", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[tipo], "tipo", $parametros))
                 );
                 /*if (count($this->parametros) <= 0){
@@ -265,12 +268,12 @@
                 if ($parametros['permiso'][1] == "1")
                     array_push($func,array('nombre'=> 'verItemsFormulario','imagen'=> "<img style='cursor:pointer' src='diseno/images/find.png' title='Ver ItemsFormulario'>"));
                 */
-                if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
+                //if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                     array_push($func,array('nombre'=> 'editarItemsFormulario','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-edit\"  title='Editar Items'></i>"));
-                if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
+                //if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
                     array_push($func,array('nombre'=> 'eliminarItemsFormulario','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\"  title='Eliminar Items'></i>"));
                
-                $config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
+                $config=array(array("width"=>"7%", "ValorEtiqueta"=>"&nbsp;"));
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
                 $array_columns =  explode('-', $parametros['mostrar-col']);
                 for($i=0;$i<count($config_col);$i++){
@@ -376,7 +379,13 @@
                 if ($parametros['corder'] == null) $parametros['corder']="descripcion";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="2-3"; 
+                    $parametros['mostrar-col']="2-4"; 
+                if (isset($parametros[desc_larga])){
+                    $parametros['mostrar-col']="2-3-4"; 
+                }
+                else{
+                    $contenido[CSS_DESC_LARGA] = 'display:none';
+                }
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */               
@@ -588,6 +597,7 @@
                 $template->setVars($contenido);
                 $objResponse = new xajaxResponse();
                 $objResponse->addScript("$('#hv-descripcion').val('$val[descripcion]');");
+                $objResponse->addScript("$('#hv-descripcion_larga').html('$val[descripcion_larga]');");
                 if ($val[vigencia] =='S' )
                     $objResponse->addScript('$("#hv-vigencia").prop("checked", true); ');
                 else

@@ -377,6 +377,7 @@
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
                     $parametros['mostrar-col']="4-5"; 
+                $contenido[CSS_DESC_LARGA] = 'display:none';
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */               
