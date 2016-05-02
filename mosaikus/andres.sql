@@ -165,3 +165,28 @@ DELIMITER ;
 /****************************************/
 ALTER TABLE `mos_usuario`
 ADD COLUMN `recibe_notificaciones`  varchar(1) NULL AFTER `cedula`;
+/****************************************/
+/*cambio del 01-05
+/modulo de notificaiones
+/****************************************/
+DROP TABLE IF EXISTS `mos_notificaciones`;
+CREATE TABLE `mos_notificaciones` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `email` varchar(100) NOT NULL,
+  `asunto` varchar(200) NOT NULL,
+  `cuerpo` text,
+  `fecha_leido` datetime DEFAULT NULL,
+  `modulo` text,
+  `fecha_alerta` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8;
+
+INSERT INTO `mos_nombres_campos` VALUES ('338', 'id', 'id', '24', 'id');
+INSERT INTO `mos_nombres_campos` VALUES ('339', 'fecha', 'fecha', '24', 'fecha');
+INSERT INTO `mos_nombres_campos` VALUES ('340', 'email', 'email', '24', 'email');
+INSERT INTO `mos_nombres_campos` VALUES ('341', 'asunto', 'asunto', '24', 'asunto');
+INSERT INTO `mos_nombres_campos` VALUES ('342', 'cuerpo', 'cuerpo', '24', 'cuerpo');
+INSERT INTO `mos_nombres_campos` VALUES ('343', 'fecha_leido', 'fecha_leido', '24', 'fecha_leido');
+INSERT INTO `mos_nombres_campos` VALUES ('344', 'modulo', 'modulo', '24', 'modulo');
+INSERT INTO `mos_nombres_campos` VALUES ('345', 'fecha_alerta', 'fecha_alerta', '24', 'fecha_alerta');
