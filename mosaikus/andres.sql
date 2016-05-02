@@ -192,3 +192,4 @@ INSERT INTO `mos_nombres_campos` VALUES ('344', 'modulo', 'modulo', '24', 'modul
 INSERT INTO `mos_nombres_campos` VALUES ('345', 'fecha_alerta', 'fecha_alerta', '24', 'fecha_alerta');
 
 
+INSERT INTO `mos_link` VALUES ('85', 'Notificaciones-indexNotificaciones-clases.notificaciones.Notificaciones', 'Notificaciones', '10', '2', 'notificaciones.php', '75', 'configuracion.png');
