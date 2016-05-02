@@ -26,6 +26,48 @@
         {CSS}
         {JAVASCRIPT}
 </head>
+<script type="text/javascript">
+//setTimeout(function(){ MostrarNotificacionesEmergente(); }, 5000);
+setInterval("MostrarNotificacionesEmergente()",10000)
+
+document.addEventListener('DOMContentLoaded', function () 
+{
+    
+if (Notification.permission !== "granted")
+{
+Notification.requestPermission();
+}
+});
+
+function notifyBrowser(title,desc,url) 
+{
+    if (!Notification) {
+        console.log('Desktop notifications not available in your browser..'); 
+        return;
+    }
+    if (Notification.permission !== "granted")
+    {
+        Notification.requestPermission();
+    }
+    else {
+        var notification = new Notification(title, {
+        icon:'diseno/images/logo_empresa/{LOGO_EMPRESA}_logo_empresa.png',
+        body: desc,
+    });
+
+    // Remove the notification from Notification Center when clicked.
+    notification.onclick = function () {
+    window.open(url);      
+    };
+
+    // Callback function when the notification is closed.
+    notification.onclose = function () {
+    console.log('Notification closed');
+    };
+
+    }
+}
+</script>
 
 <body>
 <!-- #page-wrapper -->
@@ -72,35 +114,17 @@
                 </a>
             </div>
             <div class="notifications">
-              <a class="noti-icon" data-toggle="collapse" href="#messages">
-                <span>0</span>
+              <a onclick="VerNotificacionesMenu();" class="noti-icon" data-toggle="collapse" href="#messages">
+                <span id="cantidad_notificaciones"></span>
               </a>
-                <!--<div  id="messages" class="popover bottom">
+                <div  id="messages" class="popover bottom">
                   <div class="arrow"></div>
-
-                  <div class="popover-content">
-                    <ul class="">
-                      <li>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Pellentesque
-                        at purus eu arcu maximus volutpat non ac ante.
-                      </li>
-                      <li>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Pellentesque
-                        at purus eu arcu maximus volutpat non ac ante.
-                      </li>
-                      <li>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Pellentesque
-                        at purus eu arcu maximus volutpat non ac ante.
-                      </li>
-                      <li class="last">
-                        <a href="#"><strong>Ver todas las alertas</strong></a>
-                      </li>
+                  <div class="popover-content" id="div-notificaciones" style="overflow: auto;" >
+                    <ul class="" id="popover-notificaciones">
+                        <!--AQUI SE CARGAN LAS NOTIFICACIONES-->
                     </ul>
                   </div>
-                </div>-->
+                </div>
 
 
             </div>
