@@ -190,3 +190,5 @@ INSERT INTO `mos_nombres_campos` VALUES ('342', 'cuerpo', 'cuerpo', '24', 'cuerp
 INSERT INTO `mos_nombres_campos` VALUES ('343', 'fecha_leido', 'fecha_leido', '24', 'fecha_leido');
 INSERT INTO `mos_nombres_campos` VALUES ('344', 'modulo', 'modulo', '24', 'modulo');
 INSERT INTO `mos_nombres_campos` VALUES ('345', 'fecha_alerta', 'fecha_alerta', '24', 'fecha_alerta');
+
+
