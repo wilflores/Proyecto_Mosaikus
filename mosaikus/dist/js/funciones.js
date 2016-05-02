@@ -1257,3 +1257,31 @@ function getForm (frm){
             
         }
     
+    function VerNotificacionesMenu(){
+        array = new XArray();
+        array.setObjeto('Notificaciones','VerNotificacionesMenu');
+        array.addParametro('import','clases.notificaciones.Notificaciones');
+        xajax_Loading(array.getArray());
+    }
+    function LeerNotificacionesMenu(id){
+        array = new XArray();
+        array.setObjeto('Notificaciones','LeerNotificacionesMenu');
+        array.addParametro('id',id);
+        array.addParametro('import','clases.notificaciones.Notificaciones');
+        xajax_Loading(array.getArray());
+    }    
+    function MostrarNotificacionesEmergente(){
+        array = new XArray();
+        array.setObjeto('Notificaciones','MostrarNotificacionesEmergente');
+        array.addParametro('import','clases.notificaciones.Notificaciones');
+        xajax_Loading(array.getArray());
+    } 
+    function verWorkFlow(id){
+    array = new XArray();
+    array.setObjeto('Documentos','ver_workflow');
+    array.addParametro('id',id);
+    array.addParametro('vienede','mensaje');
+    array.addParametro('import','clases.documentos.Documentos');
+    xajax_Loading(array.getArray());
+    //PanelOperator.showDetail('');    
+    }
