@@ -3628,17 +3628,33 @@
                     if (strlen($respuesta ) < 10 ) {
                         $parametros[id] = $respuesta;
                         //ENVIAR EMAIL SI ES GUARDAR Y NOTIFICAR
+                        //print_r($parametros);
                         if($parametros['notificar']=='si'){
                             $correowf = $this->verWFemail($parametros[id]);
+                            $this->cargar_nombres_columnas();
+                            $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                             if($correowf[email]!='' && $correowf[recibe_notificaciones]=='S'){
-                                $this->cargar_nombres_columnas();
-                                $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                                 $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
                                // $correowf[email] = 'azambrano75@gmail.com';
                                 $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                                 $ut_tool = new ut_Tool();
-                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
-                            } 
+                                //SE ENVIA EL CORREO
+                                //$ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
+                            }
+                            //SE CARGA LA NOTIFICACION
+                                import('clases.notificaciones.Notificaciones');
+                                $noti = new Notificaciones();
+                                $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'.$parametros[version].'<br>';
+                                if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
+                                if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
+                                $atr[cuerpo] .= "<a onclick=\"verWorkFlow(".$parametros[id].");\" href=\"#\">";
+                                $atr[cuerpo] .= "<strong>Click para ver WF</strong></a>";                        
+                                
+                                $atr[modulo]='DOCUMENTOS';
+                                $atr[asunto]='Tiene un documento '.$etapa.'';
+                                $atr[email]=$correowf[email];
+                                $mensaje=$noti->ingresarNotificaciones($atr);
+
                         }                        
                         if(!class_exists('Parametros')){
                             import("clases.parametros.Parametros");
@@ -3799,15 +3815,29 @@
                         //ENVIAR EMAIL SI ES GUARDAR Y NOTIFICAR
                         if($parametros['notificar']=='si'){
                             $correowf = $this->verWFemail($params[id_registro]);
+                            $this->cargar_nombres_columnas();
+                            $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                             if($correowf[email]!='' && $correowf[recibe_notificaciones]=='S'){
-                                $this->cargar_nombres_columnas();
-                                $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                                 $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
                                 //$correowf[email] = 'azambrano75@gmail.com';
                                 $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                                 $ut_tool = new ut_Tool();
-                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
+                                //$ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
                             } 
+                            //SE CARGA LA NOTIFICACION
+                                import('clases.notificaciones.Notificaciones');
+                                $noti = new Notificaciones();
+                                $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'.$parametros[version].'<br>';
+                                if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
+                                if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
+                                $atr[cuerpo] .= "<a onclick=\"verWorkFlow(".$parametros[id].");\" href=\"#\">";
+                                $atr[cuerpo] .= "<strong>Click para ver WF</strong></a>";                        
+                                
+                                $atr[modulo]='DOCUMENTOS';
+                                $atr[asunto]='Tiene un documento '.$etapa.'';
+                                $atr[email]=$correowf[email];
+                                $mensaje=$noti->ingresarNotificaciones($atr);
+                            
                         }                        
                         
                         $objResponse->addScriptCall("MostrarContenido");
@@ -4377,15 +4407,29 @@
                         if($parametros['notificar']=='si'){
                             $correowf = $this->verWFemail($parametros[id]);
                            // print_r($correowf);
+                            $this->cargar_nombres_columnas();
+                            $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                             if($correowf[email]!=''&& $correowf[recibe_notificaciones]=='S'){
-                                $this->cargar_nombres_columnas();
-                                $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                                 $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
                                // $correowf[email] = 'azambrano75@gmail.com';
                                 $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                                 $ut_tool = new ut_Tool();
-                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
-                            } 
+                               // $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
+                            }
+                            //SE CARGA LA NOTIFICACION
+                                import('clases.notificaciones.Notificaciones');
+                                $noti = new Notificaciones();
+                                $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'.$parametros[version].'<br>';
+                                if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
+                                if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
+                                $atr[cuerpo] .= "<a onclick=\"verWorkFlow(".$parametros[id].");\" href=\"#\">";
+                                $atr[cuerpo] .= "<strong>Click para ver WF</strong></a>";                        
+                                
+                                $atr[modulo]='DOCUMENTOS';
+                                $atr[asunto]='Tiene un documento '.$etapa.'';
+                                $atr[email]=$correowf[email];
+                                $mensaje=$noti->ingresarNotificaciones($atr);
+                            
                         }
                         $arr = explode(",", $parametros[nodos]);
                         $params[IDDoc] = $parametros[id];
@@ -5008,14 +5052,15 @@
             {   //print_r($parametros);
                 $parametros['id_usuario']= $_SESSION['CookIdUsuario'];
                 $respuesta = $this->cambiarestadowf($parametros);
+                $val = $this->verDocumentos($parametros[id]);
                 $objResponse = new xajaxResponse();
                // print_r($parametros);
                 if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
                         $correowf = $this->verWFemail($parametros[id]);
                         //echo $correowf[email];
+                        $this->cargar_nombres_columnas();
+                        $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                         if($correowf[email]!='' && $correowf[recibe_notificaciones]=='S'){
-                            $this->cargar_nombres_columnas();
-                            $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                             $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
                             if($correowf[estado_workflow]=='RECHAZADO'){
                                 $cuerpo .= 'Rechazado por:<br><span style="color:red">'.$correowf[observacion_rechazo].'</span>';
@@ -5024,8 +5069,29 @@
                             $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                             $ut_tool = new ut_Tool();
                             //echo $cuerpo;
-                            $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
-                        } 
+                            //$ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
+                        }
+                        //SE CARGA LA NOTIFICACION
+                            import('clases.notificaciones.Notificaciones');
+                            $noti = new Notificaciones();
+                            $atr[cuerpo] .=$val[Codigo_doc].'-'.$val[nombre_doc].'-V'.$val[version].'<br>';
+                            if($correowf[etapa_workflow]=='estado_pendiente_revision' && $correowf[estado_workflow]=='OK') {
+                                $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
+                            }
+                            else 
+                                if($correowf[etapa_workflow]=='estado_pendiente_aprobacion' && $correowf[estado_workflow]=='OK') {
+                                    $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
+                                }
+                                else
+                                    if($correowf[estado_workflow]=='RECHAZADO') {
+                                        $atr[cuerpo] .=$correowf[estado_workflow].'. Se ha rechazado el documento<br>';
+                                    }
+                            $atr[cuerpo] .= "<a onclick=\"verWorkFlow(".$val[IDDoc].");\" href=\"#\">";
+                            $atr[cuerpo] .= "<strong>Click para ver WF</strong></a>";                        
+                            $atr[modulo]='DOCUMENTOS';
+                            $atr[asunto]='Tiene un documento '.$etapa.'';
+                            $atr[email]=$correowf[email];
+                            $mensaje=$noti->ingresarNotificaciones($atr);
                         //die;
                     $objResponse->addScriptCall("MostrarContenido");
                     $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
