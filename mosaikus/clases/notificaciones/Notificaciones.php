@@ -174,19 +174,25 @@
                         ,cuerpo
                         ,fecha_leido
                         ,modulo
+                        ,funcion
                          FROM mos_notificaciones 
                          WHERE email = '".$atr['email']."' and fecha_leido is null and fecha_alerta is null "
-                     . " order by id desc limit 1;"; 
+                     . " order by id desc;"; 
                 //echo $sql;
                 $this->operacion($sql, $atr);
-                $val = $this->dbl->data[0];
+                $val = $this->dbl->data;
                 if(sizeof($val)>0){
+                    $ids = array();
+                    foreach ($val as $valor) {
+                        $ids[]=$valor[id];
+                    }
                     $sql = "UPDATE mos_notificaciones SET                            
                                     fecha_alerta = now()
-                            WHERE  id = $val[id]";      
+                            WHERE  id in (".implode(',',$ids )." )";      
+                    //echo $sql;
                     $this->dbl->insert_update($sql);
                 }
-                return $this->dbl->data[0];
+                return $this->dbl->data;
             }    
              public function ListarNotificacionesNoLeidas($atr){
                 $sql = "SELECT id
@@ -196,6 +202,7 @@
                         ,cuerpo
                         ,fecha_leido
                         ,modulo
+                        ,funcion
                          FROM mos_notificaciones 
                          WHERE email = '".$atr['email']."' and fecha_leido is null "
                      . " order by fecha desc"; 
@@ -223,9 +230,9 @@
                     $atr = $this->dbl->corregir_parametros($atr);
                     /*Carga Acceso segun el arbol*/
                     //echo $sql;
-                    $sql = "INSERT INTO mos_notificaciones(fecha,email,asunto,cuerpo,modulo)
+                    $sql = "INSERT INTO mos_notificaciones(fecha,email,asunto,cuerpo,modulo,funcion)
                             VALUES(
-                                now(),'$atr[email]','$atr[asunto]','$atr[cuerpo]','$atr[modulo]'
+                                now(),'$atr[email]','$atr[asunto]','$atr[cuerpo]','$atr[modulo]','$atr[funcion]'
                                 )";
                     $this->dbl->insert_update($sql);
                     /*
@@ -850,9 +857,11 @@
                     $html .= "<span id='cuerpo_".$value[id]."'>";
                     if (strlen($value[cuerpo])<8000){
                         $html .= $value[cuerpo];
+                        if($value[funcion]!='')
+                            $html .= "<a onclick='".$value[funcion]."' href='#'><u>Click para ver WF</u></a>";
                         //$html .= "<a onclick=\"document.getElementById('cuerpo_".$value[id]."').innerHTML='".$value[cuerpo]."';LeerNotificacionesMenu(".$value[id].");\" href='#'>";
-                        $html .= "<br><a onclick='LeerNotificacionesMenu(".$value[id].");' href='#'>";
-                        $html .= "<strong>(Leer)</strong></a>";                        
+                        $html .= "<br><a id='marcarleido".$value[id]."' onclick='LeerNotificacionesMenu(".$value[id].");this.innerHTML=\"\";'; href='#'>";
+                        $html .= "<strong>(Marcar como leido)</strong></a>";                        
                     }
                     else{
                         $html .= substr($value[cuerpo], 0, 80).'...';
@@ -920,10 +929,24 @@
                 $datos = $this->ListarNotificacionesNoLeidas($parametros);
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('cantidad_notificaciones',"innerHTML",sizeof($datos));
-                if(sizeof($val)>0){
+                if(sizeof($val)>3){
                     //print_r($val);
-                    $objResponse->addScript('notifyBrowser("Nueva Notificacion Mosaikus","'.$val[asunto].' del '.$val[fecha].'","");');
+                    $objResponse->addScript('notifyBrowser("Notificaciones Mosaikus","Tiene '.sizeof($val).' nuevas notificaciones por leer.","mostrarventana");');
                 }
+                else if(sizeof($val)>0){
+                   // echo 'si';
+                    $funciones='';
+                    foreach ($val as $value) {                       
+                        //echo $value[asunto];
+                        $funciones ='notifyBrowser("Notificaciones Mosaikus","'.$value[asunto].' del '.$value[fecha].'","'.$value[funcion].'");';
+                        $objResponse->addScript($funciones);
+                        $objResponse->addScript('sleep(5000);');
+                        //$funciones .= 'notifyBrowser("Notificaciones Mosaikus","fdsfsdf","");sleep(2000);';
+                    }
+                    //echo $funciones;
+                    
+                    //$objResponse->addScript('notifyBrowser("Notificaciones Mosaikus","fdsfsdf","");');
+                }   
                 return $objResponse;
             }
          
