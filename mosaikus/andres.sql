@@ -179,8 +179,10 @@ CREATE TABLE `mos_notificaciones` (
   `fecha_leido` datetime DEFAULT NULL,
   `modulo` text,
   `fecha_alerta` datetime DEFAULT NULL,
+  `funcion` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8;
+
 
 INSERT INTO `mos_nombres_campos` VALUES ('338', 'id', 'id', '24', 'id');
 INSERT INTO `mos_nombres_campos` VALUES ('339', 'fecha', 'fecha', '24', 'fecha');
