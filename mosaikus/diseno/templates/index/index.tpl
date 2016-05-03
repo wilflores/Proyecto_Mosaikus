@@ -56,7 +56,7 @@ function notifyBrowser(title,desc,url)
         body: desc,
     });
 
-    // Remove the notification from Notification Center when clicked.
+    // //Remove the notification from Notification Center when clicked.
     notification.onclick = function () {
     //window.open(url); 
     if(url=='mostrarventana'){
