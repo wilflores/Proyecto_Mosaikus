@@ -29,7 +29,7 @@
 <script type="text/javascript">
 //setTimeout(function(){ MostrarNotificacionesEmergente(); }, 5000);
 setInterval("MostrarNotificacionesEmergente()",10000)
-
+MostrarNotificacionesEmergente();
 document.addEventListener('DOMContentLoaded', function () 
 {
     
@@ -51,13 +51,20 @@ function notifyBrowser(title,desc,url)
     }
     else {
         var notification = new Notification(title, {
-        icon:'diseno/images/logo_empresa/{LOGO_EMPRESA}_logo_empresa.png',
+        //icon:'diseno/images/logo_empresa/{LOGO_EMPRESA}_logo_empresa.png',
+        icon:'dist/images/logo.png',
         body: desc,
     });
 
     // Remove the notification from Notification Center when clicked.
     notification.onclick = function () {
-    window.open(url);      
+    //window.open(url); 
+    if(url=='mostrarventana'){
+        VerNotificacionesMenu();
+        $('#messages').collapse("show");
+    }
+    else
+        if(url!='') eval(url);
     };
 
     // Callback function when the notification is closed.
@@ -114,7 +121,7 @@ function notifyBrowser(title,desc,url)
                 </a>
             </div>
             <div class="notifications">
-              <a onclick="VerNotificacionesMenu();" class="noti-icon" data-toggle="collapse" href="#messages">
+              <a id="notificaciones" onclick="VerNotificacionesMenu();" class="noti-icon" data-toggle="collapse" href="#messages">
                 <span id="cantidad_notificaciones"></span>
               </a>
                 <div  id="messages" class="popover bottom">
