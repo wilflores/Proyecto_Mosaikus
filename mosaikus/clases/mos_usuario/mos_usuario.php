@@ -114,14 +114,14 @@
                             VALUES(
                                 '$atr[nombres]','$atr[apellido_paterno]','$atr[apellido_materno]','$atr[telefono]','".date('Y-m-d G:h:s')."','$atr[fecha_expi]','$atr[vigencia]','$atr[super_usuario]','$atr[email]','".md5($atr[password_1])."','$atr[cedula]'
                                 )";
-                    $this->dbl->insert_update($sql);
+                    $respuesta = $this->dbl->insert_update($sql);                    
                     $nuevo = "Id Usuario: \'$atr[id_usuario]\', Nombres: \'$atr[nombres]\', Apellido Paterno: \'$atr[apellido_paterno]\', Apellido Materno: \'$atr[apellido_materno]\', Telefono: \'$atr[telefono]\', Fecha Creacion: \'$atr[fecha_creacion]\', Fecha Expi: \'$atr[fecha_expi]\', Vigencia: \'$atr[vigencia]\', Super Usuario: \'$atr[super_usuario]\', Email: \'$atr[email]\', Password 1: \'$atr[password_1]\', Cedula: \'$atr[cedula]\', ";
                     $this->registraTransaccionLog(21,$nuevo,'', '');
                     return "El usuario '$atr[nombres]' ha sido ingresado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
-                        if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
-                            return "Ya existe una sección con el mismo nombre.";                        
+                        if (preg_match("/Duplicate entry/",$error ) == true) 
+                            return "Usuario ya existe en el sistema.";                        
                         return $error; 
                     }
             }
@@ -1331,16 +1331,22 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
 
     public function eliminarHuerfanoEstrustura(){
             $atr=array();
-            $sql = "DELETE FROM `mos_usuario_estructura` WHERE NOT id_usuario_filial IN (
-                SELECT id
-                FROM mos_usuario_filial
-                )";        
-            $this->operacion($sql, $atr);        
+            $sql = "SELECT DISTINCT mue.id_usuario_filial FROM mos_usuario_estructura AS mue
+                RIGHT JOIN mos_usuario_filial AS muf ON mue.id_usuario = muf.id_usuario AND mue.cod_perfil = muf.cod_perfil
+                WHERE mue.id_usuario IS NOT NULL
+                ";  
+            $this->operacion($sql, $atr);             
+            foreach ($this->dbl->data as $arrP) {
+                $idnh .= $arrP[id_usuario_filial].",";
+            }
+            $idnh = substr($idnh, 0, -1);            
+            $sql = "DELETE FROM mos_usuario_estructura WHERE NOT id_usuario_filial IN ($idnh)";  
+            $this->operacion($sql, $atr);             
     }
+    
     public function eliminarPerfilesUsuario($atr){
            try {                   
-               $respuesta = $this->dbl->delete("mos_usuario_filial", "id_usuario = $atr[id_usuario]");
-               
+               $this->dbl->delete("mos_usuario_filial", "id_usuario = $atr[id_usuario]");               
                return "ha sido eliminada con exito";
            } catch(Exception $e) {
                $error = $e->getMessage();                     
@@ -1464,18 +1470,22 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
             
             $params[id_usuario] = $parametros[id_usuario];
             $params[id_filial] = $_SESSION[CookFilial]; 
-             //deris
+             
             $this->eliminarPerfilesUsuario($parametros);
+                        
             foreach($arr as $temp){
                  $params[cod_perfil] = $temp;
+                 if($params[cod_perfil]!="")
                  $respuesta = $this->ingresarPerfilesUsuario($params);
             }
-
+            
             foreach($arrportal as $temp){
                  $params[cod_perfil] = $temp;
+                 if($params[cod_perfil]!="")
                  $respuesta = $this->ingresarPerfilesPortalUsuario($params);
             }
             
+            $this->eliminarHuerfanoEstrustura();
             $objResponse->addScriptCall("MostrarContenido");
             $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
        }
