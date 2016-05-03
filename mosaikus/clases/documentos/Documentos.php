@@ -3639,7 +3639,7 @@
                                 $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                                 $ut_tool = new ut_Tool();
                                 //SE ENVIA EL CORREO
-                                //$ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
+                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
                             }
                             //SE CARGA LA NOTIFICACION
                                 import('clases.notificaciones.Notificaciones');
@@ -3647,9 +3647,8 @@
                                 $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'.$parametros[version].'<br>';
                                 if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
                                 if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
-                                $atr[cuerpo] .= "<a onclick=\"verWorkFlow(".$parametros[id].");\" href=\"#\">";
-                                $atr[cuerpo] .= "<strong>Click para ver WF</strong></a>";                        
-                                
+                                $atr[funcion] = "verWorkFlow(".$parametros[id].");";
+
                                 $atr[modulo]='DOCUMENTOS';
                                 $atr[asunto]='Tiene un documento '.$etapa.'';
                                 $atr[email]=$correowf[email];
@@ -3822,7 +3821,7 @@
                                 //$correowf[email] = 'azambrano75@gmail.com';
                                 $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                                 $ut_tool = new ut_Tool();
-                                //$ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
+                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
                             } 
                             //SE CARGA LA NOTIFICACION
                                 import('clases.notificaciones.Notificaciones');
@@ -3830,9 +3829,7 @@
                                 $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'.$parametros[version].'<br>';
                                 if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
                                 if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
-                                $atr[cuerpo] .= "<a onclick=\"verWorkFlow(".$parametros[id].");\" href=\"#\">";
-                                $atr[cuerpo] .= "<strong>Click para ver WF</strong></a>";                        
-                                
+                                $atr[funcion] = "verWorkFlow(".$params[id_registro].");";                                
                                 $atr[modulo]='DOCUMENTOS';
                                 $atr[asunto]='Tiene un documento '.$etapa.'';
                                 $atr[email]=$correowf[email];
@@ -4414,7 +4411,7 @@
                                // $correowf[email] = 'azambrano75@gmail.com';
                                 $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                                 $ut_tool = new ut_Tool();
-                               // $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
+                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
                             }
                             //SE CARGA LA NOTIFICACION
                                 import('clases.notificaciones.Notificaciones');
@@ -4422,9 +4419,7 @@
                                 $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'.$parametros[version].'<br>';
                                 if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
                                 if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
-                                $atr[cuerpo] .= "<a onclick=\"verWorkFlow(".$parametros[id].");\" href=\"#\">";
-                                $atr[cuerpo] .= "<strong>Click para ver WF</strong></a>";                        
-                                
+                                $atr[funcion] = "verWorkFlow(".$parametros[id].");";
                                 $atr[modulo]='DOCUMENTOS';
                                 $atr[asunto]='Tiene un documento '.$etapa.'';
                                 $atr[email]=$correowf[email];
@@ -5069,7 +5064,7 @@
                             $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                             $ut_tool = new ut_Tool();
                             //echo $cuerpo;
-                            //$ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
+                            $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
                         }
                         //SE CARGA LA NOTIFICACION
                             import('clases.notificaciones.Notificaciones');
@@ -5077,19 +5072,21 @@
                             $atr[cuerpo] .=$val[Codigo_doc].'-'.$val[nombre_doc].'-V'.$val[version].'<br>';
                             if($correowf[etapa_workflow]=='estado_pendiente_revision' && $correowf[estado_workflow]=='OK') {
                                 $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
+                                $atr[asunto]='Tiene un documento '.$etapa.'';
                             }
                             else 
                                 if($correowf[etapa_workflow]=='estado_pendiente_aprobacion' && $correowf[estado_workflow]=='OK') {
                                     $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
+                                    $atr[asunto]='Tiene un documento '.$etapa.'';
                                 }
                                 else
                                     if($correowf[estado_workflow]=='RECHAZADO') {
-                                        $atr[cuerpo] .=$correowf[estado_workflow].'. Se ha rechazado el documento<br>';
+                                        $atr[cuerpo] .='Tiene un documento Rechazado<br>';
+                                        $atr[asunto]='Tiene un documento Rechazado';
                                     }
-                            $atr[cuerpo] .= "<a onclick=\"verWorkFlow(".$val[IDDoc].");\" href=\"#\">";
-                            $atr[cuerpo] .= "<strong>Click para ver WF</strong></a>";                        
+                            
                             $atr[modulo]='DOCUMENTOS';
-                            $atr[asunto]='Tiene un documento '.$etapa.'';
+                            $atr[funcion] = "verWorkFlow(".$val[IDDoc].");";
                             $atr[email]=$correowf[email];
                             $mensaje=$noti->ingresarNotificaciones($atr);
                         //die;
