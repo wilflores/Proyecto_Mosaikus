@@ -3644,10 +3644,10 @@
                             //SE CARGA LA NOTIFICACION
                                 import('clases.notificaciones.Notificaciones');
                                 $noti = new Notificaciones();
-                                $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'.$parametros[version].'<br>';
+                                $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT).'<br>';
                                 if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
                                 if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
-                                $atr[funcion] = "verWorkFlow(".$parametros[id].");";
+                                $atr[funcion] = "verWorkFlowPopup(".$parametros[id].");";
 
                                 $atr[modulo]='DOCUMENTOS';
                                 $atr[asunto]='Tiene un documento '.$etapa.'';
@@ -3826,10 +3826,10 @@
                             //SE CARGA LA NOTIFICACION
                                 import('clases.notificaciones.Notificaciones');
                                 $noti = new Notificaciones();
-                                $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'.$parametros[version].'<br>';
+                                $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT).'<br>';
                                 if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
                                 if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
-                                $atr[funcion] = "verWorkFlow(".$params[id_registro].");";                                
+                                $atr[funcion] = "verWorkFlowPopup(".$params[id_registro].");";                                
                                 $atr[modulo]='DOCUMENTOS';
                                 $atr[asunto]='Tiene un documento '.$etapa.'';
                                 $atr[email]=$correowf[email];
@@ -4416,10 +4416,10 @@
                             //SE CARGA LA NOTIFICACION
                                 import('clases.notificaciones.Notificaciones');
                                 $noti = new Notificaciones();
-                                $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'.$parametros[version].'<br>';
+                                $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT).'<br>';
                                 if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
                                 if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
-                                $atr[funcion] = "verWorkFlow(".$parametros[id].");";
+                                $atr[funcion] = "verWorkFlowPopup(".$parametros[id].");";
                                 $atr[modulo]='DOCUMENTOS';
                                 $atr[asunto]='Tiene un documento '.$etapa.'';
                                 $atr[email]=$correowf[email];
@@ -4933,7 +4933,8 @@
                
                $contenido_1['DOCFUENTE']=$html;
                $contenido_1['PAGINA_VOLVER'] = "listarDocumentos.php";
-               $contenido_1['TITULO_FORMULARIO'] = 'Flujo de Trabajo "'.$this->nombres_columnas[$val[etapa_workflow]].'"-'.$val[estado_workflow].' por '.$persona_pendiente;
+               
+               $contenido_1['TITULO_FORMULARIO'] =$val["Codigo_doc"].'-'.$val["nombre_doc"].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT). '<br>Flujo de Trabajo "'.$this->nombres_columnas[$val[etapa_workflow]].'"-'.$val[estado_workflow].' por '.$persona_pendiente;
                //echo $val[etapa_workflow] 
               // print_r($this->nombres_columnas);
                 $template = new Template();
@@ -4958,6 +4959,7 @@
                           });");
                 $objResponse->addScript("$('#tabs-hv-2').tab();"
                         . "$('#tabs-hv-2 a:first').tab('show');");
+                //$objResponse->addAssign('div-titulo-for',"innerHTML",'xxxxxxxxxxx');
                 //$objResponse->addScript('setTimeout(function(){ alert("vaaa");$(\'#iframe-vis\').attr("src",$("#text-iframe").html()+"&embedded=true");},1000);');
                 $objResponse->addScript("$js");
                 return $objResponse;
@@ -5069,7 +5071,7 @@
                         //SE CARGA LA NOTIFICACION
                             import('clases.notificaciones.Notificaciones');
                             $noti = new Notificaciones();
-                            $atr[cuerpo] .=$val[Codigo_doc].'-'.$val[nombre_doc].'-V'.$val[version].'<br>';
+                            $atr[cuerpo] .=$val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT).'<br>';
                             if($correowf[etapa_workflow]=='estado_pendiente_revision' && $correowf[estado_workflow]=='OK') {
                                 $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
                                 $atr[asunto]='Tiene un documento '.$etapa.'';
@@ -5086,7 +5088,7 @@
                                     }
                             
                             $atr[modulo]='DOCUMENTOS';
-                            $atr[funcion] = "verWorkFlow(".$val[IDDoc].");";
+                            $atr[funcion] = "verWorkFlowPopup(".$val[IDDoc].");";
                             $atr[email]=$correowf[email];
                             $mensaje=$noti->ingresarNotificaciones($atr);
                         //die;
