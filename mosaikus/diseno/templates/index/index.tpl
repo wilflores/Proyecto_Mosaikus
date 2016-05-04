@@ -50,7 +50,8 @@ function notifyBrowser(title,desc,url)
         Notification.requestPermission();
     }
     else {
-        var notification = new Notification(title, {
+        var notification = window.Notification || window.mozNotification || window.webkitNotification;
+         notification = new Notification(title, {
         //icon:'diseno/images/logo_empresa/{LOGO_EMPRESA}_logo_empresa.png',
         icon:'dist/images/logo.png',
         body: desc,
@@ -59,12 +60,20 @@ function notifyBrowser(title,desc,url)
     // //Remove the notification from Notification Center when clicked.
     notification.onclick = function () {
     //window.open(url); 
+    notification.close();
     if(url=='mostrarventana'){
         VerNotificacionesMenu();
         $('#messages').collapse("show");
     }
-    else
+    else{
+        var isChrome = /chrome/.test(navigator.userAgent.toLowerCase());
+        //alert(isChrome)
+        if (isChrome) {
+          window.focus();
+        }
         if(url!='') eval(url);
+    }
+    
     };
 
     // Callback function when the notification is closed.
