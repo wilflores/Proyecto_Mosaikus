@@ -23,7 +23,7 @@
         </div>
         <div class="panel-heading">
             <div class="row">
-                <div class="panel-title col-xs-20" id="div-titulo-for">
+                <div class="panel-title col-xs-20" id="div-titulo-for-wf">
                     {TITULO_FORMULARIO}  {VERHISTO}
                     <br>
                     <button  {MOSTRARCAMBIAR} type="button" class="btn btn-default" onclick="CambiarEstadoWF('OK','{ETAPANUEVA}',{IDDOC});"><i class="glyphicon glyphicon-ok"></i> &nbsp;{TITULOESTADO}</button>
