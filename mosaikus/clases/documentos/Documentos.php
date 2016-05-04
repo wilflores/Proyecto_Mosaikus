@@ -5085,6 +5085,10 @@
                                     if($correowf[estado_workflow]=='RECHAZADO') {
                                         $atr[cuerpo] .='Tiene un documento Rechazado<br>';
                                         $atr[asunto]='Tiene un documento Rechazado';
+                                    } else
+                                    if($correowf[etapa_workflow]=='estado_aprobado') {
+                                        $atr[cuerpo] .='Tiene un documento Aprobado<br>';
+                                        $atr[asunto]='Tiene un documento Aprobado';
                                     }
                             
                             $atr[modulo]='DOCUMENTOS';
