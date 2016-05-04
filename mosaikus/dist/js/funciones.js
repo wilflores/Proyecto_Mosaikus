@@ -1276,7 +1276,7 @@ function getForm (frm){
         array.addParametro('import','clases.notificaciones.Notificaciones');
         xajax_Loading(array.getArray());
     } 
-    function verWorkFlow(id){
+    function verWorkFlowPopup(id){
     array = new XArray();
     array.setObjeto('Documentos','ver_workflow');
     array.addParametro('id',id);
@@ -1285,3 +1285,31 @@ function getForm (frm){
     xajax_Loading(array.getArray());
     //PanelOperator.showDetail('');    
     }
+    function CambiarEstadoWF(estado,etapa,id){
+    array = new XArray();
+    array.setObjeto('Documentos','cambiar_estado');
+    array.addParametro('id',id);
+    array.addParametro('estado',estado);
+    array.addParametro('etapa',etapa);
+    array.addParametro('import','clases.documentos.Documentos');
+    xajax_Loading(array.getArray());
+}
+function RechazarWF(estado,etapa,id){
+    if(document.getElementById("observacion_rechazo").style.display==''){
+        array = new XArray();
+        array.setObjeto('Documentos','cambiar_estado');
+        array.addParametro('id',id);
+        array.addParametro('estado',estado);
+        array.addParametro('etapa',etapa);
+        array.addParametro('observacion_rechazo',document.getElementById("observacion_rechazo").value);
+        array.addParametro('import','clases.documentos.Documentos');
+        xajax_Loading(array.getArray());
+        $('#myModal-observacion-rechazo').modal('hide');
+        
+        }
+    else{
+        document.getElementById("observacion_rechazo").style.display='';
+        alertify.error("Cargue una observacion de rechazo y vuelva a presionar Rechazar",5); 
+    }
+        
+}
