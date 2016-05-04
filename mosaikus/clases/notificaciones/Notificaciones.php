@@ -168,7 +168,7 @@
             }
               public function VerNotificacionEmergente($atr){
                 $sql = "SELECT id
-                        ,DATE_FORMAT(fecha, '%d/%m/%Y %H:%m')fecha
+                        ,DATE_FORMAT(fecha, '%d/%m/%Y %H:%i')fecha
                         ,email
                         ,asunto
                         ,cuerpo
@@ -196,7 +196,7 @@
             }    
              public function ListarNotificacionesNoLeidas($atr){
                 $sql = "SELECT id
-                        ,DATE_FORMAT(fecha, '%d/%m/%Y %H:%m')fecha
+                        ,DATE_FORMAT(fecha, '%d/%m/%Y %H:%i')fecha
                         ,email
                         ,asunto
                         ,cuerpo
@@ -205,7 +205,7 @@
                         ,funcion
                          FROM mos_notificaciones 
                          WHERE email = '".$atr['email']."' and fecha_leido is null "
-                     . " order by fecha desc"; 
+                     . " order by id desc"; 
                 //echo $sql;
                 $this->operacion($sql, $atr);
                 return $this->dbl->data;
