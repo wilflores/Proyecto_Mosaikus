@@ -73,6 +73,17 @@
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }
+              public function TieneDocumentoActivo($id){
+                $atr=array();
+                $sql = "SELECT
+                    count(mos_documentos.IDDoc) cant
+                    FROM
+                    mos_documentos
+                    where etapa_workflow in ('estado_pendiente_revision','estado_pendiente_aprobacion') and 
+                    id_workflow_documento = $id "; 
+                $this->operacion($sql, $atr);
+                return $this->dbl->data[0][cant];
+            }          
             public function ingresarWorkflowDocumentos($atr){
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
@@ -844,21 +855,26 @@
                          $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
                 }else
                   {
-                    if($parametros[id_personal_responsable]!=$parametros[id_personal_revisa]&&$parametros[id_personal_responsable]!=$parametros[id_personal_aprueba]&&$parametros[id_personal_revisa]!=$parametros[id_personal_aprueba])
-                    {
-                        $respuesta = $this->modificarWorkflowDocumentos($parametros);
-                        if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
-                            $objResponse->addScriptCall("MostrarContenido");
-                            $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
-                        }
-                        else
-                            $objResponse->addScriptCall('VerMensaje','error',$respuesta);
-                    }
-                    else{
-                        $respuesta = 'El personal seleccionado para el workflow deben ser diferentes';
+                    if($this->TieneDocumentoActivo($parametros[id])>0){
+                        $respuesta = 'No se puede modificar pues tiene documentos activos con este flujo de trabajo ';
                         $objResponse->addScriptCall('VerMensaje','error',$respuesta);
                     }
-
+                    else{
+                        if($parametros[id_personal_responsable]!=$parametros[id_personal_revisa]&&$parametros[id_personal_responsable]!=$parametros[id_personal_aprueba]&&$parametros[id_personal_revisa]!=$parametros[id_personal_aprueba])
+                        {
+                            $respuesta = $this->modificarWorkflowDocumentos($parametros);
+                            if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
+                                $objResponse->addScriptCall("MostrarContenido");
+                                $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+                            }
+                            else
+                                $objResponse->addScriptCall('VerMensaje','error',$respuesta);
+                        }
+                        else{
+                            $respuesta = 'El personal seleccionado para el workflow deben ser diferentes';
+                            $objResponse->addScriptCall('VerMensaje','error',$respuesta);
+                        }
+                    }
                 }        
                 $objResponse->addScript("$('#MustraCargando').hide();"); 
                 $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
@@ -870,7 +886,10 @@
             public function eliminar($parametros)
             {
                 $val = $this->verWorkflowDocumentos($parametros[id]);
-                $respuesta = $this->eliminarWorkflowDocumentos($parametros);
+                if($this->TieneDocumentoActivo($parametros[id])>0)
+                    $respuesta = 'No se puede borrar pues tiene documentos activos con este flujo de trabajo ';
+                else
+                    $respuesta = $this->eliminarWorkflowDocumentos($parametros);
                 $objResponse = new xajaxResponse();
                 if (preg_match("/ha sido eliminada con exito/",$respuesta ) == true) {
                     $objResponse->addScriptCall("MostrarContenido");
