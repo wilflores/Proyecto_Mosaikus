@@ -88,7 +88,7 @@
                                         END sema_evi
                          FROM mos_acciones_correctivas ac
                          INNER JOIN mos_origen_ac o ON o.id = origen_hallazgo
-                         INNER JOIN mos_personal p ON p.cod_emp = responsable_analisis
+                         left JOIN mos_personal p ON p.cod_emp = responsable_analisis
                          LEFT JOIN mos_personal per ON per.cod_emp = id_responsable_segui
                          WHERE ac.id = $atr[id] "; 
                 //echo $sql;
@@ -119,10 +119,14 @@
                     if (strlen($atr[id_responsable_segui]) == 0){
                         $atr[id_responsable_segui] = 'NULL';
                     }
-                    $sql = "INSERT INTO mos_acciones_correctivas(origen_hallazgo,fecha_generacion,descripcion,analisis_causal,responsable_analisis,id_organizacion,id_proceso,fecha_acordada,fecha_realizada,id_responsable_segui,alto_potencial)
+                    if (strlen($atr[responsable_analisis]) == 0){
+                        $atr[responsable_analisis] = 'NULL';
+                    }
+                    $sql = "INSERT INTO mos_acciones_correctivas(origen_hallazgo,fecha_generacion,descripcion,analisis_causal,responsable_analisis,id_organizacion,id_proceso,fecha_acordada,fecha_realizada,id_responsable_segui,alto_potencial,responsable_desvio)
                             VALUES(
-                                $atr[origen_hallazgo],'$atr[fecha_generacion]','$atr[descripcion]','$atr[analisis_causal]',$atr[responsable_analisis],$atr[id_organizacion],$atr[id_proceso],$atr[fecha_acordada],$atr[fecha_realizada],$atr[id_responsable_segui], '$atr[alto_potencial]'
+                                $atr[origen_hallazgo],'$atr[fecha_generacion]','$atr[descripcion]','$atr[analisis_causal]',$atr[responsable_analisis],$atr[id_organizacion],$atr[id_proceso],$atr[fecha_acordada],$atr[fecha_realizada],$atr[id_responsable_segui], '$atr[alto_potencial]',$atr[responsable_desvio]
                                 )";
+                    //echo $sql;
                     $this->dbl->insert_update($sql);
                     /*
                     $this->registraTransaccion('Insertar','Ingreso el mos_acciones_correctivas ' . $atr[descripcion_ano], 'mos_acciones_correctivas');
@@ -179,6 +183,9 @@
                     }
                     if (strlen($atr[id_responsable_segui]) == 0){
                         $atr[id_responsable_segui] = 'NULL';
+                    }
+                    if (strlen($atr[responsable_analisis]) == 0){
+                        $atr[responsable_analisis] = 'NULL';
                     }
                     $sql = "UPDATE mos_acciones_correctivas SET                            
                                     origen_hallazgo = '$atr[origen_hallazgo]',fecha_generacion = '$atr[fecha_generacion]',descripcion = '$atr[descripcion]',analisis_causal = '$atr[analisis_causal]',responsable_analisis = $atr[responsable_analisis],id_organizacion = $atr[id_organizacion],id_proceso = $atr[id_proceso],fecha_acordada = $atr[fecha_acordada],fecha_realizada = $atr[fecha_realizada],id_responsable_segui = $atr[id_responsable_segui]
@@ -4088,9 +4095,10 @@
                 foreach ( $this->placeholder as $key => $value) {
                     $contenido_1["P_" . strtoupper($key)] =  $value;
                 }     
-                $contenido_1[RESPONSABLE_SEGUI] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE interno = 1"
+                $contenido_1[RESPONSABLE_DESVIO] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
+                                                                        CONCAT(initcap(p.apellido_paterno), ' ',initcap(p.apellido_materno), ' ', initcap(p.nombres))  nombres
+                                                                            FROM mos_personal p WHERE interno = 1 AND workflow = 'S'
+                                                                            ORDER BY apellido_paterno, apellido_materno, nombres"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                 $contenido_1[ORIGENES] .= $ut_tool->OptionsCombo("SELECT id, 
@@ -4099,8 +4107,9 @@
                                                                     , 'id'
                                                                     , 'descripcion', $value[valor]);
                 $contenido_1[RESPONSABLE_ANALISIS] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE interno = 1"
+                                                                        CONCAT(initcap(p.apellido_paterno), ' ',initcap(p.apellido_materno), ' ', initcap(p.nombres))  nombres
+                                                                            FROM mos_personal p WHERE interno = 1 AND workflow = 'S'
+                                                                            ORDER BY apellido_paterno, apellido_materno, nombres"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                 if (count($this->campos_activos) <= 0){
@@ -4132,7 +4141,8 @@
                         }
                     }   
                     
-                } 
+                }  
+                /*CAMPOS DINAMICOS*/
                 if(!class_exists('Parametros')){
                     import("clases.parametros.Parametros");
                 }
@@ -4140,6 +4150,21 @@
                 $array = $campos_dinamicos->crear_campos_dinamicos(8);
                 $contenido_1[CAMPOS_DINAMICOS] = $array[html];
                 $js = $array[js];
+                
+                /* EVIDENCIAS ADJUNTADAS*/
+                if(!class_exists('ArchivosAdjuntos')){
+                    import("clases.utilidades.ArchivosAdjuntos");
+                }
+                $adjuntos = new ArchivosAdjuntos();
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_acciones_evidencia', 'fk_id_accion_c');
+                $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
+                $js .= $array_nuevo[js];
+                
+                /*FIN EVIDENNCIAS*/
+                
+                
+                $contenido_1[NUM_ITEMS] = 0;
+                
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'acciones_correctivas/';
                 $template->setTemplate("formulario");
@@ -4211,6 +4236,17 @@
                         }
                         $campos_dinamicos = new Parametros();
                         $campos_dinamicos->guardar_parametros_dinamicos($parametros, 8);
+                        /* EVIDENCIAS ADJUNTADAS*/
+                        if(!class_exists('ArchivosAdjuntos')){
+                            import("clases.utilidades.ArchivosAdjuntos");
+                        }
+                        $adjuntos = new ArchivosAdjuntos();
+                        $parametros[tabla] = 'mos_acciones_evidencia';
+                        $parametros[clave_foranea] = 'fk_id_accion_c';
+                        $parametros[valor_clave_foranea] = $respuesta;
+                        $adjuntos->guardar($parametros);
+                        /*FIN EVIDENNCIAS*/
+                        
                         $objResponse->addScriptCall("MostrarContenido");
                         $objResponse->addScriptCall('VerMensaje','exito',"La Acción Correctiva '$parametros[descripcion]' ha sido ingresado con exito");
                     }
@@ -4317,6 +4353,12 @@
                                                                             FROM mos_personal p WHERE interno = 1"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val["id_responsable_segui"]);
+                $contenido_1[RESPONSABLE_DESVIO] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
+                                                                        CONCAT(initcap(p.apellido_paterno), ' ',initcap(p.apellido_materno), ' ', initcap(p.nombres))  nombres
+                                                                            FROM mos_personal p WHERE interno = 1 AND workflow = 'S'
+                                                                            ORDER BY apellido_paterno, apellido_materno, nombres"
+                                                                    , 'cod_emp'
+                                                                    , 'nombres', $value[responsable_desvio]);
                 $contenido_1[ORIGENES] .= $ut_tool->OptionsCombo("SELECT id, 
                                                                         descripcion
                                                                             FROM mos_origen_ac ORDER BY descripcion"
@@ -4365,7 +4407,19 @@
                 $campos_dinamicos = new Parametros();
                 $array = $campos_dinamicos->crear_campos_dinamicos(8,$val["id"]);
                 $contenido_1[CAMPOS_DINAMICOS] = $array[html];
-
+                $js = $array[js];
+                
+                /* EVIDENCIAS ADJUNTADAS*/
+                if(!class_exists('ArchivosAdjuntos')){
+                    import("clases.utilidades.ArchivosAdjuntos");
+                }
+                $adjuntos = new ArchivosAdjuntos();                
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_acciones_evidencia', 'fk_id_accion_c',$val["id"]);
+                $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
+                $js .= $array_nuevo[js];
+                
+                /*FIN EVIDENNCIAS*/
+                
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'acciones_correctivas/';
                 $template->setTemplate("formulario");
@@ -4393,7 +4447,7 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");
-                $objResponse->addScript($array[js]);
+                $objResponse->addScript($js);
                 $objResponse->addScript("$('#fecha_generacion').datepicker();");
                 $objResponse->addScript("$('#fecha_acordada').datepicker();");
                 $objResponse->addScript("$('#fecha_realizada').datepicker();");
@@ -4436,6 +4490,16 @@
                         }
                         $campos_dinamicos = new Parametros();
                         $campos_dinamicos->guardar_parametros_dinamicos($parametros, 8);
+                        /* EVIDENCIAS ADJUNTADAS*/
+                        if(!class_exists('ArchivosAdjuntos')){
+                            import("clases.utilidades.ArchivosAdjuntos");
+                        }
+                        $adjuntos = new ArchivosAdjuntos();
+                        $parametros[tabla] = 'mos_acciones_evidencia';
+                        $parametros[clave_foranea] = 'fk_id_accion_c';
+                        $parametros[valor_clave_foranea] = $parametros[id];
+                        $adjuntos->guardar($parametros);
+                        /*FIN EVIDENNCIAS*/
                         $objResponse->addScriptCall("MostrarContenido");
                         $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
                     }

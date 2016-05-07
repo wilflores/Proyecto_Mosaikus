@@ -54,6 +54,8 @@ if(!defined('CONFIGURACION')){
   define('CLIENTID','415793471408-qg0ehdufh3fg6616b5u0ka6motcje4d0.apps.googleusercontent.com');
   define('CLIENTSECRET','X50ApYkdaig2_W7kQcexnX-G');
   define('URLCALLBACK', APPLICATION_HOST.'/'.RUTA.'login.php');
+  
+  define('PASSWORD','123456');
   //define('PATH_TO_MSGS',HOME.'/libreria/msgs/espanol/');  
   //define('PATH_GRA',HOME.'/libreria/graficos/grafi/datos/');  
   

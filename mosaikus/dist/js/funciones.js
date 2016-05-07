@@ -1,4 +1,113 @@
+function init_archivos_adjuntos(){
+    $("#fileUpload2").change(function (){
+                var names = [];
+                var i = $('#num_items').val();
+                i = parseInt(i) + 1;    
+                var formData = new FormData(document.getElementById("formuploadajax"));
+                for (var k = 0; k < this.files.length; ++k) {
+                    if(this.files[k].size>1024*1024*3){
+                        VerMensaje('error','El archivo ' + this.files[k].name + ' excede el tamaño permitido en este sitio, Tamaño máximo del archivo a subir: 1MB');
+                    }
+                    else
+                        names.push(k);
+                }
+                var html;
+                for (var k = 0; k < names.length;++k){
+                    i = $('#num_items').val();
+                    i = parseInt(i) + 1;   
+                    html = '<tr id="tr-esp-' + i + '">'; 
+                    html = html + '<td align="center">'+
+                                       ' ' +
+                                  '  </td>';
+                    html = html + '<td >'+
+                                        '<a id="a-img-'+ i +'" href="#" title="'+ this.files[names[k]].name + '" >'+
+                                            this.files[names[k]].name + 
+                                        '</a>'+
+                                        '<div id="a-img-msj-'+ i +'" style="color:red"></div>'
+                                   '</td>';
+                    html = html + '<td>' +
+                                       + Math.round(this.files[names[k]].size / 1024) + ' KB <br>' +
+                                        '<div class="progress" style="width: 200px;">'+
+                                            '<div class="progress-bar" id="estado-progress-bar-'+i+'" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;">'+
+                                              '0%'+
+                                            '</div>'+
+                                        '</div>'+
+                                    '</td>';
 
+                    html = html + '<td>' +
+                                       '<i class="glyphicon glyphicon-trash cursor-pointer" href="'+ i + '" id="ico_trash_img_'+ i + '" tok=""></i>'+
+                                    '</td>';
+                    html = html + '</tr>' ;       
+                    $("#table-items-esp tbody").append(html);  
+                    
+                    formData.append('fileUpload',this.files[names[k]]); 
+                    formData.append('tok', $('#tok_new_edit').val());
+                    var ajaxloopreq = function (formData,i) {
+                        $.ajax({
+                            url: "pages/acciones_evidencia/uploadFileOtro2_vis.php",
+                            type: "post",
+                            dataType: "html",
+                            data: formData,
+                            cache: false,
+                            contentType: false,
+                         processData: false,
+                         xhr: function() {
+                                myXhr = $.ajaxSettings.xhr();
+                                if (myXhr.upload) {
+                                    myXhr.upload.addEventListener('progress', function(prog) {
+                                        var value = ~~((prog.loaded / prog.total) * 100);
+                                        var $bar = $('#estado-progress-bar-'+i);
+                                        $bar.width(value*200/100);
+                                        $bar.text(value+ "%");
+                                    }, false);
+                                }
+                                return myXhr;
+                            }
+                        })
+                        .done(function(res){
+                           try{
+                                respuesta = $.parseJSON(res);
+                                if (respuesta[0].exito == 1) {
+                                    if (respuesta[0].gallery == 1)
+                                        $('#a-img-'+i).attr('data-gallery','');
+                                    if (respuesta[0].target == 1)
+                                        $('#a-img-'+i).attr('target','_blank');
+                                    $('#a-img-'+i).attr('href',respuesta[0].url);
+                                    $('#ico_trash_img_'+i).attr('tok',respuesta[0].id);
+                                    $("#ico_trash_img_" + i).click(function(e){ 
+                                        e.preventDefault();
+                                        var id = $(this).attr('href');
+                                        $('tr-esp-' + id).remove();
+                                        var parent = $(this).parents().parents().get(0);
+                                            $(parent).remove();
+                                        var id = $(this).attr('tok');            
+                                        array = new XArray();
+                                        array.setObjeto('ArchivosAdjuntos','actualizar');
+                                        array.addParametro('tok',id);                        
+                                        array.addParametro('token', $('#tok_new_edit').val());
+                                        array.addParametro('import','clases.utilidades.ArchivosAdjuntos');
+                                        xajax_Loading(array.getArray());
+                                    }); 
+                                }
+                                else{
+                                    $('#a-img-msj-'+i).html(respuesta[0].msj);
+                                }
+                            }catch (e) {
+                                $('#a-img-msj-'+i).html(respuesta[0].msj);
+                            }
+
+                           $('#estado-progress-bar-'+i).parent().hide();
+                        });
+                    };
+                    ajaxloopreq(formData,i);
+                    
+                    $('#num_items').val(i);
+                }
+                $('#fileUpload2').val('');       
+
+
+            });
+}
 function admin_ao(){    
         var to = false;
         $('#demo_q').keyup(function () {

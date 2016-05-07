@@ -178,6 +178,8 @@ class Pagina{
         $this->asigna_script_vendor('jstree/dist/jstree.min.js');  
         $this->asigna_script_vendor('perfect-scrollbar/js/perfect-scrollbar.jquery.js');  
         $this->asigna_script_vendor('alertifyjs/alertify.min.js');  //para alertas
+        $this->asigna_script_vendor('Gallery/js/jquery.blueimp-gallery.min.js');  
+        $this->asigna_script_vendor('Bootstrap-Image-Gallery/js/bootstrap-image-gallery.min.js');
         
         
       
@@ -622,6 +624,8 @@ class Pagina{
         }
         $this->asigna_css_vendor('alertifyjs/css/alertify.min.css');  //para alertas
         $this->asigna_css_vendor('alertifyjs/css/themes/bootstrap.min.css');  //para alertas
+        $this->asigna_css_vendor('Gallery/css/blueimp-gallery.min.css');
+        $this->asigna_css_vendor('Bootstrap-Image-Gallery/css/bootstrap-image-gallery.min.css');
         
         $this->asigna_css("jstree-mosaikus/style.css");
         $this->asigna_css("styles.css");

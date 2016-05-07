@@ -57,10 +57,12 @@ function init_filtrar(){
             placeholder: "Selecione el revisor",
             allowClear: true
           }); 
-          $( "#id_responsable_segui" ).select2({
+          $( "#responsable_desvio" ).select2({
             placeholder: "Selecione el elaborador",
             allowClear: true
-          });           
+          });    
+          
+          
     }
     
     function filtrar_arbol(){
@@ -191,5 +193,7 @@ function init_filtrar(){
         array.addParametro('import','clases.acciones_evidencia.AccionesEvidencia');
         xajax_Loading(array.getArray());
     }
+    
+    
     
     

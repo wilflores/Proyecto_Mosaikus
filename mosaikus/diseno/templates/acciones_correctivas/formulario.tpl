@@ -28,16 +28,25 @@
                                           <textarea class="form-control" rows="3" id="descripcion" name="descripcion" data-validation="required" placeholder="{N_DESCRIPCION}">{DESCRIPCION}</textarea>
                                       </div>                                
                                   </div>
+                                  <div class="form-group">
+                                        <label for="responsable_analisis" class="col-md-4 control-label">{N_RESPONSABLE_DESVIO}</label>                                           
+                                      <div class="col-md-10">                                              
+                                                    <select name="responsable_desvio" id="responsable_desvio" data-validation="required">
+                                                        <option selected="" value="">-- Seleccione --</option>
+                                                        {RESPONSABLE_DESVIO}
+                                                    </select>
+                                          </div>
+                                  </div>
 <div class="form-group">
                                         <label for="analisis_causal" class="col-md-4 control-label">{N_ANALISIS_CAUSAL}</label>
                                         <div class="col-md-10">                                          
-                                          <textarea class="form-control" rows="3" id="analisis_causal" name="analisis_causal" data-validation="required" placeholder="{N_ANALISIS_CAUSAL}">{ANALISIS_CAUSAL}</textarea>
+                                          <textarea class="form-control" rows="3" id="analisis_causal" name="analisis_causal" placeholder="{N_ANALISIS_CAUSAL}">{ANALISIS_CAUSAL}</textarea>
                                       </div>                                
                                   </div>
 <div class="form-group">
                                         <label for="responsable_analisis" class="col-md-4 control-label">{N_RESPONSABLE_ANALISIS}</label>                                           
                                       <div class="col-md-10">                                              
-                                                    <select name="responsable_analisis" id="responsable_analisis" data-validation="required">
+                                                    <select name="responsable_analisis" id="responsable_analisis" >
                                                         <option selected="" value="">-- Seleccione --</option>
                                                         {RESPONSABLE_ANALISIS}
                                                     </select>
@@ -47,9 +56,12 @@
                                     {ID_ORGANIZACIONES}
                                     {ID_PROCESOS}
                                   
+                                  <div class="form-group" id="tabla_fileUpload">
+                                        <label for="archivo" class="col-md-4 control-label">{N_DOC_FISICO}</label>
+                                        {ARCHIVOS_ADJUNTOS}                                          
+                                 </div>                                    
                                       
-                                      
-                                  
+<!--                                  
 <div class="form-group">
                                         <label for="fecha_acordada" class="col-md-4 control-label">{N_FECHA_ACORDADA}</label>
                                         <div class="col-md-10">
@@ -73,7 +85,7 @@
                                           </div>
                                                                      
                                   </div>
-
+-->
                                       
 <div class="modal fade bs-example-modal-lg" id="myModal-Filtrar-Arbol" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                             <div class="modal-dialog  modal-lg" role="document">
