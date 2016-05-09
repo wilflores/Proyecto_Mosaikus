@@ -182,7 +182,7 @@
                                     $nombrecorreo=$fila['persona'];
                                 }
                                 $celdas .='<tr><td>'.$fila[Codigo_doc].'-'.$fila[nombre_doc].'-V'. str_pad($fila["version"], 2, "0", STR_PAD_LEFT).'</td>';
-                                $celdas .='<td>'.$fila[fecha_vencimiento].'('.$fila[dias_vig].')</td></tr>';
+                                $celdas .='<td>'.$fila[fecha_vencimiento].'&nbsp;('.$fila[dias_vig].'&nbsp;Dias)</td></tr>';
                             }
                             if(sizeof($data2)>0){
                                 if(sizeof($data)==0) {
@@ -201,8 +201,8 @@
                             if($cuerpocorreo!=''){
                                 $ut_tool = new ut_Tool();
                                 //$filacorreo[email]='azambrano75@gmail.com';
-                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $filacorreo[email], 'nombres'=>$nombrecorreo)), 'Notificaciones de Mosaikus', $cuerpocorreo);
-                                //echo $cuerpocorreo;
+                                //$ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $filacorreo[email], 'nombres'=>$nombrecorreo)), 'Notificaciones de Mosaikus', $cuerpocorreo);
+                                echo $cuerpocorreo;
                             }
                                 //echo $bds[db].":'ACCIONES CORRECTIVAS'  Ejecutado el dia ". date('Y/m/d h:m')."\n";
                     }
