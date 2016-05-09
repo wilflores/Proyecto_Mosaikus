@@ -201,8 +201,8 @@
                             if($cuerpocorreo!=''){
                                 $ut_tool = new ut_Tool();
                                 //$filacorreo[email]='azambrano75@gmail.com';
-                                //$ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $filacorreo[email], 'nombres'=>$nombrecorreo)), 'Notificaciones de Mosaikus', $cuerpocorreo);
-                                echo $cuerpocorreo;
+                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $filacorreo[email], 'nombres'=>$nombrecorreo)), 'Notificaciones de Mosaikus', $cuerpocorreo);
+                                //echo $cuerpocorreo;
                             }
                                 //echo $bds[db].":'ACCIONES CORRECTIVAS'  Ejecutado el dia ". date('Y/m/d h:m')."\n";
                     }
