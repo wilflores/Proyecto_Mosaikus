@@ -152,7 +152,9 @@
                                         , case when ifnull(DATEDIFF(DATE_ADD(fecha_revision,INTERVAL v_meses MONTH),CURRENT_DATE()),DATEDIFF(DATE_ADD(fecha,INTERVAL v_meses MONTH),CURRENT_DATE()))<0 then 'Vencido'
                                                 else case when ifnull(DATEDIFF(DATE_ADD(fecha_revision,INTERVAL v_meses MONTH),CURRENT_DATE()),DATEDIFF(DATE_ADD(fecha,INTERVAL v_meses MONTH),CURRENT_DATE()))<semaforo then 'A vencer'
                                                 else 'Ok' end 
-                                        end estado, v_meses
+                                        end estado
+                                        , v_meses
+                                        ,DATE_FORMAT(IFNULL(DATE_ADD(fecha_revision,INTERVAL v_meses MONTH),DATE_ADD(fecha,INTERVAL v_meses MONTH)), '%d/%m/%Y') fecha_vencimiento
                                         ,Codigo_doc
                                         ,nombre_doc
                                         ,CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno), ' ', initcap(p.apellido_materno))  persona
@@ -170,6 +172,7 @@
                                     else 'Ok' end 
                             end ) in ('Vencido','A vencer')
                             order by dias_vig asc;";
+                            //echo $Consulta;
                             $data2 = $pagina2->query($Consulta, array());
                             $cuerpo='';
                             $celdas='';
@@ -179,7 +182,7 @@
                                     $nombrecorreo=$fila['persona'];
                                 }
                                 $celdas .='<tr><td>'.$fila[Codigo_doc].'-'.$fila[nombre_doc].'-V'. str_pad($fila["version"], 2, "0", STR_PAD_LEFT).'</td>';
-                                $celdas .='<td>'.$fila[fecha].'</td></tr>';
+                                $celdas .='<td>'.$fila[fecha_vencimiento].'('.$fila[dias_vig].')</td></tr>';
                             }
                             if(sizeof($data2)>0){
                                 if(sizeof($data)==0) {
