@@ -89,7 +89,7 @@
     
     function ao_simple(){
     $('#div-ao-form').jstree(
-//            {
+            {
 //                "types": {
 //                    "verde": {
 //                        "icon": "diseno/images/verde.png"
@@ -98,8 +98,8 @@
 //                        "icon": "diseno/images/rojo.png"
 //                    }
 //                },
-//                "plugins": ["search", "wholerow", "types"]
-//            }
+                "plugins": ["search", "types"]
+            }
         );
     $('#div-ao-form').on("changed.jstree", function (e, data) {
         if (data.selected.length > 0){
@@ -117,7 +117,14 @@
         //console.log(data.selected);
     });
     $('#div-ao-form').jstree(true).open_all();               
-        
+    var to = false;
+    $('#demo_q_ao').keyup(function () {                    
+            if(to) { clearTimeout(to); }
+            to = setTimeout(function () {
+                    var v = $('#demo_q_ao').val();
+                    $('#div-ao-form').jstree(true).search(v);
+            }, 250);
+    });    
 }
 
 function ao_multiple(){
