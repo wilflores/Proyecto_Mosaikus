@@ -85,7 +85,7 @@ function notifyBrowser(title,desc,url)
 }
 </script>
 
-<body>
+<body onclick="CerrarNotificacionesSiOpen();">
 <!-- #page-wrapper -->
 <div id="page-wrapper">
   <!-- #page -->
