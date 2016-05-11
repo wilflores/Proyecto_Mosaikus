@@ -396,7 +396,9 @@
             }
             public function verWFemail($id){
                 $atr=array();
-                $sql = "select mos_personal.email, mos_personal.nombres, mos_personal.apellido_paterno,etapa_workflow, estado_workflow, observacion_rechazo, IFNULL(recibe_notificaciones,'N') recibe_notificaciones 
+                $sql = "select mos_personal.email, mos_personal.nombres, mos_personal.apellido_paterno,etapa_workflow, estado_workflow, observacion_rechazo, 
+                        IFNULL(recibe_notificaciones,'N') recibe_notificaciones,email_revisa,nombre_revisa,email_reponsable,nombre_responsable,
+                        recibe_notificaciones_revisa,recibe_notificaciones_responsable, email_aprueba, nombre_aprueba,recibe_notificaciones_aprueba
                         from mos_personal inner join 
                         (
                                 SELECT
@@ -413,16 +415,31 @@
                                                 end	
                                 end
                                 end as id_persona,
+                                pers.email email_revisa,
+                                concat(pers.apellido_paterno,' ',pers.nombres) nombre_revisa,
+                                pers_r.email email_reponsable,
+                                concat(pers_r.apellido_paterno,' ',pers_r.nombres) nombre_responsable,
+                                IFNULL(usu_rev.recibe_notificaciones,'N') recibe_notificaciones_revisa,
+                                IFNULL(usu_resp.recibe_notificaciones,'N') recibe_notificaciones_responsable,
+                                pers_apr.email email_aprueba,
+                                concat(pers_apr.apellido_paterno,' ',pers_apr.nombres) nombre_aprueba,
+                                IFNULL(usu_apr.recibe_notificaciones,'N') recibe_notificaciones_aprueba,
                                 mos_documentos.IDDoc,
                                 mos_documentos.etapa_workflow,
                                 mos_documentos.estado_workflow,
                                 mos_documentos.observacion_rechazo
                                 FROM
-                                mos_documentos 
+                                mos_documentos left join mos_personal pers
+                                on mos_documentos.reviso =  pers.cod_emp left join mos_personal pers_r
+                                on mos_documentos.elaboro =  pers_r.cod_emp inner join mos_usuario usu_resp
+                                on pers_r.email = usu_resp.email inner join mos_usuario usu_rev
+                                on pers.email = usu_rev.email left join mos_personal pers_apr
+                                on mos_documentos.aprobo =  pers_apr.cod_emp inner join mos_usuario usu_apr
+                                on pers_apr.email = usu_apr.email
                                 where IDDoc=$id
                         ) as wf
                         on mos_personal.cod_emp= id_persona inner join mos_usuario usu
-                        on mos_personal.email = usu.email
+                        on mos_personal.email = usu.email 
                         ;"; 
                 //echo $sql;
                 $this->operacion($sql, $atr);
@@ -3010,12 +3027,22 @@
                 //$_SESSION[CookEmail]
                 //$_SESSION[CookCodEmp]
                 if($_SESSION[SuperUser]=='S'){
+//                    $sql="SELECT wf.id,
+//                            CONCAT('".$this->nombres_columnas[elaboro]."=>', 
+//                            CONCAT(CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_materno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2)))) 
+//                            ,'&rarr;".$this->nombres_columnas[reviso]."=>', 
+//                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
+//                            ,'&rarr;".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+//                            FROM mos_workflow_documentos AS wf
+//                            left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
+//                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+//                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
                     $sql="SELECT wf.id,
-                            CONCAT('".$this->nombres_columnas[elaboro]."=>', 
+                            CONCAT( 
                             CONCAT(CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_materno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2)))) 
-                            ,' | ".$this->nombres_columnas[reviso]."=>', 
+                            ,'&rarr;', 
                             IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
-                            ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            ,'&rarr;', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
                             FROM mos_workflow_documentos AS wf
                             left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
@@ -3024,9 +3051,9 @@
                 else
                 {
                     $sql="SELECT wf.id,
-                            CONCAT('".$this->nombres_columnas[reviso]."=>', 
+                            CONCAT( 
                             IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))),'N/A') 
-                            ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            ,'&rarr;', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
                             FROM mos_workflow_documentos AS wf
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
@@ -3396,11 +3423,11 @@
                     }    
                     if($_SESSION[SuperUser]=='S'){
                         $sql="SELECT wf.id,
-                                CONCAT('".$this->nombres_columnas[elaboro]."=>', 
+                                CONCAT( 
                                 CONCAT(CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_materno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2)))) 
-                                ,' | ".$this->nombres_columnas[reviso]."=>', 
+                                ,'&rarr;', 
                                 IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
-                                ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                                ,'&rarr;', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
                                 FROM mos_workflow_documentos AS wf
                                 left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                                 left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
@@ -3409,9 +3436,9 @@
                     else
                     {
                         $sql="SELECT wf.id,
-                                CONCAT('".$this->nombres_columnas[reviso]."=>', 
+                                CONCAT( 
                                 IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))),'N/A') 
-                                ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                                ,'&rarr;', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
                                 FROM mos_workflow_documentos AS wf
                                 left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                                 INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
@@ -3645,8 +3672,8 @@
                                 import('clases.notificaciones.Notificaciones');
                                 $noti = new Notificaciones();
                                 $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT).'<br>';
-                                if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
-                                if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
+                                //if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
+                                //if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
                                 $atr[funcion] = "verWorkFlowPopup(".$parametros[id].");";
 
                                 $atr[modulo]='DOCUMENTOS';
@@ -3827,8 +3854,8 @@
                                 import('clases.notificaciones.Notificaciones');
                                 $noti = new Notificaciones();
                                 $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT).'<br>';
-                                if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
-                                if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
+                                //if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
+                                //if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
                                 $atr[funcion] = "verWorkFlowPopup(".$params[id_registro].");";                                
                                 $atr[modulo]='DOCUMENTOS';
                                 $atr[asunto]='Tiene un documento '.$etapa.'';
@@ -3986,11 +4013,11 @@
                 $contenido_1['V_MESES'] = $ut_tool->combo_array("v_meses", $desc, $ids,false,$val["v_meses"],false,false,false,false,'display:inline;width:70px');
                 if($_SESSION[SuperUser]=='S'){
                     $sql="SELECT wf.id,
-                            CONCAT('".$this->nombres_columnas[elaboro]."=>', 
+                            CONCAT( 
                             CONCAT(CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_materno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2)))) 
-                            ,' | ".$this->nombres_columnas[reviso]."=>', 
+                            ,'&rarr;', 
                             IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
-                            ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            ,'&rarr;', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
                             FROM mos_workflow_documentos AS wf
                             left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
@@ -3999,9 +4026,9 @@
                 else
                 {
                     $sql="SELECT wf.id,
-                            CONCAT('".$this->nombres_columnas[reviso]."=>', 
+                            CONCAT( 
                             IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
-                            ,' | ".$this->nombres_columnas[aprobo]."=>', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            ,'&rarr;', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
                             FROM mos_workflow_documentos AS wf
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
@@ -4417,8 +4444,8 @@
                                 import('clases.notificaciones.Notificaciones');
                                 $noti = new Notificaciones();
                                 $atr[cuerpo] .=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT).'<br>';
-                                if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
-                                if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
+                                //if($correowf[etapa_workflow]=='estado_pendiente_revision') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
+                                //if($correowf[etapa_workflow]=='estado_pendiente_aprobacion') $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
                                 $atr[funcion] = "verWorkFlowPopup(".$parametros[id].");";
                                 $atr[modulo]='DOCUMENTOS';
                                 $atr[asunto]='Tiene un documento '.$etapa.'';
@@ -5051,43 +5078,83 @@
                 $respuesta = $this->cambiarestadowf($parametros);
                 $val = $this->verDocumentos($parametros[id]);
                 $objResponse = new xajaxResponse();
+               // echo $respuesta;
                // print_r($parametros);
                 if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
+                        $cc=array();
+                        $from=array();
+                        $ut_tool = new ut_Tool();
                         $correowf = $this->verWFemail($parametros[id]);
                         //echo $correowf[email];
                         $this->cargar_nombres_columnas();
                         $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
-                        if($correowf[email]!='' && $correowf[recibe_notificaciones]=='S'){
+                        //echo $correowf[email];
+                        if($correowf[email]!=''){
                             $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
-                            if($correowf[estado_workflow]=='RECHAZADO'){
-                                $cuerpo .= 'Rechazado por:<br><span style="color:red">'.$correowf[observacion_rechazo].'</span>';
-                            }
                            // $correowf[email] = 'azambrano75@gmail.com';
                             $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
-                            $ut_tool = new ut_Tool();
                             //echo $cuerpo;
-                            $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
                         }
+                        if($correowf[estado_workflow]=='RECHAZADO'){
+                            $cuerpo .= 'Rechazado por:<br><span style="color:red">'.$correowf[observacion_rechazo].'</span>';
+                            //echo $_SESSION[CookEmail].' '.$correowf[email_aprueba].' '.$correowf[recibe_notificaciones_revisa].' '.$correowf[recibe_notificaciones_responsable];
+                            if($_SESSION[CookEmail]==$correowf[email_aprueba]){
+                                if($correowf[recibe_notificaciones_revisa]=='S'){
+                                    $cc = array(array('correo' => $correowf[email_revisa], 'nombres'=>$correowf[nombre_revisa]));
+                                    //$cc = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_revisa]));
+                                }
+                                if($correowf[recibe_notificaciones_responsable]=='S'){
+                                    $from = array(array('correo' => $correowf[email_responsable], 'nombres'=>$correowf[nombre_responsable]));
+                                    //$from = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_responsable]));
+                                }
+                                if(sizeof($from)>0 || sizeof($cc)>0)
+                                    $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, 'Notificaciones de Flujo de Trabajo', $cuerpo, array(),$cc);                                
+                            }            
+                        }
+
                         //SE CARGA LA NOTIFICACION
                             import('clases.notificaciones.Notificaciones');
                             $noti = new Notificaciones();
                             $atr[cuerpo] .=$val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT).'<br>';
                             if($correowf[etapa_workflow]=='estado_pendiente_revision' && $correowf[estado_workflow]=='OK') {
-                                $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
+                                //$atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
                                 $atr[asunto]='Tiene un documento '.$etapa.'';
                             }
                             else 
                                 if($correowf[etapa_workflow]=='estado_pendiente_aprobacion' && $correowf[estado_workflow]=='OK') {
-                                    $atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
+                                    //$atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
                                     $atr[asunto]='Tiene un documento '.$etapa.'';
                                 }
                                 else
                                     if($correowf[estado_workflow]=='RECHAZADO') {
-                                        $atr[cuerpo] .='Tiene un documento Rechazado<br>';
+                                        //$atr[cuerpo] .='Tiene un documento Rechazado<br>';
                                         $atr[asunto]='Tiene un documento Rechazado';
                                     } else
                                     if($correowf[etapa_workflow]=='estado_aprobado') {
-                                        $atr[cuerpo] .='Tiene un documento Aprobado<br>';
+                                        //$atr[cuerpo] .='Tiene un documento Aprobado<br>';
+                                        if(!class_exists('Template')){
+                                            import("clases.interfaz.Template");
+                                        }
+                                        $contenido   = array();
+                                        $contenido['ELABORADOR']=$correowf[nombre_responsable];
+                                        $contenido['DOCUMENTO']=$val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                                        $template = new Template();
+                                        $template->PATH = PATH_TO_TEMPLATES.'documentos/';
+                                        $template->setTemplate("cuerpo_notificacion");
+                                        $template->setVars($contenido);
+                                        $cuerpo = $template->show();
+
+                                        //echo $cuerpo;
+                                        if($correowf[recibe_notificaciones_revisa]=='S'){
+                                            $cc = array(array('correo' => $correowf[email_revisa], 'nombres'=>$correowf[nombre_revisa]));
+                                            //$cc = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_revisa]));
+                                        }
+                                        if($correowf[recibe_notificaciones_responsable]=='S'){
+                                            $from = array(array('correo' => $correowf[email_responsable], 'nombres'=>$correowf[nombre_responsable]));
+                                            //$from = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_responsable]));
+                                        }
+                                        if(sizeof($from)>0 || sizeof($cc)>0)
+                                            $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, 'Notificaciones de Flujo de Trabajo', $cuerpo, array(),$cc);                                
                                         $atr[asunto]='Tiene un documento Aprobado';
                                     }
                             
