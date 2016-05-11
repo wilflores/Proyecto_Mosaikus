@@ -719,6 +719,14 @@ function ao_multiple(){
         else
             $('#nodos').val('');
     });
+    var to = false;
+    $('#demo_q_ao').keyup(function () {                    
+            if(to) { clearTimeout(to); }
+            to = setTimeout(function () {
+                    var v = $('#demo_q_ao').val();
+                    $('#div-ao-form').jstree(true).search(v);
+            }, 250);
+    });  
 //    $('#div-ao-form').jstree(true).open_all();               
         
 }    

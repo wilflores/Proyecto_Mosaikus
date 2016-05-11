@@ -124,7 +124,7 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col-xs-10" style="max-height: 350px;overflow-y: scroll;">
+                                <div class="col-xs-10">
                                     
                                     <!--
                                     <iframe id="iframearbol" src="pages/personas/emb_jstree_single_persona.php?id={ID_ORGANIZACION}&cod_cargo={COD_CARGO}" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>

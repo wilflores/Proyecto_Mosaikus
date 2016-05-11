@@ -800,7 +800,11 @@ function MostrarContenido2()
     document.getElementById('contenido-aux').innerHTML='';
     $('#contenido-form-aux').parent().show();
     $('#contenido-aux').parent().hide();
-    $('#div-titulo-for').html($('#div-titulo-mod').html() + '<br>' + $('#div-titulo-for').html());
+    if($('#div-titulo-mod').html().indexOf('<br') >0){
+        $('#div-titulo-for').html($('#div-titulo-mod').html().substring(0, $('#div-titulo-mod').html().indexOf('<br')-1) + '<br>' + $('#div-titulo-for').html());
+    }
+    else
+        $('#div-titulo-for').html($('#div-titulo-mod').html() + '<br>' + $('#div-titulo-for').html());
 }
 
 function MostrarContenido()

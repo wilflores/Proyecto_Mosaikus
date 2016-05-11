@@ -128,7 +128,7 @@
                                   </div>
                                   <div class="form-group">
                                     
-                                    <div class="col-md-9" style="max-height: 350px;overflow-y: scroll;">
+                                    <div class="col-md-9" >
                                         <!--label for="vigencia" class="col-md-10 control-label" style="text-align: left;">Árbol organizacional</label>
                                         <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
                                         <iframe id="iframearbol" src="pages/cargo/prueba_arbolV4.php?IDDoc={IDDOC}" frameborder="0" width="100%" height="310px" scrolling="no"></iframe-->
