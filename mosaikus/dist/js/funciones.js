@@ -1378,6 +1378,14 @@ function getForm (frm){
         array.addParametro('id',id);
         array.addParametro('import','clases.notificaciones.Notificaciones');
         xajax_Loading(array.getArray());
+        var node=document.getElementById("noti"+id);
+        node.parentNode.removeChild(node);
+        alto = (document.getElementById('div-notificaciones').style.height);
+        alto2 = parseInt(alto.replace('px',''));
+        if(alto2-200>0)
+            document.getElementById('div-notificaciones').style.height=(alto2-200)+'px';
+        else
+            $("#messages").collapse("hide");
     }    
     function MostrarNotificacionesEmergente(){
         array = new XArray();
@@ -1421,4 +1429,12 @@ function RechazarWF(estado,etapa,id){
         alertify.error("Cargue una observacion de rechazo y vuelva a presionar Rechazar",5); 
     }
         
+}
+function CerrarNotificacionesSiOpen(){
+    $("body").click(function(e) {
+        //alert(e.target.id+'-'+(e.target.id).indexOf('cerrar'));
+        if (!( (e.target.id).indexOf('cerrar')!=-1 || e.target.id == "messages" || $(e.target).parents("#messages").size())) { 
+           $("#messages").collapse("hide");
+        }
+    });
 }
