@@ -192,8 +192,37 @@
                         //echo $sql;
                     
                     //$sql .= " order by $atr[corder] $atr[sorder] ";
-                    //$sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                    $sql .= " LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                    //echo $sql;
+                    //exit();
                     $this->operacion($sql, $atr);
+             }
+             
+             public function ContarArbolOrganizacionalReporte($atr){
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $this->cargar_acceso_nodos($atr);
+                    $sql_left = $sql_col_left = $sql_where = "";
+                    $k = 1;                    
+                    for($k=1;$k<=$atr[niveles];$k++) {
+                        if ($k==1){
+                            $sql_left .= "mos_organizacion a$k ";       
+                            $sql_where .= " AND a$k.id IN (". implode(',', array_keys($this->id_org_acceso)) . ") ";
+                        }
+                        else{
+                            $sql_left.= " LEFT JOIN mos_organizacion a$k on a$k.parent_id = a".($k-1).".id  AND a$k.id IN (". implode(',', array_keys($this->id_org_acceso)) . ") ";
+                        }
+                        $sql_col_left .= ",a$k.id id_$k, a$k.title nombre_$k";   
+                        
+                    }
+                    
+                    $sql = "select COUNT(*) total_registros
+                        from $sql_left
+                                where a1.parent_id IN ( ". $atr["b-id_organizacion"] . ") $sql_where";
+                        //echo $sql;
+                    
+                    //$sql .= " order by $atr[corder] $atr[sorder] ";
+                    $total_registros = $this->dbl->query($sql, $atr);
+                    return $total_registros[0][total_registros];  
              }
              
              public function eliminarArbolOrganizacional($atr){
@@ -300,7 +329,7 @@
                 if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
                 
                 /*CALCULA EL NUMERO DE NIVELES DEL ARBOL*/
-                $out[niveles] = $niveles = $parametros[niveles] = $this->numeroNivelesHijos(array($parametros["b-id_organizacion"]));
+                $out[niveles] = $niveles = $parametros[niveles];// = $this->numeroNivelesHijos(array($parametros["b-id_organizacion"]));
                 $out[titulo] = "";
                 for($i=1;$i<=$niveles;$i++){
                     $out[titulo] .= "<th style=\"width: ". 100 / $niveles  . "%\" >Nivel $i</th>" ;
@@ -619,6 +648,8 @@
                 }
                 //print_r($parametros);
                 //print_r($this->id_org_acceso_explicito);
+                $parametros[reg_por_pagina] = 5000;
+                $parametros[niveles] = $this->numeroNivelesHijos(array($parametros["b-id_organizacion"]));
                 $grid = $this->verListaArbolOrganizacionalReporte($parametros);
                 $contenido['MODO'] = $parametros['modo'];
                 $contenido['COD_LINK'] = $parametros['cod_link'];
@@ -848,6 +879,8 @@
                 if (count($this->id_org_acceso) <= 0){
                     $this->cargar_acceso_nodos($parametros);
                 }
+                $parametros[reg_por_pagina] = 5000;
+                $parametros[niveles] = $this->numeroNivelesHijos(array($parametros["b-id_organizacion"]));
                 $grid = $this->verListaArbolOrganizacionalReporte($parametros);                
                 $objResponse = new xajaxResponse();
                 
@@ -1406,14 +1439,15 @@
 
                         foreach ($Resp3 as $Fila3) 
                         {
-                                if($Fila3[organizacion_padre]==2)
+                                //if($Fila3[organizacion_padre]==2)
+                                if(($Fila3[organizacion_padre]==2)||($Fila3[organizacion_padre]==1))
                                 {
                                         $OrgNom.=($Fila3[identificacion]);
                                         return($OrgNom);                                        
                                 }
                                 else
                                 {
-                                        $OrgNom .= $this->BuscaOrganizacional(array('id_organizacion' => $Fila3[organizacion_padre])) . ' -> ' . ($Fila3[identificacion]);
+                                        $OrgNom .= $this->BuscaOrganizacional(array('id_organizacion' => $Fila3[organizacion_padre])) . ' &#8594; ' . ($Fila3[identificacion]);
                                 }
                         }
                 }

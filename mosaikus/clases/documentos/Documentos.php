@@ -2509,10 +2509,11 @@
                     $id_ao = $p->verAreaPersonas($_SESSION['CookCodEmp']);
                     $contenido[FILTRO_OTROS_CAMPOS] .= '<br>
                                     <label class="checkbox-inline"> 
-                                    <input type="checkbox" id="b-mi-nivel" name="b-mi-nivel" value="N"> Mi Nivel </label>';
-                            
+                                    <input type="checkbox" class="b-mi-nivel" value="N"> Mi Nivel </label>';
+                    $contenido[TITULO_MODULO] .= ' &nbsp;<label class="checkbox-inline"> 
+                                    <input type="checkbox" class="b-mi-nivel" value="N"> Mi Nivel </label>' ;       
                     $js_flujo .= "
-                            $('#b-mi-nivel').on('change', function (event) {
+                            $('.b-mi-nivel').on('change', function (event) {
                                 /*event.preventDefault();
                                 var id = $(this).attr('tok');*/
                                  if( $(this).is(':checked') ){
@@ -2523,6 +2524,7 @@
                             });";
                 }
                 $contenido[FILTRO_OTROS_CAMPOS] .= '</div>';
+                /*FIN VALIDACION*/
                 
                 import('clases.organizacion.ArbolOrganizacional');
 
@@ -3040,9 +3042,9 @@
                     $sql="SELECT wf.id,
                             CONCAT( 
                             CONCAT(CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_materno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2)))) 
-                            ,'&rarr;', 
+                            ,' &rarr; ', 
                             IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
-                            ,'&rarr;', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
                             FROM mos_workflow_documentos AS wf
                             left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
@@ -3053,7 +3055,7 @@
                     $sql="SELECT wf.id,
                             CONCAT( 
                             IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))),'N/A') 
-                            ,'&rarr;', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
                             FROM mos_workflow_documentos AS wf
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
@@ -3425,9 +3427,9 @@
                         $sql="SELECT wf.id,
                                 CONCAT( 
                                 CONCAT(CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_materno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2)))) 
-                                ,'&rarr;', 
+                                ,' &rarr; ', 
                                 IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
-                                ,'&rarr;', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                                ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
                                 FROM mos_workflow_documentos AS wf
                                 left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                                 left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
@@ -3438,7 +3440,7 @@
                         $sql="SELECT wf.id,
                                 CONCAT( 
                                 IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))),'N/A') 
-                                ,'&rarr;', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                                ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
                                 FROM mos_workflow_documentos AS wf
                                 left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                                 INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
@@ -4015,9 +4017,9 @@
                     $sql="SELECT wf.id,
                             CONCAT( 
                             CONCAT(CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_materno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2)))) 
-                            ,'&rarr;', 
+                            ,' &rarr; ', 
                             IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
-                            ,'&rarr;', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
                             FROM mos_workflow_documentos AS wf
                             left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
@@ -4028,7 +4030,7 @@
                     $sql="SELECT wf.id,
                             CONCAT( 
                             IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_materno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2)))) ,'N/A')
-                            ,'&rarr;', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
+                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) ) as wf
                             FROM mos_workflow_documentos AS wf
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp

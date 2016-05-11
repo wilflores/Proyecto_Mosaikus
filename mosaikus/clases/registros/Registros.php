@@ -1879,6 +1879,12 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=> 'Vigencia'));
                             array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>  htmlentities($value[Nombre], ENT_QUOTES, "UTF-8")));
                             break;
+                        case '14':
+                                $ancho = 5;                                                            
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro('Personas en Cargo', "pn$k", $parametros,'r_link_titulos')));            
+                                //$k++;
+                                break;
                         default :
                             array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>  htmlentities($value[Nombre], ENT_QUOTES, "UTF-8")));
                     }
@@ -1982,7 +1988,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
                                       
                                      <label >
-                                         <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                         <input  type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
                                      ' . $value[Nombre] . ' Personal </label>
                                  
                            </div>';
@@ -2372,7 +2378,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
                                       
                                      <label >
-                                         <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                         <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
                                      ' . $value[Nombre] . ' Personal </label>
                                  
                            </div>';

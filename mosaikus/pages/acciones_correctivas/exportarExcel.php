@@ -37,7 +37,7 @@
             <tr>
                 <td style="border: 0px solid #ddd;"><b style="font-size: 18px;">Acciones Correctivas</b><br/></td>
                 <td colspan="3" style="border: 0px solid #ddd;">&nbsp;</td>
-                <td style="border: 0px solid #ddd;"><img class="img-responsive" src="<?php echo PATH_TO_IMG . 'logo_empresa/11_logo_empresa_report.png'; ?>"></td>
+                <td style="border: 0px solid #ddd;"><img class="img-responsive" src="<?php echo PATH_TO_IMG . 'logo_empresa/'.$_SESSION[CookIdEmpresa].'_logo_empresa_report.png'; ?>"></td>
             </tr>
             <tr>
                 <td style="border: 0px solid #ddd;">Fecha: <?php echo date('d/m/Y'); ?></td>

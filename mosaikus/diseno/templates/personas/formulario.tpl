@@ -13,7 +13,7 @@
                                     <div class="form-group col-xs-8">
                                         <label for="id_personal" class="">{N_ID_PERSONAL}</label>
                                         <input type="checkbox" style="display: none;" name="interno" id="interno" value="1" {CHECKED_INTERNO}>                                         
-                                        <input type="text" onblur="fomatear_rut(this.value);" value="{ID_PERSONAL}" class="form-control" id="id_personal" name="id_personal" placeholder="{P_ID_PERSONAL}" data-validation="required rut"/>
+                                        <input type="text"value="{ID_PERSONAL}" class="form-control" id="id_personal" name="id_personal" placeholder="{P_ID_PERSONAL}" data-validation="required"/>  <!--onblur="fomatear_rut(this.value);"-->
                                     </div>    
                                     <div class="form-group col-xs-{COL_NOM}">
                                         <label for="nombres" class="">{N_NOMBRES}</label>                                        
@@ -77,13 +77,13 @@
                                                 <input type="radio" id="extranjero" value="NO" id="extranjero" name="extranjero" {CHECKED_EXT_NO}> No
                                             </label>                                                        
                                             </div>
-                                        </div>-->
+                                        </div>
                                     <div class="checkbox">
                                         <label>
                                             <input type="checkbox" name="extranjero" value="SI" id="extranjero" {CHECKED_EXT_SI}>
                                             {N_EXTRANJERO}
                                         </label>
-                                    </div>
+                                    </div>-->
                                     <div class="checkbox">
                                         <label>
                                             <input type="checkbox" name="vigencia" id="vigencia" value="S" {CHECKED_VIGENCIA}>
@@ -152,6 +152,12 @@
                                     </div>   
                                 </div>
                         </div>
+                        <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" name="responsable_area" value="S" id="responsable_area" {CHECKED_RESP_SI}>
+                                            {N_RESPONSABLE_AREA}
+                                        </label>
+                                    </div>
 
                                                 <input type="hidden" class="form-control" id="id_organizacion" name="id_organizacion" value="{ID_ORGANIZACION}" placeholder="Id Organizacion"  data-validation="required"/>
                                 

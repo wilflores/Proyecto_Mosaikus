@@ -14,7 +14,7 @@
                         </div>
                         
                         <div class="panel-actions col-xs-14" style=" height: 40px;">
-                        <!--
+                        
                             <ul class="navbar">                                       
                                 <li>
                                     <a href="#"  onClick="exportarExcel();">
@@ -29,10 +29,12 @@
                                     </a>
                                 </li>                                  
                             </ul>
-                        -->
+                        
                             <form id="busquedaFrm" > 
                                 <input id="b-id_proceso" name="b-id_proceso" type="hidden"/>
                                 <input id="b-id_organizacion" name="b-id_organizacion" type="hidden"/>
+                                <input type="hidden" name="cod_link" id="cod_link" value="{COD_LINK}"/>
+                                <input type="hidden" name="modo" id="modo" value="{MODO}"/>
                             </form>
                         </div>
                         

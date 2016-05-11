@@ -73,6 +73,12 @@
                                           <input type="checkbox" name="SelectAcc" id="SelectAcc" value="17" class="checkbox-mos-col" checked="checked">   &nbsp;
                                       {N_APROBO}</label>
                                   </div>
+                                  
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="18" class="checkbox-mos-col" >   &nbsp;
+                                      {N_RESPONSABLE_AREA}</label>
+                                  </div>
                            
                            
                                   <div class="checkbox" {DISPLAY_FECHA_INGRESO}>      

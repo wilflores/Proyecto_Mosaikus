@@ -787,6 +787,92 @@
                 return $objResponse;
             }
             
+            public function indexParametrosInspecciones($parametros)
+            {
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                
+                if ($parametros['corder'] == null) $parametros['corder']="espanol";
+                if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
+                if ($parametros['mostrar-col'] == null) 
+                    $parametros['mostrar-col']="2-3-4-5-6"; 
+                /*if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                } */               
+                $k = 19;
+                $contenido[PARAMETROS_OTROS] = "";
+                $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
+                foreach ($this->parametros as $value) {                    
+                    $parametros['mostrar-col'] .= "-$k";
+                    $contenido[PARAMETROS_OTROS] .= '<div class="form-group">
+                                  <label for="SelectAcc" class="col-md-9 control-label">' . $value[espanol] . '</label>
+                                  <div class="col-md-3">      
+                                      <label class="checkbox-inline">
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                      </label>
+                                  </div>
+                            </div>';
+                    $k++;
+                }
+                $parametros['b-cod_categoria'] = $_SESSION[cod_categoria] = 14;
+                //print_r($parametros);
+                $grid = $this->verListaParametros($parametros);
+                $contenido['CORDER'] = $parametros['corder'];
+                $contenido['SORDER'] = $parametros['sorder'];
+                $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['OPCIONES_BUSQUEDA'] = " <option value='campo'>campo</option>";
+                $contenido['JS_NUEVO'] = 'nuevo_Parametros();';
+                $contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;Parametros';
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
+
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'parametros/';
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }  
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                } 
+                $template->setTemplate("busqueda");
+                $template->setVars($contenido);
+                $contenido['CAMPOS_BUSCAR'] = $template->show();
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'parametros/';
+
+                $template->setTemplate("mostrar_colums");
+                $template->setVars($contenido);
+                $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
+                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
+
+                $template->setTemplate("listar");
+                $template->setVars($contenido);
+                //$this->contenido['CONTENIDO']  = $template->show();
+                //$this->asigna_contenido($this->contenido);
+                //return $template->show();
+                if (isset($parametros['html']))
+                    return $template->show();
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('contenido',"innerHTML",$template->show());
+                $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
+                $objResponse->addAssign('modulo_actual',"value","parametros");
+                $objResponse->addIncludeScript(PATH_TO_JS . 'parametros/parametros.js?'.rand());
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                //$objResponse->addScript('PanelOperator.initPanels("");');
+                $objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
+                return $objResponse;
+            }
+            
             
             public function crear_campos_dinamicos($modulo,$id_registro=null,$col_lab=4,$col_cam=10){
                 if(!class_exists('Template')){
