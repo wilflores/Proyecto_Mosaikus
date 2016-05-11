@@ -262,7 +262,10 @@ class GenerarPDFReportes{
         //usando MFPDF
                 
         
-        
+        if (!file_exists("downloads/tmp_doc/".$ruta."/")) {
+	    	mkdir("downloads/tmp_doc/".$ruta."/", 0777);
+			chmod("downloads/tmp_doc/".$ruta."/", 0777);
+		}
         $path_to_pdf="downloads/tmp_doc/".$ruta."/".$filename.".pdf";
         $formato = "";
 

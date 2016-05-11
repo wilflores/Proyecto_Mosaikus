@@ -11,8 +11,8 @@
                 <div class="row">
                     <div class="panel-title col-xs-18">
                         Árbol Organizacional<br/>
-                        <span class="small">Fecha: {FECHA}</span><br/> <br/>
-                        <span class="small"></span>
+                        <span class="small">{AREA}</span><br/> 
+                        <span class="small">Fecha: {FECHA}</span>
                     </div>
                     <div class="col-xs-4 report-logo">
                         <img class="img-responsive" src="{HOME}/diseno/images/logo_empresa/{ID_EMPRESA}_logo_empresa_report.png">

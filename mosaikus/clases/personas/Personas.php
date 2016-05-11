@@ -116,6 +116,7 @@
                             ,extranjero
                             ,DATE_FORMAT(fecha_ingreso, '%d/%m/%Y') fecha_ingreso
                             ,DATE_FORMAT(fecha_egreso, '%d/%m/%Y') fecha_egreso
+                            ,responsable_area
                          FROM mos_personal p
                         LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo
                          WHERE cod_emp = $id "; 
@@ -184,10 +185,11 @@
                     }
                     else $atr[email] = "NULL";
                     
-                    $sql = "INSERT INTO mos_personal(cod_emp,id_personal,nombres,apellido_paterno,apellido_materno,genero,fecha_nacimiento,vigencia,interno,id_filial,id_organizacion,cod_cargo,workflow,email,relator,reviso,elaboro,aprobo,extranjero, fecha_ingreso, fecha_egreso)
+                    $sql = "INSERT INTO mos_personal(cod_emp,id_personal,nombres,apellido_paterno,apellido_materno,genero,fecha_nacimiento,vigencia,interno,id_filial,id_organizacion,cod_cargo,workflow,email,relator,reviso,elaboro,aprobo,extranjero, fecha_ingreso, fecha_egreso
+                        , responsable_area)
                             VALUES(
                                 $atr[cod_emp],'$atr[id_personal]','$atr[nombres]','$atr[apellido_paterno]','$atr[apellido_materno]','$atr[genero]',$atr[fecha_nacimiento],'$atr[vigencia]','$atr[interno]',$atr[id_filial],$atr[id_organizacion],$atr[cod_cargo],'$atr[workflow]',$atr[email],'$atr[relator]','$atr[reviso]','$atr[elaboro]','$atr[aprobo]','$atr[extranjero]'
-                                    ,$atr[fecha_ingreso],$atr[fecha_egreso]
+                                    ,$atr[fecha_ingreso],$atr[fecha_egreso],'$atr[responsable_area]'
                                 )";
                     $this->dbl->insert_update($sql);
                     
@@ -279,9 +281,11 @@
                         $atr[email] = "'$atr[email]'";                        
                     }
                     else $atr[email] = "NULL";
+                    //. ",extranjero = '$atr[extranjero]'
                     $sql = "UPDATE mos_personal SET                            
-                                    id_personal = '$atr[id_personal]',nombres = '$atr[nombres]',apellido_paterno = '$atr[apellido_paterno]',apellido_materno = '$atr[apellido_materno]',genero = '$atr[genero]',fecha_nacimiento = $atr[fecha_nacimiento],vigencia = '$atr[vigencia]',interno = '$atr[interno]',id_organizacion = $atr[id_organizacion],cod_cargo = $atr[cod_cargo],workflow = '$atr[workflow]',email = $atr[email],relator = '$atr[relator]',reviso = '$atr[reviso]',elaboro = '$atr[elaboro]',aprobo = '$atr[aprobo]',extranjero = '$atr[extranjero]'
+                                    id_personal = '$atr[id_personal]',nombres = '$atr[nombres]',apellido_paterno = '$atr[apellido_paterno]',apellido_materno = '$atr[apellido_materno]',genero = '$atr[genero]',fecha_nacimiento = $atr[fecha_nacimiento],vigencia = '$atr[vigencia]',interno = '$atr[interno]',id_organizacion = $atr[id_organizacion],cod_cargo = $atr[cod_cargo],workflow = '$atr[workflow]',email = $atr[email],relator = '$atr[relator]',reviso = '$atr[reviso]',elaboro = '$atr[elaboro]',aprobo = '$atr[aprobo]'                            
                                         ,fecha_ingreso=$atr[fecha_ingreso], fecha_egreso=$atr[fecha_egreso]
+                                        ,responsable_area = '$atr[responsable_area]'
                             WHERE  cod_emp = $atr[id]";    
                     $val = $this->verPersonas($atr[id]);
                     $this->dbl->insert_update($sql);
@@ -297,8 +301,9 @@
                     if ($atr[email] != 'NULL'){
                         $atr[email] = "\\" . substr($atr[email], 0, strlen($atr[email])-1)  . "\'";
                     }
-                    $nuevo = "Rut: \'$atr[id_personal]\',Nombres: \'$atr[nombres]\', Apellido Paterno: \'$atr[apellido_paterno]\', Apellido Materno: \'$atr[apellido_materno]\', Genero: \'$atr[genero]\', Fecha Nacimiento: $atr[fecha_nacimiento], Vigencia: \'$atr[vigencia]\', Interno: \'$atr[interno]\', Id Organizacion: $atr[id_organizacion], Cargo: $atr[cod_cargo], Workflow: \'$atr[workflow]\', Email: $atr[email], Relator: \'$atr[relator]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Extranjero: \'$atr[extranjero]\'";
-                    $anterior = "Rut: \'$val[id_personal]\',Nombres: \'$val[nombres]\', Apellido Paterno: \'$val[apellido_paterno]\', Apellido Materno: \'$val[apellido_materno]\', Genero: \'$val[genero]\', Fecha Nacimiento: \'$val[fecha_nacimiento]\', Vigencia: \'$val[vigencia]\', Interno: \'$val[interno]\', Id Organizacion: $val[id_organizacion], Cargo: $val[cod_cargo], Workflow: \'$val[workflow]\', Email: \'$val[email]\', Relator: \'$val[relator]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\', Extranjero: \'$val[extranjero]\'";
+                    /*Desactivado campo extranjero , Extranjero: \'$atr[extranjero]\'  , Extranjero: \'$val[extranjero]\'*/
+                    $nuevo = "Rut: \'$atr[id_personal]\',Nombres: \'$atr[nombres]\', Apellido Paterno: \'$atr[apellido_paterno]\', Apellido Materno: \'$atr[apellido_materno]\', Genero: \'$atr[genero]\', Fecha Nacimiento: $atr[fecha_nacimiento], Vigencia: \'$atr[vigencia]\', Interno: \'$atr[interno]\', Id Organizacion: $atr[id_organizacion], Cargo: $atr[cod_cargo], Workflow: \'$atr[workflow]\', Email: $atr[email], Relator: \'$atr[relator]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\'";
+                    $anterior = "Rut: \'$val[id_personal]\',Nombres: \'$val[nombres]\', Apellido Paterno: \'$val[apellido_paterno]\', Apellido Materno: \'$val[apellido_materno]\', Genero: \'$val[genero]\', Fecha Nacimiento: \'$val[fecha_nacimiento]\', Vigencia: \'$val[vigencia]\', Interno: \'$val[interno]\', Id Organizacion: $val[id_organizacion], Cargo: $val[cod_cargo], Workflow: \'$val[workflow]\', Email: \'$val[email]\', Relator: \'$val[relator]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\'";
                     $this->registraTransaccionLog(19,$nuevo,$anterior, '');
                     //$this->registraTransaccion('Modificar','Modifico el Personas ' . $atr[descripcion_ano], 'mos_personal');
                     return "'$atr[nombres] $atr[apellido_paterno]' ha sido actualizado con exito";
@@ -393,7 +398,9 @@
                     if (strlen($atr["b-aprobo"])>0)
                                 $sql .= " AND upper(aprobo) like '%" . strtoupper($atr["b-aprobo"]) . "%'";
                     if (strlen($atr["b-extranjero"])>0)
-                        $sql .= " AND upper(extranjero) like '%" . strtoupper($atr["b-extranjero"]) . "%'";
+                        $sql .= " AND upper(extranjero) like '%" . strtoupper($atr["b-extranjero"]) . "%'";        
+                    if (strlen($atr["b-responsable_area"])>0)
+                        $sql .= " AND upper(responsable_area) = '" . strtoupper($atr["b-responsable_area"]) . "'";
                     //if (count($this->id_org_acceso)>0)
                     {                            
                         $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
@@ -420,10 +427,11 @@
                                     ,id_filial                                                                                                            
                                     ,email
                                     ,CASE relator  when 'S' then 'Si' Else 'No' END relator
-                                    ,CASE reviso when 'S' then 'Si' Else 'No' END reviso
                                     ,CASE elaboro when 'S' then 'Si' Else 'No' END elaboro
+                                    ,CASE reviso when 'S' then 'Si' Else 'No' END reviso                                    
                                     ,CASE aprobo  when 'S' then 'Si' Else 'No' END aprobo
-                                    ,extranjero
+                                    ,CASE responsable_area  when 'S' then 'Si' Else 'No' END responsable_area
+                                    -- ,extranjero
                                     ,DATE_FORMAT(fecha_ingreso, '%d/%m/%Y') fecha_ingreso
                                     ,DATE_FORMAT(fecha_egreso, '%d/%m/%Y') fecha_egreso
                                     $sql_col_left
@@ -492,6 +500,8 @@
                                 $sql .= " AND upper(aprobo) like '%" . strtoupper($atr["b-aprobo"]) . "%'";
                     if (strlen($atr["b-extranjero"])>0)
                                 $sql .= " AND upper(extranjero) like '%" . strtoupper($atr["b-extranjero"]) . "%'";
+                    if (strlen($atr["b-responsable_area"])>0)
+                        $sql .= " AND upper(responsable_area) = '" . strtoupper($atr["b-responsable_area"]) . "'";
                     //if (count($this->id_org_acceso)>0)
                     {                            
                         $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
@@ -631,10 +641,12 @@
                
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[email], "email", $parametros)),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[relator], "relator", $parametros)),
-               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[reviso], "reviso", $parametros)),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[elaboro], "elaboro", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[reviso], "reviso", $parametros)),
+               
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[aprobo], "aprobo", $parametros)),
-               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[extranjero], "extranjero", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[responsable_area], "responsable_area", $parametros)),
+               //     array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[extranjero], "extranjero", $parametros)),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_ingreso], "fecha_ingreso", $parametros)),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_egreso], "fecha_egreso", $parametros))
                 );
@@ -795,10 +807,13 @@
                     array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($this->nombres_columnas[id_filial], ENT_QUOTES, "UTF-8"))),                                             
                     array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($this->nombres_columnas[email], ENT_QUOTES, "UTF-8"))),
                     array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($this->nombres_columnas[relator], ENT_QUOTES, "UTF-8"))),
-                    array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($this->nombres_columnas[reviso], ENT_QUOTES, "UTF-8"))),
                     array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($this->nombres_columnas[elaboro], ENT_QUOTES, "UTF-8"))),
+                    array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($this->nombres_columnas[reviso], ENT_QUOTES, "UTF-8"))),
+                    
                     array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($this->nombres_columnas[aprobo], ENT_QUOTES, "UTF-8"))),
-                    array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($this->nombres_columnas[extranjero], ENT_QUOTES, "UTF-8"))),
+                    
+                    array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($this->nombres_columnas[responsable_area], ENT_QUOTES, "UTF-8"))),
+                    //array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($this->nombres_columnas[extranjero], ENT_QUOTES, "UTF-8"))),
                      array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($this->nombres_columnas[fecha_ingreso], ENT_QUOTES, "UTF-8"))),
                      array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($this->nombres_columnas[fecha_egreso], ENT_QUOTES, "UTF-8"))),
               );
@@ -1170,6 +1185,7 @@
                     if (!isset($parametros[workflow])) $parametros[workflow] = 'N';
                     if (!isset($parametros[reviso])) $parametros[reviso] = 'N';
                     if (!isset($parametros[elaboro])) $parametros[elaboro] = 'N';
+                    if (!isset($parametros[responsable_area])) $parametros[responsable_area] = 'N';
                     $respuesta = $this->ingresarPersonas($parametros);
 
                     //if (preg_match("/ha sido ingresado con exito/",$respuesta ) == true) {
@@ -1329,6 +1345,7 @@
                 //$contenido_1['EXTRANJERO'] = ($val["extranjero"]);
                 $contenido_1[CHECKED_EXT_NO] = $val["extranjero"] == 'NO' ? 'checked="checked"' : '';
                 $contenido_1[CHECKED_EXT_SI] = $val["extranjero"] == 'SI' ? 'checked="checked"' : '';
+                $contenido_1[CHECKED_RESP_SI] = $val["responsable_area"] == 'S' ? 'checked="checked"' : '';
 
                 import('clases.organizacion.ArbolOrganizacional');
                 $ao = new ArbolOrganizacional();
@@ -1456,6 +1473,7 @@
                     if (!isset($parametros[workflow])) $parametros[workflow] = 'N';
                     if (!isset($parametros[reviso])) $parametros[reviso] = 'N';
                     if (!isset($parametros[elaboro])) $parametros[elaboro] = 'N';
+                    if (!isset($parametros[responsable_area])) $parametros[responsable_area] = 'N';
                     $respuesta = $this->modificarPersonas($parametros);
 
                     if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) 

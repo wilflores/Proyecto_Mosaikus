@@ -19,6 +19,7 @@
             $params['b-id_organizacion'] = $_GET['b-id_organizacion'];
             $params[cod_link] = $_GET[cod_link];
             $params[modo] = $_GET[modo];
+            $params[reg_por_pagina] = 5000;
             $pagina->cargar_acceso_nodos($params);
             $html = $pagina->verListaArbolProcesosReporte($params);
             //echo 1;

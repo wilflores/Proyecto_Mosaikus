@@ -127,6 +127,56 @@
                 return $num;                                
             }
             
+            public function ContarArbolProcesosReporte($atr){
+                    /*$atr = $this->dbl->corregir_parametros($atr);
+                    $sql_left = $sql_col_left = "";
+                     $sql = "select g.id g_id, g.title g,a.id a_id, a.title a,sa1.id sa1_id, sa1.title sa1,sa2.id sa2_id,sa2.title sa2 
+                        from mos_arbol_procesos g
+                                LEFT JOIN mos_arbol_procesos a on a.parent_id = g.id
+                                LEFT JOIN mos_arbol_procesos sa1 on sa1.parent_id =a.id
+                                LEFT JOIN mos_arbol_procesos sa2 on sa2.parent_id = sa1.id
+                                where g.parent_id = 2";
+//                    $sql .= " order by $atr[corder] $atr[sorder] ";
+//                    $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";*/
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $sql_left = $sql_col_left = $sql_order = $sql_where = "";
+                    $k = 1;                    
+                    for($k=2;$k<=$atr[niveles]+1;$k++) {
+                        if ($k==2){
+                            $sql_left .= "mos_arbol_procesos a$k ";  
+                            $sql_order = "a$k.id_organizacion,a$k.title";
+                            $sql_col_left .= ",a$k.id_organizacion id_1,a$k.id id_$k, a$k.title nombre_$k";   
+                            $sql_where .= " AND a$k.id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ") ";
+                            
+                        }
+                        else{
+                            $sql_left.= " LEFT JOIN mos_arbol_procesos a$k on a$k.parent_id = a".($k-1).".id   ";
+                            $sql_order .= ",a$k.title";
+                            $sql_col_left .= ",a$k.id id_$k, a$k.title nombre_$k";  
+                        }
+                                              
+                    }
+                    
+                    $id_org = -1;
+                    if ((strlen($atr["b-id_organizacion"])>0) && ($atr["b-id_organizacion"] != "2")){     
+                        if(!class_exists('ArbolOrganizacional')){
+                            import('clases.organizacion.ArbolOrganizacional');
+                        }
+                        
+                        $ao = new ArbolOrganizacional();
+                        $id_org = $ao->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
+                        $sql_where .= " AND a2.id_organizacion IN (". $id_org . ")";
+                    }
+                    
+                    
+                    $sql = "select COUNT(*) total_registros
+                        from $sql_left
+                                where NOT a2.id_organizacion IS NULL $sql_where ";   
+                    //echo $sql;
+                    $total_registros = $this->dbl->query($sql, $atr);
+                    return $total_registros[0][total_registros];  
+             }
+            
              public function listarArbolProcesosReporte($atr, $pag, $registros_x_pagina){
                     /*$atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
@@ -173,6 +223,7 @@
                         from $sql_left
                                 where NOT a2.id_organizacion IS NULL $sql_where "
                             . " ORDER BY $sql_order";
+                    $sql .= " LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                    //   echo $sql;
                     $this->operacion($sql, $atr);
              }
@@ -351,12 +402,13 @@
                 if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
                 
                 /*CALCULA EL NUMERO DE NIVELES DEL ARBOL*/
-                $out[niveles] = $niveles = $parametros[niveles] = $this->numeroNivelesHijos();
+                //$out[niveles] = $niveles = $parametros[niveles] = $this->numeroNivelesHijos();
+                $out[niveles] = $niveles = $parametros[niveles] = 2;
                 $out[titulo] = "";
                 if ($niveles == 2){
-                    $ancho_area = 50;
+                    $ancho_area = 35;
                 }
-                else $ancho_area = 40;
+                else $ancho_area = 30;
                 for($i=1;$i<=$niveles;$i++){
                     if ($i==1){
                         $out[titulo] .= "<th style=\"width: ".$ancho_area  . "%\" >&Aacute;rea</th>" ;                        
@@ -386,7 +438,7 @@
                 foreach ($data as $value) {
                     for($i=1;$i<=$niveles+1;$i++){
                         if ($value["id_$i"] != $id_aux[$i]){
-                            $ids[$id_aux[$i]] = $con_g[$i];
+                            $ids[$id_aux[$i].'-'.$i] = $con_g[$i];
                             $id_aux[$i] = $value["id_$i"];
                             $con_g[$i] = 1;
                         }
@@ -395,8 +447,9 @@
                     }                    
                 }
                 for($i=1;$i<=$niveles+1;$i++){                    
-                    $ids[$id_aux[$i]] = $con_g[$i];                        
+                    $ids[$id_aux[$i].'-'.$i] = $con_g[$i];                        
                 }  
+                //print_r($ids);
                 /*
                 $g_id = $a_id = $sa1_id = $sa2_id = array();
                 $g_id_aux = $data[0][g_id];
@@ -485,10 +538,17 @@
                             if ($value["id_$i"] != $id_aux[$i]){
                                 if ($i == 1){
                                     $nombre_area = $ao->BuscaOrganizacional(array('id_organizacion'=>$value[$i]));
-                                    $html .= '<td rowspan="'. $ids[$value["id_$i"]] .'">'.$nombre_area.'</td>';
+                                    if ($ids[$value["id_$i"].'-'.$i] > 0)
+                                        $html .= '<td rowspan="'. $ids[$value["id_$i"].'-'.$i] .'">'.$nombre_area.'</td>';
+                                    else
+                                        $html .= '<td>'.$value["nombre_$i"].'</td>';
                                 }                                    
-                                else                                        
-                                    $html .= '<td rowspan="'. $ids[$value["id_$i"]] .'">'.$value["nombre_$i"].'</td>';
+                                else{
+                                    if ($ids[$value["id_$i"].'-'.$i] > 0)
+                                        $html .= '<td rowspan="'. $ids[$value["id_$i"].'-'.$i] .'">'.$value["nombre_$i"].'</td>';
+                                    else
+                                        $html .= '<td>'.$value["nombre_$i"].'</td>';
+                                }
                                 $id_aux[$i] = $value["id_$i"];;
                             }
                         }
@@ -500,6 +560,7 @@
 
                      $html .= '</tr>';
                 }
+                //echo $html;
                 $out[tabla] = $html;
                 //$out['tabla']= $grid->armarTabla();
 //                if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina)){
@@ -591,7 +652,7 @@
                             </div>';
                     $k++;
                 }
-                $grid = $this->verListaArbolProcesos($parametros);
+                //$grid = $this->verListaArbolProcesos($parametros);
                 $contenido['MODO'] = $parametros['modo'];
                 $contenido['COD_LINK'] = $parametros['cod_link'];
                 $contenido['CORDER'] = $parametros['corder'];
@@ -683,6 +744,7 @@
                 if (count($this->id_org_acceso) <= 0){
                     $this->cargar_acceso_nodos($parametros);
                 }
+                $parametros[reg_por_pagina] = 5000;
                 $grid = $this->verListaArbolProcesosReporte($parametros);
                 $contenido['MODO'] = $parametros['modo'];
                 $contenido['COD_LINK'] = $parametros['cod_link'];
@@ -915,6 +977,8 @@
                 if (count($this->id_org_acceso) <= 0){
                     $this->cargar_acceso_nodos($parametros);
                 }
+                
+                $parametros[reg_por_pagina] = 5000;
                 $grid = $this->verListaArbolProcesosReporte($parametros);                
                 $html = '<table class="table table-report  ">
                       <thead>

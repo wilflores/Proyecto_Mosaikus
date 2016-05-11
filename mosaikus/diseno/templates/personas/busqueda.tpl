@@ -145,7 +145,7 @@
                             </div>                                                           
                                   <input type="hidden" value="1" id="b-interno" name="b-interno">                                                                                
                                                         
-                            <div class="form-group">                                                             
+                            <!--<div class="form-group">                                                             
                             
                                 <label for="extranjero" class="col-md-24 control-label">{N_EXTRANJERO}</label>
                             </div>
@@ -155,6 +155,19 @@
                                       
                                           <input type="radio" value="NO" id="b-extranjero" name="b-extranjero"> No &nbsp;
                                           <input type="radio" value="" id="b-extranjero" name="b-extranjero" checked="checked"> Todos
+                                      </label>
+                                <input type="hidden" id="b-id_organizacion" name="b-id_organizacion"/>
+                            </div>-->
+                            <div class="form-group">                                                             
+                            
+                                <label for="extranjero" class="col-md-24 control-label">{N_RESPONSABLE_AREA}</label>
+                            </div>
+                            <div class="form-group">                                    
+                                    <label class="checkbox-inline" style="padding-top: 0px;">
+                                        <input type="radio" value="S" id="b-responsable_area" name="b-responsable_area"> Si &nbsp;
+                                      
+                                          <input type="radio" value="N" id="b-responsable_area" name="b-responsable_area"> No &nbsp;
+                                          <input type="radio" value="" id="b-responsable_area" name="b-responsable_area" checked="checked"> Todos
                                       </label>
                                 <input type="hidden" id="b-id_organizacion" name="b-id_organizacion"/>
                             </div>
