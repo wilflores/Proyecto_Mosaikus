@@ -853,21 +853,19 @@
                 //echo $cant;
                 foreach ($datos as $value) {
                     $html .='<li id=noti'.$value[id].' '.$styleul.'>';
+                    $html .= "<div  align='right'><a id='cerrar".$value[id]."' title='cerrar notificacion' style='
+                        color: #000;font-family: impact; font-size: 23px;text-shadow:   -1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff;' 
+                        onclick='LeerNotificacionesMenu(".$value[id].");' href='#'>&#215;</a></div>";
+                    if($value[funcion]!='')
+                        $html .= "<a onclick='".$value[funcion]."' href='#'>";
                     $html .= '<strong>'.($i+1).'-'.$value[asunto].'&nbsp;['.$value[fecha].']</strong><br>';
                     $html .= "<span id='cuerpo_".$value[id]."'>";
-                    if (strlen($value[cuerpo])<8000){
-                        $html .= $value[cuerpo];
-                        if($value[funcion]!='')
-                            $html .= "<a onclick='".$value[funcion]."' href='#'><u>Click para ver WF</u></a>";
+                    $html .= '<br>'.$value[cuerpo];
                         //$html .= "<a onclick=\"document.getElementById('cuerpo_".$value[id]."').innerHTML='".$value[cuerpo]."';LeerNotificacionesMenu(".$value[id].");\" href='#'>";
-                        $html .= "<br><a id='marcarleido".$value[id]."' onclick='LeerNotificacionesMenu(".$value[id].");this.innerHTML=\"\";'; href='#'>";
-                        $html .= "<strong>(Marcar como leido)</strong></a>";                        
-                    }
-                    else{
-                        $html .= substr($value[cuerpo], 0, 80).'...';
-                        $html .= "<a onclick=\"document.getElementById('cuerpo_".$value[id]."').innerHTML='".$value[cuerpo]."';LeerNotificacionesMenu(".$value[id].");\" href='#'>";
-                        $html .= "<strong>(Leer m&aacute;s)</strong></a>";
-                    }
+                    if($value[funcion]!='')
+                        $html .= "</a>";
+                        //$html .= "<br><a id='marcarleido".$value[id]."' onclick='LeerNotificacionesMenu(".$value[id].");this.innerHTML=\"\";'; href='#'>";
+                        //$html .= "<strong>(Marcar como leido)</strong></a>";                        
                     $html .= '</span>';
                     $html .='</li>';
                     $i++;
