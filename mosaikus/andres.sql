@@ -184,14 +184,14 @@ CREATE TABLE `mos_notificaciones` (
 ) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8;
 
 
-INSERT INTO `mos_nombres_campos` VALUES ('338', 'id', 'id', '24', 'id');
-INSERT INTO `mos_nombres_campos` VALUES ('339', 'fecha', 'fecha', '24', 'fecha');
-INSERT INTO `mos_nombres_campos` VALUES ('340', 'email', 'email', '24', 'email');
-INSERT INTO `mos_nombres_campos` VALUES ('341', 'asunto', 'asunto', '24', 'asunto');
-INSERT INTO `mos_nombres_campos` VALUES ('342', 'cuerpo', 'cuerpo', '24', 'cuerpo');
-INSERT INTO `mos_nombres_campos` VALUES ('343', 'fecha_leido', 'fecha_leido', '24', 'fecha_leido');
-INSERT INTO `mos_nombres_campos` VALUES ('344', 'modulo', 'modulo', '24', 'modulo');
-INSERT INTO `mos_nombres_campos` VALUES ('345', 'fecha_alerta', 'fecha_alerta', '24', 'fecha_alerta');
+INSERT INTO `mos_nombres_campos`(nombre_campo, texto, modulo, placeholder) VALUES ('id', 'id', '24', 'id');
+INSERT INTO `mos_nombres_campos`(nombre_campo, texto, modulo, placeholder) VALUES ('fecha', 'fecha', '24', 'fecha');
+INSERT INTO `mos_nombres_campos`(nombre_campo, texto, modulo, placeholder) VALUES ('email', 'email', '24', 'email');
+INSERT INTO `mos_nombres_campos`(nombre_campo, texto, modulo, placeholder) VALUES ('asunto', 'asunto', '24', 'asunto');
+INSERT INTO `mos_nombres_campos`(nombre_campo, texto, modulo, placeholder) VALUES ('cuerpo', 'cuerpo', '24', 'cuerpo');
+INSERT INTO `mos_nombres_campos`(nombre_campo, texto, modulo, placeholder) VALUES ('fecha_leido', 'fecha_leido', '24', 'fecha_leido');
+INSERT INTO `mos_nombres_campos`(nombre_campo, texto, modulo, placeholder) VALUES ('modulo', 'modulo', '24', 'modulo');
+INSERT INTO `mos_nombres_campos`(nombre_campo, texto, modulo, placeholder) VALUES ('fecha_alerta', 'fecha_alerta', '24', 'fecha_alerta');
 
 
 INSERT INTO `mos_link` VALUES ('85', 'Notificaciones-indexNotificaciones-clases.notificaciones.Notificaciones', 'Notificaciones', '10', '2', 'notificaciones.php', '75', 'configuracion.png');

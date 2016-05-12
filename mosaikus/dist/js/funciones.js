@@ -1374,7 +1374,8 @@ function getForm (frm){
         array = new XArray();
         array.setObjeto('Notificaciones','VerNotificacionesMenu');
         array.addParametro('import','clases.notificaciones.Notificaciones');
-        xajax_Loading(array.getArray());
+        xajax_Loading(array.getArray());        
+        $('#messages').css('margin-left',($('.status-bar').width()-300)+'px')
     }
     function LeerNotificacionesMenu(id){
         array = new XArray();

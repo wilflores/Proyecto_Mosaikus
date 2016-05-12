@@ -299,3 +299,58 @@ UPDATE `mos_link` SET `nombre_link`='Perfiles Portal' WHERE (`cod_link`='81');
 ALTER TABLE `mos_documentos`
 MODIFY COLUMN `observacion`  text NULL AFTER `id_usuario`;
 
+/*atributo responsable area*/
+
+ALTER TABLE `mos_personal`
+ADD COLUMN `responsable_area`  varchar(2) NULL DEFAULT 'N' AFTER `cod_contratista`;
+
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('responsable_area', 'Responsable de Área', '1');
+UPDATE `mos_nombres_campos` SET `texto`='ID', `placeholder`='Nº Documento de Identidad' WHERE (`id`='1');
+
+/*Dar permiso a un area a un usuario segun perfil */
+
+CREATE TRIGGER `permisos_perfil_usuarios` AFTER INSERT ON `mos_organizacion`
+FOR EACH ROW INSERT into mos_usuario_estructura(id_usuario_filial,id_estructura, id_usuario,cod_perfil,portal)
+select id_usuario_filial,NEW.id,id_usuario,cod_perfil,portal from mos_usuario_estructura 
+where id_estructura = NEW.parent_id;;
+
+
+
+/**/
+-- Cambios nuevos para inspecciones
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('descripcion_larga', 'Descripción Larga', '22', 'Descripción Larga')
+
+ALTER TABLE `mos_parametro_det`
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`cod_parametro_det`);
+
+ALTER TABLE `mos_parametro_det` DROP FOREIGN KEY `mos_parametro_det_ibfk_1`;
+
+ALTER TABLE `mos_parametro_det`
+DROP INDEX `Ind04`,
+DROP INDEX `Ind02`,
+DROP INDEX `Ind03`,
+DROP INDEX `Ind01`,
+DROP INDEX `Ind05`;
+
+ALTER TABLE `mos_acciones_correctivas`
+ADD COLUMN `responsable_desvio`  int NULL AFTER `fecha_cambia_estado`;
+
+
+rename table mos_acciones_evidencia TO mos_acciones_trazabilidad;
+
+insert into mos_acciones_evidencia(fk_id_trazabilidad, nomb_archivo,archivo,contenttype)
+select id, nomb_archivo, archivo, contenttype from mos_acciones_trazabilidad where LENGTH(archivo) > 0;
+
+/*Ejecutar solo en mosaikus_admin*/
+
+DROP VIEW IF EXISTS `mos_admin_usuarios`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `mos_admin_usuarios` AS select `santateresa`.`mos_usuario`.`email` AS `email`,`santateresa`.`mos_usuario`.`password_1` AS `password_1`,concat(`santateresa`.`mos_usuario`.`nombres`,' ',`santateresa`.`mos_usuario`.`apellido_paterno`) AS `nombres`,11 AS `id_empresa`,`santateresa`.`mos_usuario`.`id_usuario` AS `id_usuario` from `santateresa`.`mos_usuario`;
+/* fin */
+
+
+
+INSERT INTO `mos_link` (`descripcion`, `nombre_link`) VALUES ('Parametros-indexParametrosInspecciones-clases.parametros.Parametros', 'Parametros de Inspecciones');
+UPDATE `mos_link` SET `dependencia`='83' WHERE (`cod_link`='0');
+UPDATE `mos_link` SET `cod_link`='86' WHERE (`cod_link`='0');
+

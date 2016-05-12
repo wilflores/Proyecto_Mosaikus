@@ -28,7 +28,7 @@
 </head>
 <script type="text/javascript">
 //setTimeout(function(){ MostrarNotificacionesEmergente(); }, 5000);
-setInterval("MostrarNotificacionesEmergente()",10000)
+setInterval("MostrarNotificacionesEmergente()",90000)
 MostrarNotificacionesEmergente();
 document.addEventListener('DOMContentLoaded', function () 
 {
@@ -129,14 +129,14 @@ function notifyBrowser(title,desc,url)
 
                 </a>
             </div>
-            <div class="notifications">
+            <div class="notifications"><!---->
               <a id="notificaciones" onclick="VerNotificacionesMenu();" class="noti-icon" data-toggle="collapse" href="#messages">
                 <span id="cantidad_notificaciones"></span>
               </a>
                 <div  id="messages" class="popover bottom">
                   <div class="arrow"></div>
                   <div class="popover-content" id="div-notificaciones" style="overflow: auto;" >
-                    <ul class="" id="popover-notificaciones">
+                    <ul class="" id="popover-notificaciones">                        
                         <!--AQUI SE CARGAN LAS NOTIFICACIONES-->
                     </ul>
                   </div>

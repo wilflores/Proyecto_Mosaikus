@@ -5776,11 +5776,12 @@ button.close {
   border-bottom-color: #000; }
 
 .popover {
-  position: absolute;
+   position: absolute;
   top: 0;
   left: 0;
   z-index: 1060;
   display: none;
+  min-width: 300px;
   max-width: 300px;
   padding: 1px;
   font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -5870,7 +5871,7 @@ button.close {
     border-right-color: #eeeeee; }
 
 .popover.bottom > .arrow {
-  left: 50%;
+  left: 90%;
   margin-left: -11px;
   border-top-width: 0;
   border-bottom-color: #999999;
@@ -8901,8 +8902,8 @@ body {
       padding-right: 6px;
       padding-top: 8px; }
     .status-bar .notifications .popover.bottom {
-      margin-left: -94px;
-      margin-top: 50px;
+      margin-left: 120px;
+      margin-top: 60px;
       font-size: 0.9em; }
       .status-bar .notifications .popover.bottom ul {
         width: 100%;

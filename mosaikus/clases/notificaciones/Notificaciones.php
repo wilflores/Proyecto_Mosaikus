@@ -853,14 +853,15 @@
                 //echo $cant;
                 foreach ($datos as $value) {
                     $html .='<li id=noti'.$value[id].' '.$styleul.'>';
-                    $html .= "<div  align='right'><a id='cerrar".$value[id]."' title='cerrar notificacion' style='
+                    $html .= "<div  align='right' style='float:right;margin-top: -8px;'><a id='cerrar".$value[id]."' title='cerrar notificacion' style='
                         color: #000;font-family: impact; font-size: 23px;text-shadow:   -1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff;' 
                         onclick='LeerNotificacionesMenu(".$value[id].");' href='#'>&#215;</a></div>";
                     if($value[funcion]!='')
                         $html .= "<a onclick='".$value[funcion]."' href='#'>";
                     $html .= '<strong>'.($i+1).'-'.$value[asunto].'&nbsp;['.$value[fecha].']</strong><br>';
                     $html .= "<span id='cuerpo_".$value[id]."'>";
-                    $html .= '<br>'.$value[cuerpo];
+                    //$html .= '<br>'.$value[cuerpo];
+                    $html .= ''.$value[cuerpo];
                         //$html .= "<a onclick=\"document.getElementById('cuerpo_".$value[id]."').innerHTML='".$value[cuerpo]."';LeerNotificacionesMenu(".$value[id].");\" href='#'>";
                     if($value[funcion]!='')
                         $html .= "</a>";
