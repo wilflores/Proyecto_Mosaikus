@@ -3049,6 +3049,7 @@
                             left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
+                    $contenido_1["N_ELABORO"] .= ' &#8594;';
                 }
                 else
                 {
@@ -3060,6 +3061,7 @@
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
                     WHERE wf.id_personal_responsable='".$_SESSION['CookCodEmp']."'";
+                    $contenido_1["N_ELABORO"] = '';
                     
                 }
                 //echo $sql;
@@ -3434,6 +3436,7 @@
                                 left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                                 left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                                 INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
+                        $contenido_1["N_ELABORO"] .= ' &#8594;';
                     }
                     else
                     {
@@ -3445,7 +3448,7 @@
                                 left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                                 INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
                         WHERE wf.id_personal_responsable='".$_SESSION['CookCodEmp']."'";
-
+                        $contenido_1["N_ELABORO"] = ' ';
                     }
                     //echo $sql;
                     $contenido_1['ID_WORKFLOW_DOCUMENTO'] = $ut_tool->OptionsCombo($sql
@@ -4024,6 +4027,7 @@
                             left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
+                    $contenido_1["N_ELABORO"] .= ' &#8594;';
                 }
                 else
                 {
@@ -4035,6 +4039,7 @@
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
                     WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."' or wf.id_personal_revisa='".$_SESSION['CookCodEmp']."')";
+                    $contenido_1["N_ELABORO"] = ' ';
                     
                 }
                 //echo $sql;
