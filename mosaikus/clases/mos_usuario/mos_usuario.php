@@ -903,13 +903,14 @@
                 return $objResponse;
                 
             }
+            
             public function indexmos_usuario($parametros)
             {
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
                 $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
-                if ($parametros['corder'] == null) $parametros['corder']="nombres";
+                if ($parametros['corder'] == null) $parametros['corder']="id_usuario";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
                     $parametros['mostrar-col']="1-2-8-9-11"; 
@@ -1332,7 +1333,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
     public function eliminarHuerfanoEstrustura(){
             $atr=array();
             $sql = "SELECT DISTINCT mue.id_usuario_filial FROM mos_usuario_estructura AS mue
-                RIGHT JOIN mos_usuario_filial AS muf ON mue.id_usuario = muf.id_usuario AND mue.cod_perfil = muf.cod_perfil
+                RIGHT JOIN mos_usuario_filial AS muf ON mue.id_usuario = muf.id_usuario AND (mue.cod_perfil = muf.cod_perfil OR mue.cod_perfil = muf.cod_perfil_portal)
                 WHERE mue.id_usuario IS NOT NULL
                 ";  
             $this->operacion($sql, $atr);             
@@ -1382,6 +1383,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
            }
     } 
 
+    
     
     public function ingresarPerfilesEstructura($atr){
         try {  
@@ -1448,6 +1450,70 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
                 return $error; 
             }
     }    
+
+
+   public function obtenerPerfilesActuales($parametros){
+        $atr=array();
+        $sql = "SELECT * FROM mos_usuario_filial WHERE id_usuario = $parametros[id_usuario]";
+        $this->operacion($sql, $atr);          
+        return $this->dbl->data;
+          
+   }
+
+    public function administrarPerfilesNuevos($parametros, $perfiles_actuales){
+        $atr=array();
+        import("clases.organizacion.ArbolOrganizacional");       
+        $organizacion = new ArbolOrganizacional;        
+        $sql = "SELECT id_organizacion FROM mos_personal
+                WHERE (SELECT SUBSTRING_INDEX(email, '@', -1)) = (SELECT SUBSTRING_INDEX(email, '@', -1) FROM mos_usuario WHERE id_usuario = $parametros[id_usuario])
+        ";
+        $this->operacion($sql, $atr);        
+        
+        $nodos = explode(",",$organizacion->BuscaOrgNivelHijos($this->dbl->data[0]["id_organizacion"]));        
+        $nodos_esp = explode(",", $parametros[nodos]);
+        $nodos_portal = explode(",", $parametros[nodosportal]);
+
+        foreach($perfiles_actuales as $act){
+            for($i=0;$i<count($nodos_esp);$i++){
+                if($act[cod_perfil] == $nodos_esp[$i]){                    
+                    unset($nodos_esp[$i]);
+                    $nodos_esp = array_values($nodos_esp);
+                    break;
+                }
+            }
+            for($i=0;$i<count($nodos_portal);$i++){
+                if($act[cod_perfil_portal] == $nodos_portal[$i]){                    
+                    unset($nodos_portal[$i]);
+                    $nodos_portal = array_values($nodos_portal);
+                    break;
+                }
+            }          
+        }
+        $params[id_usuario] = $parametros[id_usuario];
+        foreach($nodos_esp as $temp){            
+             $params[cod_perfil] = $temp;
+             $sql ="SELECT * FROM mos_usuario_filial WHERE id_usuario = $params[id_usuario] AND cod_perfil = $params[cod_perfil];";
+             $this->operacion($sql, $atr);
+            $params[id_filial] = $this->dbl->data[0][id];           
+             foreach($nodos as $est){
+                $params[id_estructura] = $est; 
+                //print_r($params);
+                $this->ingresarPerfilesEstructura($params);
+             }
+        }     
+        //echo("\n");
+        foreach($nodos_portal as $temp){            
+             $params[cod_perfil] = $temp;
+             $sql ="SELECT * FROM mos_usuario_filial WHERE id_usuario = $params[id_usuario] AND cod_perfil_portal = $params[cod_perfil];";
+             $this->operacion($sql, $atr);
+            $params[id_filial] = $this->dbl->data[0][id];           
+             foreach($nodos as $est){
+                $params[id_estructura] = $est; 
+                //print_r($params);
+                $this->ingresarPerfilesEstructuraPortal($params);
+             }
+        }                        
+   }
     
    public function cargarConfiguracion($parametros)
    {       
@@ -1468,6 +1534,8 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
             $arr = explode(",", $parametros[nodos]);
             $arrportal = explode(",", $parametros[nodosportal]);
             
+            $perfiles_actuales = $this->obtenerPerfilesActuales($parametros);
+            
             $params[id_usuario] = $parametros[id_usuario];
             $params[id_filial] = $_SESSION[CookFilial]; 
              
@@ -1484,8 +1552,10 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
                  if($params[cod_perfil]!="")
                  $respuesta = $this->ingresarPerfilesPortalUsuario($params);
             }
-            
             $this->eliminarHuerfanoEstrustura();
+            $this->administrarPerfilesNuevos($parametros,$perfiles_actuales);
+            
+            
             $objResponse->addScriptCall("MostrarContenido");
             $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
        }
@@ -1493,8 +1563,9 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
        $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
                                $( '#btn-guardar' ).prop( 'disabled', false );");
        return $objResponse;
-   }    
-
+   }  
+   
+   
    public function cargarConfiguracionPerfiles($parametros)
    {   
        
