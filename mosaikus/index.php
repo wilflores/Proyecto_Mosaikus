@@ -54,6 +54,7 @@
                         $parametros['import'] = $datos_clase[2];
                         $parametros['objeto'] = $datos_clase[0];
                         $parametros['metodo'] = $datos_clase[1];
+                        $_SESSION[ParamAdic] = $datos_clase[3];
                         $parametros['nombre_modulo'] = $datos[nombre_link];                        
                         $parametros['cod_link'] = $datos[cod_link]; 
                         $parametros['modo'] = 'Especialista'; 
