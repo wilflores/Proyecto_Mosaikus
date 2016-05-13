@@ -107,6 +107,7 @@
 //			$_SESSION[Usuario]=$Fila["loginDB"];
 //			$_SESSION[Pwd]=$Fila["passwordDB"];
 			$EnDecryptText = new EnDecryptText();
+                        $_SESSION[ParamAdic]='';
 			$_SESSION[BaseDato] = $EnDecryptText->Encrypt_Text($Fila["db"]);
 			$_SESSION[LoginBD] = $EnDecryptText->Encrypt_Text($Fila["loginDB"]);
 			$_SESSION[PwdBD] = $EnDecryptText->Encrypt_Text($Fila["passwordDB"]);
