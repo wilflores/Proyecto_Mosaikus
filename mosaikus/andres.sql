@@ -195,3 +195,17 @@ INSERT INTO `mos_nombres_campos`(nombre_campo, texto, modulo, placeholder) VALUE
 
 
 INSERT INTO `mos_link` VALUES ('85', 'Notificaciones-indexNotificaciones-clases.notificaciones.Notificaciones', 'Notificaciones', '10', '2', 'notificaciones.php', '75', 'configuracion.png');
+
+/****************************************/
+/*cambio del 13-05*/
+/****************************************/
+
+INSERT INTO `mos_parametro_categoria` VALUES ('15', 'Formularios', 'Formularios', 'S');
+
+INSERT INTO `mos_link` VALUES ('86', 'Documentos-indexDocumentos-clases.documentos.Documentos-formulario', 'Administrador de Formularios', '3', '2', 'mos_documentos.php', '12', 'documental.png');
+INSERT INTO `mos_link` VALUES ('87', 'Parametros-indexParametros-clases.parametros.Parametros-formulario', 'Parámetros de Formularios', '3', '2', '', '13', 'documental.png');
+
+update mos_link
+set descripcion='Documentos-indexDocumentosFormulario-clases.documentos.Documentos-formulario'
+where cod_link=16
+
