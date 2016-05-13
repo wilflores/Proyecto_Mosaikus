@@ -9,7 +9,7 @@
             session_start();
             //$_SESSION['USERID'] = 1;
             
-            putenv("PAGINACION=10");// NUMERO UTILIZADO PARA LA PAGINACION
+            putenv("PAGINACION=25");// NUMERO UTILIZADO PARA LA PAGINACION
             include('clases/clases.php');
             include_once('configuracion/import.php');            
             if(isset($_POST['usuario_id']))

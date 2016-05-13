@@ -985,6 +985,7 @@ public function EnviarEMail($NombreFrom,$para,$asunto,$cuerpo,$adjuntos=array(),
       //$mail->Username   = CORREO_SALIENTE; //"saludmedioambienteseguridad.chile@masisa.com" ;  // GMAIL username
       //$mail->Password   = CONTRASENA_CORREO_SALIENTE;// "masisa.2014";            // GMAIL password      
       $mail->SetFrom('notificacion@mosaikus.com', $NombreFrom);
+      $mail->CharSet = 'UTF-8';
       //$mail->AddReplyTo('name@yourdomain.com', 'First Last');
       $mail->Subject = $asunto;
       $mail->AltBody = 'To view the message, please use an HTML compatible email viewer!'; // optional - MsgHTML will create an alternate automatically

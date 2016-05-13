@@ -893,7 +893,7 @@
                 }
                 if($cant==0){
                         $html .='<li id=vermas>';
-                        $html .= "NO HAY NOTIFICACIONES" ;
+                        $html .= "NO HAY NUEVAS NOTIFICACIONES" ;
                         $html .='</li>';
                         $heightdiv=150;
 

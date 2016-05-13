@@ -317,6 +317,62 @@ where id_estructura = NEW.parent_id;;
 
 
 /**/
+
+/* CAMBIOS WF DOCUMENTOS*/
+DROP TRIGGER `registra_mos_historico_wf_documentos`;
+
+DROP TRIGGER `registra_mos_historico_wf_documentos_cambio`;
+
+DELIMITER ;;
+
+CREATE TRIGGER `registra_mos_historico_wf_documentos` AFTER INSERT ON `mos_documentos`
+FOR EACH ROW BEGIN
+/*guarda historico al insertar un doc*/
+         DECLARE etapa text;  
+			IF(NEW.id_workflow_documento is not null)THEN
+				set etapa= (SELECT
+				IFNULL(mos_nombres_campos.texto,'')
+				FROM
+				mos_nombres_campos
+				WHERE
+				mos_nombres_campos.modulo = 6 AND
+				mos_nombres_campos.nombre_campo = NEW.etapa_workflow);
+
+        INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+				VALUES (NEW.IDDoc,CONCAT('CREADO:  ',IFNULL(NEW.estado_workflow,''),' ',etapa ),NEW.id_usuario_workflow);
+			END IF;
+END;
+
+;;
+DELIMITER ;
+
+DELIMITER ;;
+
+CREATE TRIGGER `registra_mos_historico_wf_documentos_cambio` BEFORE UPDATE ON `mos_documentos`
+FOR EACH ROW BEGIN
+/*guarda historico al modificar un doc si cambian los datos del wf*/
+        DECLARE etapa text;  
+				set etapa= (SELECT
+				IFNULL(mos_nombres_campos.texto,'')
+				FROM
+				mos_nombres_campos
+				WHERE
+				mos_nombres_campos.modulo = 6 AND
+				mos_nombres_campos.nombre_campo = NEW.etapa_workflow);
+
+			IF((NEW.etapa_workflow<>OLD.etapa_workflow) or (NEW.estado_workflow<>OLD.estado_workflow)) THEN
+        INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+				VALUES (NEW.IDDoc,CONCAT('ESTADO:',NEW.estado_workflow,' ',IFNULL(NEW.observacion_rechazo,''),',cambió a ',etapa),NEW.id_usuario_workflow);
+			END IF;
+			IF(OLD.etapa_workflow is Null and NEW.etapa_workflow<>'') THEN
+        INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+				VALUES (NEW.IDDoc,CONCAT('ESTADO:',NEW.estado_workflow,' ',IFNULL(NEW.observacion_rechazo,''),',cambió a ',etapa),NEW.id_usuario_workflow);
+			END IF;
+END;
+
+;;
+DELIMITER ;
+/*FIN CAMBIOS*/
 -- Cambios nuevos para inspecciones
 INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('descripcion_larga', 'Descripción Larga', '22', 'Descripción Larga')
 

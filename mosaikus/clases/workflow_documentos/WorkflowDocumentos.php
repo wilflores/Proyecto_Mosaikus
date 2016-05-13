@@ -671,21 +671,21 @@
                 
                 $contenido_1[ID_PERSONAL_RESPONSABLE] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
-                                                                        (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
+                                                                        (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
                                                                             FROM mos_personal p WHERE interno = 1 and elaboro = 'S'
                                                                             AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                 $contenido_1[ID_PERSONAL_REVISA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
-                                                                        (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
+                                                                        (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
                                                                             FROM mos_personal p WHERE interno = 1 and reviso = 'S'
                                                                             AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                 $contenido_1[ID_PERSONAL_APRUEBA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
-                                                                        (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
+                                                                        (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
                                                                             FROM mos_personal p WHERE interno = 1 and aprobo = 'S'
                                                                             AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
                                                                     , 'cod_emp'
@@ -785,19 +785,19 @@
                 }    
                 $contenido_1[ID_PERSONAL_RESPONSABLE] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
-                                                                        (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
+                                                                        (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
                                                                             FROM mos_personal p WHERE interno = 1 and elaboro = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val["id_personal_responsable"]);
                 $contenido_1[ID_PERSONAL_REVISA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
-                                                                        (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
+                                                                        (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
                                                                             FROM mos_personal p WHERE interno = 1 and reviso = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val["id_personal_revisa"]);
                 $contenido_1[ID_PERSONAL_APRUEBA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
-                                                                        (case when email<>'' and email is not null then CONCAT('=>',email) else '' end) )  nombres
+                                                                        (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
                                                                             FROM mos_personal p WHERE interno = 1 and aprobo = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val["id_personal_aprueba"]);

@@ -115,8 +115,8 @@
           });           
     }
     function AsignaCorreo(combo,correo){
-        if($("#"+combo).select2('data').text.split("=>")[1])
-            $("#"+correo).val($("#"+combo).select2('data').text.split("=>")[1]);
+        if($("#"+combo).select2('data').text.split(" → ")[1])
+            $("#"+correo).val($("#"+combo).select2('data').text.split(" → ")[1]);
         else
             $("#"+correo).val('');
     }

@@ -229,6 +229,8 @@ function cargar_autocompletado(){
             array.setObjeto('Documentos','crear_revision');
             array.addParametro('id',id);
             array.addParametro('import','clases.documentos.Documentos');
+            array.addParametro('modo',document.getElementById('modo').value);
+            array.addParametro('cod_link',document.getElementById('cod_link').value);
             xajax_Loading(array.getArray());
     }
     
