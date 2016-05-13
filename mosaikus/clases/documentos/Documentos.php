@@ -341,8 +341,8 @@
                 //echo     $this->nivel_area;
             }
             
-            private function cargar_parametros(){
-                $sql = "SELECT cod_parametro, espanol FROM mos_parametro WHERE cod_categoria = '1' AND vigencia = 'S' ORDER BY cod_parametro";
+            private function cargar_parametros($modulo){
+                $sql = "SELECT cod_parametro, espanol FROM mos_parametro WHERE cod_categoria = '$modulo' AND vigencia = 'S' ORDER BY cod_parametro";
                 $this->parametros = $this->dbl->query($sql, array());
             }
             
@@ -1312,7 +1312,7 @@
                     $atr[doc_fisico] = $archivo;
                     $atr[doc_visualiza] = $doc_ver;    
                     $sql_doc_fisico ='';
-                    if (strlen($atr[doc_fisico])>= 0){
+                    if (strlen($atr[doc_fisico])> 0){
                         $sql_doc_fisico .= ",doc_fisico = '$atr[doc_fisico]', contentType = '$atr[contentType]'";
                                          
                     }                    
@@ -1442,11 +1442,19 @@
         
              public function listarDocumentos($atr, $pag, $registros_x_pagina){
                  // HABILIYAR LA COLUMNA ESYAD0
-                   // print_r($atr);
+                    //print_r($atr);
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
+                    if($atr[formulario]=='S') {
+                        $modulo = 15;
+                        $campo_formulario=',formulario ';
+                    }
+                    else{
+                        $modulo = 1;
+                        $campo_formulario=',formulario ';
+                    }                       
                     if (count($this->parametros) <= 0){
-                        $this->cargar_parametros();
+                        $this->cargar_parametros($modulo);
                     }                    
                     $k = 1;                    
                     foreach ($this->parametros as $value) {
@@ -1482,7 +1490,11 @@
                             $sql_left
                                 $filtro_ao
                             WHERE muestra_doc='S' " ;                    
-                                                                                                                
+                            if($atr[formulario]=='S')
+                                $sql .= " and formulario = 'S'";
+                            else
+                                $sql .= " and formulario = 'N' ";
+                                                                                                              
                             if(($_SESSION[SuperUser]!='S')&&(isset($atr[terceros]))){
                                 $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
                                 $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
@@ -1562,8 +1574,8 @@
                                 $sql .= " AND upper(descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
                     if (strlen($atr["b-palabras_claves"])>0)
                                 $sql .= " AND upper(palabras_claves) like '%" . strtoupper($atr["b-palabras_claves"]) . "%'";
-                    if (strlen($atr["b-formulario"])>0)
-                                $sql .= " AND upper(formulario) like '%" . strtoupper($atr["b-formulario"]) . "%'";
+//                    if (strlen($atr["b-formulario"])>0)
+//                                $sql .= " AND upper(formulario) like '%" . strtoupper($atr["b-formulario"]) . "%'";
                     if (strlen($atr["b-vigencia"])>0)
                         $sql .= " AND (d.vigencia) = '" . ($atr["b-vigencia"]) . "'";
 //                    if (strlen($atr["b-publico"])>0){
@@ -1643,7 +1655,7 @@
                                     ,CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno), ' ', initcap(p.apellido_materno))  elaboro
                                     ,CONCAT(initcap(re.nombres), ' ', initcap(re.apellido_paterno), ' ', initcap(re.apellido_materno)) reviso                                    
                                     ,CONCAT(initcap(ap.nombres), ' ', initcap(ap.apellido_paterno), ' ', initcap(ap.apellido_materno)) aprobo
-                                    ,formulario
+                                    $campo_formulario
                                     ,v_meses                                    
                                     ,version
                                     ,DATE_FORMAT(fecha, '%d/%m/%Y') fecha                                    
@@ -1681,6 +1693,11 @@
                             $sql_left
                                 $filtro_ao
                             WHERE muestra_doc='S' ";
+                            if($atr[formulario]=='S')
+                                $sql .= " and formulario = 'S'";
+                            else
+                                $sql .= " and formulario = 'N' ";
+                    
                             if(($_SESSION[SuperUser]!='S')&&(isset($atr[terceros]))){
                                 $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
                                 $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
@@ -1761,8 +1778,8 @@
                                 $sql .= " AND upper(descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
                     if (strlen($atr["b-palabras_claves"])>0)
                                 $sql .= " AND upper(palabras_claves) like '%" . strtoupper($atr["b-palabras_claves"]) . "%'";
-                    if (strlen($atr["b-formulario"])>0)
-                                $sql .= " AND upper(formulario) like '%" . strtoupper($atr["b-formulario"]) . "%'";
+//                    if (strlen($atr["b-formulario"])>0)
+//                                $sql .= " AND upper(formulario) like '%" . strtoupper($atr["b-formulario"]) . "%'";
                     if (strlen($atr["b-vigencia"])>0)
                         $sql .= " AND (d.vigencia) = '" . ($atr["b-vigencia"]) . "'";
 //                    if (strlen($atr["b-publico"])>0){
@@ -1839,7 +1856,7 @@
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //print_r(array_keys($this->id_org_acceso));
                     //print_r($atr);
-                    //  echo $sql;
+                     // echo $sql;
                     $this->operacion($sql, $atr);
              }
              
@@ -1992,6 +2009,16 @@
              }
  
      public function verListaDocumentos($parametros){
+         //print_r($parametros);
+                if($_SESSION[ParamAdic]=='formulario') {
+                    $parametros['formulario']='S';
+                    $modulo=15;
+                    $muestra_col_formulario="display:;";
+                }
+                else{
+                    $modulo=1;
+                    $muestra_col_formulario="display:none";
+                }
                 $grid= "";
                 $grid= new DataGrid();
                 if ($parametros['pag'] == null) 
@@ -2018,7 +2045,7 @@
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[contentType], "contentType", $parametros)),               
                array( "width"=>"5%","ValorEtiqueta"=>"Visor de Google"),  
                array( "width"=>"3%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[contentType_visualiza], "contentType_visualiza", $parametros)),
-                
+                //"style"=>$muestra_col_formulario,
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[elaboro], "elaboro", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[reviso], "reviso", $parametros)),               
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[aprobo], "aprobo", $parametros)),
@@ -2058,7 +2085,7 @@
                
                 );
                 if (count($this->parametros) <= 0){
-                        $this->cargar_parametros();
+                        $this->cargar_parametros($modulo);
                 }
                 $k = 1;
                 foreach ($this->parametros as $value) {                    
@@ -2111,7 +2138,7 @@
                             break;
                     }
                 }
-                
+                //if($modulo==1) $grid->hidden[12] = true;
                 $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
                 //$grid->setFuncion("semaforo", "semaforo");
                 $grid->setParent($this);
@@ -2144,6 +2171,7 @@
          
         
             public function verListaDocumentosReporte($parametros){
+                if($_SESSION[ParamAdic]=='formulario') $parametros['formulario']='S';
                 $grid= "";
                 $grid= new DataGrid();
                 if ($parametros['pag'] == null) 
@@ -2209,7 +2237,7 @@
                
                 );
                 if (count($this->parametros) <= 0){
-                        $this->cargar_parametros();
+                        $this->cargar_parametros(15);
                 }
                 $k = 1;
                 foreach ($this->parametros as $value) {                    
@@ -2356,8 +2384,14 @@
 
                 $columna_funcion =10;
            // $grid->hidden = array(0 => true);
+                if($_SESSION[ParamAdic]=='formulario') {
+                    $modulo=15;
+                }
+                else{
+                    $modulo=1;
+                }                
            if (count($this->parametros) <= 0){
-                        $this->cargar_parametros();
+                        $this->cargar_parametros($modulo);
                 }
                 $k = 1;
                 foreach ($this->parametros as $value) {                    
@@ -2417,15 +2451,27 @@
  
             public function indexDocumentos($parametros)
             { //print_r($parametros);
+            
+                //echo  $_SESSION[ParamAdic];
+                if($_SESSION[ParamAdic]=='formulario') {
+                    $parametros['formulario']='S';
+                    $modulo = 15;
+                }
+                else{
+                    $modulo = 1;
+                }
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
                 if ($parametros['corder'] == null) $parametros['corder']="dias_vig";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="2-3-4-5-7-8-9-12-14-17-20-21";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
+                    if($modulo == 15)
+                        $parametros['mostrar-col']="2-3-4-5-7-8-9-12-14-17-20-21";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
+                    else
+                        $parametros['mostrar-col']="2-3-4-5-7-8-9-14-17-20-21";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
                 if (count($this->parametros) <= 0){
-                        $this->cargar_parametros();
+                        $this->cargar_parametros($modulo);
                 }
                 $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
                 $contenido[TITULO_MODULO] .= '<br><label class="checkbox-inline"> 
@@ -2627,7 +2673,7 @@
                 if ($parametros['mostrar-col'] == null) 
                     $parametros['mostrar-col']="2-4-5-6-12-14-17-20";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
                 if (count($this->parametros) <= 0){
-                        $this->cargar_parametros();
+                        $this->cargar_parametros(15);
                 }
                 $k = 30;
                 $contenido[PARAMETROS_OTROS] = "";
@@ -2726,9 +2772,9 @@
                 $objResponse->addAssign('modulo_actual',"value","documentos");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'documentos/documentos_reporte_reg.js?'.  rand());
                 $objResponse->addScript("$('#MustraCargando').hide();");            
-                if (($parametros['b-formulario'])=='S'){
-                    $objResponse->addScript("$('#b-formulario').prop('checked',true);");
-                }
+//                if (($parametros['b-formulario'])=='S'){
+//                    $objResponse->addScript("$('#b-formulario').prop('checked',true);");
+//                }
                 //$objResponse->addScript('setTimeout(function(){ init_documentos(); }, 500);');
                 //$objResponse->addScript('setTimeout(function(){ init_tabla_reporte(); }, 500);');
                 /* JS init_documentos()*/
@@ -2748,9 +2794,9 @@
                                         $("#b-fecha-hasta").datepicker();
                                         $("#b-fecha_rev-desde").datepicker();
                                         $("#b-fecha_rev-hasta").datepicker();
-                                        if(($("#b-formulario").is(":checked"))) {
-                                            $("#b-formulario").parent().parent().hide();
-                                        }
+//                                        if(($("#b-formulario").is(":checked"))) {
+//                                            $("#b-formulario").parent().parent().hide();
+//                                        }
 
                                         PanelOperator.initPanels("");
                                         ScrollBar.initScroll();
@@ -2824,7 +2870,7 @@
                 if ($parametros['mostrar-col'] == null) 
                     $parametros['mostrar-col']="2-4-5-14-17-20";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
                 if (count($this->parametros) <= 0){
-                        $this->cargar_parametros();
+                        $this->cargar_parametros(1);
                 }
                 $k = 30;
                 $contenido[PARAMETROS_OTROS] = "";
@@ -2918,9 +2964,9 @@
                 $objResponse->addAssign('modulo_actual',"value","documentos");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'documentos/documentos_reporte.js?'.  rand());
                 $objResponse->addScript("$('#MustraCargando').hide();");            
-                if (($parametros['b-formulario'])=='S'){
-                    $objResponse->addScript("$('#b-formulario').prop('checked',true);");
-                }
+//                if (($parametros['b-formulario'])=='S'){
+//                    $objResponse->addScript("$('#b-formulario').prop('checked',true);");
+//                }
                 /* JS init_documentos() */
                 $objResponse->addScript('$( "#b-reviso" ).select2({
                                                 placeholder: "Selecione el revisor",
@@ -2938,9 +2984,9 @@
                                             $("#b-fecha-hasta").datepicker();
                                             $("#b-fecha_rev-desde").datepicker();
                                             $("#b-fecha_rev-hasta").datepicker();
-                                            if(($("#b-formulario").is(":checked"))) {
-                                                $("#b-formulario").parent().parent().hide();
-                                            }
+//                                            if(($("#b-formulario").is(":checked"))) {
+//                                                $("#b-formulario").parent().parent().hide();
+//                                            }
 
                                             PanelOperator.initPanels("");
                                             ScrollBar.initScroll();
@@ -2987,7 +3033,12 @@
                 import('clases.organizacion.ArbolOrganizacional');
                 $ao = new ArbolOrganizacional();
                 $parametros[opcion] = 'simple';
-                
+                if($_SESSION[ParamAdic]=='formulario') {
+                    $modulo = 15;
+                }
+                else{
+                    $modulo = 1;
+                }                
                 
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
@@ -3073,7 +3124,11 @@
                     import("clases.parametros.Parametros");
                 }
                 $campos_dinamicos = new Parametros();
-                $array = $campos_dinamicos->crear_campos_dinamicos(1,null,6,14);
+                if($_SESSION[ParamAdic]=='formulario') 
+                    $array = $campos_dinamicos->crear_campos_dinamicos(15,null,6,14);
+                else
+                    $array = $campos_dinamicos->crear_campos_dinamicos(1,null,6,14);
+                    
                 $contenido_1[OTROS_CAMPOS] = $array[html];
                 $js = $array[js];
 //                if (count($this->parametros) <= 0){
@@ -3132,6 +3187,10 @@
                 $objResponse->addScript("$('#fecha').datepicker();");
                 $objResponse->addScript("$('#tabs-hv-2').tab();"
                         . "$('#tabs-hv-2 a:first').tab('show');");
+                if($_SESSION[ParamAdic]!='formulario')
+                {
+                    $objResponse->addScript("$($('#tabs-hv-2').find('#li2')).hide();");
+                }
                 $objResponse->addScript($js);
                 return $objResponse;
             }
@@ -3644,6 +3703,17 @@
                                 break;
                             }
                     }
+
+                    if($parametros[formulario]=='N' && $_SESSION[ParamAdic]=='formulario'){
+                        $objResponse->addScriptCall('VerMensaje','error','Debe agregar al menos un Parámetros para Indexación de Registros');
+                        $objResponse->addScript("$('#MustraCargando').hide();"); 
+                        $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                        $( '#btn-guardar' ).prop( 'disabled', false );
+                        $('#btn-guardar-not' ).html('Guardar y Notificar');
+                        $( '#btn-guardar-not' ).prop( 'disabled', false );");                        
+                        return $objResponse;
+                    }
+                    
                     if($parametros["id_workflow_documento"]!=''){
                         import("clases.workflow_documentos.WorkflowDocumentos");
                         $wf = new WorkflowDocumentos();
@@ -3666,13 +3736,14 @@
                             $this->cargar_nombres_columnas();
                             $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                             if($correowf[email]!='' && $correowf[recibe_notificaciones]=='S'){
-                                $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
-                               // $correowf[email] = 'azambrano75@gmail.com';
-                                $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
-                                $ut_tool = new ut_Tool();
-                                //SE ENVIA EL CORREO
-                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
-                            }
+                               $cuerpo = 'Sr(a). ' .$correowf[apellido_paterno].' '.$correowf[nombres] . '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br>';
+                               $asunto = 'Documento '. $etapa . ': ' . $parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT);
+                              // $correowf[email] = 'azambrano75@gmail.com';
+                               $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
+                               $ut_tool = new ut_Tool();
+                               //SE ENVIA EL CORREO
+                               $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), $asunto, $cuerpo);
+                           }
                             //SE CARGA LA NOTIFICACION
                                 import('clases.notificaciones.Notificaciones');
                                 $noti = new Notificaciones();
@@ -3691,7 +3762,11 @@
                             import("clases.parametros.Parametros");
                         }
                         $campos_dinamicos = new Parametros();
-                        $campos_dinamicos->guardar_parametros_dinamicos($parametros, 1);
+                        if($_SESSION[ParamAdic]=='formulario') 
+                            $campos_dinamicos->guardar_parametros_dinamicos($parametros, 15);
+                        else
+                            $campos_dinamicos->guardar_parametros_dinamicos($parametros, 1);
+                        
                         
                         $arr = explode(",", $parametros[nodos]);
 
@@ -3828,12 +3903,17 @@
                   //  print_r($parametros);
                     $respuesta = $this->ingresarDocumentosVersion($parametros,$archivo,$doc_vis);
                    // echo($respuesta);
-                        
+                    if($_SESSION[ParamAdic]=='formulario') {
+                        $modulo = 15;
+                    }
+                    else{
+                        $modulo = 1;
+                    }       
                     
                     //if (preg_match("/ha sido ingresado con exito/",$respuesta ) == true) {
                     if (strlen($respuesta ) < 10 ) {
                         if (count($this->parametros) <= 0){
-                            $this->cargar_parametros();
+                            $this->cargar_parametros($modulo);
                         }                                                                
                         foreach ($this->parametros as $value) {                    
                             $params[cod_parametro_det] = $parametros["cmb-".$value[cod_parametro]];
@@ -4081,7 +4161,12 @@
                     import("clases.parametros.Parametros");
                 }
                 $campos_dinamicos = new Parametros();
-                $array = $campos_dinamicos->crear_campos_dinamicos(1,$val[IDDoc],6,14);
+                if($_SESSION[ParamAdic]=='formulario') 
+                    $array = $campos_dinamicos->crear_campos_dinamicos(15,$val[IDDoc],6,14);
+                else
+                    $array = $campos_dinamicos->crear_campos_dinamicos(1,$val[IDDoc],6,14);
+                
+                
                 $contenido_1[OTROS_CAMPOS] = $array[html];
                 $js_din = $array[js];
                 $template = new Template();
@@ -4322,6 +4407,11 @@
                 $objResponse->addScript('ao_multiple();');
                 $objResponse->addScript("$('#tabs-hv-2').tab();"
                         . "$('#tabs-hv-2 a:first').tab('show');");
+                if($_SESSION[ParamAdic]!='formulario')
+                {
+                    $objResponse->addScript("$($('#tabs-hv-2').find('#li2')).hide();");
+                }
+                //echo $_SESSION[ParamAdic];
                 $objResponse->addScript("$js");
                 $objResponse->addScript("$jswf");
                 $objResponse->addScript("$js_din");
@@ -4440,13 +4530,14 @@
                            // print_r($correowf);
                             $this->cargar_nombres_columnas();
                             $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
-                            if($correowf[email]!=''&& $correowf[recibe_notificaciones]=='S'){
-                                $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
-                               // $correowf[email] = 'azambrano75@gmail.com';
-                                $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
-                                $ut_tool = new ut_Tool();
-                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
-                            }
+                             if($correowf[email]!=''&& $correowf[recibe_notificaciones]=='S'){
+                               $cuerpo = 'Sr(a). ' .$correowf[apellido_paterno].' '.$correowf[nombres] . '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br>';
+                               $asunto = 'Documento '. $etapa . ': ' . $parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT);
+                              // $correowf[email] = 'azambrano75@gmail.com';
+                               $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
+                               $ut_tool = new ut_Tool();
+                               $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), $asunto, $cuerpo);
+                           }
                             //SE CARGA LA NOTIFICACION
                                 import('clases.notificaciones.Notificaciones');
                                 $noti = new Notificaciones();
@@ -4485,7 +4576,12 @@
                             import("clases.parametros.Parametros");
                         }
                         $campos_dinamicos = new Parametros();
-                        $campos_dinamicos->guardar_parametros_dinamicos($parametros, 1);
+                        if($_SESSION[ParamAdic]=='formulario') 
+                            $campos_dinamicos->guardar_parametros_dinamicos($parametros, 15);
+                        else
+                            $campos_dinamicos->guardar_parametros_dinamicos($parametros, 1);
+                        
+                        
                         if (strlen($parametros[id_unico_del])>0){
                             $parametros[id_unico_del] = substr($parametros[id_unico_del], 0, strlen($parametros[id_unico_del]) - 1);
                             $sql = "DELETE FROM mos_documentos_datos_formulario WHERE id_unico IN ($parametros[id_unico_del]) "
@@ -4810,7 +4906,7 @@
                 $item_histo .='<table class=table table-striped table-condensed  width=100%>';
                     $item_histo .="<thead><tr>";
                     $item_histo .="<th>Fecha</th>";
-                    $item_histo .="<th>Operacion</th>";
+                    $item_histo .="<th>Operaci&oacute;n</th>";
                     $item_histo .="<th>Usuario</th>";
                     $item_histo .="</tr></thead>";
                 foreach ($historia as $value) {
@@ -4956,16 +5052,16 @@
                 $ruta_doc = $documento->ActivarDocumento();
                 
                 $html = '<div style="height:700px;" class="content-panel panel">
-                <div class="content">
-                  <div class="row" style="height:700px;">
-                        <iframe src="http://docs.google.com/gview?url='.$ruta_doc.'&embedded=true" style="height:90%;width:100%;" frameborder="0"></iframe>
-                  </div>
+               <div class="content">
+                 <div class="row" style="height:700px;">
+                       <iframe src="'.$http.'://docs.google.com/gview?url='.$ruta_doc.'&embedded=true" style="height:90%;width:100%;" frameborder="0"></iframe>
+                 </div>
 
-                </div>
-              </div>';
-                /**/
-               
-               $contenido_1['DOCFUENTE']=$html;
+               </div>
+             </div>';
+               /**/
+              
+              $contenido_1['DOCFUENTE']=$html;
                $contenido_1['PAGINA_VOLVER'] = "listarDocumentos.php";
                
                $contenido_1['TITULO_FORMULARIO'] =$val["Codigo_doc"].'-'.$val["nombre_doc"].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT). '<br>Flujo de Trabajo "'.$this->nombres_columnas[$val[etapa_workflow]].'"-'.$val[estado_workflow].' por '.$persona_pendiente;
@@ -5096,14 +5192,28 @@
                         $this->cargar_nombres_columnas();
                         $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                         //echo $correowf[email];
-                        if($correowf[email]!=''){
-                            $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
+                        //if($correowf[email]!='')
+                        {
+                            
+                            $cuerpo = 'Sr(a). ' .$correowf[apellido_paterno].' '.$correowf[nombres] . '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br><br>';
+                            $asunto = 'Documento '. $etapa . ': ' . $val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
                            // $correowf[email] = 'azambrano75@gmail.com';
                             $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                             //echo $cuerpo;
                         }
-                        if($correowf[estado_workflow]=='RECHAZADO'){
+                        if($correowf[etapa_workflow]=='estado_pendiente_aprobacion' && $correowf[estado_workflow]=='OK') {                            
+                            if($correowf[recibe_notificaciones]=='S'){
+                                $from = array(array('correo' => $correowf[email], 'nombres'=>$nombres));                                
+                            }                            
+                            if($correowf[recibe_notificaciones_responsable]=='S'){
+                                $cc = array(array('correo' => $correowf[email_responsable], 'nombres'=>$correowf[nombre_responsable]));
+                            }
+                            if(sizeof($from)>0 || sizeof($cc)>0)
+                                    $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array(),$cc); 
+                        }
+                        else if($correowf[estado_workflow]=='RECHAZADO'){
                             $cuerpo .= 'Rechazado por:<br><span style="color:red">'.$correowf[observacion_rechazo].'</span>';
+                            $asunto = 'Documento RECHAZADO: ' . $val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
                             //echo $_SESSION[CookEmail].' '.$correowf[email_aprueba].' '.$correowf[recibe_notificaciones_revisa].' '.$correowf[recibe_notificaciones_responsable];
                             if($_SESSION[CookEmail]==$correowf[email_aprueba]){
                                 if($correowf[recibe_notificaciones_revisa]=='S'){
@@ -5115,9 +5225,10 @@
                                     //$from = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_responsable]));
                                 }
                                 if(sizeof($from)>0 || sizeof($cc)>0)
-                                    $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, 'Notificaciones de Flujo de Trabajo', $cuerpo, array(),$cc);                                
+                                    $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array(),$cc);                                
                             }            
                         }
+                        
 
                         //SE CARGA LA NOTIFICACION
                             import('clases.notificaciones.Notificaciones');
@@ -5145,6 +5256,8 @@
                                         $contenido   = array();
                                         $contenido['ELABORADOR']=$correowf[nombre_responsable];
                                         $contenido['DOCUMENTO']=$val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                                        $asunto = 'Documento Publicado: ' . $val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                                        
                                         $template = new Template();
                                         $template->PATH = PATH_TO_TEMPLATES.'documentos/';
                                         $template->setTemplate("cuerpo_notificacion");
@@ -5161,7 +5274,7 @@
                                             //$from = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_responsable]));
                                         }
                                         if(sizeof($from)>0 || sizeof($cc)>0)
-                                            $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, 'Notificaciones de Flujo de Trabajo', $cuerpo, array(),$cc);                                
+                                            $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array(),$cc);                                
                                         $atr[asunto]='Tiene un documento Aprobado';
                                     }
                             
