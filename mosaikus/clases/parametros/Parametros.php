@@ -44,10 +44,60 @@
                 
             }
 
+            public function ArmaSqlParamsDinamicos($cod_categoria,$k,$parametros,$id ){
+                $sql_left = $sql_col_left = "";
+               // print_r($parametros);
+                foreach ($parametros as $value) {
+                    switch ($value[tipo]) {
+                        case '2':
+                            $sql_left .= " LEFT JOIN mos_parametro_modulos p$k on p$k.cod_categoria = $cod_categoria AND $id=p$k.id_registro and p$k.cod_parametro=$value[cod_parametro]"; 
+                            $sql_col_left .= ",p$k.descripcion p$k ";
+                            break;
+                        case '3':
+                            $sql_left .= " LEFT JOIN mos_parametro_modulos p$k on p$k.cod_categoria = $cod_categoria AND $id=p$k.id_registro and p$k.cod_parametro=$value[cod_parametro]"; 
+                            $sql_col_left .= ",p$k.descripcion p$k ";
+                            break;
+                        case '1'://Combo
+                            $sql_col_left .= ",p$k.nom_detalle p$k ";
+                            $sql_left .= " LEFT JOIN(select t1.id_registro, t2.descripcion as nom_detalle from mos_parametro_modulos t1
+                                    inner join mos_parametro_det t2 on t1.cod_categoria=t2.cod_categoria and t1.cod_parametro=t2.cod_parametro and t1.cod_parametro_det=t2.cod_parametro_det
+                                where t1.cod_categoria=$cod_categoria and t1.cod_parametro='$value[cod_parametro]' ) AS p$k ON p$k.id_registro = $id "; 
+                            break;
+                        case '4':
+                            $sql_left .= " LEFT JOIN mos_parametro_modulos p$k on p$k.cod_categoria = $cod_categoria AND $id=p$k.id_registro and p$k.cod_parametro=$value[cod_parametro] "
+                                . " left join mos_personal per$k on per$k.cod_emp = p$k.cod_parametro_det "; 
+                            $sql_col_left .= ",CONCAT(CONCAT(UPPER(LEFT(per$k.nombres, 1)), LOWER(SUBSTRING(per$k.nombres, 2))),' ', CONCAT(UPPER(LEFT(per$k.apellido_paterno, 1)), LOWER(SUBSTRING(per$k.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(per$k.apellido_materno, 1)), LOWER(SUBSTRING(per$k.apellido_materno, 2)))) as p$k ";
+                            break;
+                        case '5':
+                            $sql_left .= " LEFT JOIN mos_parametro_modulos p$k on p$k.cod_categoria = $cod_categoria AND $id=p$k.id_registro and p$k.cod_parametro=$value[cod_parametro]";                                     
+                            $sql_col_left .= ",CASE WHEN p$k.descripcion = '1' "
+                                    . "THEN 'Bueno' "
+                                    . "ELSE 'Malo' END p$k ";
+                            break;
+                        case '6':
+                            $sql_left .= " LEFT JOIN mos_parametro_modulos p$k on p$k.cod_categoria = $cod_categoria AND $id=p$k.id_registro and p$k.cod_parametro=$value[cod_parametro]"; 
+                            $sql_col_left .= ",p$k.descripcion p$k ";
+                            break;
+                        case '7':
+                            $sql_left .= " LEFT JOIN mos_parametro_modulos p$k on p$k.cod_categoria = $cod_categoria AND $id=p$k.id_registro and p$k.cod_parametro=$value[cod_parametro]"; 
+                            $sql_col_left .= ",p$k.descripcion p$k ";
+                            break;
+                        default:
+                            break;
+                    }
 
-     
+                $k++;
+                } 
+                $retorno = array();
+                $retorno[sql_left]=$sql_left;
+                $retorno[sql_col_left]=$sql_col_left;
+                $retorno[k]=$k;
+               // print_r($retorno);
+                return $retorno;
+            }
 
-             public function verParametros($id){
+
+            public function verParametros($id){
                 $atr=array();
                 $sql = "SELECT cod_categoria
                             ,cod_parametro
