@@ -84,10 +84,10 @@
                                     </label>                                        
                             </div>-->
                                   
-                            <div class="form-group" style="margin-bottom: 0px;">                                
+                            <!--div class="form-group" style="margin-bottom: 0px;">                                
                                 <label class="checkbox-inline"> 
                                     <input type="checkbox" id="b-formulario" name="b-formulario" value="S"> {N_FORMULARIO} </label>                                     
-                            </div>   
+                            </div-->   
                             <div class="form-group">                                                                
                                 <label class="checkbox-inline"> 
                                     <input type="checkbox" id="b-publico" name="b-publico" checked="checked" value="S"> Documento {N_PUBLICO} </label>  
