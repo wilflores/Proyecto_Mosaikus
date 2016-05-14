@@ -471,7 +471,10 @@
                             </div>';
                     $k++;
                 }
-                $parametros['b-cod_categoria'] = $_SESSION[cod_categoria] = 1;
+               $parametros['b-cod_categoria'] = $_SESSION[cod_categoria] = 1; 
+               if($_SESSION[ParamAdic]=='formulario'){
+                    $parametros['b-cod_categoria'] = $_SESSION[cod_categoria] = 15;
+               }
                 //print_r($parametros);
                 $grid = $this->verListaParametros($parametros);
                 $contenido['CORDER'] = $parametros['corder'];
