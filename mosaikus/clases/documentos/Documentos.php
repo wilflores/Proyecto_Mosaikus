@@ -341,8 +341,8 @@
                 //echo     $this->nivel_area;
             }
             
-            private function cargar_parametros($modulo){
-                $sql = "SELECT cod_parametro, espanol FROM mos_parametro WHERE cod_categoria = '$modulo' AND vigencia = 'S' ORDER BY cod_parametro";
+            private function cargar_parametros($cod_categoria){
+                $sql = "SELECT cod_parametro, espanol, tipo FROM mos_parametro WHERE cod_categoria = '$cod_categoria' AND vigencia = 'S' ORDER BY cod_parametro";
                 $this->parametros = $this->dbl->query($sql, array());
             }
             
@@ -1083,7 +1083,7 @@
                         $atr[cod_parametro_det] = 0;
                     $sql = "INSERT INTO mos_parametro_modulos(cod_categoria,cod_parametro,cod_parametro_det,id_registro,cod_categoria_aux)
                             VALUES(
-                                1,$atr[cod_parametro],$atr[cod_parametro_det],$atr[id_registro],1
+                                $atr[cod_categoria],$atr[cod_parametro],$atr[cod_parametro_det],$atr[id_registro],$atr[cod_categoria]
                                 )";
                     $this->dbl->insert_update($sql);
                     return "El mos_personal '$atr[descripcion_ano]' ha sido ingresado con exito";
@@ -1241,7 +1241,7 @@
                     $sql = "INSERT INTO mos_parametro_modulos(cod_categoria,cod_parametro,cod_parametro_det,id_registro,cod_categoria_aux)
                             SELECT cod_categoria,cod_parametro,cod_parametro_det,$atr[IDDoc],cod_categoria_aux
                             FROM mos_parametro_modulos
-                            WHERE id_registro = $atr[id] AND cod_categoria = 1 AND cod_categoria_aux = 1";
+                            WHERE id_registro = $atr[id] AND cod_categoria = $atr[cod_categoria] AND cod_categoria_aux = $atr[cod_categoria]";
                     $this->dbl->insert_update($sql);
                     $sql = "UPDATE mos_documentos_datos_formulario SET IDDoc = $atr[IDDoc]"
                             . " WHERE IDDoc = $atr[id] ";
@@ -1443,27 +1443,39 @@
              public function listarDocumentos($atr, $pag, $registros_x_pagina){
                  // HABILIYAR LA COLUMNA ESYAD0
                     //print_r($atr);
+                    if(!class_exists('Parametros')){
+                        import("clases.parametros.Parametros");
+                    }                 
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
                     if($atr[formulario]=='S') {
-                        $modulo = 15;
+                        $cod_categoria = 15;
                         $campo_formulario=',formulario ';
                     }
                     else{
-                        $modulo = 1;
+                        $cod_categoria = 1;
                         $campo_formulario=',formulario ';
                     }                       
                     if (count($this->parametros) <= 0){
-                        $this->cargar_parametros($modulo);
+                        $this->cargar_parametros($cod_categoria);
                     }                    
-                    $k = 1;                    
-                    foreach ($this->parametros as $value) {
-                        $sql_left .= " LEFT JOIN(select t1.id_registro, t2.descripcion as nom_detalle from mos_parametro_modulos t1
-                                inner join mos_parametro_det t2 on t1.cod_categoria=t2.cod_categoria and t1.cod_parametro=t2.cod_parametro and t1.cod_parametro_det=t2.cod_parametro_det
-                        where t1.cod_categoria='1' and t1.cod_parametro='$value[cod_parametro]' ) AS p$k ON p$k.id_registro = d.IDDoc "; 
-                        $sql_col_left .= ",p$k.nom_detalle p$k ";
-                        $k++;
-                    }
+                    $k = 1;
+
+                    $campos_dinamicos = new Parametros();
+                    $valores = $campos_dinamicos->ArmaSqlParamsDinamicos($cod_categoria,$k,$this->parametros,'d.IDDoc');
+                    $sql_left = $valores[sql_left];
+                    $sql_col_left = $valores[sql_col_left];
+                    $k = $valores[k];
+                    //$k = 1;
+                    //$sql_left = $sql_col_left = "";
+//                    foreach ($this->parametros as $value) {
+//                        $sql_left .= " LEFT JOIN(select t1.id_registro, t2.descripcion as nom_detalle from mos_parametro_modulos t1
+//                                inner join mos_parametro_det t2 on t1.cod_categoria=t2.cod_categoria and t1.cod_parametro=t2.cod_parametro and t1.cod_parametro_det=t2.cod_parametro_det
+//                        where t1.cod_categoria='$cod_categoria' and t1.cod_parametro='$value[cod_parametro]' ) AS p$k ON p$k.id_registro = d.IDDoc "; 
+//                        $sql_col_left .= ",p$k.nom_detalle p$k ";
+//                        $k++;
+//                    }
+                    //echo $sql_left;
                     $filtro_ao ='';
                     if ((strlen($atr["b-id_organizacion"])>0)){                             
                         //$id_org = $this->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
@@ -1856,7 +1868,7 @@
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //print_r(array_keys($this->id_org_acceso));
                     //print_r($atr);
-                     // echo $sql;
+                    // echo $sql;
                     $this->operacion($sql, $atr);
              }
              
@@ -1931,7 +1943,7 @@
                             $respuesta = $this->dbl->delete("mos_documentos_categoria", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_datos_formulario", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_estrorg_arbolproc", "IDDoc = " . $atr[id]);
-                            $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = 1 AND cod_categoria_aux = 1");                         
+                            $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = " . $atr[cod_categoria] . " AND cod_categoria_aux = " . $atr[cod_categoria] . "");                         
                             //$respuesta = $this->dbl->delete("mos_registro", "IDDoc = " . $atr[id]);
                         }
                         else{
@@ -1940,7 +1952,7 @@
                             $respuesta = $this->dbl->delete("mos_documento_revision", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documento_version", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_categoria", "IDDoc = " . $atr[id]);
-                            $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = 1 AND cod_categoria_aux = 1");
+                            $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = " . $atr[cod_categoria] . " AND cod_categoria_aux = " . $atr[cod_categoria] . "");
                             //$respuesta = $this->dbl->delete("mos_documentos_datos_formulario", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_estrorg_arbolproc", "IDDoc = " . $atr[id]);
                             //$respuesta = $this->dbl->delete("mos_registro", "IDDoc = " . $atr[id]);
@@ -2012,11 +2024,11 @@
          //print_r($parametros);
                 if($_SESSION[ParamAdic]=='formulario') {
                     $parametros['formulario']='S';
-                    $modulo=15;
+                    $cod_categoria=15;
                     $muestra_col_formulario="display:;";
                 }
                 else{
-                    $modulo=1;
+                    $cod_categoria=1;
                     $muestra_col_formulario="display:none";
                 }
                 $grid= "";
@@ -2085,7 +2097,7 @@
                
                 );
                 if (count($this->parametros) <= 0){
-                        $this->cargar_parametros($modulo);
+                        $this->cargar_parametros($cod_categoria);
                 }
                 $k = 1;
                 foreach ($this->parametros as $value) {                    
@@ -2385,13 +2397,13 @@
                 $columna_funcion =10;
            // $grid->hidden = array(0 => true);
                 if($_SESSION[ParamAdic]=='formulario') {
-                    $modulo=15;
+                    $cod_categoria=15;
                 }
                 else{
-                    $modulo=1;
+                    $cod_categoria=1;
                 }                
            if (count($this->parametros) <= 0){
-                        $this->cargar_parametros($modulo);
+                        $this->cargar_parametros($cod_categoria);
                 }
                 $k = 1;
                 foreach ($this->parametros as $value) {                    
@@ -2455,10 +2467,10 @@
                 //echo  $_SESSION[ParamAdic];
                 if($_SESSION[ParamAdic]=='formulario') {
                     $parametros['formulario']='S';
-                    $modulo = 15;
+                    $cod_categoria = 15;
                 }
                 else{
-                    $modulo = 1;
+                    $cod_categoria = 1;
                 }
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
@@ -2466,12 +2478,12 @@
                 if ($parametros['corder'] == null) $parametros['corder']="dias_vig";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    if($modulo == 15)
+                    if($cod_categoria == 15)
                         $parametros['mostrar-col']="2-3-4-5-7-8-9-12-14-17-20-21";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
                     else
                         $parametros['mostrar-col']="2-3-4-5-7-8-9-14-17-20-21";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
                 if (count($this->parametros) <= 0){
-                        $this->cargar_parametros($modulo);
+                        $this->cargar_parametros($cod_categoria);
                 }
                 $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
                 $contenido[TITULO_MODULO] .= '<br><label class="checkbox-inline"> 
@@ -2481,7 +2493,7 @@
                 foreach ($this->parametros as $value) {                    
                     //$parametros['mostrar-col'] .= "-$k";
                     $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
-                                     
+                         
                                       <label class="checkbox-inline">
                                           <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col">   &nbsp;
                                       ' . $value[espanol] . '</label>                                  
@@ -2582,8 +2594,15 @@
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
                 }
+                $contenido["FORMULARIOCHECKED"] = "checked";
                 foreach ( $this->nombres_columnas as $key => $value) {
-                    $contenido["N_" . strtoupper($key)] =  $value;
+                    //echo($key).' ';
+                    if(!($cod_categoria == 1 && $key=='formulario'))
+                        $contenido["N_" . strtoupper($key)] =  $value;
+                    else{
+                        $contenido["MOSTRARREGISTRO"] =  "style='display:none;'";
+                        $contenido["FORMULARIOCHECKED"] = "";
+                    }
                 }  
                 if (count($this->placeholder) <= 0){
                         $this->cargar_placeholder();
@@ -2862,6 +2881,14 @@
                                     </a>
                                   </li>';
                 }
+                if($_SESSION[ParamAdic]=='formulario') {
+                    $parametros['formulario']='S';
+                    $cod_categoria = 15;
+                }
+                else{
+                    $cod_categoria = 1;
+                }
+                
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
@@ -2931,9 +2958,19 @@
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
                 }
+                $contenido["FORMULARIOCHECKED"] = "checked";
                 foreach ( $this->nombres_columnas as $key => $value) {
-                    $contenido["N_" . strtoupper($key)] =  $value;
-                }  
+                    //echo($key).' ';
+                    if(!($cod_categoria == 1 && $key=='formulario'))
+                        $contenido["N_" . strtoupper($key)] =  $value;
+                    else{
+                        $contenido["MOSTRARREGISTRO"] =  "style='display:none;'";
+                        $contenido["FORMULARIOCHECKED"] = "";
+                    }
+                }                  
+//                foreach ( $this->nombres_columnas as $key => $value) {
+//                    $contenido["N_" . strtoupper($key)] =  $value;
+//                }  
                 if (count($this->placeholder) <= 0){
                         $this->cargar_placeholder();
                 }
@@ -3034,10 +3071,10 @@
                 $ao = new ArbolOrganizacional();
                 $parametros[opcion] = 'simple';
                 if($_SESSION[ParamAdic]=='formulario') {
-                    $modulo = 15;
+                    $cod_categoria = 15;
                 }
                 else{
-                    $modulo = 1;
+                    $cod_categoria = 1;
                 }                
                 
                 if(!class_exists('Template')){
@@ -3901,24 +3938,33 @@
                         
                     }
                   //  print_r($parametros);
-                    $respuesta = $this->ingresarDocumentosVersion($parametros,$archivo,$doc_vis);
-                   // echo($respuesta);
                     if($_SESSION[ParamAdic]=='formulario') {
-                        $modulo = 15;
+                        $cod_categoria = 15;
+                        $parametros[cod_categoria]=15;
                     }
                     else{
-                        $modulo = 1;
-                    }       
+                        $cod_categoria = 1;
+                        $parametros[cod_categoria]=1;
+                    }                    
+                    $respuesta = $this->ingresarDocumentosVersion($parametros,$archivo,$doc_vis);
+                   // echo($respuesta);
+       
                     
                     //if (preg_match("/ha sido ingresado con exito/",$respuesta ) == true) {
                     if (strlen($respuesta ) < 10 ) {
                         if (count($this->parametros) <= 0){
-                            $this->cargar_parametros($modulo);
+                            $this->cargar_parametros($cod_categoria);
                         }                                                                
                         foreach ($this->parametros as $value) {                    
                             $params[cod_parametro_det] = $parametros["cmb-".$value[cod_parametro]];
                             $params[cod_parametro] = $value[cod_parametro];
                             $params[id_registro] = $respuesta;
+                            if($_SESSION[ParamAdic]=='formulario') {
+                                $params[cod_categoria]=15;
+                            }
+                            else{
+                                $params[cod_categoria]==1;
+                            }
                             if (strlen($params[cod_parametro_det])>0)
                                 $this->ingresarParametro($params);
                             //$this->ingresarParametro($params);
@@ -4669,7 +4715,13 @@
      
  
             public function eliminar($parametros)
-            {
+            {               
+                if($_SESSION[ParamAdic]=='formulario') {
+                    $parametros[cod_categoria]=15;
+                }
+                else{
+                    $parametros[cod_categoria]==1;
+                }
                 //$val = $this->verDocumentos($parametros[id]);
                 $respuesta = $this->eliminarDocumentos($parametros);
                 $objResponse = new xajaxResponse();
@@ -4687,9 +4739,14 @@
  
             public function buscar($parametros)
             {   $parametros['email_usuario']= $_SESSION['CookEmail'];
+                //print_r($parametros);
+                $parametros[terceros] = 'S';
+                if($_SESSION[ParamAdic]!='formulario') 
+                    $parametros[mostrar-col] = str_replace('-12','',$parametros[mostrar-col]);
+                    //$parametros['mostrar-col']="2-3-4-5-7-8-9-12-14-17-20-21";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
+               // else
+                   // $parametros['mostrar-col']="2-3-4-5-7-8-9-14-17-20-21";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
                 
-                $parametros[terceros] = 'S';
-                $parametros[terceros] = 'S';
                 $this->get_min_nivel_area($parametros);
                 $grid = $this->verListaDocumentos($parametros);                
                 $objResponse = new xajaxResponse();
