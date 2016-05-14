@@ -73,10 +73,10 @@
                                       {N_APROBO}</label>
                                   
                             </div>   
-                                  <div class="checkbox">
+                                  <div {MOSTRARREGISTRO} class="checkbox">
                                   
                                     <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="12" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                          <input  type="checkbox" name="SelectAcc" id="SelectAcc" value="12" class="checkbox-mos-col" {FORMULARIOCHECKED} >   &nbsp;
                                       {N_FORMULARIO}</label>
                                   
                             </div>
