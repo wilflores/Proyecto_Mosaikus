@@ -416,13 +416,13 @@
                                 end
                                 end as id_persona,
                                 pers.email email_revisa,
-                                concat(pers.apellido_paterno,' ',pers.nombres) nombre_revisa,
+                                IFNULL(concat(pers.nombres,' ', pers.apellido_paterno),'N/A') nombre_revisa,
                                 pers_r.email email_reponsable,
-                                concat(pers_r.apellido_paterno,' ',pers_r.nombres) nombre_responsable,
+                                concat(pers_r.nombres ,' ', pers_r.apellido_paterno) nombre_responsable,
                                 IFNULL(usu_rev.recibe_notificaciones,'N') recibe_notificaciones_revisa,
                                 IFNULL(usu_resp.recibe_notificaciones,'N') recibe_notificaciones_responsable,
                                 pers_apr.email email_aprueba,
-                                concat(pers_apr.apellido_paterno,' ',pers_apr.nombres) nombre_aprueba,
+                                concat(pers_apr.nombres,' ', pers_apr.apellido_paterno) nombre_aprueba,
                                 IFNULL(usu_apr.recibe_notificaciones,'N') recibe_notificaciones_aprueba,
                                 mos_documentos.IDDoc,
                                 mos_documentos.etapa_workflow,
@@ -432,7 +432,7 @@
                                 mos_documentos left join mos_personal pers
                                 on mos_documentos.reviso =  pers.cod_emp left join mos_personal pers_r
                                 on mos_documentos.elaboro =  pers_r.cod_emp inner join mos_usuario usu_resp
-                                on pers_r.email = usu_resp.email inner join mos_usuario usu_rev
+                                on pers_r.email = usu_resp.email left join mos_usuario usu_rev
                                 on pers.email = usu_rev.email left join mos_personal pers_apr
                                 on mos_documentos.aprobo =  pers_apr.cod_emp inner join mos_usuario usu_apr
                                 on pers_apr.email = usu_apr.email
@@ -3770,12 +3770,23 @@
                         //print_r($parametros);
                         if($parametros['notificar']=='si'){
                             $correowf = $this->verWFemail($parametros[id]);
+                            //print_r($correowf);
                             $this->cargar_nombres_columnas();
                             $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                             if($correowf[email]!='' && $correowf[recibe_notificaciones]=='S'){
-                               $cuerpo = 'Sr(a). ' .$correowf[apellido_paterno].' '.$correowf[nombres] . '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br>';
+                               $cuerpo = 'Sr(a). ' .$correowf[nombres].' '.$correowf[apellido_paterno] . '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br>';
+                               if($correowf[etapa_workflow]=='estado_pendiente_revision'){
+                                   $anexo_adicional ='<br><strong>'. $this->nombres_columnas['elaboro'].'</strong>&nbsp;';
+                                   $anexo_adicional .=$correowf[nombre_responsable].'.';
+                               }else if($correowf[etapa_workflow]=='estado_pendiente_aprobacion'){
+                                   $anexo_adicional ='<br><strong>'. $this->nombres_columnas['elaboro'].'</strong>&nbsp;';
+                                   $anexo_adicional .=$correowf[nombre_responsable].'. &rarr;';
+                                   $anexo_adicional .='<br><strong>'. $this->nombres_columnas['reviso'].'</strong>&nbsp;';
+                                   $anexo_adicional .=$correowf[nombre_revisa].'. &rarr;';
+                               }
+                               $cuerpo .= $anexo_adicional.'<br>'.APPLICATION_ROOT; 
                                $asunto = 'Documento '. $etapa . ': ' . $parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT);
-                              // $correowf[email] = 'azambrano75@gmail.com';
+                              //$correowf[email] = 'azambrano75@gmail.com';
                                $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                                $ut_tool = new ut_Tool();
                                //SE ENVIA EL CORREO
@@ -3977,6 +3988,7 @@
                             if($correowf[email]!='' && $correowf[recibe_notificaciones]=='S'){
                                 $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
                                 //$correowf[email] = 'azambrano75@gmail.com';
+                                $cuerpo .= '<br>'.APPLICATION_ROOT;
                                 $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                                 $ut_tool = new ut_Tool();
                                 $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
@@ -4416,7 +4428,7 @@
                 $template->setTemplate("formulario_editar");
                 //$template->setVars($contenido_1);
                 //print_r($val);
-                if($val["etapa_workflow"]=='estado_aprobado' && $val["estado_workflow"]=='OK')
+                if($val["etapa_workflow"]!='' && $val["estado_workflow"]=='OK')
                     $contenido_1['COMBOWFHABILITADO'] = ' disabled ';
                 if($val["etapa_workflow"]=='' && $val["estado_workflow"]=='')
                     $contenido_1['VERNOTIFICAR'] = '';
@@ -4573,13 +4585,24 @@
                         //ENVIAR EMAIL SI ES GUARDAR Y NOTIFICAR
                         if($parametros['notificar']=='si'){
                             $correowf = $this->verWFemail($parametros[id]);
-                           // print_r($correowf);
+                            //print_r($correowf);
                             $this->cargar_nombres_columnas();
                             $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                              if($correowf[email]!=''&& $correowf[recibe_notificaciones]=='S'){
-                               $cuerpo = 'Sr(a). ' .$correowf[apellido_paterno].' '.$correowf[nombres] . '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br>';
+                               $cuerpo = 'Sr(a). ' .$correowf[nombres].' '. $correowf[apellido_paterno]. '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br>';
                                $asunto = 'Documento '. $etapa . ': ' . $parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT);
-                              // $correowf[email] = 'azambrano75@gmail.com';
+                               //$correowf[email] = 'azambrano75@gmail.com';
+                               if($correowf[etapa_workflow]=='estado_pendiente_revision'){
+                                   $anexo_adicional ='<br><strong>'. $this->nombres_columnas['elaboro'].'</strong>&nbsp;';
+                                   $anexo_adicional .=$correowf[nombre_responsable].'.<br>';
+                               }else if($correowf[etapa_workflow]=='estado_pendiente_aprobacion'){
+                                   $anexo_adicional ='<br><strong>'. $this->nombres_columnas['elaboro'].'</strong>&nbsp;';
+                                   $anexo_adicional .=$correowf[nombre_responsable].' &rarr;';
+                                   $anexo_adicional .='<strong>'. $this->nombres_columnas['reviso'].'</strong>&nbsp;';
+                                   $anexo_adicional .=$correowf[nombre_revisa].'.<br>';
+                               }
+                               $cuerpo .= $anexo_adicional.'<br>'.APPLICATION_ROOT; 
+                               //echo $cuerpo;
                                $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                                $ut_tool = new ut_Tool();
                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), $asunto, $cuerpo);
@@ -5007,6 +5030,7 @@
                 if($val[etapa_workflow]=='estado_aprobado'){
                     $persona_pendiente = $val[aprobo_a];
                 }
+                $contenido_1['N_ELABORO']=$val[elaboro_a];
                 $objResponse = new xajaxResponse();
                 /*DOCUMENTO DE VISUALIZACION*/
                 $archivo_aux = $this->verDocumentoPDF($parametros[id]);
@@ -5249,27 +5273,34 @@
                         $this->cargar_nombres_columnas();
                         $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                         //echo $correowf[email];
-                        //if($correowf[email]!='')
-                        {
                             
                             $cuerpo = 'Sr(a). ' .$correowf[apellido_paterno].' '.$correowf[nombres] . '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br><br>';
                             $asunto = 'Documento '. $etapa . ': ' . $val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
                            // $correowf[email] = 'azambrano75@gmail.com';
                             $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
                             //echo $cuerpo;
-                        }
+                           // print_r($correowf);
                         if($correowf[etapa_workflow]=='estado_pendiente_aprobacion' && $correowf[estado_workflow]=='OK') {                            
                             if($correowf[recibe_notificaciones]=='S'){
                                 $from = array(array('correo' => $correowf[email], 'nombres'=>$nombres));                                
                             }                            
                             if($correowf[recibe_notificaciones_responsable]=='S'){
                                 $cc = array(array('correo' => $correowf[email_responsable], 'nombres'=>$correowf[nombre_responsable]));
+                               // $cc = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_responsable]));
                             }
-                            if(sizeof($from)>0 || sizeof($cc)>0)
-                                    $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array(),$cc); 
+                            if(sizeof($from)>0 || sizeof($cc)>0){
+                                   $anexo_adicional ='<br><strong>'. $this->nombres_columnas['elaboro'].'</strong>&nbsp;';
+                                   $anexo_adicional .=$correowf[nombre_responsable].' &rarr;';
+                                   $anexo_adicional .='<strong>'. $this->nombres_columnas['reviso'].'</strong>&nbsp;';
+                                   $anexo_adicional .=$correowf[nombre_revisa].'.<br>';
+                                   $cuerpo .= $anexo_adicional.'<br>'.APPLICATION_ROOT;
+                                   $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array(),$cc); 
+                            }
                         }
+                        
                         else if($correowf[estado_workflow]=='RECHAZADO'){
-                            $cuerpo .= 'Rechazado por:<br><span style="color:red">'.$correowf[observacion_rechazo].'</span>';
+                            $cuerpo = 'Rechazado por:&nbsp;'.$correowf[apellido_paterno].' '.$correowf[nombres];
+                            $cuerpo .= '<br><br>Motivo del Rechazo:<br><span style="color:red">'.$correowf[observacion_rechazo].'</span>';                            
                             $asunto = 'Documento RECHAZADO: ' . $val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
                             //echo $_SESSION[CookEmail].' '.$correowf[email_aprueba].' '.$correowf[recibe_notificaciones_revisa].' '.$correowf[recibe_notificaciones_responsable];
                             if($_SESSION[CookEmail]==$correowf[email_aprueba]){
@@ -5281,8 +5312,12 @@
                                     $from = array(array('correo' => $correowf[email_responsable], 'nombres'=>$correowf[nombre_responsable]));
                                     //$from = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_responsable]));
                                 }
-                                if(sizeof($from)>0 || sizeof($cc)>0)
+                                if(sizeof($from)>0 || sizeof($cc)>0){
+                                    $cuerpo .= '<br><br>'.APPLICATION_ROOT;
+                                    //echo $cuerpo;
+                                    //$correowf[email] = 'azambrano75@gmail.com';
                                     $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array(),$cc);                                
+                                }
                             }            
                         }
                         
@@ -5324,14 +5359,22 @@
                                         //echo $cuerpo;
                                         if($correowf[recibe_notificaciones_revisa]=='S'){
                                             $cc = array(array('correo' => $correowf[email_revisa], 'nombres'=>$correowf[nombre_revisa]));
-                                            //$cc = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_revisa]));
+                                           // $cc = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_revisa]));
                                         }
                                         if($correowf[recibe_notificaciones_responsable]=='S'){
                                             $from = array(array('correo' => $correowf[email_responsable], 'nombres'=>$correowf[nombre_responsable]));
-                                            //$from = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_responsable]));
+                                           // $from = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_responsable]));
                                         }
-                                        if(sizeof($from)>0 || sizeof($cc)>0)
+                                        if(sizeof($from)>0 || sizeof($cc)>0){
+                                            $anexo_adicional ='<br><strong>'. $this->nombres_columnas['elaboro'].'</strong>&nbsp;';
+                                            $anexo_adicional .=$correowf[nombre_responsable].' &rarr;';
+                                            $anexo_adicional .='<strong>'. $this->nombres_columnas['reviso'].'</strong>&nbsp;';
+                                            $anexo_adicional .=$correowf[nombre_revisa].' &rarr;';
+                                            $anexo_adicional .='<strong>'. $this->nombres_columnas['aprobo'].'</strong>&nbsp;';
+                                            $anexo_adicional .=$correowf[nombre_aprueba].'.<br>';
+                                            $cuerpo .= $anexo_adicional.'<br>'.APPLICATION_ROOT;
                                             $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array(),$cc);                                
+                                        }
                                         $atr[asunto]='Tiene un documento Aprobado';
                                     }
                             
