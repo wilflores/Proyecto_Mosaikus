@@ -202,10 +202,10 @@ INSERT INTO `mos_link` VALUES ('85', 'Notificaciones-indexNotificaciones-clases.
 
 INSERT INTO `mos_parametro_categoria` VALUES ('15', 'Formularios', 'Formularios', 'S');
 
-INSERT INTO `mos_link` VALUES ('86', 'Documentos-indexDocumentos-clases.documentos.Documentos-formulario', 'Administrador de Formularios', '3', '2', 'mos_documentos.php', '12', 'documental.png');
-INSERT INTO `mos_link` VALUES ('87', 'Parametros-indexParametros-clases.parametros.Parametros-formulario', 'Parámetros de Formularios', '3', '2', '', '13', 'documental.png');
+INSERT INTO `mos_link` VALUES ('87', 'Documentos-indexDocumentos-clases.documentos.Documentos-formulario', 'Administrador de Formularios', '3', '2', 'mos_documentos.php', '12', 'documental.png');
+INSERT INTO `mos_link` VALUES ('88', 'Parametros-indexParametros-clases.parametros.Parametros-formulario', 'Parámetros de Formularios', '3', '2', '', '13', 'documental.png');
 
 update mos_link
 set descripcion='Documentos-indexDocumentosFormulario-clases.documentos.Documentos-formulario'
-where cod_link=16
+where cod_link=16;
 
