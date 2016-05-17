@@ -410,3 +410,12 @@ INSERT INTO `mos_link` (`descripcion`, `nombre_link`) VALUES ('Parametros-indexP
 UPDATE `mos_link` SET `dependencia`='83' WHERE (`cod_link`='0');
 UPDATE `mos_link` SET `cod_link`='86' WHERE (`cod_link`='0');
 
+/*ejecutado en BD desarrollo*/
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('id', 'id', '25', 'id');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('descripcion', 'Descripción', '25', 'descripcion');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ( 'tipo_inspeccion', 'Plantilla de Inspección', '25', 'tipo_inspeccion');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ( 'fecha', 'Fecha', '25', 'fecha');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ( 'id_responsable', 'Responsable', '25', 'id_responsable');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ( 'id_organizacion', 'Árbol Organizacional', '25', 'id_organizacion');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ( 'id_proceso', 'Árbol de Procesos', '25', 'id_proceso');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('ubicacion', 'Ubicación', '25', 'ubicacion');
