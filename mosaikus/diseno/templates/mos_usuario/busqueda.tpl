@@ -90,3 +90,12 @@
                                     <input type="text" class="form-control" id="b-cedula" name="b-cedula" placeholder="{N_CEDULA}" />
                                                           
                             </div>
+<div class="form-group">
+    <label for="perfil_especialista" class="control-label">Perfil Especialista</label>
+    <input type="text" class="form-control" id="b-perfil_especialista" name="b-perfil_especialista" placeholder="Perfil Especialista" />
+</div>
+
+<div class="form-group">
+    <label for="perfil_portal" class="control-label">Perfil Portal</label>
+    <input type="text" class="form-control" id="b-perfil_portal" name="b-perfil_portal" placeholder="Perfil Portal" />
+</div>                                    

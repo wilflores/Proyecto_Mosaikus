@@ -166,7 +166,7 @@
                     }
             }
              public function listarmos_usuario($atr, $pag, $registros_x_pagina){
-                
+                //print_r($atr);
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
                     $sql = "SELECT COUNT(*) total_registros
@@ -214,7 +214,11 @@
                         $sql .= " AND upper(password_1) like '%" . strtoupper($atr["b-password_1"]) . "%'";
             if (strlen($atr["b-cedula"])>0)
                         $sql .= " AND upper(cedula) like '%" . strtoupper($atr["b-cedula"]) . "%'";
-
+            if (strlen($atr["b-perfil_especialista"])>0)
+                    $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil ON mos_usuario_filial.cod_perfil = mos_perfil.cod_perfil WHERE UPPER(mos_perfil.descripcion_perfil) LIKE '%". strtoupper($atr["b-perfil_especialista"]) . "%')";
+            if (strlen($atr["b-perfil_portal"])>0)
+                    $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil_portal ON mos_usuario_filial.cod_perfil_portal = mos_perfil_portal.cod_perfil WHERE UPPER(mos_perfil_portal.descripcion_perfil) LIKE '%". strtoupper($atr["b-perfil_portal"]) . "%')";
+            
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
             
@@ -278,10 +282,16 @@
                         $sql .= " AND upper(password_1) like '%" . strtoupper($atr["b-password_1"]) . "%'";
             if (strlen($atr["b-cedula"])>0)
                         $sql .= " AND upper(cedula) like '%" . strtoupper($atr["b-cedula"]) . "%'";
+            if (strlen($atr["b-perfil_especialista"])>0)
+                    $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil ON mos_usuario_filial.cod_perfil = mos_perfil.cod_perfil WHERE UPPER(mos_perfil.descripcion_perfil) LIKE '%". strtoupper($atr["b-perfil_especialista"]) . "%')";
+            if (strlen($atr["b-perfil_portal"])>0)
+                    $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil_portal ON mos_usuario_filial.cod_perfil_portal = mos_perfil_portal.cod_perfil WHERE UPPER(mos_perfil_portal.descripcion_perfil) LIKE '%". strtoupper($atr["b-perfil_portal"]) . "%')";
+
+            
 
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
-                
+                    
                     $this->operacion($sql, $atr);
              }
              
@@ -340,7 +350,7 @@
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[password_1], "password_1", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[cedula], "cedula", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[cedula], "perfil_portal", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[cedula], "perfil_especialista", $parametros))
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos("Perfil Especialista", "perfil_especialista", $parametros))
                 );
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();

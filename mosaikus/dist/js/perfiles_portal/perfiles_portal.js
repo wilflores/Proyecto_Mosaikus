@@ -53,6 +53,9 @@
                 var _TxtIdNodos = document.getElementById("nodos").value = iframe.contentWindow.document.getElementById('jsfields').value;
                 if (_TxtIdNodos == ''){
                     VerMensaje('error','Debe Ingresar el Parte del Menu a Permitir');
+                    $('#MustraCargando').hide();
+                    $( "#btn-guardar" ).html('Guardar');
+                    $( "#btn-guardar" ).prop( "disabled", false );                      
                     return;
                 }                
                 array.setObjeto('Perfiles_portal','cargarConfiguracion');
