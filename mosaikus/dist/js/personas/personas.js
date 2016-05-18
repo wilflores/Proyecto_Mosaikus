@@ -56,6 +56,13 @@
             errorMessage : 'Debe ingresar solo caracteres validos.',
             errorMessageKey: 'badEvenNumber'
           });
+          
+          
+          $('#responsable_area').change(function() {
+                if($(this).is(":checked")) {
+                    $("#aprobo").prop("checked", true);
+                }                       
+            });
     }
     
     function cargar_cargos(id_arbol,cod_cargo) {            

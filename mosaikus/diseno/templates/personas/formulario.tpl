@@ -102,18 +102,21 @@
                                             {N_RELATOR}
                                         </label>
                                     </div> 
-                                    <div class="checkbox">
-                                        <label>                                            
-                                            <input type="checkbox"  value="S" id="reviso" name="reviso" {CHECKED_REVISO}>
-                                            {N_REVISO}
-                                        </label>
-                                    </div> 
+                                    <div >                                                                               
+                                           Gestión en Modulo de Documentos                                        
+                                    </div>
                                     <div class="checkbox">
                                         <label>                                            
                                             <input type="checkbox"  value="S" id="elaboro" name="elaboro" {CHECKED_ELABORO}>
                                             {N_ELABORO}
                                         </label>
                                     </div> 
+                                    <div class="checkbox">
+                                        <label>                                            
+                                            <input type="checkbox"  value="S" id="reviso" name="reviso" {CHECKED_REVISO}>
+                                            {N_REVISO}
+                                        </label>
+                                    </div>                                     
                                     <div class="checkbox">
                                         <label>                                            
                                             <input type="checkbox"  value="S" id="aprobo" name="aprobo" {CHECKED_APROBO}>
