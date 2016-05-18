@@ -7,7 +7,11 @@
         private $parametros;
         private $nombres_columnas;
         private $placeholder;
-            
+
+        private $per_crear;
+        private $per_editar;
+        private $per_eliminar;        
+        
             public function mos_usuario(){
                 parent::__construct();
                 $this->asigna_script('mos_usuario/mos_usuario.js');                                             
@@ -15,7 +19,55 @@
                 $this->parametros = $this->nombres_columnas = $this->placeholder = array();
                 $this->contenido = array();
             }
+            /*
+            * Busca los permisos que tiene el usuario en el modulo
+            */
+            private function cargar_permisos($parametros){
+                if (strlen($parametros[cod_link])>0){
+                    if(!class_exists('mos_acceso')){
+                        import("clases.mos_acceso.mos_acceso");
+                    }
+                    $acceso = new mos_acceso();
+                    $data_permisos = $acceso->obtenerPermisosModulo($_SESSION[CookIdUsuario],$parametros[cod_link]);                    
+                    foreach ($data_permisos as $value) {
+                        if ($value[nuevo] == 'S'){
+                            $this->per_crear =  'S';
+                            break;
+                        }
+                    }                                               
+                    foreach ($data_permisos as $value) {
+                        if ($value[modificar] == 'S'){
+                            $this->per_editar =  'S';
+                            break;
+                        }
+                    } 
+                    foreach ($data_permisos as $value) {
+                        if ($value[eliminar] == 'S'){
+                            $this->per_eliminar =  'S';
+                            break;
+                        }
+                    } 
+                }
+            }            
 
+            public function columna_accion($tupla)
+            {
+                $html = "&nbsp;";
+                if (strlen($tupla[id_registro])<=0){
+                    if($this->per_editar == 'S'){
+                        $html .= '<a onclick="javascript:editarHojadeVida(\''.$tupla[cod_hoja_vida].'\' );">
+                                    <i style="cursor:pointer" class="icon icon-edit"  title="Editar Anotaci&oacute;n" style="cursor:pointer"></i>
+                                </a>';
+                    }                
+                    if($this->per_eliminar == 'S'){
+                        $html .= '<a onclick="javascript:eliminarHojadeVida(\''.$tupla[cod_hoja_vida].'\');;">
+                                    <i style="cursor:pointer" class="icon icon-remove" title="Eliminar Anotaci&oacute;n" style="cursor:pointer"></i>
+                                </a>';
+                    }
+                }
+                return $html;
+            }
+            
             private function operacion($sp, $atr){
                 $param=array();
                 $this->dbl->data = $this->dbl->query($sp, $param);
@@ -47,8 +99,7 @@
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->placeholder[$value[nombre_campo]] = $value[placeholder];
-                }
-                
+                }                
             }
 
             public function verfilial($id){
@@ -131,7 +182,6 @@
                 session_start();
                 $sql = "INSERT INTO mos_log(codigo_accion, fecha_hora, accion, anterior, realizo, ip) VALUES ('$accion','".date('Y-m-d G:h:s')."','$descr', '$tabla','$_SESSION[CookIdUsuario]','$_SERVER[REMOTE_ADDR]')";            
                 $this->dbl->insert_update($sql);
-
                 return true;
             }
 
@@ -215,9 +265,9 @@
             if (strlen($atr["b-cedula"])>0)
                         $sql .= " AND upper(cedula) like '%" . strtoupper($atr["b-cedula"]) . "%'";
             if (strlen($atr["b-perfil_especialista"])>0)
-                    $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil ON mos_usuario_filial.cod_perfil = mos_perfil.cod_perfil WHERE UPPER(mos_perfil.descripcion_perfil) LIKE '%". strtoupper($atr["b-perfil_especialista"]) . "%')";
+                    $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil ON mos_usuario_filial.cod_perfil = mos_perfil.cod_perfil WHERE mos_perfil.cod_perfil = ". strtoupper($atr["b-perfil_especialista"]) . ")";
             if (strlen($atr["b-perfil_portal"])>0)
-                    $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil_portal ON mos_usuario_filial.cod_perfil_portal = mos_perfil_portal.cod_perfil WHERE UPPER(mos_perfil_portal.descripcion_perfil) LIKE '%". strtoupper($atr["b-perfil_portal"]) . "%')";
+                    $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil_portal ON mos_usuario_filial.cod_perfil_portal = mos_perfil_portal.cod_perfil WHERE mos_perfil_portal.cod_perfil = ". strtoupper($atr["b-perfil_portal"]) . ")";
             
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
@@ -283,15 +333,15 @@
             if (strlen($atr["b-cedula"])>0)
                         $sql .= " AND upper(cedula) like '%" . strtoupper($atr["b-cedula"]) . "%'";
             if (strlen($atr["b-perfil_especialista"])>0)
-                    $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil ON mos_usuario_filial.cod_perfil = mos_perfil.cod_perfil WHERE UPPER(mos_perfil.descripcion_perfil) LIKE '%". strtoupper($atr["b-perfil_especialista"]) . "%')";
+                    $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil ON mos_usuario_filial.cod_perfil = mos_perfil.cod_perfil WHERE mos_perfil.cod_perfil = ". strtoupper($atr["b-perfil_especialista"]) . ")";
             if (strlen($atr["b-perfil_portal"])>0)
-                    $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil_portal ON mos_usuario_filial.cod_perfil_portal = mos_perfil_portal.cod_perfil WHERE UPPER(mos_perfil_portal.descripcion_perfil) LIKE '%". strtoupper($atr["b-perfil_portal"]) . "%')";
+                    $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil_portal ON mos_usuario_filial.cod_perfil_portal = mos_perfil_portal.cod_perfil WHERE mos_perfil_portal.cod_perfil = ". strtoupper($atr["b-perfil_portal"]) . ")";
 
             
 
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
-                    
+                    //print_r($sql);
                     $this->operacion($sql, $atr);
              }
              
@@ -364,6 +414,9 @@
                 $func= array();
 
                 $columna_funcion = 0;
+                
+                $grid->setParent($this);
+                //$func= array('funcion'=> 'columna_accion');
                 /*if (strrpos($parametros['permiso'], '1') > 0){
                     
                     $columna_funcion = 13;
@@ -928,6 +981,9 @@
                         $this->cargar_parametros();
                 } */               
                 $k = 21;
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];                
+                
                 $contenido[PARAMETROS_OTROS] = "";
                 foreach ($this->parametros as $value) {                    
                     $parametros['mostrar-col'] .= "-$k";
@@ -968,6 +1024,15 @@
                 foreach ( $this->placeholder as $key => $value) {
                     $contenido["P_" . strtoupper($key)] =  $value;
                 } 
+                
+                $ut_tool = new ut_Tool();
+                $contenido['PERFIL_ESPECIALISTA'] = $ut_tool->OptionsCombo("SELECT cod_perfil, descripcion_perfil FROM mos_perfil ORDER BY descripcion_perfil"
+                                                                    , 'cod_perfil'
+                                                                    , 'descripcion_perfil', $val['cod_emp_relator']); 
+                
+                $contenido['PERFIL_PORTAL'] = $ut_tool->OptionsCombo("SELECT cod_perfil, descripcion_perfil FROM mos_perfil_portal ORDER BY descripcion_perfil"
+                                                                    , 'cod_perfil'
+                                                                    , 'descripcion_perfil', $val['cod_emp_relator']);                   
                 $template->setTemplate("busqueda");
                 $template->setVars($contenido);
                 $contenido['CAMPOS_BUSCAR'] = $template->show();
