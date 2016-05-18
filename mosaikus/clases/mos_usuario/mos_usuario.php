@@ -216,6 +216,7 @@
                         $sql .= " AND upper(cedula) like '%" . strtoupper($atr["b-cedula"]) . "%'";
             if (strlen($atr["b-perfil_especialista"])>0)
                     $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil ON mos_usuario_filial.cod_perfil = mos_perfil.cod_perfil WHERE UPPER(mos_perfil.descripcion_perfil) LIKE '%". strtoupper($atr["b-perfil_especialista"]) . "%')";
+
             if (strlen($atr["b-perfil_portal"])>0)
                     $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil_portal ON mos_usuario_filial.cod_perfil_portal = mos_perfil_portal.cod_perfil WHERE UPPER(mos_perfil_portal.descripcion_perfil) LIKE '%". strtoupper($atr["b-perfil_portal"]) . "%')";
             
