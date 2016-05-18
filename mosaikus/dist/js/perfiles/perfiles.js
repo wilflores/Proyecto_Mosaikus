@@ -49,7 +49,6 @@
             if (doc.getElementById("opc").value == "conf"){
                 var iframe = document.getElementById("iframearbol");
                 iframe.contentWindow.submitMe();
-
                 var _TxtIdNodos = document.getElementById("nodos").value = iframe.contentWindow.document.getElementById('jsfields').value;
                 if (_TxtIdNodos == ''){
                     VerMensaje('error','Debe Ingresar el Parte del Menu a Permitir');
