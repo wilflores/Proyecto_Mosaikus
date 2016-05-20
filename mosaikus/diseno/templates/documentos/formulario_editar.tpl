@@ -165,7 +165,7 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="elaboro" class="col-md-6 control-label">{N_ID_WORKFLOW_DOCUMENTO}</label>                                                
-                                                    <div class="col-md-14">            
+                                                    <div id="div_combo_wf"  class="col-md-14">            
                                                         {N_ELABORO} {N_REVISO} &#8594; {N_APROBO}
                                                       <select {COMBOWFHABILITADO} id="id_workflow_documento" name="id_workflow_documento" data-validation="required">
                                                         <option selected="" value="">-- No Asignado --</option>
