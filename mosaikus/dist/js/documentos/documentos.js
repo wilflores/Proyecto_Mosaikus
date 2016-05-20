@@ -458,6 +458,7 @@ function cargar_autocompletado(){
                         $('#Codigo_doc').val(respuesta[0].codigo_doc);
                         $('#nombre_doc').val(respuesta[0].nombre_doc);
                         $('#version').val(respuesta[0].version_doc);
+                        validar_codigo_version();
                    }
                    else{
                        VerMensaje('error',respuesta[0].msj);
@@ -690,7 +691,15 @@ function RechazarWF(estado,etapa,id){
             array.getForm('idFormulario');
             array.addParametro('import','clases.documentos.Documentos');
             xajax_Loading(array.getArray());
-    }    
+    }   
+   function CargarCombowf(nodos,id){
+            array = new XArray();
+            array.setObjeto('Documentos','cargar_combo_wf');
+            array.addParametro('nodos',nodos);
+            array.addParametro('id',id);
+            array.addParametro('import','clases.documentos.Documentos');
+            xajax_Loading(array.getArray());
+    }  
 function ao_multiple(){    
     $('#div-ao-form').jstree(
             {
@@ -702,25 +711,34 @@ function ao_multiple(){
             }
         );
     $("#div-ao-form").on("select_node.jstree", function (e, data) {
-        if(data.event) { data.instance.select_node(data.node.children_d); }
+        if(data.event) { 
+            data.instance.select_node(data.node.children_d);
+        }
     });
     $("#div-ao-form").on("deselect_node.jstree", function (e, data) {
         if(data.event) { data.instance.deselect_node(data.node.children_d); }
     });
-    $('#div-ao-form').on("changed.jstree", function (e, data) {
-        if (data.selected.length > 0){
-            var arr;
-            var id = '';
-            for(i=0;i<data.selected.length;i++){
-                arr = data.selected[i].split("_");
-                id = id + arr[1] + ',';
-            }
-            id = id.substr(0,id.length-1);
-            $('#nodos').val(id);
-        }
-        else
-            $('#nodos').val('');
-    });
+    var to_2 = false;
+   $('#div-ao-form').on("changed.jstree", function (e, data) {
+       if (data.selected.length > 0){
+           var arr;
+           var id = '';
+           for(i=0;i<data.selected.length;i++){
+               arr = data.selected[i].split("_");
+               id = id + arr[1] + ',';
+           }
+           id = id.substr(0,id.length-1);
+           $('#nodos').val(id);
+           
+           if(to_2) { clearTimeout(to_2); }
+           to_2 = setTimeout(function () {
+                   validar_codigo_version();
+                   CargarCombowf($('#nodos').val(),$('#id').val());                   
+           }, 250);
+       }
+       else
+           $('#nodos').val('');        
+   });
     var to = false;
     $('#demo_q_ao').keyup(function () {                    
             if(to) { clearTimeout(to); }
@@ -732,3 +750,12 @@ function ao_multiple(){
 //    $('#div-ao-form').jstree(true).open_all();               
         
 }    
+function validar_codigo_version(){
+   if (($('#nodos').val().length > 0) && ($('#opc').val() == 'new')){
+       array = new XArray();
+       array.setObjeto('DocumentoCodigos','validar_codigo_version');
+       array.addParametro('nodos',$('#nodos').val());        
+       array.addParametro('import','clases.documento_codigos.DocumentoCodigos');
+       xajax_Loading(array.getArray());
+   }
+}
