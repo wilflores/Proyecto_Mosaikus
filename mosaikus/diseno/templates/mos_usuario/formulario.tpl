@@ -53,6 +53,15 @@
                                       </div>
                                         </label>
                                   </div>
+   
+                                      <div class="form-group">
+                                        <label for="recibe_notificaciones" class="col-md-4 control-label">{N_RECIBE_NOTIFICACIONES}</label>
+                                        <label class="checkbox-inline" style="padding-top: 0px;">
+                                        <div class="col-md-10">
+                                         <input type="checkbox" name="recibe_notificaciones" id="recibe_notificaciones" value="S" {RECIBE_NOTIFICACIONES}>                                             
+                                      </div>
+                                        </label>
+                                  </div>                                      
 <div class="form-group">
                                         <label for="email" class="col-md-4 control-label">{N_EMAIL}</label>
                                         <div class="col-md-10">
