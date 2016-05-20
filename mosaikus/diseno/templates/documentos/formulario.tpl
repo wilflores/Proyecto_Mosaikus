@@ -134,6 +134,7 @@
                                         <iframe id="iframearbol" src="pages/cargo/prueba_arbolV4.php?IDDoc={IDDOC}" frameborder="0" width="100%" height="310px" scrolling="no"></iframe-->
                                          <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
                                         {DIV_ARBOL_ORGANIZACIONAL}
+                                        <input type="hidden" name="nodo_area" id="nodo_area"/>
                                     </div>
                                     <div class="col-md-15">
                                         <div class="tabs">
@@ -162,8 +163,8 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="elaboro" class="col-md-6 control-label">{N_ID_WORKFLOW_DOCUMENTO}</label>                                                
-                                                    <div class="col-md-14">
-                                                        {N_ELABORO} {N_REVISO} &#8594; {N_APROBO}
+                                                    {N_ELABORO} {N_REVISO} &#8594; {N_APROBO}
+                                                    <div id="div_combo_wf" class="col-md-14">
                                                       <select id="id_workflow_documento" name="id_workflow_documento" data-validation="required">
                                                         <option selected="" value="">-- No Asignado --</option>
                                                         {ID_WORKFLOW_DOCUMENTO}
