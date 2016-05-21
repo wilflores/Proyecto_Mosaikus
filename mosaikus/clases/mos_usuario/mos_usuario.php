@@ -1076,6 +1076,8 @@
                     import("clases.interfaz.Template");
                 }
                 
+                $val = $this->vermos_usuario($_SESSION[CookIdUsuario]);
+                //print_r($val);
                 $ut_tool = new ut_Tool();
                 $contenido_1   = array();
                 if (count($this->nombres_columnas) <= 0){
@@ -1090,6 +1092,7 @@
                 foreach ( $this->placeholder as $key => $value) {
                     $contenido_1["P_" . strtoupper($key)] =  $value;
                 }     
+                $contenido_1['READ_SUPER_USUARIO'] = $val["super_usuario"] == 'S' ? '' : 'disabled="disabled"';
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
                 $template->setTemplate("formulario");
@@ -1101,7 +1104,9 @@
                 $contenido['TITULO_FORMULARIO'] = "Crear&nbsp;Usuario";
                 $contenido['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Usuario";
                 $contenido['PAGINA_VOLVER'] = "listarmos_usuario.php";
-                $contenido['DESC_OPERACION'] = "Guardar";
+                $contenido['DESC_OPERACION'] = "Guardar";                
+                
+                //print_r($contenido);
                 $contenido['OPC'] = "new";
                 $contenido['ID'] = "-1";
 
@@ -1195,10 +1200,12 @@
             $contenido_1['PASSWORD_1'] = ($val["password_1"]);
             $contenido_1['CEDULA'] = ($val["cedula"]);
 
-            $contenido_1[SUPER_USUARIO] = $val["super_usuario"] == 'S' ? 'checked="checked"' : '';
-            $contenido_1[CHECKED_VIGENCIA] = $val["vigencia"] == 'S' ? 'checked="checked"' : '';
-            $contenido_1[RECIBE_NOTIFICACIONES] = $val["recibe_notificaciones"] == 'S' ? 'checked="checked"' : '';
-            
+            $contenido_1['SUPER_USUARIO'] = $val["super_usuario"] == 'S' ? 'checked="checked"' : '';
+            $contenido_1['CHECKED_VIGENCIA'] = $val["vigencia"] == 'S' ? 'checked="checked"' : '';
+            $contenido_1['RECIBE_NOTIFICACIONES'] = $val["recibe_notificaciones"] == 'S' ? 'checked="checked"' : '';
+            $val_aux = $this->vermos_usuario($_SESSION[CookIdUsuario]);
+            $contenido_1['READ_SUPER_USUARIO'] = $val_aux["super_usuario"] == 'S' ? '' : 'disabled="disabled"';
+            //print_r($contenido_1);
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
                 $template->setTemplate("formulario");
