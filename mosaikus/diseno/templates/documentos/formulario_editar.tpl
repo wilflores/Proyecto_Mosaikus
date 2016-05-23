@@ -3,6 +3,24 @@
                   <div class="content">
                       
     <form id="idFormulario" class="form-horizontal form-horizontal-red" role="form">
+        <div class="modal fade bs-example-modal-lg" id="myModal-observacion-vigencia" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog  modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" id="myModalLabel">Vigencia</h4>
+                </div>
+                <div class="modal-body">
+                    Motivo de Vigencia
+                    <textarea  id="observacion_vigencia" cols="30" rows="2" name="observacion_vigencia" class="form-control" placeholder="Indique un comentario o motivo"></textarea>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>                                  
+                  <button type="button" class="btn btn-primary" onClick="$('#myModal-observacion-vigencia').modal('hide');">Aceptar</button>
+                </div>
+              </div>
+            </div>            
+        </div>        
         <div class="panel-heading">
             <div class="row">
                 <div class="panel-title col-xs-12" id="div-titulo-for">
