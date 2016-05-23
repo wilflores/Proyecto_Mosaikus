@@ -74,8 +74,8 @@
                 <input type="hidden" id="origen-id-area" />
                 <input type="hidden" id="relacion-id-area" />
               <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>                                  
-              <button type="button" class="btn btn-primary" onClick="asociar_area();">Relacionar Área Espejo</button>
-              <button type="button" class="btn btn-primary" onClick="eliminar_area();">Eliminar Relación Área Espejo</button>
+              <button type="button" class="btn btn-primary" onClick="asociar_area();">Vincular Área</button>
+              <button type="button" class="btn btn-primary" onClick="eliminar_area();">Eliminar Vinculo Área</button>
             </div>
         </div>
     </div>
