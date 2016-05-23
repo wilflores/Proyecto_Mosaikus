@@ -91,8 +91,7 @@
                                                           
                             </div>
 <div class="form-group">
-    <label for="perfil_especialista" class="control-label">Perfil Especialista</label>
-                                                                                        
+    <label for="perfil_especialista" class="control-label">Perfil Especialista</label>                                                                                        
     <select id="b-perfil_especialista" name="b-perfil_especialista" >
         <option selected="" value="">-- Seleccione --</option>
         {PERFIL_ESPECIALISTA}
@@ -107,4 +106,4 @@
         {PERFIL_PORTAL}
    </select>    
     <!--<input type="text" class="form-control" id="b-perfil_portal" name="b-perfil_portal" placeholder="Perfil Portal" />-->
-</div>                                    
+</div> 

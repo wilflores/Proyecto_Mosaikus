@@ -161,12 +161,12 @@
             public function ingresarmos_usuario($atr){
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
-                    $sql = "INSERT INTO mos_usuario(nombres,apellido_paterno,apellido_materno,telefono,fecha_creacion,fecha_expi,vigencia,super_usuario,email,password_1,cedula)
+                    $sql = "INSERT INTO mos_usuario(nombres,apellido_paterno,apellido_materno,telefono,fecha_creacion,fecha_expi,vigencia,super_usuario,email,password_1,cedula,recibe_notificaciones)
                             VALUES(
-                                '$atr[nombres]','$atr[apellido_paterno]','$atr[apellido_materno]','$atr[telefono]','".date('Y-m-d G:h:s')."','$atr[fecha_expi]','$atr[vigencia]','$atr[super_usuario]','$atr[email]','".md5($atr[password_1])."','$atr[cedula]'
+                                '$atr[nombres]','$atr[apellido_paterno]','$atr[apellido_materno]','$atr[telefono]','".date('Y-m-d G:h:s')."','$atr[fecha_expi]','$atr[vigencia]','$atr[super_usuario]','$atr[email]','".md5($atr[password_1])."','$atr[cedula]','$atr[recibe_notificaciones]'
                                 )";
                     $respuesta = $this->dbl->insert_update($sql);                    
-                    $nuevo = "Id Usuario: \'$atr[id_usuario]\', Nombres: \'$atr[nombres]\', Apellido Paterno: \'$atr[apellido_paterno]\', Apellido Materno: \'$atr[apellido_materno]\', Telefono: \'$atr[telefono]\', Fecha Creacion: \'$atr[fecha_creacion]\', Fecha Expi: \'$atr[fecha_expi]\', Vigencia: \'$atr[vigencia]\', Super Usuario: \'$atr[super_usuario]\', Email: \'$atr[email]\', Password 1: \'$atr[password_1]\', Cedula: \'$atr[cedula]\', ";
+                    $nuevo = "Id Usuario: \'$atr[id_usuario]\', Nombres: \'$atr[nombres]\', Apellido Paterno: \'$atr[apellido_paterno]\', Apellido Materno: \'$atr[apellido_materno]\', Telefono: \'$atr[telefono]\', Fecha Creacion: \'$atr[fecha_creacion]\', Fecha Expi: \'$atr[fecha_expi]\', Vigencia: \'$atr[vigencia]\', Super Usuario: \'$atr[super_usuario]\', Email: \'$atr[email]\', Password 1: \'$atr[password_1]\', Cedula: \'$atr[cedula]\', Recibe Notificaciones: \'$atr[recibe_notificaciones]\', ";
                     $this->registraTransaccionLog(21,$nuevo,'', '');
                     return "El usuario '$atr[nombres]' ha sido ingresado con exito";
                 } catch(Exception $e) {
@@ -196,7 +196,7 @@
                         $pass = md5($atr[password_1]);
                     }
                     $sql = "UPDATE mos_usuario SET                            
-                                    nombres = '$atr[nombres]',apellido_paterno = '$atr[apellido_paterno]',apellido_materno = '$atr[apellido_materno]',telefono = '$atr[telefono]',fecha_expi = '$atr[fecha_expi]',vigencia = '$atr[vigencia]',super_usuario = '$atr[super_usuario]',email = '$atr[email]',password_1 = '$pass',cedula = '$atr[cedula]'
+                                    nombres = '$atr[nombres]',apellido_paterno = '$atr[apellido_paterno]',apellido_materno = '$atr[apellido_materno]',telefono = '$atr[telefono]',fecha_expi = '$atr[fecha_expi]',vigencia = '$atr[vigencia]',super_usuario = '$atr[super_usuario]',email = '$atr[email]',password_1 = '$pass',cedula = '$atr[cedula]',recibe_notificaciones = '$atr[recibe_notificaciones]'
                             WHERE  id_usuario = $atr[id_usuario]"; 
                     
                     
@@ -1027,12 +1027,10 @@
                 
                 $ut_tool = new ut_Tool();
                 $contenido['PERFIL_ESPECIALISTA'] = $ut_tool->OptionsCombo("SELECT cod_perfil, descripcion_perfil FROM mos_perfil ORDER BY descripcion_perfil"
-                                                                    , 'cod_perfil'
-                                                                    , 'descripcion_perfil', $val['cod_emp_relator']); 
+                                                                    , 'cod_perfil', 'descripcion_perfil', $val['cod_perfil']); 
                 
                 $contenido['PERFIL_PORTAL'] = $ut_tool->OptionsCombo("SELECT cod_perfil, descripcion_perfil FROM mos_perfil_portal ORDER BY descripcion_perfil"
-                                                                    , 'cod_perfil'
-                                                                    , 'descripcion_perfil', $val['cod_emp_relator']);                   
+                                                                    , 'cod_perfil', 'descripcion_perfil', $val['cod_perfil']);                   
                 $template->setTemplate("busqueda");
                 $template->setVars($contenido);
                 $contenido['CAMPOS_BUSCAR'] = $template->show();
@@ -1058,6 +1056,16 @@
                 $objResponse->addIncludeScript(PATH_TO_JS . 'mos_usuario/mos_usuario.js');
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
+                $objResponse->addScript('$( "#b-perfil_especialista" ).select2({
+                                            placeholder: "Selecione el perfil especialista",
+                                            allowClear: true
+                                        }); 
+                                        $( "#b-perfil_portal" ).select2({
+                                            placeholder: "Selecione el perfil portal",
+                                            allowClear: true
+                                        }); 
+                                        $("#b-fecha_expi-desde").datepicker();        
+                                        $("#b-fecha_expi-hasta").datepicker();');                
                 return $objResponse;
             }
          
@@ -1068,6 +1076,8 @@
                     import("clases.interfaz.Template");
                 }
                 
+                $val = $this->vermos_usuario($_SESSION[CookIdUsuario]);
+                //print_r($val);
                 $ut_tool = new ut_Tool();
                 $contenido_1   = array();
                 if (count($this->nombres_columnas) <= 0){
@@ -1082,6 +1092,7 @@
                 foreach ( $this->placeholder as $key => $value) {
                     $contenido_1["P_" . strtoupper($key)] =  $value;
                 }     
+                $contenido_1['READ_SUPER_USUARIO'] = $val["super_usuario"] == 'S' ? '' : 'disabled="disabled"';
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
                 $template->setTemplate("formulario");
@@ -1093,7 +1104,9 @@
                 $contenido['TITULO_FORMULARIO'] = "Crear&nbsp;Usuario";
                 $contenido['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Usuario";
                 $contenido['PAGINA_VOLVER'] = "listarmos_usuario.php";
-                $contenido['DESC_OPERACION'] = "Guardar";
+                $contenido['DESC_OPERACION'] = "Guardar";                
+                
+                //print_r($contenido);
                 $contenido['OPC'] = "new";
                 $contenido['ID'] = "-1";
 
@@ -1187,9 +1200,12 @@
             $contenido_1['PASSWORD_1'] = ($val["password_1"]);
             $contenido_1['CEDULA'] = ($val["cedula"]);
 
-            $contenido_1[SUPER_USUARIO] = $val["super_usuario"] == 'S' ? 'checked="checked"' : '';
-            $contenido_1[CHECKED_VIGENCIA] = $val["vigencia"] == 'S' ? 'checked="checked"' : '';
-            
+            $contenido_1['SUPER_USUARIO'] = $val["super_usuario"] == 'S' ? 'checked="checked"' : '';
+            $contenido_1['CHECKED_VIGENCIA'] = $val["vigencia"] == 'S' ? 'checked="checked"' : '';
+            $contenido_1['RECIBE_NOTIFICACIONES'] = $val["recibe_notificaciones"] == 'S' ? 'checked="checked"' : '';
+            $val_aux = $this->vermos_usuario($_SESSION[CookIdUsuario]);
+            $contenido_1['READ_SUPER_USUARIO'] = $val_aux["super_usuario"] == 'S' ? '' : 'disabled="disabled"';
+            //print_r($contenido_1);
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
                 $template->setTemplate("formulario");
@@ -1539,9 +1555,8 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
         $atr=array();
         import("clases.organizacion.ArbolOrganizacional");       
         $organizacion = new ArbolOrganizacional;        
-        $sql = "SELECT id_organizacion FROM mos_personal
-                WHERE (SELECT SUBSTRING_INDEX(email, '@', -1)) = (SELECT SUBSTRING_INDEX(email, '@', -1) FROM mos_usuario WHERE id_usuario = $parametros[id_usuario])
-        ";
+        //$sql = "SELECT id_organizacion FROM mos_personal WHERE (SELECT SUBSTRING_INDEX(email, '@', -1)) = (SELECT SUBSTRING_INDEX(email, '@', -1) FROM mos_usuario WHERE id_usuario = $parametros[id_usuario])";        
+        $sql = "SELECT id_organizacion FROM mos_personal p INNER JOIN mos_usuario u ON u.email = p.email WHERE id_usuario = $parametros[id_usuario]";
         $this->operacion($sql, $atr);        
         
         $nodos = explode(",",$organizacion->BuscaOrgNivelHijos($this->dbl->data[0]["id_organizacion"]));        
