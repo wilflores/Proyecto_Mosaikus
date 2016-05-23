@@ -117,6 +117,7 @@ function admin_ao(){
                         $('#tree').jstree(true).search(v);
                 }, 250);
         });
+
         $('#tree')
                 .jstree({
                         'core' : {
@@ -133,8 +134,97 @@ function admin_ao(){
                                 }
                         },
                         'force_text' : true,
-                        'plugins' : ['state','dnd','contextmenu','search']
-                })
+                        'plugins' : ['state','dnd','contextmenu','search','types'],
+                        'types' :{
+                            'default' : {
+                                'icon': ''
+                            },
+                            'area_espejo':{
+                                'icon': 'glyphicon glyphicon-resize-small'
+                            }
+                        },
+                        'contextmenu': {
+                            items: function($node) {
+                                        var tree = $("#tree").jstree(true);
+                                        return {
+                                            "Espejo":{
+                                                "separator_before": false,
+                                                "separator_after": false,
+                                                "label": "Area Espejo",
+                                                "action": function (obj) { 
+                                                    console.log($node.id);
+                                                    marcar_area_espejo($node.id);
+                                                    /*$node = tree.create_node($node);
+                                                    tree.edit($node);*/
+                                                }
+                                            },
+                                            "Create": {
+                                                "separator_before": false,
+                                                "separator_after": false,
+                                                "label": "Crear",
+                                                "action": function (obj) { 
+                                                    $node = tree.create_node($node);
+                                                    tree.edit($node);
+                                                }
+                                            },
+                                            "Rename": {
+                                                "separator_before": false,
+                                                "separator_after": false,
+                                                "label": "Renombrar",
+                                                "action": function (obj) { 
+                                                    tree.edit($node);
+                                                }
+                                            },                         
+                                            "Remove": {
+                                                "separator_before": false,
+                                                "separator_after": false,
+                                                "label": "Eliminar",
+                                                "action": function (obj) { 
+                                                    tree.delete_node($node);
+                                                }
+                                            },
+                                            ccp:{
+                                                    separator_before:!0,
+                                                    icon:!1,
+                                                    separator_after:!1,
+                                                    label:"Edit",
+                                                    action:!1,
+                                                    submenu:{
+                                                            cut:{
+                                                                    separator_before:!1,
+                                                                    separator_after:!1,
+                                                                    label:"Cut",
+                                                                    action:function(b){
+                                                                        tree.cut($node);                                                                                                                                            
+                                                                    }
+                                                            },
+                                                            copy:{
+                                                                    separator_before:!1,
+                                                                    icon:!1,
+                                                                    separator_after:!1,
+                                                                    label:"Copy",
+                                                                    action:function(b){
+                                                                            tree.copy($node);                                                                            
+                                                                    }
+                                                            },
+                                                            paste:{
+                                                                    separator_before:!1,
+                                                                    icon:!1,
+                                                                    _disabled:function(b){
+                                                                            return!tree.can_paste()
+                                                                    },
+                                                                    separator_after:!1,
+                                                                    label:"Paste",
+                                                                    action:function(b){
+                                                                        tree.paste($node);                                                                            
+                                                                    }
+                                                            }
+                                                    }
+                                                }
+                                        };
+                                    }
+                        }
+                    })
                 .on('delete_node.jstree', function (e, data) {
                         $.get('clases/organizacion/response.php?operation=delete_node', { 'id' : data.node.id })
                                 .done(function (d) {
@@ -155,7 +245,9 @@ function admin_ao(){
                                          VerMensaje('error','No se puede eliminar el &aacute;rea, existen Correcciones asociadas');
                                      }else if (jqXHR.responseText.indexOf('mos_personal_ibfk_1')!=-1){
                                          VerMensaje('error','No se puede eliminar el &aacute;rea, existen personas asociados');
-                                     }
+                                     }else if (jqXHR.responseText.indexOf('mos_arbol_procesos_ibfk_1')!=-1){
+                                         VerMensaje('error','No se puede eliminar el &aacute;rea, existen procesos asociados');
+                                     }                                                                          
                                         data.instance.refresh();
                                 });
                 })

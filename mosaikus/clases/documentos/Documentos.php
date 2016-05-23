@@ -3306,6 +3306,7 @@
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
                     $contenido_1["N_ELABORO"] .= ' &#8594;';
+                    $contenido_1["N_ELABORO"] = '';
                 }
                 else
                 {
@@ -3701,6 +3702,7 @@
                                 left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                                 INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
                         $contenido_1["N_ELABORO"] .= ' &#8594;';
+                        $contenido_1["N_ELABORO"] = ' ';
                     }
                     else
                     {
@@ -4334,6 +4336,7 @@
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
                     $contenido_1["N_ELABORO"] .= ' &#8594;';
+                    $contenido_1["N_ELABORO"] = '';
                 }
                 else
                 {
