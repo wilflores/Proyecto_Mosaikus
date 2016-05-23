@@ -1641,6 +1641,8 @@
 //                    else
 //                    if (strlen($atr["b-privado"])>0)
 //                        $sql .= " AND publico = 'N'";
+                    if (strlen($atr["b-ocultar-publico"])>0)
+                        $sql .= " AND d.publico <> 'S' ";
                     if (strlen($atr["b-doc_fisico"])>0)
                         $sql .= " AND doc_fisico = '". $atr["b-doc_fisico"] . "'";
                     if (strlen($atr["b-contentType"])>0)
@@ -1845,6 +1847,9 @@
 //                    else
 //                    if (strlen($atr["b-privado"])>0)
 //                        $sql .= " AND publico = 'N'";
+                    if (strlen($atr["b-ocultar-publico"])>0)
+                        $sql .= " AND d.publico <> 'S' ";
+                    
                     if (strlen($atr["b-doc_fisico"])>0)
                         $sql .= " AND doc_fisico = '". $atr["b-doc_fisico"] . "'";
                     if (strlen($atr["b-contentType"])>0)
@@ -2716,6 +2721,9 @@
                 $parametros['b-formulario'] = 'S';
                 //return $this->indexDocumentosReporte($parametros);
                 $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
+                $contenido[TITULO_MODULO] .= '<br><label class="checkbox-inline"> 
+                                    <input type="checkbox" class="b-mi-ocultar-publico" value="S"> Ocultar P&uacute;blicos </label>';
+                
                 if (!isset($parametros['b-formulario'])){
                     $contenido[OTRAS_OPCIONES] = '<li>
                                     <a href="#"  onClick="reporte_documentos_pdf();">
@@ -2781,6 +2789,44 @@
                                                                             FROM mos_personal p WHERE aprobo = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val['cod_emp_relator']);
+                if ($_SESSION['CookCodEmp'] <> ''){
+                    if(!class_exists('Personas')){
+                        import("clases.personas.Personas");
+                    }
+                    $p = new Personas();
+                    $id_ao = $p->verAreaPersonas($_SESSION['CookCodEmp']);
+                    $contenido[FILTRO_OTROS_CAMPOS] .= '<br>
+                                    <label class="checkbox-inline"> 
+                                    <input type="checkbox" class="b-mi-nivel" value="N"> Mi Nivel </label>';
+                    $contenido[TITULO_MODULO] .= ' &nbsp;<label class="checkbox-inline"> 
+                                    <input type="checkbox" class="b-mi-nivel" value="N"> Mi Nivel </label>' ;       
+                    $js_flujo .= "
+                            $('.b-mi-nivel').on('change', function (event) {
+                                /*event.preventDefault();
+                                var id = $(this).attr('tok');*/
+                                 if( $(this).is(':checked') ){
+                                    $('#div-ao').jstree(true).select_node('phtml_$id_ao');                                    
+                                } else {
+                                     $('#div-ao').jstree(true).deselect_node('phtml_$id_ao');  
+                                }
+                            });";
+                }   
+
+                $js_flujo .= "$('.b-mi-ocultar-publico').on('change', function (event) {
+                                /*event.preventDefault();
+                                var id = $(this).attr('tok');*/
+                                 if( $(this).is(':checked') ){
+                                    $('#b-ocultar-publico').val('1');
+                                    verPagina(1,document);
+                                    /*alert('El checkbox con valor ' + $(this).val() + ' ha sido seleccionado');*/
+                                } else {
+                                    $('#b-ocultar-publico').val('');
+                                    verPagina(1,document);
+                                    /*alert('El checkbox con valor ' + $(this).val() + ' ha sido deseleccionado');*/
+                                }
+                            });
+                            ";                
+                
                 import('clases.organizacion.ArbolOrganizacional');
 
                 //AQUI EL ARBOL
@@ -2905,7 +2951,7 @@
                                         $('#myModal-Ventana-Titulo').html('');
                                         $('#myModal-Ventana').modal('show');
                                     });");
-                
+                $objResponse->addScript($js_flujo);
                 return $objResponse;
             }
                    
@@ -2913,6 +2959,9 @@
             public function indexDocumentosReporte($parametros)
             {
                 $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
+                $contenido[TITULO_MODULO] .= '<br><label class="checkbox-inline"> 
+                                    <input type="checkbox" class="b-mi-ocultar-publico" value="S"> Ocultar P&uacute;blicos </label>';
+                
                 if (!isset($parametros['b-formulario'])){
                     $contenido[OTRAS_OPCIONES] = '<li>
                                     <a href="#"  onClick="reporte_documentos_pdf();">
@@ -2986,6 +3035,43 @@
                                                                             FROM mos_personal p WHERE aprobo = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val['cod_emp_relator']);
+                /*VALIDAMOS QUE EL USUARIO CONECTADO ESTE REGISTRADO COMO PERSONAL*/
+                if ($_SESSION['CookCodEmp'] <> ''){
+                    if(!class_exists('Personas')){
+                        import("clases.personas.Personas");
+                    }
+                    $p = new Personas();
+                    $id_ao = $p->verAreaPersonas($_SESSION['CookCodEmp']);
+                    $contenido[FILTRO_OTROS_CAMPOS] .= '<br>
+                                    <label class="checkbox-inline"> 
+                                    <input type="checkbox" class="b-mi-nivel" value="N"> Mi Nivel </label>';
+                    $contenido[TITULO_MODULO] .= ' &nbsp;<label class="checkbox-inline"> 
+                                    <input type="checkbox" class="b-mi-nivel" value="N"> Mi Nivel </label>' ;       
+                    $js_flujo .= "
+                            $('.b-mi-nivel').on('change', function (event) {
+                                /*event.preventDefault();
+                                var id = $(this).attr('tok');*/
+                                 if( $(this).is(':checked') ){
+                                    $('#div-ao').jstree(true).select_node('phtml_$id_ao');                                    
+                                } else {
+                                     $('#div-ao').jstree(true).deselect_node('phtml_$id_ao');  
+                                }
+                            });";
+                }   
+                $js_flujo .= "$('.b-mi-ocultar-publico').on('change', function (event) {
+                                /*event.preventDefault();
+                                var id = $(this).attr('tok');*/
+                                 if( $(this).is(':checked') ){
+                                    $('#b-ocultar-publico').val('1');
+                                    verPagina(1,document);
+                                    /*alert('El checkbox con valor ' + $(this).val() + ' ha sido seleccionado');*/
+                                } else {
+                                    $('#b-ocultar-publico').val('');
+                                    verPagina(1,document);
+                                    /*alert('El checkbox con valor ' + $(this).val() + ' ha sido deseleccionado');*/
+                                }
+                            });
+                            ";                
                 import('clases.organizacion.ArbolOrganizacional');
 
 
@@ -3097,6 +3183,7 @@
                                                 $('#myModal-Ventana-Titulo').html('');
                                                 $('#myModal-Ventana').modal('show');
                                             });");
+                $objResponse->addScript($js_flujo);
                 //$objResponse->addScript('setTimeout(function(){ init_documentos(); }, 500);');
                 //$objResponse->addScript('setTimeout(function(){ init_tabla_reporte(); }, 500);');
                 
@@ -3183,9 +3270,9 @@
                     
                 }
                 //echo $sql;
-                $contenido_1['ID_WORKFLOW_DOCUMENTO'] = $ut_tool->OptionsCombo($sql
-                                                                    , 'id'
-                                                                    , 'wf', $val['cod_emp_relator']);
+//                $contenido_1['ID_WORKFLOW_DOCUMENTO'] = $ut_tool->OptionsCombo($sql
+//                                                                    , 'id'
+//                                                                    , 'wf', $val['cod_emp_relator']);
                 $contenido_1['WORKFLOW'] = 'N';
                 if(!class_exists('Parametros')){
                     import("clases.parametros.Parametros");
@@ -4482,6 +4569,17 @@
                 $contenido_1['OPC'] = "upd";
                 $contenido_1['ID'] = $val["IDDoc"];
 
+                $js .= "$('#vigencia').on('change', function (event) {
+                                 if( $(this).is(':checked') ){
+                                   $('#observacion_vigencia').val(''); 
+                                } else {
+                                    if($('#etapa').val()=='estado_aprobado'){
+                                        $('#myModal-observacion-vigencia').modal('show');
+                                    }
+                                }
+                            });
+                            ";                
+                
                 $template->setVars($contenido_1);
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
@@ -4510,7 +4608,7 @@
      
  
             public function actualizar($parametros)
-            {
+            {   //print_r($parametros);
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $objResponse = new xajaxResponse();
@@ -4532,6 +4630,7 @@
                     }
                 }  
                 //validamos 1 solo arbol Org y si hay campo Cargo
+                //echo $parametros['observacion_vigencia'];
                 if($tiene_cargo>=1){
                     if($tiene_arbol<1){
                         $objResponse->addScriptCall('VerMensaje','error','Debe agregar un campo "Arbol Organizacional" si define un campo "Cargo"');
@@ -4588,6 +4687,15 @@
                            
                     }
                     if (!isset($parametros[vigencia])) $parametros[vigencia] = 'N';
+
+                    if($parametros['vigencia']=='N' && $parametros['etapa']=='estado_aprobado' && $parametros['observacion_vigencia']==''){
+                            $objResponse->addScriptCall('VerMensaje','error','Debe cargar un motivo de la no vigencia del documento');
+                            $objResponse->addScript("$('#MustraCargando').hide();"); 
+                            $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                            $( '#btn-guardar' ).prop( 'disabled', false );");                        
+                            return $objResponse;                    
+                    }
+                    
                     //if (!isset($parametros[formulario])) $parametros[formulario] = 'N';
                     $parametros[formulario] = 'N';
                     for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
@@ -4612,6 +4720,26 @@
                     if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {  
                         //print_r($parametros);
                         //print_r($parametros[nodos]);
+                        //ENVIAR EMAIL SI DESMARCA LA VIGENCIA Y ESTA APROBADO
+                        if($parametros['vigencia']=='N' && $parametros['etapa']=='estado_aprobado'){
+                            //$doc = $this->verDocumentos($parametros[id]);
+                            import("clases.usuarios.Usuarios");
+                            $usr = new Usuarios();
+                            $datos = $usr->verUsuario($parametros['id_usuario']);
+                            $correowf = $this->verWFemail($parametros[id]); 
+                            $asunto = 'Documento enviado a Histórico: ' . $parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT);
+                            $cuerpo = '<strong>Documento enviado a Hist&oacute;rico:</strong> ' . $parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT);
+                            $cuerpo .= '<br><br><strong>Motivo:</strong>&nbsp;'.$parametros[observacion_vigencia];
+                            $cuerpo .= '<br><br><strong>Responsable:</strong>&nbsp;'.ucwords($datos[nombres]).' '.ucwords($datos[apellido_paterno]);
+                            $correos = array(array('correo' => $correowf[email_revisa], 'nombres'=>ucwords($correowf[nombre_revisa]) ),
+                                array('correo' => $correowf[email_reponsable], 'nombres'=>$correowf[nombre_responsable]),
+                                array('correo' => $correowf[email_aprueba], 'nombres'=>$correowf[nombre_aprueba]));
+                            //$correowf[email_aprueba]
+                            $ut_tool = new ut_Tool();
+                            //$ut_tool->EnviarEMail('Notificaciones Mosaikus', $correos, $asunto, $cuerpo);
+                            //echo $asunto.$cuerpo;
+                            //print_r($correos);
+                        }
                         //ENVIAR EMAIL SI ES GUARDAR Y NOTIFICAR
                         if($parametros['notificar']=='si'){
                             $correowf = $this->verWFemail($parametros[id]);
@@ -5206,14 +5334,14 @@
                 return $objResponse;
             }            
             public function buscar_reporte($parametros)
-            {   ///print_r($parametros);
+            {   //print_r($parametros);
                 
                 /*FILTRA LOS DOCUMENTOS QUE ESTAN VIGENTES*/
                 $parametros["b-vigencia"] = 'S';
                 $grid = $this->verListaDocumentosReporte($parametros);
                 $objResponse = new xajaxResponse();
                 
-                $objResponse->addScript("limpiar_titulo();");
+                //$objResponse->addScript("limpiar_titulo();");
                 if ((strlen($parametros['b-id_organizacion'])>0)&&(!strpos($parametros['b-id_organizacion'],','))){
                     //echo BuscaOrganizacional(array('id_organizacion' => $parametros['b-id_organizacion']));
                     $objResponse->addScript("$('#div-titulo-mod').html($('#div-titulo-mod').html() + '<br>' + '". BuscaOrganizacional(array('id_organizacion' => $parametros['b-id_organizacion'])). "');");
@@ -5424,10 +5552,12 @@
             
          public function cargar_combo_wf($parametros){
             // print_r($parametros);
+            import("clases.workflow_documentos.WorkflowDocumentos");
+            $wf = new WorkflowDocumentos(); 
             $val = $this->verDocumentos($parametros[id]);
             $ut_tool = new ut_Tool(); 
             $sql = "SELECT
-                    mos_personal.cod_emp, mos_personal.email
+                    mos_personal.cod_emp, mos_personal.email,mos_personal.responsable_area, mos_organizacion.id id_organizacion
                     FROM
                     mos_organizacion inner join (SELECT
                             min(mos_organizacion.level) level
@@ -5435,80 +5565,202 @@
                             mos_organizacion
                             WHERE
                             mos_organizacion.id in (".$parametros[nodos].")) nivel_minimo
-                    on nivel_minimo.`level`= mos_organizacion.`level` inner join mos_personal ON
+                    on nivel_minimo.`level`= mos_organizacion.`level` left join mos_personal ON
                     mos_personal.id_organizacion = mos_organizacion.id
                     WHERE
-                    mos_organizacion.id in (".$parametros[nodos].") "
-                    . "and mos_personal.responsable_area='S';";
+                    mos_organizacion.id in (".$parametros[nodos]."); ";
             //echo $sql;
             $this->operacion($sql, $atr);
                 //echo $sql;
             $empleados = $this->dbl->data;
             if(sizeof($this->dbl->data)>0){
-                $cod_emp = implode(',', array_column($this->dbl->data,'cod_emp'));
+                foreach($empleados as $value){
+                    if($value[responsable_area]=='S'){
+                        $cod_emp = $value[cod_emp];
+                        $es_responsable_area = $value[responsable_area];
+                        $email_aprobador = $value[email];
+                    }
+                    $id_organizacion = $value[id_organizacion];
+                }
             }
             //echo $cod_emp;
-            //print_r($this->dbl->data);
-            if($cod_emp!=''){
-                if($_SESSION[SuperUser]=='S'){
-                    $sql="SELECT wf.id,
-                            CONCAT( 
-                            CONCAT(CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2)))) 
-                            ,' &rarr; ', 
-                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))) ,'N/A')
-                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
-                            FROM mos_workflow_documentos AS wf
-                            left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
-                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
-                            where wf.id_personal_aprueba in (".$cod_emp.")";
-                            
-                }
-                else
-                {
-                    $sql="SELECT wf.id,
-                            CONCAT( 
-                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
-                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
-                            FROM mos_workflow_documentos AS wf
-                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
-                            WHERE wf.id_personal_responsable='".$_SESSION['CookCodEmp']."' and 
-                            wf.id_personal_aprueba in (".$cod_emp.")";
-
-                }
+             if($cod_emp!='' && $es_responsable_area=='S'){
+                //VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR
+                $sql="SELECT wf.id,
+                           CONCAT( 
+                           IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
+                           ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
+                           FROM mos_workflow_documentos AS wf
+                           left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                           INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                           WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
+                //echo 'query 1 VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR '.$sql;
                 $this->operacion($sql, $atr);
-                if(sizeof($this->dbl->data)<1){
-                    import("clases.workflow_documentos.WorkflowDocumentos");
-                    $wf = new WorkflowDocumentos();
-                    //$atr[id_personal_responsable],'$atr[email_responsable]',$atr[id_personal_revisa],'$atr[email_revisa]',$atr[id_personal_aprueba],'$atr[email_aprueba]'
-                    foreach($empleados as $value){
+                if(sizeof($this->dbl->data)>0){
+                    //ESTE RESPONSABLE DE AREA TIENE WF COMO APROBADOR
+                    $datos = $this->dbl->data;
+                    $sql .=" UNION ALL SELECT wf.id,
+                           CONCAT( 
+                           IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
+                           ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
+                           FROM mos_workflow_documentos AS wf
+                           left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                           INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                           WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
+                    $seleccionar=$cod_emp;
+                    //echo 'query 2 TIENE WF EL RESPONSABLE  '.$sql;
+                }
+                else{
+                     //ESTE RESPONSABLE DE AREA NO TIENE WF COMO APROBADOR Y HAY QUE CREARLO
                         $atr =array();
                         $atr[id_personal_responsable]=$_SESSION['CookCodEmp'];
                         $atr[email_responsable]=$_SESSION['CookEmail'];
-                        $atr[id_personal_aprueba]=$value[cod_emp];
-                        $atr[email_aprueba]=$value[email];
-                        //print_r($atr);
+                        $atr[id_personal_aprueba]=$cod_emp;
+                        $atr[email_aprueba]=$email_aprobador;
+                        //echo 'inserta respon area';
+                       // print_r($atr);
                         $wf->ingresarWorkflowDocumentos($atr);
-                    }
+                    $sql="SELECT wf.id,
+                               CONCAT( 
+                               IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
+                               ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
+                               FROM mos_workflow_documentos AS wf
+                               left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                               INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                               WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."')";
+                    // echo 'query 2 NO TIENE WF EL RESPONSABLE  E INSERTAMOS '.$sql;
                 }
-                if($val['id_workflow_documento']==''){
-                    $js = "$('#id_workflow_documento option').eq(1).attr('selected', 'selected');";
-                }                
-                $combosemp .= $ut_tool->OptionsCombo($sql, 'id', 'wf', $val['id_workflow_documento']);    
-                $combo .="<select class='form-control' id=\"id_workflow_documento\" name=\"id_workflow_documento\"  data-validation=\"required\" >
-                            <option value=''>-- No Asignado --</option>
-                            ".$combosemp."
-                        </select>    ";
+                $sql_wf_sel="SELECT wf.id
+                   FROM mos_workflow_documentos AS wf
+                   WHERE wf.id_personal_aprueba in (".$cod_emp.") and (wf.id_personal_responsable=".$_SESSION['CookCodEmp'].")"
+                . " limit 0,1";
+                $this->operacion($sql_wf_sel, $atr);
+                $seleccionar=$this->dbl->data[0][id];
 
             }
             else{
-                $combo .="<select class='form-control' id=\"id_workflow_documento\" name=\"id_workflow_documento\"  data-validation=\"required\" >
-                            <option value=''>-- No Asignado --</option>
-                        </select>    ";
-                
+                //EL AREA NO TIENE RESPONSABLE Y BUSCAMOS EL REPONSABLE DEL AREA SUPERIOR
+                //select min(level) nivel from mos_organizacion where id IN
+                $sql = "SELECT
+                    mos_personal.cod_emp, mos_personal.email, mos_organizacion.title
+                    FROM
+                    mos_organizacion inner join mos_personal ON
+                    mos_personal.id_organizacion = mos_organizacion.id
+                    WHERE
+                    mos_organizacion.id in (select parent_id from mos_organizacion where id IN (".$id_organizacion.") ) "
+                    . "and mos_personal.responsable_area='S';";
+               // echo $sql;
+                //echo 'query 1 SINO VERIFICAMOS SI EL RESPONSABLE SUPERIOR DE AREA TIENE WF ASIGNADO COMO APROBADOR '.$sql;
+                $this->operacion($sql, $atr);
+                //echo $sql;
+                $empleados = $this->dbl->data;
+                if(sizeof($this->dbl->data)>0){
+                $cod_emp = implode(',', array_column($this->dbl->data,'cod_emp'));
+                }    
+                if($cod_emp!=''){
+                    //VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR
+                    $sql="SELECT wf.id,
+                               CONCAT( 
+                               IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
+                               ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
+                               FROM mos_workflow_documentos AS wf
+                               left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                               INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                               WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
+                    $this->operacion($sql, $atr);
+                    if(sizeof($this->dbl->data)>0){
+                        //ESTE RESPONSABLE DE AREA TIENE WF COMO APROBADOR
+                        $datos = $this->dbl->data;
+                        $sql .=" UNION ALL SELECT wf.id,
+                               CONCAT( 
+                               IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
+                               ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
+                               FROM mos_workflow_documentos AS wf
+                               left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                               INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                               WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
+                          //$this->operacion($sql, $atr);
+                        //$datos = $this->dbl->data;
+                        //$resultado = array_merge($datos, $this->dbl->data);
+                    }
+                    else{
+                         //ESTE RESPONSABLE DE AREA NO TIENE WF COMO APROBADOR Y HAY QUE CREARLO
+                        foreach($empleados as $value){
+                            $atr =array();
+                            $atr[id_personal_responsable]=$_SESSION['CookCodEmp'];
+                            $atr[email_responsable]=$_SESSION['CookEmail'];
+                            $atr[id_personal_aprueba]=$value[cod_emp];
+                            $atr[email_aprueba]=$value[email];
+                            $area = $value[title];
+                            //echo 'inserta respon sup';
+                            //print_r($atr);
+                            $mensaje = 'Se va a crear, Flujo de Trabajo del Área '.$area.', no existe responsable en el área seleccionada';
+                            $wf->ingresarWorkflowDocumentos($atr);
+                        }
+                        
+                        $sql="SELECT wf.id,
+                                   CONCAT( 
+                                   IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
+                                   ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
+                                   FROM mos_workflow_documentos AS wf
+                                   left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                                   INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                                   WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."')";
+                        $sql_wf_sel="SELECT wf.id
+                                   FROM mos_workflow_documentos AS wf
+                                   WHERE wf.id_personal_aprueba in (".$cod_emp.") and (wf.id_personal_responsable=".$_SESSION['CookCodEmp'].")"
+                                . " limit 1,1";
+                        $this->operacion($sql_wf_sel, $atr);
+                        $seleccionar=$this->dbl->data[0][id];
+                    }
+                }                
             }
-            $objResponse = new xajaxResponse();            
+            ////////////////////////////////////////////////////////////////////////////
+//                if($_SESSION[SuperUser]=='S'){
+//                    $sql="SELECT wf.id,
+//                            CONCAT( 
+//                            CONCAT(CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2)))) 
+//                            ,' &rarr; ', 
+//                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))) ,'N/A')
+//                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
+//                            FROM mos_workflow_documentos AS wf
+//                            left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
+//                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+//                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+//                            where 1=1 and  ".$sql_perso_aprueba."";
+//                            
+//                }
+//                else
+//                {
+//                    $sql="SELECT wf.id,
+//                            CONCAT( 
+//                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
+//                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
+//                            FROM mos_workflow_documentos AS wf
+//                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+//                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+//                            WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."' or 
+//                            ".$sql_perso_aprueba;
+//
+//                }
+
+            //echo $seleccionar;    
+            if($val['id_workflow_documento']=='' && $seleccionar==''){
+                $js = "$('#id_workflow_documento option').eq(1).attr('selected', 'selected');";
+            }
+            //echo $sql;
+            $combosemp .= $ut_tool->OptionsCombo($sql, 'id', 'wf', $seleccionar);    
+            $combo .="<select class='form-control' id=\"id_workflow_documento\" name=\"id_workflow_documento\"  data-validation=\"required\" >
+                        <option value=''>-- No Asignado --</option>
+                        ".$combosemp."
+                    </select>    ";
+
+            
+
+            $objResponse = new xajaxResponse();      
+            if($mensaje!=''){
+                $objResponse->addScriptCall('VerMensaje','exito',$mensaje);
+            }
             $objResponse->addAssign('div_combo_wf',"innerHTML",$combo);
             $objResponse->addScript($js);
             return $objResponse;
