@@ -88,13 +88,13 @@
                                 <label class="checkbox-inline"> 
                                     <input type="checkbox" id="b-formulario" name="b-formulario" value="S"> {N_FORMULARIO} </label>                                     
                             </div-->   
-                            <div class="form-group">                                                                
+                            <!--div class="form-group">                                                                
                                 <label class="checkbox-inline"> 
-                                    <input type="checkbox" id="b-publico" name="b-publico" checked="checked" value="S"> Documento {N_PUBLICO} </label>  
+                                    <input type="checkbox" id="b-publico" name="b-publico" checked="checked" value="S"> Documento {N_PUBLICO} </label-->  
                                     <!--<br>
                                     <label class="checkbox-inline"> 
                                     <input type="checkbox" id="b-privado" name="b-privado" value="N"> Documento Privado </label> -->
-                            </div>   
+                            <!--/div-->   
 <!--<div class="form-group">
                                   <label for="vigencia" class="col-md-2 control-label">{N_VIGENCIA}</label>
                                   <div class="col-md-2">
@@ -219,6 +219,7 @@
                                                 {APROBO}
                                              </select>
                                              <input type="hidden" id="b-id_organizacion" name="b-id_organizacion"/>                                                                        
+                                             <input type="hidden" name="b-ocultar-publico" id="b-ocultar-publico">
                                         </div>
                                              <!--
 </div>
