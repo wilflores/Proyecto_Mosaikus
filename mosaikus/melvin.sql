@@ -373,6 +373,158 @@ END;
 ;;
 DELIMITER ;
 /*FIN CAMBIOS*/
+
+/*AJuste en menu documentos*/
+INSERT INTO `mos_link` (`cod_link`, `nombre_link`) VALUES ('89', 'Configuración');
+UPDATE `mos_link` SET `dependencia`='3', `tipo`='2', `orden`='18' WHERE (`cod_link`='89');
+UPDATE `mos_link` SET `dependencia`='89' WHERE (`cod_link`='88');
+UPDATE `mos_link` SET `dependencia`='89' WHERE (`cod_link`='75');
+UPDATE `mos_link` SET `orden`='60' WHERE (`cod_link`='89');
+/*FIN AJUSTE DOCUMENTO*/
+
+
+
+/*Codigo Documentos*/
+INSERT INTO `mos_link` (`cod_link`, `descripcion`, `nombre_link`, `dependencia`) VALUES ('90', 'DocumentoCodigos-indexDocumentoCodigos-clases.documento_codigos.DocumentoCodigos', 'Códigos de Areas', '3');
+UPDATE `mos_link` SET `orden`='59' WHERE (`cod_link`='90');
+
+ALTER TABLE `mos_organizacion_nombres`
+MODIFY COLUMN `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT FIRST ;
+ALTER TABLE `mos_organizacion_nombres`
+MODIFY COLUMN `id`  int(11) NOT NULL AUTO_INCREMENT FIRST ;
+
+
+ALTER TABLE `mos_acciones_correctivas` DROP FOREIGN KEY `mos_acciones_correctivas_ibfk_1`;
+
+ALTER TABLE `mos_acciones_correctivas` ADD CONSTRAINT `mos_acciones_correctivas_ibfk_1` FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion_nombres` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_correcciones` DROP FOREIGN KEY `mos_correcciones_ibfk_1`;
+
+ALTER TABLE `mos_correcciones` ADD CONSTRAINT `mos_correcciones_ibfk_1` FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion_nombres` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_personal` DROP FOREIGN KEY `mos_personal_ibfk_1`;
+
+ALTER TABLE `mos_personal` ADD CONSTRAINT `mos_personal_ibfk_1` FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion_nombres` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_documentos_estrorg_arbolproc` DROP FOREIGN KEY `mos_documentos_estrorg_arbolproc_ibfk_1`;
+
+ALTER TABLE `mos_documentos_estrorg_arbolproc` ADD CONSTRAINT `mos_documentos_estrorg_arbolproc_ibfk_1` FOREIGN KEY (`id_organizacion_proceso`) REFERENCES `mos_organizacion_nombres` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+ALTER TABLE `mos_arbol_procesos` DROP FOREIGN KEY `mos_arbol_procesos_ibfk_1`;
+
+ALTER TABLE `mos_arbol_procesos` ADD CONSTRAINT `mos_arbol_procesos_ibfk_1` FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion_nombres` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE `mos_cargo_estrorg_arbolproc` DROP FOREIGN KEY `mos_cargo_estrorg_arbolproc_ibfk_2`;
+
+ALTER TABLE `mos_cargo_estrorg_arbolproc` ADD CONSTRAINT `mos_cargo_estrorg_arbolproc_ibfk_2` FOREIGN KEY (`id`) REFERENCES `mos_organizacion_nombres` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+ALTER TABLE `mos_organizacion`
+ADD COLUMN `area_espejo`  int NULL AFTER `type`;
+
+ALTER TABLE `mos_organizacion_nombres`
+ADD COLUMN `area_espejo`  int NULL AFTER `title`;
+
+DROP TRIGGER `actualizar_nombre_area_ins`;
+
+DROP TRIGGER `actualizar_nombre_area`;
+
+DELIMITER ;;
+
+CREATE TRIGGER `actualizar_nombre_area_ins` AFTER INSERT ON `mos_organizacion_nombres`
+FOR EACH ROW begin
+DECLARE padre INT;  
+UPDATE mos_organizacion SET title = NEW.title  WHERE id = NEW.id;
+
+SET padre =  (SELECT parent_id FROM mos_organizacion WHERE id = NEW.id);
+ insert into mos_documentos_codigo (id_organizacion, codigo)
+      select NEW.id, codigo
+       from mos_documentos_codigo      
+      where id_organizacion =padre; 
+
+end;
+;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE TRIGGER `actualizar_nombre_area` BEFORE UPDATE ON `mos_organizacion_nombres`
+FOR EACH ROW begin 
+       UPDATE mos_organizacion SET title = NEW.title, area_espejo = NEW.area_espejo WHERE id = NEW.id;
+       IF (NEW.title <> OLD.title) AND OLD.title = 'New Node' THEN
+                UPDATE mos_documentos_codigo SET codigo = CONCAT(codigo,'_', UPPER(SUBSTR(NEW.title, 1, 3))) WHERE id_organizacion = NEW.id;
+       END IF;
+end;
+
+;;
+DELIMITER ;
+DROP TRIGGER `permisos_perfil_usuarios`;
+
+
+DELIMITER ;;
+CREATE  TRIGGER `permisos_perfil_usuarios` BEFORE INSERT ON `mos_organizacion`
+FOR EACH ROW Begin 
+      SET NEW.title = (SELECT title FROM mos_organizacion_nombres WHERE id = NEW.ID);
+
+      INSERT into mos_usuario_estructura(id_usuario_filial,id_estructura, id_usuario,cod_perfil,portal)
+      select id_usuario_filial,NEW.id,id_usuario,cod_perfil,portal from mos_usuario_estructura 
+      where id_estructura = NEW.parent_id;
+     
+     
+END;
+;;
+
+DELIMITER ;
+
+
+
+UPDATE `mos_link_portal` SET `descripcion`='Documentos-indexDocumentosFormulario-clases.documentos.Documentos-formulario' WHERE (`cod_link`='16');
+UPDATE `mos_link` SET `dependencia`='89' WHERE (`cod_link`='90');
+UPDATE `mos_link` SET `dependencia`='89' WHERE (`cod_link`='82');
+
+
+DROP TABLE IF EXISTS `mos_documentos_codigo`;
+CREATE TABLE `mos_documentos_codigo` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_organizacion` int(11) DEFAULT NULL,
+  `codigo` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `bloqueo_codigo` varchar(2) CHARACTER SET latin1 DEFAULT 'S',
+  `bloqueo_version` varchar(2) CHARACTER SET latin1 DEFAULT 'S',
+  `correlativo` int(11) DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `id_organizacion` (`id_organizacion`),
+  CONSTRAINT `mos_documentos_codigo_ibfk_1` FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion_nombres` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+insert into mos_documentos_codigo(id_organizacion,codigo,bloqueo_codigo,bloqueo_version,correlativo)
+select 
+o.id,
+concat(
+IFNULL(concat(UPPER(SUBSTR(p4.title, 1, 3)),'_'),''),
+IFNULL(concat(UPPER(SUBSTR(p3.title, 1, 3)),'_'),''),
+IFNULL(concat(UPPER(SUBSTR(p2.title, 1, 3)),'_'),''), 
+IFNULL(concat(UPPER(SUBSTR(p1.title, 1, 3)),'_'),''), 
+IFNULL(concat(UPPER(SUBSTR(padre.title, 1, 3)),'_'),''), 
+UPPER(SUBSTR(o.title, 1, 3)) 
+) codigo,
+'S',
+'S',
+IFNULL(d.total+1,1)
+from mos_organizacion o
+inner join mos_organizacion padre on padre.id = o.parent_id
+left join mos_organizacion p1 on p1.id = padre.parent_id
+left join mos_organizacion p2 on p2.id = p1.parent_id
+left join mos_organizacion p3 on p3.id = p2.parent_id
+left join mos_organizacion p4 on p4.id = p3.parent_id
+left join (
+	select da.id_organizacion_proceso, COUNT(DISTINCT d.IDDoc) total from mos_documentos_estrorg_arbolproc da
+  INNER JOIN mos_documentos d on d.IDDoc = da.IDDoc
+GROUP BY da.id_organizacion_proceso
+
+) as d on d.id_organizacion_proceso = o.id;
+
+/**/
+
 -- Cambios nuevos para inspecciones
 INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('descripcion_larga', 'Descripción Larga', '22', 'Descripción Larga')
 
@@ -409,6 +561,8 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `mos_admin_usuarios` AS sel
 INSERT INTO `mos_link` (`descripcion`, `nombre_link`) VALUES ('Parametros-indexParametrosInspecciones-clases.parametros.Parametros', 'Parametros de Inspecciones');
 UPDATE `mos_link` SET `dependencia`='83' WHERE (`cod_link`='0');
 UPDATE `mos_link` SET `cod_link`='86' WHERE (`cod_link`='0');
+
+
 
 /*ejecutado en BD desarrollo*/
 INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('id', 'id', '25', 'id');

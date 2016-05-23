@@ -18,8 +18,37 @@ function reporte_documentos_pdf(){
 
 function limpiar_titulo(){
     var titulo = $('#div-titulo-mod').html();
-    if (titulo.indexOf("<br>")>0)
-        $('#div-titulo-mod').html(titulo.substr(0, titulo.indexOf("<br>")));
+    //alert(titulo.lastIndexOf("<br>"));
+    //alert(titulo.indexOf("</label>"));
+    if (titulo.lastIndexOf("<br>")>(titulo.lastIndexOf("</label>"))){       
+        $('#div-titulo-mod').html(titulo.substr(0, titulo.lastIndexOf("<br>")));
+        $('.b-area_espejo').on('change', function (event) {
+                                /*event.preventDefault();
+                                var id = $(this).attr('tok');*/
+                                 if( $(this).is(':checked') ){
+                                    $('#b-area_espejo').val('1');
+                                    verPagina(1,document);
+                                    /*alert('El checkbox con valor ' + $(this).val() + ' ha sido seleccionado');*/
+                                } else {
+                                    $('#b-area_espejo').val('');
+                                    verPagina(1,document);
+                                    /*alert('El checkbox con valor ' + $(this).val() + ' ha sido deseleccionado');*/
+                                }
+                            });
+        $('.b-mi-ocultar-publico').on('change', function (event) {
+                                /*event.preventDefault();
+                                var id = $(this).attr('tok');*/
+                                 if( $(this).is(':checked') ){
+                                    $('#b-ocultar-publico').val('1');
+                                    verPagina(1,document);
+                                    /*alert('El checkbox con valor ' + $(this).val() + ' ha sido seleccionado');*/
+                                } else {
+                                    $('#b-ocultar-publico').val('');
+                                    verPagina(1,document);
+                                    /*alert('El checkbox con valor ' + $(this).val() + ' ha sido deseleccionado');*/
+                                }
+                            });
+    }
 }
 
 function init_documentos(){

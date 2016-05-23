@@ -183,6 +183,11 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
             //if ($fila['Type']=='real')
             //    $campos_validator .="           \$validator->addValidation(\"".$fila['Field']."\",\"real\",\"".ucfirst($fila['Field'])." de la hora debe ser un numero valido.\");\n";
         }
+        else{
+            $titulos_grilla .="\n               array( \"width\"=>\"10%\",\"ValorEtiqueta\"=>link_titulos(\$this->nombres_columnas[".$fila['Field']."], \"".$fila['Field']."\", \$parametros)),";
+            $titulos_grilla_excel .="\n         array( \"width\"=>\"10%\",\"ValorEtiqueta\"=>htmlentities(\$this->nombres_columnas[".$fila['Field']."], ENT_QUOTES, \"UTF-8\")),";
+
+        }
         $columnas_mostrar .= $columnas . '-';
         $columnas++;
     }
@@ -328,18 +333,18 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
             
             public function colum_admin_arbol(\$tupla)
             {                
-                if (\$this->id_org_acceso[\$tupla[id_organizacion]][modificar] == 'S')
+                if (\$this->id_org_acceso_explicito[\$tupla[id_organizacion]][modificar] == 'S')
                 {                    
                     \$html = \"<a href=\\\"#\\\" onclick=\\\"javascript:editar$nombre_clase('\". \$tupla[id] . \"');\\\"  title=\\\"Editar $nombre_clase\\\">                            
                                 <i class=\\\"icon icon-edit\\\"></i>
                             </a>\";
                 }
-                if (\$this->id_org_acceso[\$tupla[id_organizacion]][eliminar] == 'S')
+                if (\$this->id_org_acceso_explicito[\$tupla[id_organizacion]][eliminar] == 'S')
                 {
-                    \$html .= '<a href=\\\"#\\\" onclick=\\\"javascript:eliminar$nombre_clase(\''. \$tupla[id] . '\');\\\" title=\\\"Eliminar $nombre_clase\\\">
+                    \$html .= \"<a href=\\\"#\\\" onclick=\\\"javascript:eliminar$nombre_clase('\". \$tupla[id] . \"');\\\" title=\\\"Eliminar $nombre_clase\\\">
                             <i class=\\\"icon icon-remove\\\"></i>
 
-                        </a>'; 
+                        </a>\"; 
                 }
                 return \$html;
             }
@@ -484,7 +489,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                     \$this->dbl->insert_update(\$sql);
                     \$nuevo = \"$campos_log_new\";
                     \$anterior = \"$campos_log_ant\";
-                    \$this->registraTransaccionLog(19,\$nuevo,\$anterior, $atr[id]);
+                    \$this->registraTransaccionLog(19,\$nuevo,\$anterior, \$atr[id]);
                     /*
                     \$this->registraTransaccion('Modificar','Modifico el $nombre_clase ' . \$atr[descripcion_ano], '$tabla');
                     */
@@ -585,7 +590,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 if (\$parametros['corder'] == null) \$parametros['corder']=\"descripcion_ano\";
                 if (\$parametros['sorder'] == null) \$parametros['sorder']=\"desc\"; 
                 if (\$parametros['mostrar-col'] == null) 
-                    \$parametros['mostrar-col']=\"$columnas_mostrar\"; 
+                    \$parametros['mostrar-col']=\"0-$columnas_mostrar\"; 
                 /*if (count(\$this->parametros) <= 0){
                         \$this->cargar_parametros();
                 } */               
@@ -951,7 +956,8 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 if(\$_SESSION[CookE] == 'S')//if (\$parametros['permiso'][3] == \"1\")
                     array_push(\$func,array('nombre'=> 'eliminar$nombre_clase','imagen'=> \"<img style='cursor:pointer' src='diseno/images/ico_eliminar.png' title='Eliminar $nombre_clase'>\"));
                */
-                \$config=array(array(\"width\"=>\"10%\", \"ValorEtiqueta\"=>\"&nbsp;\"));
+                \$config=array();
+                //\$config=array(array(\"width\"=>\"10%\", \"ValorEtiqueta\"=>\"&nbsp;\"));
                 \$grid->setPaginado(\$reg_por_pagina, \$this->total_registros);
                 \$array_columns =  explode('-', \$parametros['mostrar-col']);
                 for(\$i=0;\$i<count(\$config_col);\$i++){

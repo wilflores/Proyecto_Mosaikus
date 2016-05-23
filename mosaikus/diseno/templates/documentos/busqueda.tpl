@@ -220,6 +220,7 @@
                                              </select>
                                              <input type="hidden" id="b-id_organizacion" name="b-id_organizacion"/>                                                                        
                                              <input type="hidden" name="b-ocultar-publico" id="b-ocultar-publico">
+                                             <input type="hidden" id="b-area_espejo" name="b-area_espejo"/> 
                                         </div>
                                              <!--
 </div>

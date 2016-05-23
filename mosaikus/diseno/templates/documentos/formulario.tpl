@@ -16,7 +16,7 @@
 
                             <div class="form-group" id="tabla_fileUpload"  style="{CSS_TABLA_FILEUPLOAD}">
                                     <label for="archivo" class="col-md-4 control-label">{N_DOC_FISICO}</label>
-                                    <div class="col-md-11">
+                                    <div class="col-md-12">
                                         <input type="file" value="{ARCHIVO}" accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.presentation, application/vnd.ms-excel"  id="fileUpload2" name="fileUpload2" onchange="cargar_archivo_otro();" data-validation="required"/>
                                         <input type="hidden" id="estado_actual" name="estado_actual">
                                         <input type="hidden" id="filename" name="filename" value="{FILENAME}">
@@ -40,10 +40,10 @@
                              </div>
                              <div class="form-group" id="info_archivo_adjunto"  style="display:none;">
                                     <label for="archivo" class="col-md-4 control-label">{N_DOC_FISICO}</label>
-                                    <div class="col-md-11">
+                                    <div class="col-md-12">
                                         <p class="form-control-static" style="">
                                             <!--<img src="{PAHT_TO_IMG}adjunto.png">-->
-                                            <input type="text" class="form-control" value="{CODIGO_DOC}" style="display: inline;width: 80px;" id="Codigo_doc" name="Codigo_doc" placeholder="{N_CODIGO_DOC}" data-validation="required"/>
+                                            <input type="text" class="form-control" value="{CODIGO_DOC}" style="display: inline;width: 150px;" id="Codigo_doc" name="Codigo_doc" placeholder="{N_CODIGO_DOC}" data-validation="required"/>
                                             -
                                             <input type="text" class="form-control" value="{NOMBRE_DOC}" style="display: inline;width: 200px;"id="nombre_doc" name="nombre_doc" placeholder="{N_NOMBRE_DOC}" data-validation="required"/>
                                             -V
@@ -61,7 +61,7 @@
                              </div>
                             <div class="form-group" id="tabla_fileUpload_vis"  style="{CSS_TABLA_FILEUPLOAD_VIS}">
                                     <label for="archivo" class="col-md-4 control-label">{N_NOM_VISUALIZA}</label>
-                                    <div class="col-md-11">
+                                    <div class="col-md-12">
                                         <input type="file" value="{ARCHIVO}" accept="application/pdf" id="fileUpload2_vis" name="fileUpload2_vis" onchange="cargar_archivo_vis();"/>
                                         <input type="hidden" id="estado_actual_vis" name="estado_actual_vis">
                                         <input type="hidden" id="filename_vis" name="filename_vis" value="{FILENAME}">
@@ -82,7 +82,7 @@
                              </div>
                              <div class="form-group" id="info_archivo_adjunto_vis"  style="display:none;">
                                     <label for="archivo" class="col-md-4 control-label">{N_NOM_VISUALIZA}</label>
-                                    <div class="col-md-11">
+                                    <div class="col-md-12">
                                         <p class="form-control-static" style="">
                                             <input type="text" class="form-control" style="width: 380px;display: inline;" id="info_nombre_vis" readonly="readonly">
                                             <a href="#" onclick="cancelar_archivo_vis();">

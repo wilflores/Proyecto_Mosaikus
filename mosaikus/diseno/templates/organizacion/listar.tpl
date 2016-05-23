@@ -59,4 +59,25 @@
         </div>
                   
     </div>
+                            
+<div class="modal fade bs-example-modal-lg" id="myModal-Area-Espejo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog  modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModal-Area-Espejo-Titulo">Árbol Organizacional</h4>
+            </div>
+            <div class="modal-body" id="modal-body-area-espejo">
+                
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="origen-id-area" />
+                <input type="hidden" id="relacion-id-area" />
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>                                  
+              <button type="button" class="btn btn-primary" onClick="asociar_area();">Relacionar Área Espejo</button>
+              <button type="button" class="btn btn-primary" onClick="eliminar_area();">Eliminar Relación Área Espejo</button>
+            </div>
+        </div>
+    </div>
+</div>
 

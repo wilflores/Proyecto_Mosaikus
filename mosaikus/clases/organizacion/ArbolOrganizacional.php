@@ -99,6 +99,28 @@
                     }
             }
             
+            public function modificarAreaEspejo($atr){
+                try {
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $sql = "UPDATE mos_organizacion_nombres SET                            
+                                    area_espejo = $atr[area_espejo]
+                            WHERE  id = $atr[id]";      
+                    //echo $sql;
+                    $this->dbl->insert_update($sql);
+                    $nuevo = "Area Espejo: \'$atr[area_espejo]\'";                    
+                    $this->registraTransaccionLog(88,$nuevo,'', $atr[id]);
+                    /*
+                    $this->registraTransaccion('Modificar','Modifico el ArbolOrganizacional ' . $atr[descripcion_ano], 'mos_organizacion');
+                    */
+                    return " ha sido actualizado con exito";
+                } catch(Exception $e) {
+                        $error = $e->getMessage();                     
+                        if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
+                            return "Ya existe una sección con el mismo nombre.";                        
+                        return $error; 
+                    }
+            }
+            
             public function listarArbolOrganizacional($atr, $pag, $registros_x_pagina){
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
@@ -774,6 +796,40 @@
                 $objResponse->addScript("$('#MustraCargando').hide();"); 
                 return $objResponse;
             }
+            
+            public function guardar_area_espejo($parametros)
+            {
+                session_name("$GLOBALS[SESSION]");
+                session_start();
+                $objResponse = new xajaxResponse();
+                unset ($parametros['opc']);                
+                $parametros['id_usuario']= $_SESSION['USERID'];
+
+                $validator = new FormValidator();
+                
+                if(!$validator->ValidateForm($parametros)){
+                        $error_hash = $validator->GetErrors();
+                        $mensaje="";
+                        foreach($error_hash as $inpname => $inp_err){
+                                $mensaje.="- $inp_err <br/>";
+                        }
+                         $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
+                }else{
+                    
+                    $respuesta = $this->modificarAreaEspejo($parametros);
+
+                    if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
+                        //$objResponse->addScriptCall("MostrarContenido");
+                        $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+                    }
+                    else
+                        $objResponse->addScriptCall('VerMensaje','error',$respuesta);
+                }
+                          
+                $objResponse->addScript("$('#MustraCargando').hide();");                 
+                $objResponse->addScript("$('#tree').jstree(true).refresh()");
+                return $objResponse;
+            }
      
  
             public function editar($parametros)
@@ -970,7 +1026,7 @@
         public function jstree_ao($contar=0,$parametros=array()){
             if(!class_exists('Template')){
                 import("clases.interfaz.Template");
-            }
+            }            
             $contenido_1[AO] = $this->MuestraPadre($contar,$parametros);
             $template = new Template();
             $template->PATH = PATH_TO_TEMPLATES.'organizacion/';
@@ -1044,7 +1100,7 @@
                 $sql="select * from mos_organizacion
 				Where id = $id";
                 $data = $this->dbl->query($sql, $atr);
-                $items[0] = array(id=>$data[0][id], text=>$data[0][title], "state" => array("opened" => true ));
+                $items[0] = array(id=>$data[0][id], text=>$data[0][title], "state" => array("opened" => true ), "type"=> strlen($data[0][area_espejo])>0?'area_espejo':'default');
                 
                 $sql="select * from mos_organizacion
 				Where parent_id = $id";
@@ -1081,7 +1137,7 @@
                //print_r($data_ids_acceso);
                foreach ($data_ids_acceso as $value) {
                    $this->id_org_acceso[$value[id]] = $value;
-               }                                            
+               }                   
            }
        }
        
@@ -1137,7 +1193,7 @@
                                 $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
                                     . "FROM mos_documentos_estrorg_arbolproc eao "
                                     . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
-                                    . "WHERE tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S' and d.etapa_workflow = 'estado_aprobado'"
+                                    . "WHERE tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S'  AND formulario = 'N' and d.etapa_workflow = 'estado_aprobado'"
                                     . " ";   
                                 $sql .= " AND (eao.id_organizacion_proceso IN (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
                                 if ($parametros["b-publico"] == 'S')
@@ -1296,7 +1352,7 @@
                                 $sql = "SELECT COUNT(*) total "
                                     . "FROM mos_documentos_estrorg_arbolproc eao "
                                     . "INNER JOIN mos_documentos d ON d.IDDoc = eao.IDDoc "
-                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arr[id]) . ")   AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S'  and d.etapa_workflow = 'estado_aprobado'";
+                                    . "WHERE eao.id_organizacion_proceso IN (". $this->BuscaOrgNivelHijos($arr[id]) . ")   AND tipo = 'EO' AND d.vigencia = 'S' AND muestra_doc = 'S'  AND formulario = 'N'  and d.etapa_workflow = 'estado_aprobado'";
                                 $sql .= " AND (eao.id_organizacion_proceso IN (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
                                 if ($parametros["b-publico"] == 'S')
                                     $sql .= " OR (eao.id_organizacion_proceso IN (".implode(',', array_keys($this->id_org_acceso)).") AND d.publico = 'S' )";
@@ -1455,6 +1511,34 @@
                     $OrgNom .= $_SESSION[CookNomEmpresa];
                 return $OrgNom;
 
+        }
+        
+        public function marcar_area_espejo($parametros) {
+            
+            $contenido_1   = array();
+            $parametros[opcion] = 'simple';
+            $sql = "SELECT area_espejo FROM mos_organizacion_nombres WHERE id = $parametros[id]";
+            $data = $this->dbl->query($sql);
+            $parametros[nodos_seleccionados] = array();
+            if (strlen($data[0][area_espejo])>0)
+                $parametros[nodos_seleccionados] = array($data[0][area_espejo]);
+            $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $this->jstree_ao(0,$parametros);
+            $objResponse = new xajaxResponse();
+            //$objResponse->addAssign('contenido',"innerHTML",$template->show());
+            //$objResponse->addAssign('myModal-Ventana-Cuerpo',"innerHTML",$template->show());
+            $objResponse->addAssign('modal-body-area-espejo',"innerHTML",$contenido_1[DIV_ARBOL_ORGANIZACIONAL]);
+            $objResponse->addAssign('origen-id-area',"value",$parametros[id]);
+            
+            //$objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
+            //$objResponse->addAssign('modulo_actual',"value","items_formulario");
+            $objResponse->addIncludeScript(PATH_TO_JS . 'items_formulario/items_formulario.js');
+            $objResponse->addScript("$('#MustraCargando').hide();");
+            //$objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
+            $objResponse->addScript("$('#myModal-Area-Espejo').modal('show');");
+            $objResponse->addScript("$('#myModal-Area-Espejo-Titulo').html('Área Espejo');"); 
+            $objResponse->addScript('ao_simple();');
+            return $objResponse;
+            
         }
         
         

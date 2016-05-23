@@ -99,10 +99,10 @@
                       <div class="panel-heading">
 
                             <div class="row">
-                              <div class="panel-title col-xs-10"  id="div-titulo-mod">
+                              <div class="panel-title col-xs-12"  id="div-titulo-mod">
                                 {TITULO_MODULO}
                               </div>
-                              <div class="panel-actions col-xs-14">
+                              <div class="panel-actions col-xs-12">
                                 <ul class="navbar">
                                   <li style="{PERMISO_INGRESAR}">
                                     <a href="javascript:{JS_NUEVO}" >
