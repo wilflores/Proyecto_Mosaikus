@@ -273,23 +273,42 @@ function cargar_autocompletado(){
                     }
                 }
             }
-            if(document.getElementById('id_workflow_documento').disabled)
-                document.getElementById('id_workflow_documento').disabled=false;
-            $( "#btn-guardar" ).html('Procesando..');
-            $( "#btn-guardar" ).prop( "disabled", true );
-            $( "#btn-guardar-not" ).prop( "disabled", true );
-            array = new XArray();
-            if (doc.getElementById("opc").value == "new")
-                array.setObjeto('Documentos','guardar');
-            else
-                array.setObjeto('Documentos','actualizar');
-          
-            array.addParametro('modo',document.getElementById('modo').value);
-            array.addParametro('cod_link',document.getElementById('cod_link').value);
-            array.addParametro('permiso',document.getElementById('permiso_modulo').value);
-            array.getForm('idFormulario');
-            array.addParametro('import','clases.documentos.Documentos');
-            xajax_Loading(array.getArray());
+            var ejecutar = function (){
+                if(document.getElementById('id_workflow_documento').disabled)
+                    document.getElementById('id_workflow_documento').disabled=false;
+                $( "#btn-guardar" ).html('Procesando..');
+                $( "#btn-guardar" ).prop( "disabled", true );
+                $( "#btn-guardar-not" ).prop( "disabled", true );
+                array = new XArray();
+                if (doc.getElementById("opc").value == "new")
+                    array.setObjeto('Documentos','guardar');
+                else
+                    array.setObjeto('Documentos','actualizar');
+
+                array.addParametro('modo',document.getElementById('modo').value);
+                array.addParametro('cod_link',document.getElementById('cod_link').value);
+                array.addParametro('permiso',document.getElementById('permiso_modulo').value);
+                array.getForm('idFormulario');
+                array.addParametro('import','clases.documentos.Documentos');
+                xajax_Loading(array.getArray());
+            }
+            if (($('#notificar').val() == 'si')&&($('#estado_actual').length > 0)){
+                bootbox.confirm("Va a Notificar al WF " + $("#id_workflow_documento option:selected").text() 
+                + " para Revisión, asegúrese que el " + $('#Codigo_doc').val() + '-' + $('#nombre_doc').val() + '-V' + $('#version').val()
+                + " son las correctas en el cuerpo del documento, <br>¿Desea Continuar?", function(result) {
+                    if (result == true){
+                        ejecutar();
+                    }
+
+                }); 
+            }
+            else{
+                ejecutar();
+            }
+//alert(2);
+//return;
+            
+            
         }else{
             alertify.error("Existen campos no validos.",5); 
         }
@@ -325,15 +344,26 @@ function cargar_autocompletado(){
                     }
                 }
             }
-            $( "#btn-guardar" ).html('Procesando..');
-            $( "#btn-guardar" ).prop( "disabled", true );
-            array = new XArray();
-           
-            array.setObjeto('Documentos','guardar_version');            
-            array.addParametro('permiso',document.getElementById('permiso_modulo').value);
-            array.getForm('idFormulario');
-            array.addParametro('import','clases.documentos.Documentos');
-            xajax_Loading(array.getArray());
+            var ejecutar = function (){
+                $( "#btn-guardar" ).html('Procesando..');
+                $( "#btn-guardar" ).prop( "disabled", true );
+                array = new XArray();
+
+                array.setObjeto('Documentos','guardar_version');            
+                array.addParametro('permiso',document.getElementById('permiso_modulo').value);
+                array.getForm('idFormulario');
+                array.addParametro('import','clases.documentos.Documentos');
+                xajax_Loading(array.getArray());
+            }
+            bootbox.confirm("Va a Notificar al WF " + $("#id_workflow_documento option:selected").text() 
+                + " para Revisión, asegúrese que el " + $('#Codigo_doc').val() + '-' + $('#nombre_doc').val() + '-V' + $('#version').val()
+                + " son las correctas en el cuerpo del documento, <br>¿Desea Continuar?", function(result) {
+                    if (result == true){
+                        ejecutar();
+                    }
+
+                }); 
+            
         }else{
         
         }
@@ -693,12 +723,14 @@ function RechazarWF(estado,etapa,id){
             xajax_Loading(array.getArray());
     }   
    function CargarCombowf(nodos,id){
+       if ($('#opc').val() == 'new'){
             array = new XArray();
             array.setObjeto('Documentos','cargar_combo_wf');
             array.addParametro('nodos',nodos);
             array.addParametro('id',id);
             array.addParametro('import','clases.documentos.Documentos');
             xajax_Loading(array.getArray());
+        }
     }  
 function ao_multiple(){    
     $('#div-ao-form').jstree(

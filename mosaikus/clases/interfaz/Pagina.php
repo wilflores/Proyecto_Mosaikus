@@ -189,7 +189,8 @@ class Pagina{
         $this->asigna_script('jquery/jquery.Rut.js'); 
         $this->asigna_script('jquery/select2.min.js');
         $this->asigna_script('highcharts/highcharts.js');
-        $this->asigna_script('highcharts/exporting.js');
+        //$this->asigna_script('highcharts/exporting.js');
+        $this->asigna_script("jquery/bootbox.min.js");
       
         //$this->asigna_script('jquery/jquery.multiselect.js');        temporal
         //$this->asigna_script('jquery/jquery.multiselect.filter.js');  temporal
@@ -631,7 +632,7 @@ class Pagina{
         $this->asigna_css("styles.css");
         
         $this->activar_jquery();
-        
+          
         //$this->asigna_script("jquery/jquery.fancybox-1.3.1.js");      
         //$this->asigna_css("mos_style.css");
         
