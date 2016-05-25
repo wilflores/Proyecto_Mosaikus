@@ -166,11 +166,11 @@
                     }
                 }
             }
-            
+            //return $arbol;
             $arbol_aux = array();
-            for($i=0;$i < count($arbol);$i++){
-                if (is_array($arbol[$i]))
-                    $arbol_aux[$i] = $arbol[$i];
+            foreach ($arbol as $key => $value) {                
+                if (is_array($value))
+                    $arbol_aux[$key] = $value;
             }
             
             return $arbol_aux;
