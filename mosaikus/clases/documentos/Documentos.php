@@ -1523,6 +1523,10 @@
                     if (count($this->id_org_acceso_todos_nivel) <= 0){
                         $this->cargar_acceso_nodos_todos_nivel($atr);                    
                     }
+                    //print_r(array_keys($this->id_org_acceso));
+                    //print_r(array_keys($this->id_org_acceso_todos_nivel));
+                    //print_r(array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso)));
+                    //echo implode(',',  array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))));
                     /*FILTRO NO INCLUIR AREA ESPEJO*/
                     $sql_filtro_area_espejo = "";
                     if ((strlen($atr["b-area_espejo"])>0)){ 
@@ -1573,7 +1577,7 @@
                                     if (count($this->id_org_acceso))
                                         $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ") $sql_filtro_area_espejo) )"; 
                                     if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-ocultar-publico"])==0))
-                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))) . ") $sql_filtro_area_espejo) )"; 
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso)))) . ") $sql_filtro_area_espejo) )"; 
                                 }
                                 $sql .= ")";
                             }
@@ -1593,7 +1597,7 @@
                                     if (count($this->id_org_acceso))
                                         $sql .= " OR ( d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ") $sql_filtro_area_espejo) )"; 
                                     if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-ocultar-publico"])==0))
-                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))) . ") $sql_filtro_area_espejo) )"; 
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso)))) . ") $sql_filtro_area_espejo) )"; 
                                     $sql .= ")";
 //                                }
                             }
@@ -1705,7 +1709,7 @@
                        
                        $sql .= " AND  (d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ") $sql_filtro_area_espejo)"; 
                        if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-ocultar-publico"])==0))
-                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))) . ") $sql_filtro_area_espejo) )"; 
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso)))) . ") $sql_filtro_area_espejo) )"; 
                                                                       
                        $sql .= ")";
                     }
@@ -1779,7 +1783,7 @@
                                         $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ") $sql_filtro_area_espejo) )"; 
                                     /*DOCUMENTOS PUBLICOS*/
                                     if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-ocultar-publico"])==0))
-                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S'  and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))) . ") $sql_filtro_area_espejo) )"; 
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S'  and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso)))) . ") $sql_filtro_area_espejo) )"; 
                                 }
                                 $sql .= ")";
                             }
@@ -1799,7 +1803,7 @@
                                     if (count($this->id_org_acceso))
                                         $sql .= " OR ( d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ") $sql_filtro_area_espejo) )"; 
                                     if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-ocultar-publico"])==0))
-                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))) . ") $sql_filtro_area_espejo) )"; 
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso)))) . ") $sql_filtro_area_espejo) )"; 
                                      $sql .= ")";
 //                                }
                             }
@@ -1931,6 +1935,7 @@
                     //print_r($atr);
                     // echo $sql;
                     $this->operacion($sql, $atr);
+                    
              }
              
              public function listarCamposFormulario($atr){       
@@ -2101,7 +2106,6 @@
                 $this->listarDocumentos($parametros, $parametros['pag'], $reg_por_pagina);
                 
                 $data=$this->dbl->data;
-                
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
                 }
