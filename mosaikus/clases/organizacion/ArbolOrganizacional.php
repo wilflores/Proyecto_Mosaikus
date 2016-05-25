@@ -1057,7 +1057,7 @@
                }
                $acceso = new mos_acceso();
                $data_ids_acceso = $acceso->obtenerNodosArbol($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo]);
-               print_r($data_ids_acceso);
+               //print_r($data_ids_acceso);
                foreach ($data_ids_acceso as $value) {
                    $this->id_org_acceso_exclusivo[$value[id]] = $value;
                }                                            
