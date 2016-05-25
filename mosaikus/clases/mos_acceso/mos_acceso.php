@@ -167,7 +167,13 @@
                 }
             }
             
-            return $arbol;
+            $arbol_aux = array();
+            for($i=0;$i < count($arbol);$i++){
+                if (is_array($arbol[$i]))
+                    $arbol_aux[$i] = $arbol[$i];
+            }
+            
+            return $arbol_aux;
         }
         public function obtenerNodosArbol($usuario, $modulo, $modo,$visualiza_tercero=''){
             $atr = array();
