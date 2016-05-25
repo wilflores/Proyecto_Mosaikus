@@ -1057,7 +1057,7 @@
                }
                $acceso = new mos_acceso();
                $data_ids_acceso = $acceso->obtenerNodosArbol($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo]);
-               //print_r($data_ids_acceso);
+               print_r($data_ids_acceso);
                foreach ($data_ids_acceso as $value) {
                    $this->id_org_acceso_exclusivo[$value[id]] = $value;
                }                                            
@@ -1065,7 +1065,7 @@
            $sql = "Select min(level) level FROM mos_organizacion WHERE id IN (". implode(',', array_keys($this->id_org_acceso_exclusivo)) . ")";
            
            $nivel_acceso = $this->dbl->query($sql);
-           $nivel_acceso = $nivel_acceso[0][level];
+           $nivel_acceso = $nivel_acceso[0][level] < 1 ? 1 : $nivel_acceso[0][level];
            $sql = "Select id FROM mos_organizacion WHERE id IN (". implode(',', array_keys($this->id_org_acceso)) . ") AND level = $nivel_acceso";
            $data = $this->dbl->query($sql);
            if (count($data)==0) return array();
@@ -1136,6 +1136,7 @@
                $data_ids_acceso = $acceso->obtenerArbolEstructura($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo]);
                //print_r($data_ids_acceso);
                foreach ($data_ids_acceso as $value) {
+                   //if (is_array($value))
                    $this->id_org_acceso[$value[id]] = $value;
                }                   
            }
