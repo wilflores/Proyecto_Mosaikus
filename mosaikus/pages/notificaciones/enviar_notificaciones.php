@@ -18,7 +18,7 @@
                 loginDB,
                 passwordDB
                 FROM
-                mos_adm_empresas where id_empresa=11';
+                mos_adm_empresas -- where id_empresa=11';
     //QUITAR LA VALIDACION DE ID_EMPRESA=11
     $data = $pagina->query($Consulta, array());
     foreach( $data as $bds)
@@ -204,8 +204,9 @@
                                 $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $filacorreo[email], 'nombres'=>$nombrecorreo)), 'Notificaciones de Mosaikus', $cuerpocorreo);
                                 //echo $cuerpocorreo;
                             }
-                                //echo $bds[db].":'ACCIONES CORRECTIVAS'  Ejecutado el dia ". date('Y/m/d h:m')."\n";
+                                //
                     }
+                    echo $bds[db].":'NOTIFICACION CORREO'  Ejecutado el dia ". date('Y/m/d h:m')."\n";
                     }
             }
             
