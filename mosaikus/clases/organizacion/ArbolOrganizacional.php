@@ -1536,7 +1536,7 @@
             $objResponse->addScript("$('#MustraCargando').hide();");
             //$objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
             $objResponse->addScript("$('#myModal-Area-Espejo').modal('show');");
-            $objResponse->addScript("$('#myModal-Area-Espejo-Titulo').html('Área Espejo');"); 
+            $objResponse->addScript("$('#myModal-Area-Espejo-Titulo').html('Área Vinculada');"); 
             $objResponse->addScript('ao_simple();');
             return $objResponse;
             

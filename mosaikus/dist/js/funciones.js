@@ -150,7 +150,7 @@ function admin_ao(){
                                             "Espejo":{
                                                 "separator_before": false,
                                                 "separator_after": false,
-                                                "label": "Área Vinculada",
+                                                "label": "&Aacute;rea Vinculada",
                                                 "action": function (obj) { 
                                                     console.log($node.id);
                                                     marcar_area_espejo($node.id);
