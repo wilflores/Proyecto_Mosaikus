@@ -204,6 +204,7 @@ class tree
 		foreach($sql as $k => $v) {
 			try {
                             //echo $v;
+                            //print_r($par[$k]);
 				$this->db->query($v, $par[$k]);
 			} catch(Exception $e) {
 				$this->reconstruct();
@@ -546,11 +547,7 @@ class tree
 	}
 
 	public function rm($id) {
-		$id = (int)$id;
-                $numero_registros = $this->db->one("SELECT COUNT(*) FROM mos_registro_item WHERE tipo = 11 AND valor = $id");
-                if ($numero_registros+0>0){
-                    return array('exito' => 2, 'msj' => 'No se puede eliminar el área, existen Registros asociados');
-                }                
+		$id = (int)$id;                                
 		if(!$id || $id === 1) { throw new Exception('Could not create inside roots'); }
 		$data = $this->get_node($id, array('with_children' => true, 'deep_children' => true));
 		$lft = (int)$data[$this->options['structure']["left"]];
@@ -592,11 +589,52 @@ class tree
 					$tmp[] = (int)$v['id'];
 				}
 			}
+                        /*VALIDAR RELACIONES*/
+                        $numero_registros = $this->db->one("SELECT COUNT(*) FROM mos_registro_item WHERE tipo = 11 AND valor IN (".implode(',',$tmp).")");
+                        if ($numero_registros+0>0){
+                            return array('exito' => 2, 'msj' => 'No se puede eliminar el área, existen Registros asociados');
+                        }
+                        $numero_registros = $this->db->one("SELECT COUNT(*) FROM mos_acciones_correctivas WHERE id_organizacion IN (".implode(',',$tmp).")");
+                        if ($numero_registros+0>0){
+                            return array('exito' => 2, 'msj' => 'No se puede eliminar el &aacute;rea, existen Acciones Correctivas asociadas');
+                        }
+                        $numero_registros = $this->db->one("SELECT COUNT(*) FROM mos_correcciones WHERE id_organizacion IN (".implode(',',$tmp).")");
+                        if ($numero_registros+0>0){
+                            return array('exito' => 2, 'msj' => 'No se puede eliminar el &aacute;rea, existen Correcciones asociadas');
+                        }
+                        $numero_registros = $this->db->one("SELECT COUNT(*) FROM mos_personal WHERE id_organizacion IN (".implode(',',$tmp).")");
+                        if ($numero_registros+0>0){
+                            return array('exito' => 2, 'msj' => 'No se puede eliminar el &aacute;rea, existen personas asociados');
+                        }
+                        $numero_registros = $this->db->one("SELECT COUNT(*) FROM mos_documentos_estrorg_arbolproc WHERE id_organizacion_proceso IN (".implode(',',$tmp).")");
+                        if ($numero_registros+0>0){
+                            return array('exito' => 2, 'msj' => ' No se puede eliminar el &aacute;rea, existen Documentos asociados ');
+                        }
+                        $numero_registros = $this->db->one("SELECT COUNT(*) FROM mos_arbol_procesos WHERE id_organizacion IN (".implode(',',$tmp).")");
+                        if ($numero_registros+0>0){
+                            return array('exito' => 2, 'msj' => 'No se puede eliminar el &aacute;rea, existen procesos asociados');
+                        }
+                        
+                        $numero_registros = $this->db->one("SELECT COUNT(*) FROM mos_organizacion WHERE area_espejo IN (".implode(',',$tmp).")");
+                        if ($numero_registros+0>0){
+                            return array('exito' => 2, 'msj' => 'No se puede eliminar el &aacute;rea, existen &aacute;reas vinculadas');
+                        }
+                        
 			$sql[] = "DELETE FROM ".$this->options['data_table']." WHERE ".$this->options['data2structure']." IN (".implode(',',$tmp).")";
+                        
+                        /*ELIMINAR CODIGO*/
+                        $sql[] = "DELETE FROM mos_documentos_codigo WHERE id_organizacion IN (".implode(',',$tmp).")";
+                        
+                        /*ELIMINAR LA RELACION CON CARGOS*/
+                        $sql[] = "DELETE FROM mos_cargo_estrorg_arbolproc WHERE id IN (".implode(',',$tmp).")";
+                        
+                        /*ELIMINAR ACCESO MODULOS*/
+                        $sql[] = "DELETE FROM mos_usuario_estructura WHERE id_estructura IN (".implode(',',$tmp).")";
 		}
 
 		foreach($sql as $v) {
 			try {
+                            //echo $v;
 				$this->db->query($v);
 			} catch(Exception $e) {
 				$this->reconstruct();
@@ -627,7 +665,8 @@ class tree
 				ON DUPLICATE KEY UPDATE
 					".implode(' = ?, ', array_keys($tmp))." = ?";
 			$par = array_merge(array_values($tmp), array_values($tmp));                       
-			try {
+			try {//echo $sql;
+                        //print_r($par);
 				$this->db->query($sql, $par);
 			}
 			catch(Exception $e) {
