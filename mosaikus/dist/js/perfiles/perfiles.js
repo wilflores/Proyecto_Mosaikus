@@ -60,7 +60,8 @@
                 array.setObjeto('Perfiles','cargarConfiguracion');
                 array.addParametro('nodos',_TxtIdNodos);
             }
-            
+            array.addParametro('modo',document.getElementById('modo').value);
+            array.addParametro('cod_link',document.getElementById('cod_link').value);            
             array.addParametro('permiso',document.getElementById('permiso_modulo').value);
             array.getForm('idFormulario');
             array.addParametro('import','clases.perfiles.Perfiles');
@@ -87,6 +88,8 @@
             array = new XArray();
             array.setObjeto('Perfiles','eliminar');
             array.addParametro('id',id);
+            array.addParametro('modo',document.getElementById('modo').value);
+            array.addParametro('cod_link',document.getElementById('cod_link').value);            
             array.addParametro('permiso',document.getElementById('permiso_modulo').value);
             array.addParametro('import','clases.perfiles.Perfiles');
             xajax_Loading(array.getArray());
@@ -107,6 +110,8 @@
         {
             array.addParametro('reg_por_pagina', document.getElementById("reg_por_pag").value);
         }
+            array.addParametro('modo',document.getElementById('modo').value);
+            array.addParametro('cod_link',document.getElementById('cod_link').value);        
         array.addParametro('permiso',document.getElementById('permiso_modulo').value);
         array.addParametro('pag',pag);
         array.setObjeto('Perfiles','buscar');

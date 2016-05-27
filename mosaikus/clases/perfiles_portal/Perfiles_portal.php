@@ -8,7 +8,11 @@
         private $parametros;
         private $nombres_columnas;
         private $placeholder;
-            
+
+        private $per_crear;
+        private $per_editar;
+        private $per_eliminar; 
+        
             public function Perfiles_portal(){
                 parent::__construct();
                 $this->asigna_script('perfiles_portal/perfiles_portal.js');                                             
@@ -26,6 +30,68 @@
                 $sql = "SELECT cod_parametro, espanol FROM mos_parametro WHERE cod_categoria = '3' AND vigencia = 'S' ORDER BY cod_parametro";
                 $this->parametros = $this->dbl->query($sql, array());
             }
+            private function cargar_permisos($parametros){
+                if (strlen($parametros[cod_link])>0){
+                    if(!class_exists('mos_acceso')){
+                        import("clases.mos_acceso.mos_acceso");
+                    }
+                    $acceso = new mos_acceso();
+                    $data_permisos = $acceso->obtenerPermisosModulo($_SESSION[CookIdUsuario],$parametros[cod_link]);   
+                    
+                    foreach ($data_permisos as $value) {
+                        if ($value[nuevo] == 'S'){
+                            $this->per_crear =  'S';
+                            break;
+                        }
+                    }                                               
+                    foreach ($data_permisos as $value) {
+                        if ($value[modificar] == 'S'){
+                            $this->per_editar =  'S';
+                            break;
+                        }
+                    } 
+                    foreach ($data_permisos as $value) {
+                        if ($value[eliminar] == 'S'){
+                            $this->per_eliminar =  'S';
+                            break;
+                        }
+                    } 
+                }
+            }            
+
+            public function columna_accion($tupla)
+            {
+                $html = "&nbsp;";
+                //print_r($tupla);                
+                if (strlen($tupla[cod_perfil])>0){
+                    if($this->per_editar == 'S'){
+                        $html .= '<a onclick="javascript:editarPerfiles(\''.$tupla[cod_perfil].'\' );">
+                                    <i style="cursor:pointer" class="icon icon-edit"  title="Editar Perfiles" style="cursor:pointer"></i>
+                                </a>';
+                    }                
+                    if($this->per_eliminar == 'S'){
+                        $html .= '<a onclick="javascript:eliminarPerfiles(\''.$tupla[cod_perfil].'\');;">
+                                    <i style="cursor:pointer" class="icon icon-remove" title="Eliminar Perfiles" style="cursor:pointer"></i>
+                                </a>';
+                    }
+                    if($this->per_editar == 'S'){
+                        $html .= '<a onclick="javascript:configurarPerfiles(\''.$tupla[cod_perfil].'\' );">
+                                    <i style="cursor:pointer" class="icon icon-more"  title="Configurar Perfiles" style="cursor:pointer"></i>
+                                </a>';
+                    }
+                    /*
+                if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
+                    array_push($func,array('nombre'=> 'editarPerfiles','imagen'=> "<i style='cursor:pointer' class=\"icon icon-edit\" title='Editar Perfiles'></i>"));
+                if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
+                    array_push($func,array('nombre'=> 'eliminarPerfiles','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\" title='Eliminar Perfiles'></i>"));
+                if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
+                    array_push($func,array('nombre'=> 'configurarPerfiles','imagen'=> "<i style='cursor:pointer' class=\"icon icon-more\" title='Configurar Perfiles'></i>"));
+                    */
+                }
+                return $html;
+            }
+
+
             
             private function cargar_nombres_columnas(){
                 $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 21";
@@ -222,16 +288,19 @@
                     $k++;
                 }
 
-                $func= array();
+                //$func= array();
+                $func= array('funcion'=> 'columna_accion');
 
                 $columna_funcion = 0;
+                /*
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                     array_push($func,array('nombre'=> 'editarPerfiles','imagen'=> "<i style='cursor:pointer' class=\"icon icon-edit\" title='Editar Perfiles'></i>"));
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
                     array_push($func,array('nombre'=> 'eliminarPerfiles','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\" title='Eliminar Perfiles'></i>"));
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                     array_push($func,array('nombre'=> 'configurarPerfiles','imagen'=> "<i style='cursor:pointer' class=\"icon icon-more\" title='Configurar Perfiles'></i>"));
-               
+                */
+                
                 $config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
                 $array_columns =  explode('-', $parametros['mostrar-col']);
@@ -259,7 +328,7 @@
                 //$grid->setFuncion("en_proceso_inscripcion", "enProcesoInscripcion");
                 //$grid->setAligns(1,"center");
                 //$grid->hidden = array(0 => true);
-    
+                $grid->setParent($this);    
                 $grid->setDataMSKS("td-table-data", $data, $func,$columna_funcion, $parametros['pag'] );
                 $out['tabla']= $grid->armarTabla();
                 //if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina)){
@@ -346,7 +415,10 @@
                             </div>';
                     $k++;
                 }
+                $this->cargar_permisos($parametros);                                
                 $grid = $this->verListaPerfiles($parametros);
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];                
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
@@ -737,6 +809,7 @@
  
                 public function buscar($parametros)
             {
+                $this->cargar_permisos($parametros);
                 $grid = $this->verListaPerfiles($parametros);                
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);

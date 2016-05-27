@@ -28,7 +28,8 @@
                         import("clases.mos_acceso.mos_acceso");
                     }
                     $acceso = new mos_acceso();
-                    $data_permisos = $acceso->obtenerPermisosModulo($_SESSION[CookIdUsuario],$parametros[cod_link]);                    
+                    $data_permisos = $acceso->obtenerPermisosModulo($_SESSION[CookIdUsuario],$parametros[cod_link]);   
+                    
                     foreach ($data_permisos as $value) {
                         if ($value[nuevo] == 'S'){
                             $this->per_crear =  'S';
@@ -53,16 +54,32 @@
             public function columna_accion($tupla)
             {
                 $html = "&nbsp;";
-                if (strlen($tupla[id_registro])<=0){
+                //print_r($tupla);                
+                if (strlen($tupla[id_usuario])>0){
                     if($this->per_editar == 'S'){
-                        $html .= '<a onclick="javascript:editarHojadeVida(\''.$tupla[cod_hoja_vida].'\' );">
-                                    <i style="cursor:pointer" class="icon icon-edit"  title="Editar Anotaci&oacute;n" style="cursor:pointer"></i>
+                        $html .= '<a onclick="javascript:editarmos_usuario(\''.$tupla[id_usuario].'\' );">
+                                    <i style="cursor:pointer" class="icon icon-edit"  title="Editar Usuario" style="cursor:pointer"></i>
                                 </a>';
                     }                
                     if($this->per_eliminar == 'S'){
-                        $html .= '<a onclick="javascript:eliminarHojadeVida(\''.$tupla[cod_hoja_vida].'\');;">
-                                    <i style="cursor:pointer" class="icon icon-remove" title="Eliminar Anotaci&oacute;n" style="cursor:pointer"></i>
+                        $html .= '<a onclick="javascript:eliminarmos_usuario(\''.$tupla[id_usuario].'\');;">
+                                    <i style="cursor:pointer" class="icon icon-remove" title="Eliminar Usuario" style="cursor:pointer"></i>
                                 </a>';
+                    }
+                    if($this->per_editar == 'S'){
+                        $html .= '<a onclick="javascript:configurarmos_usuario(\''.$tupla[id_usuario].'\' );">
+                                    <i style="cursor:pointer" class="icon icon-more"  title="Configurar Perfiles" style="cursor:pointer"></i>
+                                </a>';
+                        if($tupla[perfil_portal] > 0){
+                            $html .= '<a onclick="javascript:perfil_portal(\''.$tupla[id_usuario].'\' );">
+                                        <i style="cursor:pointer" class="icon-app-mode icon-app-mode-portal"  title="Administrar Perfiles Portal" style="cursor:pointer"></i>
+                                    </a>';                            
+                        }
+                        if($tupla[perfil_especialista] > 0){
+                            $html .= '<a onclick="javascript:perfil_especialista(\''.$tupla[id_usuario].'\' );">
+                                        <i style="cursor:pointer" class="icon-app-mode icon-app-mode-specialist"  title="Administrar Perfiles Especialista" style="cursor:pointer"></i>
+                                    </a>';                            
+                        }                        
                     }
                 }
                 return $html;
@@ -130,6 +147,7 @@
                         ,email
                         ,password_1
                         ,cedula
+                        ,recibe_notificaciones
                          FROM mos_usuario 
                          WHERE id_usuario = $id "; 
                 $this->operacion($sql, $atr);
@@ -284,9 +302,10 @@
                             ,email
                             ,password_1
                             ,cedula
+                            ,recibe_notificaciones
                             ,(SELECT COUNT(muf.cod_perfil_portal) FROM mos_usuario_filial as muf WHERE muf.cod_perfil_portal IS NOT NULL AND muf.id_usuario = mu.id_usuario ) as perfil_portal 
-                            ,(SELECT COUNT(muf.cod_perfil) FROM mos_usuario_filial as muf WHERE muf.cod_perfil IS NOT NULL AND muf.id_usuario = mu.id_usuario ) as perfil_especialista
-                                     $sql_col_left
+                            ,(SELECT COUNT(muf.cod_perfil) FROM mos_usuario_filial as muf WHERE muf.cod_perfil IS NOT NULL AND muf.id_usuario = mu.id_usuario ) as perfil_especialista                            
+                            $sql_col_left
                             FROM mos_usuario as mu $sql_left
                             WHERE 1 = 1 ";
                 
@@ -337,8 +356,6 @@
             if (strlen($atr["b-perfil_portal"])>0)
                     $sql .= "AND id_usuario IN (SELECT id_usuario FROM mos_usuario_filial INNER JOIN mos_perfil_portal ON mos_usuario_filial.cod_perfil_portal = mos_perfil_portal.cod_perfil WHERE mos_perfil_portal.cod_perfil = ". strtoupper($atr["b-perfil_portal"]) . ")";
 
-            
-
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //print_r($sql);
@@ -347,8 +364,7 @@
              
              public function eliminarmos_usuario($atr){
                 try {
-                    $atr = $this->dbl->corregir_parametros($atr);
-                    
+                    $atr = $this->dbl->corregir_parametros($atr);                    
                     $estructura = $this->verusuario_estructura($atr[id]);                     
                     foreach ($estructura as $arrE){                        
                         $respuesta = $this->dbl->delete("mos_usuario_estructura", "id_usuario = " . $arrE[id_usuario]);
@@ -361,6 +377,7 @@
                     //por ultimos se elimina el usuario
                     $respuesta = $this->dbl->delete("mos_usuario", "id_usuario = " . $atr[id]);
                     return "ha sido eliminada con exito";
+                    
                 } catch(Exception $e) {
                     $error = $e->getMessage();                     
                     if (preg_match("/alumno_inscrito_fk_id_ano_escolar_fkey/",$error ) == true) 
@@ -385,42 +402,39 @@
                 }
 
                 $grid->SetConfiguracionMSKS("tblmos_usuario", "");
-                $config_col=array(
-                    
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_usuario], "id_usuario", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[nombres], "nombres", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apellido_paterno], "apellido_paterno", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apellido_materno], "apellido_materno", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[telefono], "telefono", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_creacion], "fecha_creacion", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_expi], "fecha_expi", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[super_usuario], "super_usuario", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[email], "email", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[password_1], "password_1", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[cedula], "cedula", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[cedula], "perfil_portal", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos("Perfil Especialista", "perfil_especialista", $parametros))
+                $config_col=array(                    
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_usuario], "id_usuario", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[nombres], "nombres", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apellido_paterno], "apellido_paterno", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apellido_materno], "apellido_materno", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[telefono], "telefono", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_creacion], "fecha_creacion", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_expi], "fecha_expi", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[super_usuario], "super_usuario", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[email], "email", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[password_1], "password_1", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[cedula], "cedula", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[recibe_notificaciones], "recibe_notificaciones", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos("Perfil Especialista", "perfil_especialista", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos("Perfil Portal", "perfil_portal", $parametros))                    
                 );
-                /*if (count($this->parametros) <= 0){
-                        $this->cargar_parametros();
-                }*/
+
                 $k = 1;
                 foreach ($this->parametros as $value) {                    
                     array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>link_titulos(($value[espanol]), "p$k", $parametros)));
                     $k++;
                 }
 
-                $func= array();
-
+                $func= array('funcion'=> 'columna_accion');
                 $columna_funcion = 0;
                 
-                $grid->setParent($this);
-                //$func= array('funcion'=> 'columna_accion');
+                
                 /*if (strrpos($parametros['permiso'], '1') > 0){
                     
                     $columna_funcion = 13;
                 }*/
+                /*
                 if ($_SESSION[CookM] == 'S')
                     //array_push($func,array('nombre'=> 'vermos_usuario','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-view-document\" title='Ver Usuario'></i>"));                
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
@@ -433,27 +447,24 @@
                 array_push($func,array('condicion'=> array('columna'=> 'perfil_portal', 'valor'=> " > 0"), 'parametros' => "$data[id_usuario]", 'nombre'=> 'perfil_portal','imagen'=> "<i style='cursor:pointer' class=\"icon-app-mode icon-app-mode-portal\" title='Administrar Perfiles Portal'></i>"));
                 
                 array_push($func,array('condicion'=> array('columna'=> 'perfil_especialista', 'valor'=> " > 0"), 'parametros' => "$data[id_usuario]", 'nombre'=> 'perfil_especialista','imagen'=> "<i style='cursor:pointer' class=\"icon-app-mode icon-app-mode-specialist\" title='Administrar Perfiles Especialista'></i>"));
-
+*/
                 $config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
                 $array_columns =  explode('-', $parametros['mostrar-col']);
                 for($i=0;$i<count($config_col);$i++){
                     switch ($i) {                                             
-//                        case 1:
-//                        case 2:
-//                        case 3:
-//                        case 4:
-//                            array_push($config,$config_col[$i]);
-//                            break;
-
+                          //case 0:
+                        //case 2:
+//                        /case 3:
+                        //case 4:
+                            //array_push($config,$config_col[$i]);
+                            //break;
                         default:
-                            
                             if (in_array($i, $array_columns)) {
                                 array_push($config,$config_col[$i]);
                             }
                             else                                
                                 $grid->hidden[$i] = true;
-                            
                             break;
                     }
                 }
@@ -461,7 +472,9 @@
                 //$grid->setFuncion("en_proceso_inscripcion", "enProcesoInscripcion");
                 //$grid->setAligns(1,"center");
                 //$grid->hidden = array(0 => true);
-    
+                $grid->setParent($this);
+///                $func= array('funcion'=> 'columna_accion');
+                
                 $grid->setDataMSKS("td-table-data", $data, $func,$columna_funcion, $parametros['pag'] );
                 $out['tabla']= $grid->armarTabla();
                 //if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina)){
@@ -977,12 +990,8 @@
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
                     $parametros['mostrar-col']="1-2-8-9-11"; 
-                /*if (count($this->parametros) <= 0){
-                        $this->cargar_parametros();
-                } */               
+
                 $k = 21;
-                $contenido['MODO'] = $parametros['modo'];
-                $contenido['COD_LINK'] = $parametros['cod_link'];                
                 
                 $contenido[PARAMETROS_OTROS] = "";
                 foreach ($this->parametros as $value) {                    
@@ -997,7 +1006,11 @@
                             </div>';
                     $k++;
                 }
+                $this->cargar_permisos($parametros);
                 $grid = $this->verListamos_usuario($parametros);
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];  
+                
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
@@ -1008,7 +1021,7 @@
                 $contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;mos_usuario';
                 $contenido['TABLA'] = $grid['tabla'];
                 $contenido['PAGINADO'] = $grid['paginado'];
-                $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
+                $contenido['PERMISO_INGRESAR'] = $this->per_crear == 'S' ? '' : 'display:none;';
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
@@ -1151,7 +1164,9 @@
 
                     if (preg_match("/ha sido ingresado con exito/",$respuesta ) == true) {
                         $objResponse->addScriptCall("MostrarContenido");
+                        
                         $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+                        //$objResponse->addScript("verPagina(1,1);");
                     }
                     else
                         $objResponse->addScriptCall('VerMensaje','error',$respuesta);
@@ -1262,6 +1277,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
 
                     if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
                         $objResponse->addScriptCall("MostrarContenido");
+                        $objResponse->addScript("verPagina(1,1);");
                         $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
                     }
                     else
@@ -1277,13 +1293,12 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
  
             public function eliminar($parametros)
             { 
-                $val = $this->vermos_usuario($parametros[id]); 
-                
+                $val = $this->vermos_usuario($parametros[id]);                 
                 $respuesta = $this->eliminarmos_usuario($parametros);
                 $objResponse = new xajaxResponse();
                 if (preg_match("/ha sido eliminada con exito/",$respuesta ) == true) {
                     $objResponse->addScriptCall("MostrarContenido");
-                    $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+                    $objResponse->addScriptCall('VerMensaje','exito',$respuesta);                    
                 }
                 else
                     $objResponse->addScriptCall('VerMensaje','error',$respuesta);
@@ -1295,6 +1310,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
  
                 public function buscar($parametros)
             {
+                $this->cargar_permisos($parametros);    
                 $grid = $this->verListamos_usuario($parametros);                
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
@@ -1647,18 +1663,21 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
             
             
             $objResponse->addScriptCall("MostrarContenido");
+            
             $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+            
        }
+       
        $objResponse->addScript("$('#MustraCargando').hide();"); 
        $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
-                               $( '#btn-guardar' ).prop( 'disabled', false );");
+                               $( '#btn-guardar' ).prop('disabled', false );");
+       
        return $objResponse;
    }  
    
    
    public function cargarConfiguracionPerfiles($parametros)
-   {   
-       
+   {          
        session_name("$GLOBALS[SESSION]");
        session_start();
        $objResponse = new xajaxResponse();

@@ -1,4 +1,3 @@
-
     
     function init_filtrar(){        
             PanelOperator.initPanels('');
@@ -156,7 +155,7 @@ function r_init_filtrar(){
 
 
     function eliminarmos_usuario(id){
-        if(confirm("¿Desea Eliminar el mos_usuario Seleccionado?")){
+        if(confirm("¿Desea Eliminar el usuario Seleccionado?")){
             array = new XArray();
             array.setObjeto('mos_usuario','eliminar');
             array.addParametro('id',id);
@@ -166,8 +165,7 @@ function r_init_filtrar(){
         }
     }
 
-    function vermos_usuario(id){
-        
+    function vermos_usuario(id){        
         var src = 'pages/' +  document.getElementById("modulo_actual").value + '/verUsuario.php?id='+id;
         $('a#ver_ficha_trabajador').fancybox({
                     'titleShow': false,
