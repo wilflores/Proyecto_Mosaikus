@@ -177,7 +177,16 @@
                                                    <input type="hidden" id="num_items_esp" name="num_items_esp" value="{NUM_ITEMS_ESP}"/> 
                                                    <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="{TOK_NEW}"/>
                                                    <!--<input type="button" class="button add" value="Agregar" onClick="agregar_esp();" >-->
-                                                   <button type="button" onClick="agregar_esp();" class="btn btn-primary  btn-xs">Agregar</button>
+                                                                                                    
+                                                    <button type="button" onClick="agregar_esp();" class="btn btn-primary  btn-xs">Agregar</button>
+                                                   &nbsp;<label for="actualizacion_activa" class="control-label">{N_ACTUALIZACION_ACTIVA}</label>
+                                                    <input type="checkbox" name="actualizacion_activa" id="actualizacion_activa" value="S" {CHECKED_ACTUALIZACION_ACTIVA}>
+                                                   
+                                                   <br><br>
+                                                            
+                                                            
+                                                    
+
                                                     <table id="table-items-esp" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">
                                                         <thead>
                                                             <tr bgcolor="#FFFFFF" height="30px">
