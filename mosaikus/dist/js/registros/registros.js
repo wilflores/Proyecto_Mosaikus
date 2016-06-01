@@ -122,7 +122,6 @@ function r_marcar_desmarcar_checked_columns(checked){
                     //alert('Pr'+arbolP[i]+document.getElementById('nodosp_'+arbolP[i]).value)
                 }
         }
-            
         if(arbolsel=='1'){    
             if($('#r-idFormulario').isValid()) {
                 $( "#btn-guardar" ).html('Procesando..');
@@ -431,4 +430,14 @@ function r_marcar_desmarcar_checked_columns(checked){
                 opt.selected=false;
             }
         }
+    }
+    function crearActualizacionRegistro(id){
+            array = new XArray();
+            array.setObjeto('Registros','crear_actualizacion');
+            array.addParametro('id',id);
+            array.addParametro('modo',document.getElementById('modo').value);
+            array.addParametro('cod_link',document.getElementById('cod_link').value);
+            
+            array.addParametro('import','clases.registros.Registros');
+            xajax_Loading(array.getArray());
     }
