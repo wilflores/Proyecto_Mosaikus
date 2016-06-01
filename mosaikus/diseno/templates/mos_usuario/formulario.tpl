@@ -65,8 +65,7 @@
 <div class="form-group">
                                         <label for="email" class="col-md-4 control-label">{N_EMAIL}</label>
                                         <div class="col-md-10">
-                                          <input type="text" class="form-control" value="{EMAIL}" id="email" name="email" placeholder="{N_EMAIL}" data-validation="required"/>
-                                          
+                                          <input type="text" class="form-control" value="{EMAIL}" id="email" name="email" placeholder="{N_EMAIL}" data-validation="required" />                                          
                                       </div>                                
                                   </div>
 <div class="form-group">

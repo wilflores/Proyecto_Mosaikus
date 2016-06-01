@@ -484,19 +484,26 @@
             }
 
             public function configurarPerfil($parametros){
-                
-                if(!class_exists('Template')){
-                    import("clases.interfaz.Template");
-                }
-                $ut_tool = new ut_Tool();
-                $filial = $this->verfilial($parametros[if_filial]);
-                
-                $val = $this->vermos_usuario($filial[id_usuario]); 
-                //$usuario = $val[apellido_paterno].", ".$val[nombres];
-
+                session_name("$GLOBALS[SESSION]");
+                session_start();                
+                import('clases.organizacion.ArbolOrganizacional');
                 import("clases.perfiles.Perfiles");
                 $perfil = new Perfiles();
+                $ao = new ArbolOrganizacional();              
+                $filial = $this->verfilial($parametros[if_filial]);                  
+                $val = $this->vermos_usuario($filial[id_usuario]); 
                 $val2 = $perfil->verPerfiles($filial[cod_perfil]);
+                $val_aux = $this->verPerfilesEspecialista($filial[id_usuario], $filial[cod_perfil]);                
+                $selec_nodo = array();
+                foreach ($val_aux as $value) {
+                    array_push($selec_nodo,$value[id_estructura]);
+                }
+                $parametros[nodos_seleccionados] = $selec_nodo;
+                $parametros[opcion] = 'simple';                                                             
+                $ut_tool = new ut_Tool();              
+                $contenido_1   = array();                  
+                $contenido_1['DIV_ARBOL_ORGANIZACIONAL'] =  $ao->jstree_ao(0,$parametros);                
+                
 
                 $contenido_1['ID_FILIAL'] = $parametros[if_filial];
                 $contenido_1['ID_USUARIO'] = $val["id_usuario"];
@@ -519,38 +526,54 @@
                 $template->setVars($contenido_1);
                 
                 $contenido['CAMPOS'] = $template->show();
-
-                //$template->PATH = PATH_TO_TEMPLATES.'interfaz/';
-                //$template->setTemplate("formulario");
-
-
-                //$template->setVars($contenido);
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('contenido-form-aux',"innerHTML",$template->show());
                 $objResponse->addScriptCall("calcHeight");
                 $objResponse->addScriptCall("MostrarContenido2Aux");          
                 $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript('ao_multiple();');
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
-                          });");  return $objResponse;                
-                
+                          });");  return $objResponse;                                
             }
 
-            public function configurarPerfilPortal($parametros){
-                
+            public function configurarPerfilPortal($parametros){                
+                /*
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
                 $ut_tool = new ut_Tool();
                 $filial = $this->verfilialPortal($parametros[if_filial]);
                 
-                $val = $this->vermos_usuario($filial[id_usuario]); 
-                //$usuario = $val[apellido_paterno].", ".$val[nombres];
+                $val = $this->vermos_usuario($filial[id_usuario]);                 
 
                 import("clases.perfiles.Perfiles");
                 $perfil = new Perfiles();
                 $val2 = $perfil->verPerfilesPortal($filial[cod_perfil]);
-                //print_r($val2);
+                */
+                session_name("$GLOBALS[SESSION]");
+                session_start();                                
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                import('clases.organizacion.ArbolOrganizacional');
+                import("clases.perfiles.Perfiles");
+                $perfil = new Perfiles();
+                $ao = new ArbolOrganizacional();              				
+                $ut_tool = new ut_Tool();
+                $filial = $this->verfilialPortal($parametros[if_filial]);                
+                $val = $this->vermos_usuario($filial[id_usuario]);                 
+                $val2 = $perfil->verPerfilesPortal($filial[cod_perfil]);
+                $val_aux = $this->verPerfilesPortal($filial[id_usuario], $filial[cod_perfil]);
+                $selec_nodo = array();
+                foreach ($val_aux as $value) {
+                    array_push($selec_nodo,$value[id_estructura]);
+                }
+                $parametros[nodos_seleccionados] = $selec_nodo;
+                $parametros[opcion] = 'simple';
+                $contenido_1['DIV_ARBOL_ORGANIZACIONAL'] =  $ao->jstree_ao(0,$parametros);                
+                
+                
                 $contenido_1['ID_FILIAL'] = $parametros[if_filial];
                 $contenido_1['ID_USUARIO'] = $val["id_usuario"];
                 $contenido_1['NOMBRES'] = ($val[apellido_paterno].", ".$val[nombres]);
@@ -569,19 +592,13 @@
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
                 $template->setTemplate("configurar_perfil_usuario_portal");
-                $template->setVars($contenido_1);
-                
+                $template->setVars($contenido_1);               
                 $contenido['CAMPOS'] = $template->show();
-
-                //$template->PATH = PATH_TO_TEMPLATES.'interfaz/';
-                //$template->setTemplate("formulario");
-
-
-                //$template->setVars($contenido);
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('contenido-form-aux',"innerHTML",$template->show());
                 $objResponse->addScriptCall("calcHeight");
-                $objResponse->addScriptCall("MostrarContenido2Aux");          
+                $objResponse->addScriptCall("MostrarContenido2Aux");
+                $objResponse->addScript('ao_multiple();');
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
@@ -1148,6 +1165,10 @@
                 $parametros['id_usuario']= $_SESSION['USERID'];
 
                 $validator = new FormValidator();
+                $validator->addValidation("email","email","El email especificado es invalido");
+                $validator->addValidation("cedula","num","La cedula especificada es un numero invalido.");
+                $validator->addValidation("telefono","num","El telefono especificado es un numero invalido.");
+                
                 
                 if(!$validator->ValidateForm($parametros)){
                         $error_hash = $validator->GetErrors();
@@ -1676,8 +1697,7 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
    }  
    
    
-   public function cargarConfiguracionPerfiles($parametros)
-   {          
+   public function cargarConfiguracionPerfiles($parametros){          
        session_name("$GLOBALS[SESSION]");
        session_start();
        $objResponse = new xajaxResponse();
@@ -1693,19 +1713,42 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
                 $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
        }else{
           
-            $arr = explode(",", $parametros[nodos]);
-            $arrportal = explode(",", $parametros[nodosportal]);
+            $arr = explode(",", $parametros[nodos]);           
             
             $params[id_usuario] = $parametros[id_usuario];
             $params[id_filial] = $parametros[id_filial]; 
             $params[cod_perfil] = $parametros[cod_perfil];
             $this->eliminarPerfilesEstructura($parametros);
+                        
             foreach($arr as $temp){
                  $params[id_estructura] = $temp;
+                 $nodos_sel .= $temp. ",";
                  $respuesta = $this->ingresarPerfilesEstructura($params);
-            }           
-//            $objResponse->addScriptCall("MostrarContenido");
-//            $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+            }      
+            // al momento de enviar la asignacion de los nodos seleccionadas
+            // se guardan los id de esos nodo y luego se realiza la consulta para 
+            // buscar cual de ellos posee nodos espejo, luego si alguno posee nodos espejo
+            // se toman los nodos y sus hijos y se hace la asignacion de esos nodos 
+            // con los mismos parametros con los que se asignan los nodos iniciales 
+                        
+            $nodos_sel = substr ($nodos_sel, 0, strlen($nodos_sel) - 1);
+            $sql = "select * from mos_organizacion where area_espejo > 0 and   id in (".$nodos_sel.")";  
+            $this->operacion($sql, "");
+            $nodos_espejos = $this->dbl->data;
+            import("clases.organizacion.ArbolOrganizacional");       
+            $organizacion = new ArbolOrganizacional; 
+            $nodos = array();            
+            foreach($nodos_espejos as $temp){
+                $aux = explode(",",$organizacion->BuscaOrgNivelHijos($temp[area_espejo]));
+                foreach($aux as $temp2){
+                    array_push($nodos,$temp2);
+                }                                
+            }            
+           foreach($nodos as $temp){
+                 $params[id_estructura] = $temp;     
+                 $respuesta = $this->ingresarPerfilesEstructura($params);
+            }   
+            
             $objResponse->addScriptCall("MostrarContenidoAux");
             $objResponse->addScriptCall('VerMensaje','exito',"Perfil actualizado con exito");
             
