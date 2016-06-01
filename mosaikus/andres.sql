@@ -209,3 +209,19 @@ update mos_link
 set descripcion='Documentos-indexDocumentosFormulario-clases.documentos.Documentos-formulario'
 where cod_link=16;
 
+/****************************************/
+/*cambio del 26-05*/
+/****************************************/
+ALTER TABLE `mos_documentos`
+ADD COLUMN `actualizacion_activa`  char(1) NULL DEFAULT 'N' AFTER `publico`;
+
+INSERT INTO `mos_nombres_campos`(nombre_campo, texto, modulo, placeholder) 
+VALUES ('actualizacion_activa', 'Activar actualización de Registro', '6', 'Activar actualización de Registro');
+
+ALTER TABLE `mos_registro`
+ADD COLUMN `vigencia`  varchar(1) NULL DEFAULT 'S' AFTER `identificacion`,
+ADD COLUMN `idRegistro_original`  int(9) NULL AFTER `vigencia`,
+DROP PRIMARY KEY;
+
+update mos_registro
+set idRegistro_original=idRegistro
