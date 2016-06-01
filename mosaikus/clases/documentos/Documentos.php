@@ -541,6 +541,7 @@
                                 ,wf.email_revisa
                                 ,wf.email_aprueba
                                 ,dao.id_organizacion
+                                ,d.actualizacion_activa
                          FROM mos_documentos  d
                                 left join mos_personal p on d.elaboro=p.cod_emp
                                 left join mos_personal re on d.reviso=re.cod_emp
@@ -717,7 +718,7 @@
             $Nivls = "";
             {                                           
                     //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
-                    $Consulta3="select count(*) cant from mos_registro where IDDoc='".$tupla[IDDoc]."'";                    
+                    $Consulta3="select count(*) cant from mos_registro where vigencia='S' and IDDoc='".$tupla[IDDoc]."'";                    
                     $Resp3 = $dbl->query($Consulta3,array());                    
                     $resp3 = $Resp3[0][cant];
                     //<img border="0" title="Ver Registros" src="diseno/images/ico_explorer.png">
@@ -1118,8 +1119,9 @@
             }
             
             public function ingresarDocumentos($atr,$archivo,$doc_ver){
-               // print_r($atr);
+                //print_r($atr);
                 try {
+                    
                     $atr = $this->dbl->corregir_parametros($atr);
                     $atr[IDDoc] = $this->codigo_siguiente();
                 /*VALIDAR CODIGO SUGERIDO*/
@@ -1202,10 +1204,10 @@
                         $atr[id_usuario_workflow]=$atr[id_usuario];
                     }   
                     //
-                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo,publico, id_workflow_documento,etapa_workflow,estado_workflow,id_usuario_workflow)                            
+                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo,publico, id_workflow_documento,etapa_workflow,estado_workflow,id_usuario_workflow, actualizacion_activa)                            
                             VALUES(
                                 $atr[IDDoc],'$atr[Codigo_doc]','$atr[nombre_doc]',$atr[version],'$atr[fecha]','$atr[descripcion]','$atr[palabras_claves]','$atr[formulario]','$atr[vigencia]','$atr[doc_fisico]','$atr[contentType]',$atr[id_filial],'$atr[nom_visualiza]','$atr[doc_visualiza]','$atr[contentType_visualiza]',$atr[id_usuario],'$atr[observacion]','$atr[estrucorg]','$atr[arbproc]','$atr[apli_reg_estrorg]','$atr[apli_reg_arbproc]','$atr[workflow]',$atr[semaforo],$atr[v_meses],$atr[reviso],$atr[elaboro],$atr[aprobo]
-                                    ,'$atr[publico]',$atr[id_workflow_documento],$atr[etapa_workflow],$atr[estado_workflow],$atr[id_usuario_workflow] 
+                                    ,'$atr[publico]',$atr[id_workflow_documento],$atr[etapa_workflow],$atr[estado_workflow],$atr[id_usuario_workflow] ,'$atr[actualizacion_activa]'
                                 )";
                     //echo $sql;
                     $this->dbl->insert_update($sql);
@@ -1441,7 +1443,7 @@
                                     descripcion = '$atr[descripcion]',palabras_claves = '$atr[palabras_claves]',formulario = '$atr[formulario]',vigencia = '$atr[vigencia]'"
                             . ",nom_visualiza = $atr[nom_visualiza],doc_visualiza = $atr[doc_visualiza],contentType_visualiza = $atr[contentType_visualiza],id_usuario = $atr[id_usuario],observacion = '$atr[observacion]',estrucorg = '$atr[estrucorg]',arbproc = '$atr[arbproc]'"
                             . ",apli_reg_estrorg = '$atr[apli_reg_estrorg]',apli_reg_arbproc = '$atr[apli_reg_arbproc]',workflow = '$atr[workflow]',semaforo = $atr[semaforo],v_meses = $atr[v_meses],reviso = $atr[reviso],elaboro = $atr[elaboro],aprobo = $atr[aprobo]
-                               ,publico = '$atr[publico]' $sql_wf $sql_doc_fisico
+                               ,publico = '$atr[publico]',actualizacion_activa= '$atr[actualizacion_activa]' $sql_wf $sql_doc_fisico
                             WHERE  IDDoc = $atr[id]";      
                    //echo $sql;
                    // die;
@@ -4001,7 +4003,7 @@
                         $params = array();
                         $params[IDDoc] = $respuesta;
                         for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
-                            echo $parametros["nro_pts_$i"];
+                            //echo $parametros["nro_pts_$i"];
                             if (isset($parametros["nombre_din_$i"])){                                
                                 //$atr[IDDoc],'$atr[nombre]','$atr[tipo]','$atr[valores]'
                                 $params[nombre] = $parametros["nombre_din_$i"];
@@ -4315,6 +4317,7 @@
                     $ids[] = $i*7;
                 }
                 //$contenido_1[CHECKED_VIGENCIA] = 'checked="checked"';
+                $contenido_1[CHECKED_ACTUALIZACION_ACTIVA] = $val["actualizacion_activa"] == 'S' ? 'checked="checked"' : '';
                 $contenido_1[CHECKED_VIGENCIA] = $val["vigencia"] == 'S' ? 'checked="checked"' : '';
                 $contenido_1[CHECKED_PUBLICO] = $val["publico"] == 'S' ? 'checked="checked"' : '';
                 $contenido_1['SEMAFORO'] = $ut_tool->combo_array("semaforo", $desc, $ids,false,$val["semaforo"],false,false,false,false,'display:inline;width:70px');
