@@ -200,6 +200,9 @@
                                                    <input type="hidden" id="id_unico_del" name="id_unico_del" value=""/>
                                                    <!--<input type="button" class="button add" value="Agregar" onClick="agregar_esp();" >-->
                                                    <button type="button" onClick="agregar_esp();" class="btn btn-primary  btn-xs">Agregar</button>
+                                                    &nbsp;<input type="checkbox" name="actualizacion_activa" id="actualizacion_activa" value="S" {CHECKED_ACTUALIZACION_ACTIVA}>
+                                                    <label for="actualizacion_activa" class="control-label">{N_ACTUALIZACION_ACTIVA}</label>
+                                                   <br><br>
                                                     <table id="table-items-esp" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">
                                                         <thead>
                                                             <tr bgcolor="#FFFFFF" height="30px">
