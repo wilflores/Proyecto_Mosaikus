@@ -40,7 +40,7 @@
             }
             
             public function colum_admin($tupla)
-            {
+            { //print_r($tupla);
                 /*Si tiene activo campos tipo persona o tipo arbol*/
                 //print_r($this->colummas_arbol);
                 if (count($this->colummas_arbol)>0){
@@ -116,6 +116,12 @@
 
                             </a>'; 
                     }
+                    if ($tupla[actualizacion_activa] == 'S'){
+                        //<img title="Crear Versión '.$tupla[nombre_doc].'" src="diseno/images/ticket_ver.png" style="cursor:pointer">
+                        $html .= '<a href="#" onclick="javascript:crearActualizacionRegistro(\''. $tupla[idRegistro] . '\');" title="Crear actualizacion de este registro">                        
+                                    <i class="icon icon-v"></i>
+                            </a>'; 
+                    }                    
                 }
                 else{
                     /*Validacion sencilla segun rol asignado al usuario en el modulo de registros*/
@@ -132,6 +138,13 @@
 
                             </a>'; 
                     }
+                    if ($tupla[actualizacion_activa] == 'S'){
+                        //<img title="Crear Versión '.$tupla[nombre_doc].'" src="diseno/images/ticket_ver.png" style="cursor:pointer">
+                        $html .= '<a href="#" onclick="javascript:crearActualizacionRegistro(\''. $tupla[idRegistro] . '\');" title="Crear actualizacion de este registro">                        
+                                    <i class="icon icon-v"></i>
+                            </a>'; 
+                    }
+                    
                 }
                return $html;
 
@@ -299,6 +312,7 @@
                             ,contentType
                             ,id_procesos
                             ,id_organizacion
+                            ,idRegistro_original
                          FROM mos_registro 
                          WHERE idRegistro = $id "; 
                 $this->operacion($sql, $atr);
@@ -684,9 +698,13 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);//,version,correlativo,id_procesos,id_organizacion
                     $atr[doc_fisico] = $archivo;
-                    $sql = "INSERT INTO mos_registro(IDDoc,identificacion,id_usuario,descripcion,doc_fisico,contentType)
+                    if($atr['r-id-original'] == '') 
+                        $atr['idRegistro_original']='NULL' ;
+                    else
+                        $atr['idRegistro_original']=$atr['r-id-original'] ;
+                    $sql = "INSERT INTO mos_registro(IDDoc,identificacion,id_usuario,descripcion, idRegistro_original,doc_fisico,contentType)
                             VALUES(
-                                $_SESSION[IDDoc],'$atr[identificacion]',$atr[id_usuario],'$atr[descripcion]','$atr[doc_fisico]','$atr[contentType]'
+                                $_SESSION[IDDoc],'$atr[identificacion]',$atr[id_usuario],'$atr[descripcion]',$atr[idRegistro_original],'$atr[doc_fisico]','$atr[contentType]'
                                 )";//,$atr[version],$atr[correlativo],$atr[id_procesos],$atr[id_organizacion]
                     //echo $sql;
                     $this->dbl->insert_update($sql);
@@ -696,9 +714,28 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     
                     $sql = "SELECT MAX(idRegistro) ultimo FROM mos_registro"; 
                     $this->operacion($sql, $atr);
-                    $nuevo = "IdRegistro: \'".$this->dbl->data[0][0]."\', IDDoc: \'$_SESSION[IDDoc]\', Identificacion: \'$atr[identificacion]\',  Id Usuario: \'$atr[id_usuario]\', Descripcion: \'$atr[descripcion]\', ContentType: \'$atr[contentType]\', Id Procesos: \'$atr[id_procesos]\', Id Organizacion: \'$atr[id_organizacion]\', ";
+                    $idregistro = $this->dbl->data[0][0];
+                    // actualizamos las actualizacion en caso de que aplique
+                    //echo 'aqui:'.$atr[idRegistro_original];
+                    if ($atr[idRegistro_original]!='NULL'){
+                        $sql = "update mos_registro
+				set vigencia = 'N'
+				where (idRegistro_original = ".$atr[idRegistro_original].") AND 
+                                (idRegistro <> ".$idregistro." );";
+                        $this->dbl->insert_update($sql);
+                       // echo $sql;
+                    }
+                    else{
+                        $sql = "update mos_registro
+				set idRegistro_original = ".$idregistro."
+				where idRegistro = ".$idregistro." ;";
+                        $this->dbl->insert_update($sql);
+
+                    }
+                     // echo $sql;
+                    $nuevo = "IdRegistro: \'".$idregistro."\', IDDoc: \'$_SESSION[IDDoc]\', Identificacion: \'$atr[identificacion]\',  Id Usuario: \'$atr[id_usuario]\', Descripcion: \'$atr[descripcion]\', ContentType: \'$atr[contentType]\', Id Procesos: \'$atr[id_procesos]\', Id Organizacion: \'$atr[id_organizacion]\', ";
                     $this->registraTransaccionLog(7,$nuevo,'', '');
-                    return $this->dbl->data[0][0];
+                    return $idregistro;
                     return "El mos_registro '$atr[descripcion_ano]' ha sido ingresado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
@@ -842,7 +879,24 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         return $error; 
                     }
             }
-            
+
+            public function modificarRegistroActualizacion($atr){
+                try {
+                    $sql = "select max(idRegistro) id from mos_registro where idRegistro_original =".$atr[idRegistro_original]." ;";      
+                    $this->operacion($sql, $atr);
+                    $id = $this->dbl->data[0][id];
+                    $sql = "update mos_registro
+                            set vigencia='S'
+                            where idRegistro=".$id.";";      
+                    //echo $sql;
+                    $this->dbl->insert_update($sql);
+                } catch(Exception $e) {
+                        $error = $e->getMessage();                     
+                        if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
+                            return "Ya existe una sección con el mismo nombre.";                        
+                        return $error; 
+                    }
+            }            
             
             
              public function listarRegistros($atr, $pag, $registros_x_pagina){
@@ -1025,6 +1079,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     $sql = "SELECT COUNT(*) total_registros
                          FROM mos_registro r $sql_left
                          WHERE 1 = 1 ";
+                    $sql  = $sql . ($atr[actualizacion_historico]=='S' ? " and r.vigencia='N' " : " and r.vigencia='S' ");
+                    
                     if (strlen($_SESSION[IDDoc])>0){
                         $sql .= " AND IDDoc = $_SESSION[IDDoc] ";
                     }
@@ -1218,12 +1274,13 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                     ,r.contentType
                                     -- ,r.id_procesos
                                     -- ,r.id_organizacion AQUI
-
+                                    ,d.actualizacion_activa
                                      $sql_col_left
                             FROM mos_registro r
                             INNER JOIN mos_documentos d ON d.IDDoc = r.IDDoc
                             $sql_left
                             WHERE 1 = 1 ";
+                            $sql  = $sql . ($atr[actualizacion_historico]=='S' ? " and r.vigencia='N' " : " and r.vigencia='S' ");                  
                     if (strlen($_SESSION[IDDoc])>0){
                         $sql .= " AND r.IDDoc = $_SESSION[IDDoc] ";
                     }
@@ -1443,7 +1500,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[descripcion], "descripcion", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[doc_fisico], "doc_fisico", $parametros,'r_link_titulos')),
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[contentType], "contentType", $parametros,'r_link_titulos')),
-               
+               array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[actualizacion_activa], "actualizacion_activa", $parametros,'r_link_titulos')),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_procesos], "id_procesos", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_organizacion], "id_organizacion", $parametros))
                 );
@@ -1585,6 +1642,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             break;
                     }
                 }
+                $grid->hidden[5] = true;
                 $grid->setParent($this);
                 $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
                 $grid->setFuncion("contentType", "archivo_reg");
@@ -1603,6 +1661,199 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 {
                     $out['paginado']=$grid->setPaginadohtmlMSKS("verPagina_aux", "document", "r-pag_actual","r-reg_por_pag");
                 }
+                return $out;
+            }
+     public function verListaRegistrosHistorico($parametros){
+               // print_r($parametros);
+                $grid= "";
+                $grid= new DataGrid();
+                if ($parametros['pag'] == null) 
+                    $parametros['pag'] = 1;
+                $reg_por_pagina = getenv("PAGINACION");
+                if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
+                $parametros['actualizacion_historico']='S';
+                //print_r($parametros);
+                $this->listarRegistros($parametros, $parametros['pag'], $reg_por_pagina);
+                $data=$this->dbl->data;
+                //print_r($data);
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+
+                $grid->SetConfiguracionMSKS("tblRegistros", "");
+                $config_col=array(
+                   
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[idRegistro], "idRegistro", $parametros,'r_link_titulos')),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[IDDoc], "IDDoc", $parametros,'r_link_titulos')),
+               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[identificacion], "identificacion", $parametros,'r_link_titulos')),
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[correlativo], "correlativo", $parametros)),
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_usuario], "id_usuario", $parametros)),
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[descripcion], "descripcion", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[doc_fisico], "doc_fisico", $parametros,'r_link_titulos')),
+               array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[contentType], "contentType", $parametros,'r_link_titulos')),
+               
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_procesos], "id_procesos", $parametros)),
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_organizacion], "id_organizacion", $parametros))
+                );
+                if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                }
+                $k = 1;
+                //print_r($this->parametros);
+                if(!class_exists('Personas')){
+                    import("clases.personas.Personas");
+                }
+                $personal = new Personas();
+                $bandera_permisos_arbol = false;
+                foreach ($this->parametros as $value) {   
+                    switch ($value[tipo]) {
+                        case 'Seleccion Simple':
+                        case '7':
+                            $ancho = 5;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                            break;
+                        case 'Seleccion Multiple':
+                        case '8':
+                            $ancho = 5;   
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                            break;
+                        case 'Combo':
+                            $ancho = 7;
+                        case '9':
+                            $ancho = 7;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                            break;
+                        case 'Texto':
+                        case '1':
+                             $ancho = 10;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                            break;
+                        case 'Numerico':
+                        case '2':
+                             $ancho = 3;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                            break;
+                        case '3':
+                        case 'Fecha':
+                              $ancho = 2;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                            break;
+                        case '5':
+                        case 'Rut':
+                              $ancho = 5;     
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                            break;
+                        case 'Persona':
+                        case '6':
+                                $ancho = 15;
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                                $bandera_permisos_arbol = true;
+                                if (count($personal->nombres_columnas) <= 0){
+                                    $personal->cargar_nombres_columnas();
+                                }
+                                if (count($personal->campos_activos) <= 0){
+                                        $personal->cargar_campos_activos();
+                                }
+                                /*Columnas del ID, area y cargo de la persona*/
+                                array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_personal], ENT_QUOTES, "UTF-8"))));   
+                                array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion], ENT_QUOTES, "UTF-8")))); 
+                                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo], ENT_QUOTES, "UTF-8"))));                                
+                                //$k++;$k++;$k++;
+                            break;
+                        case '10':
+                                $ancho = 2;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                                break;
+                        case '11':
+                                $ancho = 10;
+                                $bandera_permisos_arbol = true;
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                                break;
+                        case '12':
+                                $ancho = 5;
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                                break;
+                        case '13':
+                                $ancho = 5;                                                            
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro('Vigencia', "edop$k", $parametros,'r_link_titulos')));            
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                                //$k++;
+                                break;
+                        case '14':
+                                $ancho = 5;                                                            
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro('Personas en Cargo', "pn$k", $parametros,'r_link_titulos')));            
+                                //$k++;
+                                break;
+                            
+
+                        default:
+                            array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
+                            break;
+                    }                        
+                   // print_r($value);
+                    $k++;
+                }
+
+               $func= array();
+
+                $columna_funcion = 0;
+                /*if (strrpos($parametros['permiso'], '1') > 0){
+                    
+                    $columna_funcion = 12;
+                }
+                if ($parametros['permiso'][1] == "1")
+                    array_push($func,array('nombre'=> 'verRegistros','imagen'=> "<img style='cursor:pointer' src='diseno/images/find.png' title='Ver Registros'>"));
+                
+                if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
+                    array_push($func,array('nombre'=> 'editarRegistros','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-edit\"  title='Editar Registros'></i>"));
+                if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
+                    array_push($func,array('nombre'=> 'eliminarRegistros','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\"  title='Eliminar Registros'></i>"));
+               */
+                $config=array(array("width"=>"5%", "ValorEtiqueta"=>"<div style='width:50px;'>&nbsp;</div>"));
+                $grid->setPaginado($reg_por_pagina, $this->total_registros);
+                $array_columns =  explode('-', $parametros['mostrar-col']);                
+                for($i=0;$i<count($config_col);$i++){
+                    switch ($i) {                                             
+//                        case 1:
+//                        case 2:
+//                        case 3:
+//                        case 4:
+//                            array_push($config,$config_col[$i]);
+//                            break;
+
+                        default:
+                            
+                            if (in_array($i, $array_columns)) {
+                                array_push($config,$config_col[$i]);
+                            }
+                            else                                
+                                $grid->hidden[$i] = true;
+                            
+                            break;
+                    }
+                }
+                $grid->hidden[5] = true;
+                $grid->setParent($this);
+                $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
+                $grid->setFuncion("contentType", "archivo_reg");
+                $grid->setAligns(4,"center");
+                //print_r($this->funciones);
+                foreach ($this->funciones as $key => $value) {
+                    $grid->setFuncion($key, $value);
+                }
+                //$grid->hidden = array(0 => true);
+                if (!($bandera_permisos_arbol==true)){
+                    $this->cargar_permisos_simple($parametros);
+                }
+                $grid->setDataMSKS("td-table-data", $data, $func,$columna_funcion, $parametros['pag'] );
+                $out['tabla']= $grid->armarTabla();
+                //if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina))
+                {
+                    $out['paginado']=$grid->setPaginadohtmlMSKS("verPagina_aux", "document", "r-pag_actual","r-reg_por_pag");
+                }
+                //echo $out;
                 return $out;
             }
             
@@ -1951,7 +2202,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } 
-                $k = 5;
+                $k = 6;
                 $contenido[PARAMETROS_OTROS] = "";
                 //print_r($this->parametros);
                 foreach ($this->parametros as $value) {  
@@ -2241,7 +2492,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 }
                 else{
                     $this->cargar_permisos_simple($parametros);
-                    $contenido['PERMISO_INGRESAR'] = $this->crear == 'S' ? '' : 'display:none;';
+                    $contenido['PERMISO_INGRESAR'] = $this->per_crear == 'S' ? '' : 'display:none;';
                 }
                 
                 
@@ -2954,7 +3205,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'registros/';
                 $template->setTemplate("formulario_1");
-                //$template->setVars($contenido_1);
+               // print_r($contenido_1);
 //                $contenido['CAMPOS'] = $template->show();
 //
 //                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
@@ -2978,7 +3229,9 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             lang: 'es'  
                           });");   
                 $objResponse->addScript($js);
+               // print_r($contenido_1);
                 return $objResponse;
+                
             }
      
  
@@ -2991,7 +3244,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
                                         $( '#btn-guardar' ).prop( 'disabled', false );");
                 unset ($parametros['opc']);
-                unset ($parametros['id']);
+                if($parametros['r-actualziacion']=='')
+                    unset ($parametros['id']);
                 $parametros['id_usuario']= $_SESSION['CookIdUsuario'];
                // print_r($parametros);
                 
@@ -3513,7 +3767,505 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             lang: 'es'  
                           });");  return $objResponse;
             }
-     
+
+            public function crear_actualizacion($parametros)
+            {
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                $ut_tool = new ut_Tool();
+                $val = $this->verRegistros($parametros[id]); 
+
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido_1["N_" . strtoupper($key)] =  $value;
+                }                
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido_1["P_" . strtoupper($key)] =  $value;
+                }
+                $contenido_1[CODIGO_DOC] = $_SESSION[Codigo_doc];
+                $contenido_1[NOMBRE_DOC] = $val["descripcion"];
+                $contenido_1['IDREGISTRO'] = $val["idRegistro"];
+                $contenido_1['IDDOC'] = $val["IDDoc"];
+                $contenido_1['IDENTIFICACION'] = ($val["identificacion"]);
+                $contenido_1['VERSION'] = $val["version"];
+                $contenido_1['CORRELATIVO'] = $val["correlativo"];
+                $contenido_1['ID_USUARIO'] = $val["id_usuario"];
+                $contenido_1['DESCRIPCION'] = ($val["descripcion"]);
+                $contenido_1['DOC_FISICO'] = $val["doc_fisico"];
+                $contenido_1['CONTENTTYPE'] = ($val["contentType"]);
+                $contenido_1['ID_PROCESOS'] = $val["id_procesos"];
+                $contenido_1['ID_ORGANIZACION'] = $val["id_organizacion"];
+                
+                $campos_din = $this->verValoresCamposDinamicos($val["idRegistro"]);                
+                $html = '';
+                $js='';
+                $i = 1;
+                $campos_arbol_o='';
+                $campos_arbol_p='';
+              
+                if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                } 
+                $k = 5;
+                $contenido[PARAMETROS_OTROS] = "";
+                //print_r($this->parametros);
+                $parametros['mostrar-col']="2-4"; 
+                foreach ($this->parametros as $value) {  
+                    if ($value[tipo] == 13){
+                        $parametros['mostrar-col'] .= "-$k";
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" checked="checked">   &nbsp;
+                                          Vigencia </label>
+
+                                </div>';
+                        $k++;
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+                                       
+                                      <label >
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                      ' . $value[Nombre] . '</label>
+                                  
+                            </div>';
+                        $k++;
+                    }
+                    else if ($value[tipo] == 14){
+                       $parametros['mostrar-col'] .= "-$k";
+                       $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+                                      
+                                     <label >
+                                         <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                     ' . $value[Nombre] . '</label>
+                                 
+                           </div>';
+                       $k++;
+                       //  $parametros['mostrar-col'] .= "-$k";
+                       $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+                                      
+                                     <label >
+                                         <input  type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                     ' . $value[Nombre] . ' Personal </label>
+                                 
+                           </div>';
+                       $k++;   
+                        
+                    }
+                    else if ($value[tipo] == 6){
+                        $parametros['mostrar-col'] .= "-$k";
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+                                       
+                                      <label >
+                                          <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                      ' . $value[Nombre] . '</label>
+                                  
+                            </div>';
+                        $k++;
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                          ID ' . $value[Nombre] . ' </label>
+
+                                </div>';
+                        $k++;
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                          Área ' . $value[Nombre] . ' </label>
+
+                                </div>';
+                        $k++;
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                          Cargo ' . $value[Nombre] . ' </label>
+
+                                </div>';
+                        $k++;
+                    }
+                    else{
+                        $parametros['mostrar-col'] .= "-$k";
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" checked="checked">   &nbsp;
+                                          ' . $value[Nombre] . '</label>
+
+                                </div>';
+                        $k++;
+                    }
+                }
+                
+                foreach ($campos_din as $value) {//Nombre,tipo,valores
+                    $html .= '<div class="form-group">
+                                        <label for="idRegistro" class="col-md-4 control-label">' . $value[Nombre] . '</label>';
+                    //$html .= '<td style="width: 141px;" class="title">' . $value[Nombre] . ':</td><td>';
+                    /*
+                      $ids = array('7','8','9','1','2','3','5','6');
+                $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona');
+                     */
+                    //print_r($value);
+                    switch ($value[tipo]) {
+                        case 'Seleccion Simple':
+                        case '7':
+                            //$cadenas = split("<br />", $value[valores]) ;
+                            $valores_actuales = split(",", $value[valor]) ;
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
+                            }
+                            foreach ($cadenas as $key => $valores) {
+                               
+                                $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="radio-inline">
+                                            <input '. (in_array($key, $valores_actuales)? 'checked' : '') .' type="radio" value="' . $key . '" name="campo_' . $i . '" id="campo_' . $i . '"> '. $valores . ' 
+                                          </label>';
+                                
+                                //$html .= '<input type="radio" class="form-box" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' value="' . $valores . '" size="20" name="campo_' . $i . '" id="campo_' . $i . '">'. $valores;
+                            }
+                            break;
+                        case 'Seleccion Multiple':
+                        case '8':
+                            //$cadenas = split("<br />", $value[valores]) ;
+                            $valores_actuales = split(",", $value[valor]) ;
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
+                            }
+                            $j = 1;
+                            foreach ($cadenas as $key => $valores) {
+                                
+                                $html .= '&nbsp;&nbsp;&nbsp;&nbsp;<label class="checkbox-inline">
+                                            <input id="campo_' . $i . '_' . $j . '" '. (in_array($key, $valores_actuales)? 'checked' : '') .' type="checkbox" value="' . $key . '" name="campo_' . $i . '_' . $j . '"> '. $valores . ' 
+                                          </label>';
+                                //$html .= '<input id="campo_' . $i . '_' . $j . '" '. (in_array($valores, $valores_actuales)? 'checked' : '') .' type="checkbox" value="' . $valores . '" name="campo_' . $i . '_' . $j . '">'. $valores;
+                                
+                                $j++;
+                            }
+                            $html .= '<input id="num_campo_' . $i . '" type="hidden" value="' . ($j - 1) . '" name="num_campo_' . $i . '">';
+                            break;
+                        case 'Combo':
+                        case '9':
+                            //$cadenas = split("<br />", $value[valores]) ;
+                            $items_campo = $this->verItemsCamposDinamicos($value[id_unico]);
+                            $cadenas = array();
+                            foreach ($items_campo as $value_item) {
+                                $cadenas[$value_item[id]] = $value_item[descripcion];
+                            }
+                            //$html .= '<select id="campo_' . $i . '" name="campo_' . $i . '" class="form-box"><option value="">Seleccione</option>';
+                            $html .= '<div class="col-md-10">                                              
+                                                      <select class="form-control" name="campo_' . $i . '" id="campo_' . $i . '" data-validation="required">
+                                                        <option selected="" value="">-- Seleccione --</option>';
+                            foreach ($cadenas as $key => $valores) {
+                                $html .= '<option '. ($value[valor] == $key? 'selected' : '') .' value="' . $key . '">' . $valores . '</option>';
+                            }
+                            $html .= '</select></div>';
+                            break;
+                        case 'Texto':
+                        case '1':
+                                $html .= '<div class="col-md-10">';
+                                $html .= '<input type="text" data-validation="required" class="form-control" value="'. $value[valor] .'" name="campo_' . $i . '" id="campo_' . $i . '">';
+                                $html .= '</div>';
+                            break;
+                        case 'Numerico':
+                        case '2':
+                                $html .= '<div class="col-md-6">';
+                                $html .= '<input type="text" data-validation="number" data-validation-allowing="float,negative" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
+                                $html .= '</div>';
+                            break;
+                        case '3':
+                        case 'Fecha':
+                                $html .= '<div class="col-md-6">';
+                                $html .= '<input type="text" style="width: 120px;" placeholder="dd/mm/yyyy"  data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
+                                $html .= '</div>';
+                                $js .= "$('#campo_$i').datepicker({
+                        changeMonth: true,
+                        yearRange: '-50:+20',
+                        changeYear: true
+                      }); ";
+                            break;
+                        case '5':
+                        case 'Rut':
+                                $html .= '<div class="col-md-6">';
+                                $html .= '<input type="text" onblur="this.value=$.Rut.formatear(this.value);"  data-validation="required rut" style="width: 160px;" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
+                                $html .= '</div>';                                
+                            break;
+                        case 'Persona':
+                        case '6':
+                                if (count($this->id_org_acceso) <= 0){
+                                    $this->cargar_acceso_nodos($parametros);                    
+                                }
+                                $html .= '<div class="col-md-10">                                              
+                                                      <select name="campo_' . $i . '" id="campo_' . $i . '" data-validation="required">
+                                                        <option selected="" value="">-- Seleccione --</option>';
+                                $html .= $ut_tool->OptionsCombo("SELECT cod_emp, 
+                                                                        CONCAT(id_personal, ' - ',CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
+                                                                            FROM mos_personal p WHERE interno = 1
+                                                                            AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
+                                                                    , 'cod_emp'
+                                                                    , 'nombres', $value[valor]);
+                                $js .= '$( "#campo_' . $i . '" ).select2({
+                                            placeholder: "Selecione",
+                                            allowClear: true
+                                          }); ';
+                                $html .= '</select></div>';
+                                break;
+                        case '10':
+                            $html .= '<div class="col-md-11">'
+                                . '<label for="campo-'.$value[cod_parametro].'" class="col-md-'.$col_lab.' control-label">' . $value[espanol] . '</label>'; 
+                            $html .= '<label class="radio-inline" style="color:white;">
+                                            <input '. (($value[valor] == '1')? 'checked' : '') .' type="radio" value="1" name="campo_' . $i . '" id="campo_' . $i . '"> <img src="diseno/images/verde.png" /> 
+                                          </label>';
+                            $html .= '<label class="radio-inline" style="color:white;">
+                                            <input '. ($value[valor] == '2'? 'checked' : '') .' type="radio" value="2" name="campo_' . $i . '" id="campo_' . $i . '"> <img src="diseno/images/amarillo.png" /> 
+                                          </label>';
+                            $html .= '<label class="radio-inline" style="color:white;">
+                                            <input '. ($value[valor] == '3'? 'checked' : '') .' type="radio" value="3" name="campo_' . $i . '" id="campo_' . $i . '"> <img src="diseno/images/atrasado.png" /> 
+                                          </label>';
+                            $html .= '</div>';
+                            break;
+                        
+                        case '11':
+                                $html .= '<div class="col-md-11" style="max-height: 350px;overflow-y: scroll;">';
+                                import('clases.organizacion.ArbolOrganizacional');
+                                $ao = new ArbolOrganizacional();
+                                
+                                //$organizacion = array();
+                                //if(strpos($val[id_organizacion],',')){    
+                               //         $organizacion = explode(",", $val[id_organizacion]);
+                               //     }
+                               //     else{
+                               //         $organizacion[] = $val[id_organizacion];                    
+                               //     }
+                                $parametros[nodos_seleccionados] = explode(",", $value[valor]) ;;
+                                $html_arbol = $ao->MuestraPadre(0, $parametros);
+                                //$html .= '<input type="hidden" value="'.$this->verArbol($value[id_unico],$value[idRegistro]).'" name="nodos_'.$i.'" id="nodos_'.$i.'"/>
+                                $html .= '<input type="hidden" value="" name="nodosreg" id="nodosreg"/>
+                                        <input type="hidden" id="cargar_cargo" name="cargar_cargo" value="0">
+                                        <div id="div-ao-'.$i.'" class="jstree-container">
+                                            <ul class="jstree">
+                                                '.$html_arbol.'
+                                            </ul>
+                                        </div>
+                                        <!--<iframe id="iframearbol_'.$i.'" src="pages/cargo/prueba_arbolV4.php?IDUnico='.$value[id_unico].'&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>-->';
+                                $html .= '</div>';  
+                                $campos_arbol_o .=$i.',';
+                                $js .= "$('#div-ao-$i').jstree(
+                                                {
+                                                    'checkbox':{
+                                                        three_state : false,
+                                                            cascade : ''
+                                                    },
+                                                    'plugins': ['search', 'types','checkbox']
+                                                }
+                                            );
+                                        $('#div-ao-$i').on('select_node.jstree', function (e, data) {
+                                            if(data.event) { data.instance.select_node(data.node.children_d); }
+                                        });
+                                        $('#div-ao-$i').on('deselect_node.jstree', function (e, data) {
+                                            if(data.event) { data.instance.deselect_node(data.node.children_d); }
+                                        });
+                                        $('#div-ao-$i').on('changed.jstree', function (e, data) {
+                                            if (data.selected.length > 0){
+                                                var arr;
+                                                var id = '';
+                                                for(i=0;i<data.selected.length;i++){
+                                                    arr = data.selected[i].split('_');
+                                                    id = id + arr[1] + ',';
+                                                }
+                                                id = id.substr(0,id.length-1);
+                                                $('#nodosreg').val(id);
+                                            }
+                                            else
+                                                $('#nodosreg').val('');
+                                            if ($('#cargar_cargo').val() == '1')
+                                                VerificarCargo($('#nodosreg').val());
+                                            else
+                                                $('#cargar_cargo').val('1');                                                                                 
+                                        });
+                                        $('#div-ao-$i').jstree(true).open_all();  ";
+                            break;/*else{
+                                                       */
+                        case '12':
+                            /*DATOS SELECCIONADOS ARBOL ORGANIZACIONAL*/
+                                $sql = 'select GROUP_CONCAT(valor) valor 
+                                                from mos_registro_item t1 
+                                                where tipo=11 and idRegistro ='.$val["idRegistro"];                           
+                                $this->operacion($sql, $atr);
+                                $seleccionados = $this->dbl->data[0][valor];  
+                                $html .= '<div class="col-md-11" style="max-height: 350px;overflow-y: scroll;">';//'.$this->verArbolP($value[id_unico],$value[idRegistro]).'
+                                $html .= '<input type="hidden" value="" name="nodosp_'.$i.'" id="nodosp_'.$i.'"/>
+                                        <div id="div-ap-'.$i.'">
+                                            <div id="div-ap-'.$i.'-n" class="jstree-container">
+                                                Seleccione un &Aacute;rea para cargar el &Aacute;rbol de Procesos
+                                            </div>
+                                        </div>
+                                        <!--<iframe id="iframearbolp_'.$i.'" src="pages/cargo/arbol_procesoV4.php?funcion=MarcarNodosP('.$i.')&IDUnico='.$value[id_unico].'&IDReg='.$val["idRegistro"].'" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>-->';
+                                $html .= '</div>';   
+                                $campos_arbol_p .=$i.',';
+                                $js .= "$('#div-ap-$i-n')
+                                            .jstree({
+                                                    'core' : {
+                                                            'data' : {
+                                                                    'url' : 'clases/arbol_procesos/server.php?id_ao=$seleccionados&MarcarNodosP=$value[valor]',                                        
+                                                                    'data' : function (node) {
+                                                                            return { 'id' : node.id };
+                                                                    }
+                                                            },
+                                                            'check_callback' : true,
+                                                            'themes' : {
+                                                                    'responsive' : false
+                                                            }
+                                                    },
+                                                    'force_text' : true,                        
+                                                    'checkbox':{
+                                                        three_state : false,
+                                                            cascade : ''
+                                                    },
+                                                    'plugins' : ['search', 'types','checkbox']
+                                            });
+                                        $('#div-ao-$i-n').on('select_node.jstree', function (e, data) {
+                                            if(data.event) { data.instance.select_node(data.node.children_d); }
+                                        });
+                                        $('#div-ao-$i-n').on('deselect_node.jstree', function (e, data) {
+                                            if(data.event) { data.instance.deselect_node(data.node.children_d); }
+                                        });
+                                        $('#div-ap-$i-n').on('changed.jstree', function (e, data) {
+                                            if (data.selected.length > 0){                                       
+                                                var id = '';
+                                                for(k=0;k<data.selected.length;k++){                        
+                                                    id = id + data.selected[k] + ',';
+                                                }
+                                                id = id.substr(0,id.length-1);
+                                                $('#nodosp_$i').val(id);
+                                            }
+                                            else
+                                                $('#nodosp_$i').val('');               
+                                        });";
+                            break;
+                        case '13':
+                                $html .= '<div class="col-md-11">';
+                                $html .= '<input type="text" style="width: 120px;" placeholder="dd/mm/yyyy"  data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
+                                $html .= '</div>';
+                                $js .= "$('#campo_$i').datepicker({
+                        changeMonth: true,
+                        yearRange: '-50:+20',
+                        changeYear: true
+                      });";
+                            break;                        
+                        
+                        case '14':
+                                $sql = 'select GROUP_CONCAT(valor) valor 
+                                                from mos_registro_item t1 
+                                                where id_unico='.$value[id_unico].' and idRegistro ='.$val["idRegistro"];
+                                $this->operacion($sql, $atr);
+                                $seleccionados = $this->dbl->data[0][valor];                                
+                                $html .= '<div class="col-md-11" id="col-md-10-'.$i.'">  ';                                            
+                                $sql = 'SELECT DISTINCT
+                                        mos_cargo.cod_cargo id,
+                                        mos_cargo.descripcion,
+                                        cargos_reg.valor
+                                        FROM
+                                        mos_cargo_estrorg_arbolproc
+                                        INNER JOIN mos_cargo ON mos_cargo.cod_cargo = mos_cargo_estrorg_arbolproc.cod_cargo
+                                        left join (select valor 
+                                                from mos_registro_item t1 
+                                                where id_unico='.$value[id_unico].' and idRegistro ='.$val["idRegistro"].') cargos_reg
+                                        on mos_cargo.cod_cargo = cargos_reg.valor
+                                        where mos_cargo_estrorg_arbolproc.id in (select valor
+                                                                                from mos_registro_item 
+                                                                                where tipo=11 and idRegistro ='.$val["idRegistro"].')
+                                                                            order by mos_cargo.descripcion';                                
+                                $combosemp = '';
+                                
+                                $combosemp .= $ut_tool->OptionsComboMultiple($sql, 'id', 'descripcion','valor');      
+                                $html .= '<input type="hidden" name="campo_cargo_' . $i . '" id="campo_cargo_' . $i . '" value="' . $i . '" />';    
+                                $html .= '<input type="hidden" name="sel_cargo_' . $i . '" id="sel_cargo_' . $i . '" value="' .$seleccionados. '" />';
+                                $html .="<select size=7 class='form-control' id=\"campo_".$i."\" name=\"campo_".$i."[]\"  data-validation=\"required\" multiple>
+                                            <option value=''>-- Seleccione --</option>
+                                            ".$combosemp."
+                                        </select>    ";
+                                $html .= '</select></div>';
+                                
+                                break;
+                        default:
+                            break;
+                    }
+                    //CON ESTO CONTROLO CUANTOS ARBOLES HAY PARA EL VALIDAR QUE TENGAN SELECCIONADOS
+                    //FIN VALIDACION DE ARBOLES
+                    $html .= '<input id="tipo_dato_' . $i . '" type="hidden" value="' . $value[tipo] . '" name="tipo_dato_' . $i . '">';
+                    $html .= '<input id="nombre_' . $i . '" type="hidden" value="' . $value[Nombre] . '" name="nombre_' . $i . '">';
+                    //$html .= '<input id="validacion_' . $i . '" type="hidden" value="' . $value[validacion] . '" name="validacion_' . $i . '">';
+                    $html .= '<input id="valores_' . $i . '" type="hidden" value="' . $value[valores] . '" name="valores_' . $i . '">';
+                    $html .= '<input id="id_atributo_' . $i . '" type="hidden" value="' . $value[id_unico] . '" name="id_atributo_' . $i . '">';
+                    if (strlen($value[idRegistro]) == 0)
+                        $html .= '<input id="id_unico_campo_new_' . $i . '" type="hidden" value="' . $value[id_unico] . '" name="id_unico_campo_new_' . $i . '">';
+                    $html .= '</div>';
+                    $i++;
+                }
+                    if($campos_arbol_o != '')
+                       $campos_arbol_o = substr($campos_arbol_o, 0, strlen($campos_arbol_o)-1);
+                    if($campos_arbol_p != '')
+                        $campos_arbol_p = substr($campos_arbol_p, 0, strlen($campos_arbol_p)-1);
+                    $html .= '<input type="hidden" value="'.$campos_arbol_o.'" name="arbolesO" id="arbolesO"/>';
+                    $html .= '<input type="hidden" value="'.$campos_arbol_p.'" name="arbolesP" id="arbolesP"/>';    
+                
+                $html .= '</table>';
+                $contenido_1[CAMPOS_DINAMICOS] = $html;
+
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'registros/';
+                $template->setTemplate("formulario_actualizacion");
+//                $template->setVars($contenido_1);
+//
+//                $contenido['CAMPOS'] = $template->show();
+
+//                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
+//                $template->setTemplate("formulario");
+                $parametros['corder']="idRegistro";
+                $parametros['sorder']="desc"; 
+                
+                
+                $grid = $this->verListaRegistrosHistorico($parametros);
+                
+                $contenido_1['TABLA'] = $grid['tabla'];
+                $contenido_1['TITULO_FORMULARIO'] = "Editar&nbsp;Registros";
+                $contenido_1['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Registros";
+                $contenido_1['PAGINA_VOLVER'] = "listarRegistros.php";
+                $contenido_1['DESC_OPERACION'] = "Guardar";
+                $contenido_1['OPC'] = "new";
+                //echo $val["idRegistro"];
+                $contenido_1['ID'] = $val["idRegistro"];
+                $contenido_1['IDORIGINAL'] = $val["idRegistro_original"];
+                
+                $template->setVars($contenido_1);
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('contenido-form-aux',"innerHTML",$template->show());
+                
+                $objResponse->addScriptCall("calcHeight");
+                $objResponse->addScriptCall("MostrarContenido2Aux");   
+                $objResponse->addScript($js);
+                $objResponse->addScriptCall("r_cargar_autocompletado");
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("$('#tabs-hv').tab();$('#tabs-hv a:last').tab('show');");
+                   // $objResponse->addScript ("$('.nav-tabs a[href=\"#hv-red\"]').hide();");
+                
+                $objResponse->addScript("$.validate({
+                            lang: 'es'  
+                          });");  
+                return $objResponse;
+            }
+            
  
             public function actualizar($parametros)
             {
@@ -3649,6 +4401,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $respuesta = $this->eliminarRegistros($parametros);
                 $objResponse = new xajaxResponse();
                 if (preg_match("/ha sido eliminada con exito/",$respuesta ) == true) {
+                    $this->modificarRegistroActualizacion($val);
                     $objResponse->addScriptCall("MostrarContenidoAux");
                     $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
                 }
