@@ -1884,6 +1884,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[descripcion], "descripcion", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[doc_fisico], "doc_fisico", $parametros,'r_link_titulos')),
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[contentType], "contentType", $parametros,'r_link_titulos')),
+                    array( "width"=>"2%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[actualizacion_activa], "actualizacion_activa", $parametros,'r_link_titulos')),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_procesos], "id_procesos", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_organizacion], "id_organizacion", $parametros))
                 );
@@ -2594,7 +2595,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } 
-                $k = 5;
+                $k = 6;
                 $contenido[PARAMETROS_OTROS] = "";
                 foreach ($this->parametros as $value) {
                     if ($value[tipo] == 13){

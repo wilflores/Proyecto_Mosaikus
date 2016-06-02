@@ -743,7 +743,7 @@
             $Nivls = "";
             {                                           
                     //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
-                    $Consulta3="select count(*) cant from mos_registro where IDDoc='".$tupla[IDDoc]."'";                    
+                    $Consulta3="select count(*) cant from mos_registro where vigencia='S' and IDDoc='".$tupla[IDDoc]."'";                    
                     $Resp3 = $this->dbl->query($Consulta3,array());                    
                     $resp3 = $Resp3[0][cant];
                     //<img border="0" title="Ver Registros" src="diseno/images/ico_explorer.png">
