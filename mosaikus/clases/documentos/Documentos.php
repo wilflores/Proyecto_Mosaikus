@@ -1415,6 +1415,7 @@
                         $atr[elaboro] = "elaboro";                     
                     }
                     $val = $this->verDocumentos($atr[id]);
+                    //echo $val[etapa_workflow];
                     if(!($val[etapa_workflow]=='estado_aprobado' && $val[estado_workflow]=='OK')){
                         if($atr[notificar]=='si'){                            
                             if($atr[reviso]=='NULL'){                                
@@ -1430,11 +1431,12 @@
                                        estado_workflow='OK'";
                         }else
                         {   
-                            $sql_wf = ", id_workflow_documento=$atr[id_workflow_documento],
-                                        id_usuario_workflow=$atr[id_usuario],
-                                       etapa_workflow=NULL,
-                                       observacion_rechazo=null,
-                                       estado_workflow=NULL";
+//                            $sql_wf = ", id_workflow_documento=$atr[id_workflow_documento],
+//                                        id_usuario_workflow=$atr[id_usuario],
+//                                       etapa_workflow=NULL,
+//                                       observacion_rechazo=null,
+//                                       estado_workflow=NULL";
+                            $sql_wf = ", id_workflow_documento=$atr[id_workflow_documento]";
                         }                      
                     }
                     //echo $sql_wf;

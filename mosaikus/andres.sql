@@ -224,4 +224,4 @@ ADD COLUMN `idRegistro_original`  int(9) NULL AFTER `vigencia`,
 DROP PRIMARY KEY;
 
 update mos_registro
-set idRegistro_original=idRegistro
+set idRegistro_original=idRegistro;

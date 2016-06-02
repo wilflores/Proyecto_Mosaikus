@@ -125,13 +125,13 @@
                 }
                 else{
                     /*Validacion sencilla segun rol asignado al usuario en el modulo de registros*/
-                    if ($this->editar == 'S')
+                    if ($this->per_editar == 'S')
                     {                    
                         $html = "<a href=\"#\" onclick=\"javascript:editarRegistros('". $tupla[idRegistro] . "');\"  title=\"Editar Registros\">                            
                                     <i class=\"icon icon-edit\"></i>
                                 </a>";
                     }
-                    if ($this->eliminar == 'S')
+                    if ($this->per_eliminar == 'S')
                     {
                         $html .= '<a href="#" onclick="javascript:eliminarRegistros(\''. $tupla[idRegistro] . '\');" title="Eliminar Registros">
                                 <i class="icon icon-remove"></i>
