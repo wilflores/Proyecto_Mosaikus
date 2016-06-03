@@ -1499,6 +1499,13 @@ function getForm (frm){
     xajax_Loading(array.getArray());
     //PanelOperator.showDetail('');    
     }
+    function VerhistoricoNotificaciones(){
+    array = new XArray();
+    array.setObjeto('Notificaciones','indexNotificacionesHistorico');
+    array.addParametro('import','clases.notificaciones.Notificaciones');
+    xajax_Loading(array.getArray());
+    //PanelOperator.showDetail('');    
+    }    
     function CambiarEstadoWF(estado,etapa,id){
     array = new XArray();
     array.setObjeto('Documentos','cambiar_estado');
