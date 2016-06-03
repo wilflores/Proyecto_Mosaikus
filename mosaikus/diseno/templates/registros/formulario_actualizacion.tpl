@@ -3,7 +3,7 @@
         <div class="content">
             <div class="panel-heading">
                 <div class="row">
-                    <div class="panel-title col-xs-19" id="div-titulo-for">
+                    <div class="panel-title col-xs-19" id="r-div-titulo-for">
                         Actualizaci&oacute;n del Registro
                     </div>                
                     <div class="panel-actions col-xs-4">
@@ -27,14 +27,14 @@
                             <li><a href="#hv-red" data-toggle="tab">Crear Actualizaci&oacute;n </a></li>
                             <li><a href="#hv-blue" data-toggle="tab">Histórico de Actualizaciones</a></li>                
                         </ul>        
-                        <div id="my-tab-content" style="padding-right: 5%;" class="tab-content">
+                        <div id="my-tab-content" style="padding: 5%;" class="tab-content">
                             <div class="tab-pane active"  id="hv-red">
                                 <form id="r-idFormulario" class="form-horizontal form-horizontal-red" role="form">
                                     <div class="row">
                                         <div class="col-xs-24"> 
        
                                             <div class="form-group">
-                                                <label for="archivo" class="col-md-5 control-label">Agregar Nueva Actualizaci&oacute;n</label>
+                                                <label for="archivo" class="col-md-4 control-label">Agregar Nueva Actualizaci&oacute;n</label>
                                                 <div class="col-md-12">
                                                     <p class="form-control-static" style="">
                                                         <input type="text" class="form-control" readonly="readonly" value="{NOMBRE_DOC}">
@@ -45,7 +45,7 @@
                                             <div class="form-group" id="r-tabla_fileUpload"  style="{CSS_TABLA_FILEUPLOAD}">
                                                 
                                                     <label for="archivo" class="col-md-4 control-label">{N_DOC_FISICO}</label>
-                                                    <div class="col-md-10">
+                                                    <div class="col-md-12">
                                                         
                                                         <input type="file" value="{ARCHIVO}" accept="application/pdf" id="r-fileUpload2" name="fileUpload2" onchange="cargar_archivo_reg();" data-validation="required"/>
                                                         <input type="hidden" id="r-estado_actual" name="estado_actual">
@@ -67,10 +67,10 @@
                                              </div>
                                              <div class="form-group" id="r-info_archivo_adjunto"  style="display:none;">
                                                     <label for="archivo" class="col-md-4 control-label">{N_DOC_FISICO}</label>
-                                                    <div class="col-md-10">
+                                                    <div class="col-md-12">
                                                         <p class="form-control-static">
                                                             <!--<img src="{PAHT_TO_IMG}adjunto.png">-->
-                                                            <input type="text" readonly="readonly" onkeypress="return false;" style="display: inline;width: 80px;" class="form-control" value="{CODIGO_DOC}" id="r-Codigo_doc" name="Codigo_doc" placeholder="{N_CODIGO_DOC}" data-validation="required"/>
+                                                            <input type="text" readonly="readonly" onkeypress="return false;" style="display: inline;width: 120px;" class="form-control" value="{CODIGO_DOC}" id="r-Codigo_doc" name="Codigo_doc" placeholder="{N_CODIGO_DOC}" data-validation="required"/>
                                                             -
                                                             <input type="text" style="display: inline;width: 220px;" class="form-control" value="{NOMBRE_DOC}" id="r-nombre_doc" name="nombre_doc" placeholder="{N_NOMBRE_DOC}" data-validation="required"/>
                                                             .pdf

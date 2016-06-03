@@ -743,7 +743,7 @@
             $Nivls = "";
             {                                           
                     //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
-                    $Consulta3="select count(*) cant from mos_registro where IDDoc='".$tupla[IDDoc]."'";                    
+                    $Consulta3="select count(*) cant from mos_registro where vigencia='S' and IDDoc='".$tupla[IDDoc]."'";                    
                     $Resp3 = $this->dbl->query($Consulta3,array());                    
                     $resp3 = $Resp3[0][cant];
                     //<img border="0" title="Ver Registros" src="diseno/images/ico_explorer.png">
@@ -1415,6 +1415,7 @@
                         $atr[elaboro] = "elaboro";                     
                     }
                     $val = $this->verDocumentos($atr[id]);
+                    //echo $val[etapa_workflow];
                     if(!($val[etapa_workflow]=='estado_aprobado' && $val[estado_workflow]=='OK')){
                         if($atr[notificar]=='si'){                            
                             if($atr[reviso]=='NULL'){                                
@@ -1430,11 +1431,12 @@
                                        estado_workflow='OK'";
                         }else
                         {   
-                            $sql_wf = ", id_workflow_documento=$atr[id_workflow_documento],
-                                        id_usuario_workflow=$atr[id_usuario],
-                                       etapa_workflow=NULL,
-                                       observacion_rechazo=null,
-                                       estado_workflow=NULL";
+//                            $sql_wf = ", id_workflow_documento=$atr[id_workflow_documento],
+//                                        id_usuario_workflow=$atr[id_usuario],
+//                                       etapa_workflow=NULL,
+//                                       observacion_rechazo=null,
+//                                       estado_workflow=NULL";
+                            $sql_wf = ", id_workflow_documento=$atr[id_workflow_documento]";
                         }                      
                     }
                     //echo $sql_wf;
