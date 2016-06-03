@@ -34,3 +34,4 @@
                                     <input type="text" class="form-control" id="b-id_modulo" name="b-id_modulo" placeholder="{N_ID_MODULO}"/>
                                                              
                             </div>
+<input type="hidden"  id="ver_histo" name="ver_histo" value="{VERHISTO}"/>
