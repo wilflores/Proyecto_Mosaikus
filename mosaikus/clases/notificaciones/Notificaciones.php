@@ -380,6 +380,70 @@
                     //echo $sql;
                     $this->operacion($sql, $atr);
              }
+             public function listarNotificacionesHistorico($atr, $pag, $registros_x_pagina){
+                 //print_r($atr);
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $sql_left = $sql_col_left = "";
+                    
+                    $sql = "SELECT COUNT(*) total_registros
+                         FROM mos_notificaciones 
+                         WHERE 1 = 1 and email='$_SESSION[CookEmail]'";
+                    if (strlen($atr['b-filtro-sencillo'])>0){
+                        $sql .= " AND ((upper(asunto) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%') OR (upper(cuerpo) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
+                    }
+                    if (strlen($atr[valor])>0)
+                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
+                    if (strlen($atr["b-fecha"])>0)
+                        $sql .= " AND DATE_FORMAT(fecha, '%d/%m/%Y') like '%" . strtoupper($atr["b-fecha"]) . "%'";
+            if (strlen($atr["b-email"])>0)
+                        $sql .= " AND upper(email) like '%" . strtoupper($atr["b-email"]) . "%'";
+            if (strlen($atr["b-asunto"])>0)
+                        $sql .= " AND upper(asunto) like '%" . strtoupper($atr["b-asunto"]) . "%'";
+            if (strlen($atr["b-cuerpo"])>0)
+                        $sql .= " AND upper(cuerpo) like '%" . strtoupper($atr["b-cuerpo"]) . "%'";
+             if (strlen($atr["b-fecha_leido"])>0)
+                        $sql .= " AND DATE_FORMAT(fecha_leido, '%d/%m/%Y %H:%d') like '%" . strtoupper($atr["b-fecha_leido"]). "%'";
+             if (strlen($atr["b-modulo"])>0)
+                        $sql .= " AND modulo = '". $atr["b-modulo"] . "'";
+
+                    if (count($this->id_org_acceso)>0){                            
+                        $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
+                    }
+                    $total_registros = $this->dbl->query($sql, $atr);
+                    $this->total_registros = $total_registros[0][total_registros];   
+            
+                    $sql = "SELECT id
+                                    ,DATE_FORMAT(fecha, '%d/%m/%Y') fecha
+                                    ,asunto
+                                    ,cuerpo
+                                    ,DATE_FORMAT(fecha_leido, '%d/%m/%Y %H:%d') fecha_leido
+                                    ,modulo
+                                     $sql_col_left
+                            FROM mos_notificaciones $sql_left
+                            WHERE 1 = 1 and email='$_SESSION[CookEmail]'";
+                    if (strlen($atr['b-filtro-sencillo'])>0){
+                        $sql .= " AND ((upper(asunto) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%') OR (upper(cuerpo) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
+                    }
+                    if (strlen($atr[valor])>0)
+                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
+                    if (strlen($atr["b-fecha"])>0)
+                        $sql .= " AND DATE_FORMAT(fecha, '%d/%m/%Y') like '%" . strtoupper($atr["b-fecha"]). "%'";
+            if (strlen($atr["b-email"])>0)
+                        $sql .= " AND upper(email) like '%" . strtoupper($atr["b-email"]) . "%'";
+            if (strlen($atr["b-asunto"])>0)
+                        $sql .= " AND upper(asunto) like '%" . strtoupper($atr["b-asunto"]) . "%'";
+            if (strlen($atr["b-cuerpo"])>0)
+                        $sql .= " AND upper(cuerpo) like '%" . strtoupper($atr["b-cuerpo"]) . "%'";
+             if (strlen($atr["b-fecha_leido"])>0)
+                        $sql .= " AND DATE_FORMAT(fecha_leido, '%d/%m/%Y %H:%d') like '%" . strtoupper($atr["b-fecha_leido"]). "%'";
+             if (strlen($atr["b-modulo"])>0)
+                        $sql .= " AND modulo = '". $atr["b-modulo"] . "'";
+
+                    $sql .= " order by $atr[corder] $atr[sorder] ";
+                    $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                    //echo $sql;
+                    $this->operacion($sql, $atr);
+             }
              public function eliminarNotificaciones($atr){
                     try {
                         $atr = $this->dbl->corregir_parametros($atr);
@@ -480,6 +544,92 @@
                 //if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina))
                 {
                     $out['paginado']=$grid->setPaginadohtmlMSKS("verPagina", "document");
+                }
+                return $out;
+            }
+        
+            public function verListaNotificacionesHistorico($parametros){
+                $grid= "";
+                $grid= new DataGrid();
+                if ($parametros['pag'] == null) 
+                    $parametros['pag'] = 1;
+                $reg_por_pagina = getenv("PAGINACION");
+                if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
+                $this->listarNotificacionesHistorico($parametros, $parametros['pag'], $reg_por_pagina);
+                $data=$this->dbl->data;
+                
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+
+                $grid->SetConfiguracionMSKS("tblNotificaciones", "");
+                $config_col=array(
+                    
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha], "fecha", $parametros)),
+               array( "width"=>"30%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[asunto], "asunto", $parametros)),
+               array( "width"=>"35%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[cuerpo], "cuerpo", $parametros)),
+               array( "width"=>"15%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_leido], "fecha_leido", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[modulo], "modulo", $parametros))
+                );
+                /*if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                }*/
+                $k = 1;
+                foreach ($this->parametros as $value) {                    
+                    array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>link_titulos(($value[espanol]), "p$k", $parametros)));
+                    $k++;
+                }
+
+                $func= array();
+
+                $columna_funcion = -1;
+                /*if (strrpos($parametros['permiso'], '1') > 0){
+                    
+                    $columna_funcion = 8;
+                }
+                if ($parametros['permiso'][1] == "1")
+                    array_push($func,array('nombre'=> 'verNotificaciones','imagen'=> "<img style='cursor:pointer' src='diseno/images/find.png' title='Ver Notificaciones'>"));
+                
+                if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
+                    array_push($func,array('nombre'=> 'editarNotificaciones','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_modificar.png' title='Editar Notificaciones'>"));
+                if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
+                    array_push($func,array('nombre'=> 'eliminarNotificaciones','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_eliminar.png' title='Eliminar Notificaciones'>"));
+               */
+                $config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
+                $grid->setPaginado($reg_por_pagina, $this->total_registros);
+                $array_columns =  explode('-', $parametros['mostrar-col']);
+                for($i=0;$i<count($config_col);$i++){
+                    switch ($i) {                                             
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            array_push($config,$config_col[$i]);
+                            break;
+
+                        default:
+                            
+                            if (in_array($i, $array_columns)) {
+                                array_push($config,$config_col[$i]);
+                            }
+                            else                                
+                                $grid->hidden[$i] = true;
+                            
+                            break;
+                    }
+                }
+                $grid->setParent($this);
+                $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
+                $grid->setFuncion("id", "colum_admin");
+                //$grid->setFuncion("en_proceso_inscripcion", "enProcesoInscripcion");
+                //$grid->setAligns(1,"center");
+                //$grid->hidden = array(0 => true);
+    
+                $grid->setDataMSKS("td-table-data", $data, $func,$columna_funcion, $parametros['pag'] );
+                $out['tabla']= $grid->armarTabla();
+                //if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina))
+                {
+                    $out['paginado']=$grid->setPaginadohtmlMSKS("verPaginaHistorico", "document");
                 }
                 return $out;
             }
@@ -629,7 +779,96 @@
                         init_filtro_ao_simple();');
                 return $objResponse;
             }
-         
+
+            public function indexNotificacionesHistorico($parametros)
+            {
+                $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                if ($parametros['corder'] == null) $parametros['corder']="id";
+                if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
+                if ($parametros['mostrar-col'] == null) 
+                    $parametros['mostrar-col']="1-2-3-4-5-6-7-"; 
+                /*if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                } */               
+                $k = 19;
+                $contenido[PARAMETROS_OTROS] = "";
+                foreach ($this->parametros as $value) {                    
+                    $parametros['mostrar-col'] .= "-$k";
+                    $contenido[PARAMETROS_OTROS] .= '<div class="form-group">
+                                  <label for="SelectAcc" class="col-md-9 control-label">' . $value[espanol] . '</label>
+                                  <div class="col-md-3">      
+                                      <label class="checkbox-inline">
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                      </label>
+                                  </div>
+                            </div>';
+                    $k++;
+                }
+                $this->cargar_permisos($parametros);
+                $grid = $this->verListaNotificacionesHistorico($parametros);
+                $contenido['CORDER'] = $parametros['corder'];
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];
+                $contenido['SORDER'] = $parametros['sorder'];
+                $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['OPCIONES_BUSQUEDA'] = " <option value='campo'>campo</option>";
+                $contenido['JS_NUEVO'] = 'nuevo_Notificaciones();';
+                $contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;Notificaciones';
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['PERMISO_INGRESAR'] = $this->per_crear == 'S' ? '' : 'display:none;';
+
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'notificaciones/';
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }  
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                } 
+                $contenido["VERHISTO"] =  'S';
+                $template->setTemplate("busqueda");
+                $template->setVars($contenido);
+                $contenido['CAMPOS_BUSCAR'] = $template->show();
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'notificaciones/';
+
+                $template->setTemplate("mostrar_colums");
+                $template->setVars($contenido);
+                $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
+                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
+
+                $template->setTemplate("listar");
+                $template->setVars($contenido);
+                //$this->contenido['CONTENIDO']  = $template->show();
+                //$this->asigna_contenido($this->contenido);
+                //return $template->show();
+                if (isset($parametros['html']))
+                    return $template->show();
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('contenido',"innerHTML",$template->show());
+                $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
+                $objResponse->addAssign('modulo_actual',"value","notificaciones");
+                $objResponse->addIncludeScript(PATH_TO_JS . 'notificaciones/notificaciones.js');
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript('PanelOperator.initPanels("");
+                        ScrollBar.initScroll();
+                        init_filtro_rapido();
+                        init_filtro_ao_simple();');
+                return $objResponse;
+            }
+            
  
             public function crear($parametros)
             {
@@ -838,6 +1077,19 @@
                 $objResponse->addScript("PanelOperator.resize();");
                 return $objResponse;
             }
+                public function buscarHistorico($parametros)
+            {
+                /*Permisos en caso de que no se use el arbol organizacional*/
+                $this->cargar_permisos($parametros);
+                $grid = $this->verListaNotificacionesHistorico($parametros);                
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
+                $objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
+                          
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("PanelOperator.resize();");
+                return $objResponse;
+            }
                 public function VerNotificacionesMenu($parametros)
             {
                 session_name("mosaikus");
@@ -883,8 +1135,8 @@
                     }
                 }
                 if($cant>3){
-                        $html .='<li id=vermas>';
-                        $html .= "<a onclick=\"" .$clicvermas."\" href='#'><strong>Ver todas las alertas</strong></a>" ;
+                        $html .="<li  id=vermas>";
+                        $html .= "<a onclick=\"" .$clicvermas."\" ><strong>Ver todas las alertas</strong></a>" ;
                         $html .='</li>';
 
                 }
@@ -898,6 +1150,10 @@
                         $heightdiv=150;
 
                 }
+                $html .='<li id=verhistorial >';
+                $html .= "<a onclick='VerhistoricoNotificaciones()' ><strong>Ver&nbsp;Historial</strong></a>" ;
+                $html .='</li>';
+
                 $objResponse = new xajaxResponse();
                 $objResponse->addScript("document.getElementById('div-notificaciones').style.height='".$heightdiv."px';"); 
                 $objResponse->addAssign('popover-notificaciones',"innerHTML",$html);
