@@ -64,6 +64,7 @@
             xajax_Loading(array.getArray());
         }
     }
+
     function verPagina(pag,doc){
         array = new XArray();
         if (doc== null)
@@ -82,11 +83,12 @@
         array.addParametro('permiso',document.getElementById('permiso_modulo').value);
         array.addParametro('pag',pag);
         array.setObjeto('Notificaciones','buscar');
+        if(document.getElementById('ver_histo').value=='S')
+            array.setObjeto('Notificaciones','buscarHistorico');
         array.addParametro('import','clases.notificaciones.Notificaciones');
         $('#MustraCargando').show();
         xajax_Loading(array.getArray());
     }
-
     function verNotificaciones(id){
         var src = 'pages/' +  document.getElementById("modulo_actual").value + '/verNotificaciones.php?id='+id;
         $('a#ver_ficha_trabajador').fancybox({
