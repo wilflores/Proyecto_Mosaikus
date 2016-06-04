@@ -246,8 +246,16 @@
              }
              public function eliminarPerfiles($atr){
                     try {
-                        $respuesta = $this->dbl->delete("mos_perfil_portal", "cod_perfil = " . $atr[id]);
-                        return "ha sido eliminada con exito";
+                        $sql = "select count(*) as registros from mos_usuario_filial where cod_perfil_portal = " . $atr[id];
+                        $this->operacion($sql, "");
+                        $registros = $this->dbl->data[0][registros];                        
+                        if($registros > 0){
+                            return "- No se pueden eliminar perfiles con usuarios asociados.";
+                        }
+                        else{                         
+                            $respuesta = $this->dbl->delete("mos_perfil_portal", "cod_perfil = " . $atr[id]);
+                            return "ha sido eliminada con exito";
+                        }                       
                     } catch(Exception $e) {
                         $error = $e->getMessage();                     
                         if (preg_match("/alumno_inscrito_fk_id_ano_escolar_fkey/",$error ) == true) 
