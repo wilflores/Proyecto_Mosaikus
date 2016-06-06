@@ -1254,9 +1254,11 @@
                                 $sql = "SELECT
                                         IFNULL(count(mos_registro_item.idRegistro),0) cant  
                                         FROM
-                                        mos_registro_item
+                                        mos_registro_item inner join mos_registro reg 
+                                        on reg.idRegistro = mos_registro_item.idRegistro
                                         WHERE
-                                        IDDoc= ".$_SESSION[IDDoc]." and 
+                                        reg.vigencia = 'S' and
+                                        mos_registro_item.IDDoc= ".$_SESSION[IDDoc]." and 
                                         valor in (".$this->BuscaOrgNivelHijos($arrP[id]).")
                                         and tipo = 11 ";
                                     if (count($this->id_org_acceso_explicito)>0)
@@ -1272,15 +1274,17 @@
                                 //FALTA AQUIIIIIIIIIII
                                 //// los registros de los empleados de las areas donde tiene permisos
                                 $sql = "SELECT 
-                                        count(idRegistro) cant
+                                        count(reg.idRegistro) cant
                                         FROM
                                         mos_registro_formulario reg inner join mos_personal per on
-                                        reg.Nombre = per.cod_emp
+                                        reg.Nombre = per.cod_emp inner join mos_registro reg_1 
+                                        on reg.idRegistro = reg_1.idRegistro
                                         WHERE
+                                        reg_1.vigencia = 'S' and
                                         reg.IDDoc = ".$_SESSION[IDDoc]." and tipo=6
-                                        and id_organizacion in (".$this->BuscaOrgNivelHijos($arrP[id]).")";
+                                        and per.id_organizacion in (".$this->BuscaOrgNivelHijos($arrP[id]).")";
                                     if (count($this->id_org_acceso_explicito)>0)
-                                       $sql .= " and id_organizacion in (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
+                                       $sql .= " and per.id_organizacion in (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
                                 
                                 //echo $sql;
                                 $data_aux = $this->dbl->query($sql, $atr);
@@ -1417,9 +1421,11 @@
                                 $sql="SELECT
                                     IFNULL(count(mos_registro_item.idRegistro),0) cant
                                     FROM
-                                    mos_registro_item
+                                    mos_registro_item inner join mos_registro reg 
+                                        on reg.idRegistro = mos_registro_item.idRegistro
                                     WHERE
-                                    IDDoc= ".$_SESSION[IDDoc]." and
+                                    reg.vigencia = 'S' and
+                                    mos_registro_item.IDDoc= ".$_SESSION[IDDoc]." and
                                     valor in (".$this->BuscaOrgNivelHijos($arr[id]).")
                                     and tipo = 11;";  
 
@@ -1431,30 +1437,34 @@
                                 break;
                             case 6:
                                 $sql = "SELECT 
-                                        count(idRegistro) cant
+                                        count(reg.idRegistro) cant
                                         FROM
                                         mos_registro_formulario reg inner join mos_personal per on
-                                        reg.Nombre = per.cod_emp
+                                        reg.Nombre = per.cod_emp inner join mos_registro reg_1 
+                                        on reg.idRegistro = reg_1.idRegistro
                                         WHERE
+                                        reg_1.vigencia = 'S' and
                                         reg.IDDoc = ".$_SESSION[IDDoc]." and tipo=6
-                                        and id_organizacion in (".$this->BuscaOrgNivelHijos($arr[id]).")";
+                                        and per.id_organizacion in (".$this->BuscaOrgNivelHijos($arr[id]).")";
                                     //if (count($this->id_org_acceso_explicito)>0)
-                                       $sql .= " and id_organizacion in (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
+                                       $sql .= " and per.id_organizacion in (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
 
                                 
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador='';
                                 $contador=$data_aux[0][cant];                                                                
                                 $sql = "SELECT 
-                                        count(idRegistro) cant
+                                        count(reg.idRegistro) cant
                                         FROM
                                         mos_registro_formulario reg inner join mos_personal per on
-                                        reg.Nombre = per.cod_emp
+                                        reg.Nombre = per.cod_emp inner join mos_registro reg_1 
+                                        on reg.idRegistro = reg_1.idRegistro
                                         WHERE
+                                        reg_1.vigencia = 'S' and
                                         reg.IDDoc = ".$_SESSION[IDDoc]." and tipo=6
-                                        and id_organizacion in (".$arr[id].")";
+                                        and per.id_organizacion in (".$arr[id].")";
                                     //if (count($this->id_org_acceso_explicito)>0)
-                                       $sql .= " and id_organizacion in (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
+                                       $sql .= " and per.id_organizacion in (".implode(',', array_keys($this->id_org_acceso_explicito)).")";
                                 //echo $sql;
                                 $data_aux = $this->dbl->query($sql, $atr);                                
                                 
