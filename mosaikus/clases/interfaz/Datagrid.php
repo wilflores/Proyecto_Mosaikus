@@ -782,7 +782,7 @@ public function setData2($cssclass, $data, $funciones=array(), $colbotones=-1,$n
     public function setPaginadohtmlMSKS($nombre,$para,$nombre_pag_actual='pag_actual',$nombre_r_x_pag='reg_por_pag'){
         $nroPag=$this->getNumeroPag();
         //$html_pag_actual = '<input type="hidden" name="pag_actual" id="'.$nombre_pag_actual.'" value="'. $this->pagActual. '"/><select id="ir_a" name="ir_a" >';
-        $html_pag_actual = '<input type="hidden" name="pag_actual" id="'.$nombre_pag_actual.'" value="'. $this->pagActual. '"/>';
+        /*$html_pag_actual = '<input type="hidden" name="pag_actual" id="'.$nombre_pag_actual.'" value="'. $this->pagActual. '"/>';
         For ($i=1; $i<=$nroPag; $i++ ){
             if($i==$this->pagActual){
                 //<li><a href="#">1</a></li>
@@ -792,34 +792,71 @@ public function setData2($cssclass, $data, $funciones=array(), $colbotones=-1,$n
                 //$html_pag_actual.="<option value='$i'>$i</option>";
                 $html_pag_actual .= "<li><a href=\"#grid\"  onclick=\"". $nombre . '(' . $i .  ','. $para . ");\">$i</a></li>";
             }
+        }*/
+        $html_pag_actual = '<div class="col-xs-10" style="padding-left: 0px;padding-right: 0px;float:right;">   
+                                <div style="float:right;">
+                                <label class="control-label">Página: &nbsp;</label>
+                                    <select class="form-control" name="pag_actual" id="'.$nombre_pag_actual.'" onchange="'. $nombre . '(this.value,'. $para . ');" style="">';
+        For ($i=1; $i<=$nroPag; $i++ ){
+//            if($i==$this->pagActual){
+//                //<li><a href="#">1</a></li>
+//                //$html_pag_actual.="<option value='$i' selected>$i</option>";
+//                $html_pag_actual .= "<li><a style=\"background-color:#455a64;color:#fafafa;border-color:#cfd8dc;\" href=\"#grid-paginado\">$i</a></li>";
+//            }else{
+//                //$html_pag_actual.="<option value='$i'>$i</option>";
+//                $html_pag_actual .= "<li><a href=\"#grid\"  onclick=\"". $nombre . '(' . $i .  ','. $para . ");\">$i</a></li>";
+//            }
+            $selected = ($i==$this->pagActual ? "selected" : "");
+            $html_pag_actual .= "<option $selected value=\"$i\">$i</option>";
         }
-        //$html_pag_actual .= '</select>';
-        $linkpages ="<div class=\"col-xs-5\">Total: " . $this->total_reg . " Items</div>";
+        $html_pag_actual .= '       </select> '
+                . '              <label class="control-label"> &nbsp;de '.$nroPag.'</label>'
+                . '         </div></div>';//
+        $restar = $this->pagActual == $nroPag ? (($this->pagActual -1)*$this->regPagina + $this->regPagina) - $this->total_reg : 0;
+        $linkpages ="<div class=\"col-xs-5\"><div class=\"col-xs-23\" style=\"padding-top: 8px;\"><label class=\"control-label\">". (($this->pagActual -1)*$this->regPagina + 1) . " - " . (($this->pagActual -1)*$this->regPagina + $this->regPagina - $restar). " de " . $this->total_reg . " Items</label></div></div>";
         $reg_x_pag = array(10,15,20,25,50);
-        $linkpages .= '<div class="col-xs-6"><div class="row">
-                                  <div class="col-xs-7">                                    
+        $linkpages .= '<div class="col-xs-5"><!--<div class="row">--> 
+                                  <div class="col-xs-16">   
+                                  <label class="control-label">Visualizar:&nbsp;</label>
                                     <select class="form-control" name="reg_por_pag" id="'.$nombre_r_x_pag.'" onchange="'. $nombre . '(' . 1 .  ','. $para . ');" style="padding-left: 3px; padding-right: 3px;">';
         for($i=0;$i<count($reg_x_pag);$i++){
             $selected = ($reg_x_pag[$i]==$this->regPagina ? "selected" : "");
             $linkpages .= "<option $selected value=\"$reg_x_pag[$i]\">$reg_x_pag[$i]</option>";
         }
         $linkpages .= '             </select>
-                                  </div>
-                                  <label class="col-xs-17">Registros por Página</label>
+                                  <!--</div>-->
+                                  
                         </div></div>';
 //        $linkpages = '<div id="pager" class="fieldset-content">
 //                        <div class="page-number DatosGrilla"  style="font-size: 12px;">
 //                            <span>P&aacute;gina ' . $this->pagActual . '/' . $nroPag . '</span> &nbsp; <span>Total ' . $this->total_reg . ' Registros </span>
 //                        </div>
 //                        <div class="page-control">';
-        $linkpages .= '<div class="col-xs-12">
-                                <ul class="pagination">
+        $linkpages .= '<div class="col-xs-10">';
+        $linkpages .= $html_pag_actual;
+        $linkpages .= '</div>';
+        $linkpages .= '<div class="col-xs-4">
+            ';
+        $anterior = $this->pagActual == 1 ? 1 : $this->pagActual - 1;
+        $siguiente = $this->pagActual == $nroPag ? $nroPag : $this->pagActual + 1;
+        $linkpages .= '
+            <ul class="pagination">
                                   <li>
                                     <a href="#grid" onclick="'. $nombre . '(' . 1 .  ','. $para . ');" aria-label="Previous">
                                       <span aria-hidden="true">&laquo;</span>
                                     </a>
+                                  </li>
+                                  <li>
+                                    <a href="#grid" onclick="'. $nombre . '(' . $anterior .  ','. $para . ');" aria-label="Previous">
+                                      <span aria-hidden="true"> < </span>
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a href="#grid" onclick="'. $nombre . '(' . $siguiente .  ','. $para . ');" aria-label="Previous">
+                                      <span aria-hidden="true"> > </span>
+                                    </a>
                                   </li>';
-        $linkpages .= $html_pag_actual;
+        
         
         $linkpages .= '<li>
                                     <a href="#grid"  onclick="'. $nombre . '(' . $nroPag .  ','. $para . ');" aria-label="Next">
@@ -828,6 +865,7 @@ public function setData2($cssclass, $data, $funciones=array(), $colbotones=-1,$n
                                   </li>
                                 </ul>
                               </div>';
+        
 //        if($this->pagActual == 1){
 //              $linkpages .= '<input type="button" class="page-button first_over"/>
 //                             <input type="button" class="page-button prev_over"/>';
