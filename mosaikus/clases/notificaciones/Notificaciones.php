@@ -782,7 +782,7 @@
 
             public function indexNotificacionesHistorico($parametros)
             {
-                $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
+                $contenido[TITULO_MODULO] = 'Histórico de Notificaciones ';
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }

@@ -740,7 +740,7 @@
                     $val = $this->verDocumentoCodigosArea($data[0][id]);
                     //print_r($val);
                     $codigo = $val["codigo"] . '_' . str_pad($val["correlativo"], 3, "0", STR_PAD_LEFT);
-                    if ($val[bloqueo_codigo] == 'S'){
+                    if (($val[bloqueo_codigo] == 'S')&&($_SESSION[SuperUser]!='S')){
                         $objResponse->addScript("$('#Codigo_doc').val('$codigo');");
                         $objResponse->addScript("$('#Codigo_doc').attr('readonly', true);");
                     }
