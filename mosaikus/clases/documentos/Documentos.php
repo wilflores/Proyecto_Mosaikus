@@ -5668,7 +5668,7 @@
             $val = $this->verDocumentos($parametros[id]);
             $ut_tool = new ut_Tool(); 
             $sql = "SELECT
-                    mos_personal.cod_emp, mos_personal.email,mos_personal.responsable_area, mos_organizacion.id id_organizacion
+                    mos_personal.cod_emp, mos_personal.email, mos_organizacion.id id_organizacion
                     FROM
                     mos_organizacion inner join (SELECT
                             min(mos_organizacion.level) level
@@ -5676,26 +5676,43 @@
                             mos_organizacion
                             WHERE
                             mos_organizacion.id in (".$parametros[nodos].")) nivel_minimo
-                    on nivel_minimo.`level`= mos_organizacion.`level` left join mos_personal ON
-                    mos_personal.id_organizacion = mos_organizacion.id
+                    on nivel_minimo.`level`= mos_organizacion.`level` INNER JOIN mos_responsable_area AS resp 
+                    ON mos_organizacion.id = resp.id_organizacion INNER JOIN mos_personal 
+                    ON mos_personal.cod_emp = resp.cod_emp 
                     WHERE
-                    mos_organizacion.id in (".$parametros[nodos]."); ";
+                    resp.id_organizacion in (".$parametros[nodos]."); ";
             //echo $sql;
             $this->operacion($sql, $atr);
                 //echo $sql;
             $empleados = $this->dbl->data;
-            if(sizeof($this->dbl->data)>0){
-                foreach($empleados as $value){
-                    if($value[responsable_area]=='S'){
-                        $cod_emp = $value[cod_emp];
-                        $es_responsable_area = $value[responsable_area];
-                        $email_aprobador = $value[email];
-                    }
-                    $id_organizacion = $value[id_organizacion];
-                }
-            }
-            //echo $cod_emp;
-             if($cod_emp!='' && $es_responsable_area=='S'){
+            $cod_emp = implode(",", array_column($empleados,'cod_emp'));
+            
+             if($cod_emp!=''){
+                 //echo $cod_emp;
+                 // CONSULTAMOS SI ESTOS COD_EMP TIENEN WF
+                 $sql="SELECT wf.id_personal_aprueba
+                           FROM mos_workflow_documentos AS wf
+                           left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                           INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                           WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
+                 $this->operacion($sql, $atr);
+                 $emp_resp = $this->dbl->data;
+                 // print_r($empleados);
+                 $empl_inter = array();
+                 $empl_inter = (array_diff(array_column($empleados,'cod_emp'), array_column($emp_resp,'id_personal_aprueba')));
+                     //RECORREMOS LOS COD_EMP QUE NO TIENEN WF Y HAY QUE CREARLO
+                    foreach($empleados as $value){
+                        if (in_array($value[cod_emp], $empl_inter)){
+                            $atr =array();
+                            $atr[id_personal_responsable]=$_SESSION['CookCodEmp'];
+                            $atr[email_responsable]=$_SESSION['CookEmail'];
+                            $atr[id_personal_aprueba]=$value[cod_emp];
+                            $atr[email_aprueba]=$value[email];
+                            $wf->ingresarWorkflowDocumentos($atr);
+                          //  print_r($atr);
+                        }
+                        
+                    }                 
                 //VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR
                 $sql="SELECT wf.id,
                            CONCAT( 
@@ -5722,15 +5739,7 @@
                     //echo 'query 2 TIENE WF EL RESPONSABLE  '.$sql;
                 }
                 else{
-                     //ESTE RESPONSABLE DE AREA NO TIENE WF COMO APROBADOR Y HAY QUE CREARLO
-                        $atr =array();
-                        $atr[id_personal_responsable]=$_SESSION['CookCodEmp'];
-                        $atr[email_responsable]=$_SESSION['CookEmail'];
-                        $atr[id_personal_aprueba]=$cod_emp;
-                        $atr[email_aprueba]=$email_aprobador;
-                        //echo 'inserta respon area';
-                       // print_r($atr);
-                        $wf->ingresarWorkflowDocumentos($atr);
+
                     $sql="SELECT wf.id,
                                CONCAT( 
                                IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
@@ -5753,22 +5762,54 @@
                 //EL AREA NO TIENE RESPONSABLE Y BUSCAMOS EL REPONSABLE DEL AREA SUPERIOR
                 //select min(level) nivel from mos_organizacion where id IN
                 $sql = "SELECT
-                    mos_personal.cod_emp, mos_personal.email, mos_organizacion.title
+                    mos_personal.cod_emp, mos_personal.email, mos_organizacion.id id_organizacion
                     FROM
-                    mos_organizacion inner join mos_personal ON
-                    mos_personal.id_organizacion = mos_organizacion.id
+                    mos_organizacion inner join (SELECT
+                            min(mos_organizacion.level) level
+                            FROM
+                            mos_organizacion
+                            WHERE
+                            mos_organizacion.id in ((select parent_id from mos_organizacion where id IN (".$parametros[nodos].") ))) nivel_minimo
+                    on nivel_minimo.`level`= mos_organizacion.`level` INNER JOIN mos_responsable_area AS resp 
+                    ON mos_organizacion.id = resp.id_organizacion INNER JOIN mos_personal 
+                    ON mos_personal.cod_emp = resp.cod_emp 
                     WHERE
-                    mos_organizacion.id in (select parent_id from mos_organizacion where id IN (".$id_organizacion.") ) "
-                    . "and mos_personal.responsable_area='S';";
-               // echo $sql;
+                    resp.id_organizacion in ((select parent_id from mos_organizacion where id IN (".$parametros[nodos].") )); 
+                    ";
+                //echo $sql;
                 //echo 'query 1 SINO VERIFICAMOS SI EL RESPONSABLE SUPERIOR DE AREA TIENE WF ASIGNADO COMO APROBADOR '.$sql;
                 $this->operacion($sql, $atr);
                 //echo $sql;
+                //print_r($this->dbl->data);
                 $empleados = $this->dbl->data;
                 if(sizeof($this->dbl->data)>0){
                 $cod_emp = implode(',', array_column($this->dbl->data,'cod_emp'));
-                }    
+                }  
+                //print_r($empleados);
                 if($cod_emp!=''){
+                    $sql="SELECT wf.id_personal_aprueba
+                              FROM mos_workflow_documentos AS wf
+                              left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                              INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                              WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
+                    $this->operacion($sql, $atr);
+                    $emp_resp = $this->dbl->data;
+                    // print_r($empleados);
+                    $empl_inter = array();
+                    $empl_inter = (array_diff(array_column($empleados,'cod_emp'), array_column($emp_resp,'id_personal_aprueba')));
+                        //RECORREMOS LOS COD_EMP QUE NO TIENEN WF Y HAY QUE CREARLO
+                       foreach($empleados as $value){
+                           if (in_array($value[cod_emp], $empl_inter)){
+                               $atr =array();
+                               $atr[id_personal_responsable]=$_SESSION['CookCodEmp'];
+                               $atr[email_responsable]=$_SESSION['CookEmail'];
+                               $atr[id_personal_aprueba]=$value[cod_emp];
+                               $atr[email_aprueba]=$value[email];
+                               $wf->ingresarWorkflowDocumentos($atr);
+                               //print_r($atr);
+                           }
+
+                       }                          
                     //VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR
                     $sql="SELECT wf.id,
                                CONCAT( 
@@ -5795,20 +5836,6 @@
                         //$resultado = array_merge($datos, $this->dbl->data);
                     }
                     else{
-                         //ESTE RESPONSABLE DE AREA NO TIENE WF COMO APROBADOR Y HAY QUE CREARLO
-                        foreach($empleados as $value){
-                            $atr =array();
-                            $atr[id_personal_responsable]=$_SESSION['CookCodEmp'];
-                            $atr[email_responsable]=$_SESSION['CookEmail'];
-                            $atr[id_personal_aprueba]=$value[cod_emp];
-                            $atr[email_aprueba]=$value[email];
-                            $area = $value[title];
-                            //echo 'inserta respon sup';
-                            //print_r($atr);
-                            $mensaje = 'Se va a crear, Flujo de Trabajo del Área '.$area.', no existe responsable en el área seleccionada';
-                            $wf->ingresarWorkflowDocumentos($atr);
-                        }
-                        
                         $sql="SELECT wf.id,
                                    CONCAT( 
                                    IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
