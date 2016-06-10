@@ -225,3 +225,17 @@ DROP PRIMARY KEY;
 
 update mos_registro
 set idRegistro_original=idRegistro;
+
+/****************************************/
+/*cambio del 10-06*/
+/****************************************/
+
+DROP TABLE IF EXISTS `mos_responsable_area`;
+CREATE TABLE `mos_responsable_area` (
+  `id_organizacion` int(11) NOT NULL DEFAULT '0',
+  `cod_emp` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id_organizacion`,`cod_emp`),
+  KEY `fk_respo_emp` (`cod_emp`),
+  CONSTRAINT `fk_respo_emp` FOREIGN KEY (`cod_emp`) REFERENCES `mos_personal` (`cod_emp`) ON DELETE CASCADE,
+  CONSTRAINT `fk_respo_org` FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
