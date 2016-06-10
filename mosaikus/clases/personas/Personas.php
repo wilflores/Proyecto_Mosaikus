@@ -94,7 +94,7 @@
 
              public function verPersonas($id){
                 $atr=array();
-                $sql = "SELECT cod_emp
+                $sql = "SELECT p.cod_emp
                             ,id_personal
                             ,nombres
                             ,apellido_paterno
@@ -117,9 +117,14 @@
                             ,DATE_FORMAT(fecha_ingreso, '%d/%m/%Y') fecha_ingreso
                             ,DATE_FORMAT(fecha_egreso, '%d/%m/%Y') fecha_egreso
                             ,responsable_area
+                            ,id_organizacion_resp
                          FROM mos_personal p
-                        LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo
-                         WHERE cod_emp = $id "; 
+                        LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo left join
+                        (select cod_emp,
+                                GROUP_CONCAT(id_organizacion) id_organizacion_resp
+                         from mos_responsable_area
+                         group by cod_emp) resp on p.cod_emp = resp.cod_emp
+                         WHERE p.cod_emp = $id "; 
                 //echo $sql;
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
@@ -192,7 +197,10 @@
                                     ,$atr[fecha_ingreso],$atr[fecha_egreso],'$atr[responsable_area]'
                                 )";
                     $this->dbl->insert_update($sql);
-                    
+                    //PARA GUARDAR LAS AREAS DONDE ES RESPONSABLE
+                    $atr[id]=$atr[cod_emp];
+                    $this->CargaAreasResponsables($atr);
+                    //FIN GUARDAR LAS AREAS DONDE ES RESPONSABLE
                     $this->registraTransaccionLog(18,$atr[cod_emp]. " ".trim($atr[apellido_paterno])." ".trim($atr[apellido_materno])." ".trim($atr[nombres]),'', '');
                     return $atr[cod_emp];
                     return "El mos_personal '$atr[descripcion_ano]' ha sido ingresado con exito";
@@ -244,7 +252,35 @@
                         return $error; 
                     }
             }
+            public function CargaAreasResponsables($atr) {
+            //PARA GUARDAR LAS AREAS DONDE ES RESPONSABLE
+                    //$atr[id] 
+                    $sql = "delete from mos_responsable_area  where cod_emp=".$atr[id];    
+                    $this->dbl->insert_update($sql);
+                    $org_resp = array();
+                   // print_r($atr);
+                    if(strpos($atr[nodos_responsable],',')){    
+                        $org_resp = explode(",", $atr[nodos_responsable]);
+                    }
+                    else{
+                        $org_resp[] = $atr[nodos_responsable];                                 
+                    } 
+                   // print_r($org_resp);
+                    $ind_eliminar = array_search($atr[id_organizacion], $org_resp);
+                    if($atr[responsable_area]!='' && $ind_eliminar==''){
+                        $org_resp[] = $atr[id_organizacion];
+                    }
+                    //print_r($org_resp);
+                    foreach ($org_resp as $value) {
+                        $sql = "insert into mos_responsable_area (cod_emp,id_organizacion) "
+                                . " values (".$atr[id].",".$value."); ";
+                      //  echo $sql;
+                        $this->dbl->insert_update($sql);
+                    }
+                    //FIN GUARDAR LAS AREAS DONDE ES RESPONSABLE                
+            }
             public function modificarPersonas($atr){
+                //print_r($atr);
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql = "SELECT COUNT(*) total_registros
@@ -282,13 +318,22 @@
                     }
                     else $atr[email] = "NULL";
                     //. ",extranjero = '$atr[extranjero]'
+                    
                     $sql = "UPDATE mos_personal SET                            
                                     id_personal = '$atr[id_personal]',nombres = '$atr[nombres]',apellido_paterno = '$atr[apellido_paterno]',apellido_materno = '$atr[apellido_materno]',genero = '$atr[genero]',fecha_nacimiento = $atr[fecha_nacimiento],vigencia = '$atr[vigencia]',interno = '$atr[interno]',id_organizacion = $atr[id_organizacion],cod_cargo = $atr[cod_cargo],workflow = '$atr[workflow]',email = $atr[email],relator = '$atr[relator]',reviso = '$atr[reviso]',elaboro = '$atr[elaboro]',aprobo = '$atr[aprobo]'                            
                                         ,fecha_ingreso=$atr[fecha_ingreso], fecha_egreso=$atr[fecha_egreso]
                                         ,responsable_area = '$atr[responsable_area]'
-                            WHERE  cod_emp = $atr[id]";    
-                    $val = $this->verPersonas($atr[id]);
+                            WHERE  cod_emp = ".$atr[id];
                     $this->dbl->insert_update($sql);
+                    $val = $this->verPersonas($atr[id]);
+                    //PARA GUARDAR LAS AREAS DONDE ES RESPONSABLE
+                    $this->CargaAreasResponsables($atr);
+                    //FIN GUARDAR LAS AREAS DONDE ES RESPONSABLE
+                    
+                    //unset($org_resp[$ind_eliminar]);
+                    //print_r($org_resp);
+                    //$sql = "delete from mos_responsable_area  where cod_emp=".$atr[id];    
+                   // $this->dbl->insert_update($sql);
                     if ($atr[fecha_ingreso] != 'NULL'){
                         $atr[fecha_ingreso] = "\\" . substr($atr[fecha_ingreso], 0, strlen($atr[fecha_ingreso])-1) . "\'";
                     }
@@ -1103,10 +1148,15 @@
 //                }
                 import('clases.organizacion.ArbolOrganizacional');
 
-
                 $ao = new ArbolOrganizacional();
+                
+
                 $parametros[opcion] = 'simple';
                 $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
+                
+                $aomultiple = new ArbolOrganizacional();
+                $contenido_1[DIV_ARBOL_ORGANIZACIONAL_RESPONSABLE] = str_replace('div-ao-form', 'div-ao-form-a-responsable', $aomultiple->jstree_ao(0,$parametros)) ;
+                //$contenido_1[DIV_ARBOL_ORGANIZACIONAL_MULTIPLE] =  $aomultiple->jstree_ao(0,$parametros);    
                 //$contenido_1[DIV_ARBOL_ORGANIZACIONAL] = str_replace('Árbol Organizacional', 'Árbol Organizacional &nbsp;&nbsp;<input type="text" value="" style="box-shadow:inset 0 0 4px #eee; width:220px; margin:0; padding:6px 12px; border-radius:4px; border:1px solid silver; font-size:1.1em;" id="demo_q_ao" placeholder="Buscar">', $contenido_1[DIV_ARBOL_ORGANIZACIONAL]);
                 $contenido_1[CARGAR_CARGO] = 1;
                 
@@ -1151,6 +1201,7 @@
                       });");
                 $objResponse->addScript($js);
                 $objResponse->addScript('ao_simple();');
+                $objResponse->addScript('ao_multiple_responsable();');
                 return $objResponse;
             }
      
@@ -1353,6 +1404,20 @@
                 $parametros[nodos_seleccionados] = array($val[id_organizacion]);
                 $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
                 
+                $aomultiple = new ArbolOrganizacional();
+                //print_r($val);
+                $org_resp = array();
+                
+                if(strpos($val[id_organizacion_resp],',')){    
+                    $org_resp = explode(",", $val[id_organizacion_resp]);
+                }
+                else{
+                    $org_resp[] = $val[id_organizacion_resp];                                 
+                }
+                //print_r($org_resp);
+                $parametros[nodos_seleccionados]=$org_resp;
+                $contenido_1[DIV_ARBOL_ORGANIZACIONAL_RESPONSABLE] = str_replace('div-ao-form', 'div-ao-form-a-responsable', $aomultiple->jstree_ao(0,$parametros)) ;
+                
                 if(!class_exists('Parametros')){
                     import("clases.parametros.Parametros");
                 }
@@ -1440,6 +1505,7 @@
                       });");
                 $objResponse->addScript($js);
                 $objResponse->addScript('ao_simple();');
+                $objResponse->addScript('ao_multiple_responsable();');
                 return $objResponse;
             }
      
