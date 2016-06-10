@@ -161,7 +161,69 @@ function ao_multiple(){
     $('#div-ao-form').jstree(true).open_all();               
         
 }
-
+function ao_multiple_responsable(){    
+    $('#div-ao-form-a-responsable').jstree(
+            {
+                "checkbox":{
+                    three_state : false,
+                        cascade : ''
+                },
+                "plugins": ["search", "types","checkbox"]
+            }
+        );
+    $("#div-ao-form-a-responsable").on("select_node.jstree", function (e, data) {
+        if(data.event) { 
+            data.instance.select_node(data.node.children_d);
+        }
+    });
+    $("#div-ao-form-a-responsable").on("deselect_node.jstree", function (e, data) {
+        if(data.event) { data.instance.deselect_node(data.node.children_d); }
+    });
+    var to_2 = false;
+   $('#div-ao-form-a-responsable').on("changed.jstree", function (e, data) {
+       if (data.selected.length > 0){
+           var arr;
+           var id = '';
+           for(i=0;i<data.selected.length;i++){
+               arr = data.selected[i].split("_");
+               id = id + arr[1] + ',';
+           }
+           id = id.substr(0,id.length-1);
+           $('#nodos_responsable').val(id);
+       }
+       else
+           $('#nodos_responsable').val('');        
+   });
+        
+} 
+function ao_multiple_responsableViejo(){
+    $('#div-ao-form-a-responsable').jstree(
+            {
+                "checkbox":{
+                    three_state : false,
+                        cascade : 'down'
+                },
+                "plugins": ["search", "types","checkbox"]
+            }
+        );
+    $('#div-ao-form-a-responsable').on("changed.jstree", function (e, data) {
+        if (data.selected.length > 0){
+            var arr;
+            var id = '';
+            for(i=0;i<data.selected.length;i++){
+                arr = data.selected[i].split("_");
+                id = id + arr[1] + ',';
+            }
+            id = id.substr(0,id.length-1);
+            $('#nodos_responsable').val(id);
+        }
+        else
+            $('#nodos_responsable').val('');
+        //alert($('#nodos_responsable').val());
+    });
+    $('#div-ao-form-a-responsable').jstree(true).open_all();               
+        
+}
     function validar(doc){
         if ($('#apellido_materno').val().length == 0) $('#apellido_materno').val(' ');
         if (($('#workflow').is(':checked'))||($('#reviso').is(':checked'))||($('#elaboro').is(':checked'))||($('#aprobo').is(':checked'))){ 
