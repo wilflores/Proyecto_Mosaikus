@@ -47,17 +47,14 @@
 
      
 
-             public function verItemsFormulario($id){
-                $atr=array();
-                $sql = "SELECT id
-                    ,fk_id_unico
-                    ,descripcion
-                    ,descripcion_larga
-                    ,vigencia
-                    ,tipo
-                    ,fk_id_item
-                         FROM mos_documentos_formulario_items_temp 
-                         WHERE id = $id "; 
+             public function verEvidencia($atr){
+                $atr = $this->dbl->corregir_parametros($atr);
+                //$atr=array();
+                $sql = "SELECT clave_foranea
+                         ,id_md5
+                         FROM mos_evidencias_temp 
+                         WHERE clave_foranea = $atr[id] AND tok = $atr[token] AND id_usuario = $_SESSION[CookIdUsuario] "; 
+                //echo $sql;
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }
@@ -475,8 +472,8 @@
                 $data_items = array();
                 //echo $valor_clave_foranea;
                 if (strlen($valor_clave_foranea)>0){
-                    $sql = "INSERT INTO mos_evidencias_temp(nomb_archivo, contenttype, clave_foranea, id_usuario, tok, estado)"
-                                    . " SELECT nomb_archivo, contenttype, id, $_SESSION[CookIdUsuario],$token,0 "
+                    $sql = "INSERT INTO mos_evidencias_temp(nomb_archivo, contenttype, clave_foranea, id_usuario, tok, estado, id_md5)"
+                                    . " SELECT nomb_archivo, contenttype, id, $_SESSION[CookIdUsuario],$token,0, '$tabla-$clave_foranea'"
                                     . " FROM $tabla"
                                     . " WHERE $clave_foranea = $valor_clave_foranea";
                     //echo $sql;
@@ -494,12 +491,13 @@
                     $html = '';
                     $js = '';
                     foreach ($data_items as $value) {
+                        $target = $value[contenttype] == 'application/pdf' ? 'target="_blank"' : 'data-gallery';
                         $html .= '<tr id="tr-esp-' .$i. '">'; 
                         $html.= '<td align="center">'.
                                            ' ' .
                                       '  </td>';
                         $html.= '<td >'.
-                                            '<a id="a-img-'.$i.'" href="#" title="'.$value[nomb_archivo]. '" >'.
+                                            '<a id="a-img-'.$i.'" '. $target .' href="pages/evidencias/ver_evidencia.php?id='.$value[id].'&token='.$token.'" title="'.$value[nomb_archivo]. '" >'.
                                                 $value[nomb_archivo].
                                             '</a>'.                                            
                                        '</td>';

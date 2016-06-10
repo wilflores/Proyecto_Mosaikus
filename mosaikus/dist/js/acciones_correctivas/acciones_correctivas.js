@@ -61,6 +61,10 @@ function init_filtrar(){
             placeholder: "Selecione el elaborador",
             allowClear: true
           });    
+          $( "#reportado_por" ).select2({
+            placeholder: "Selecione el elaborador",
+            allowClear: true
+          });    
           
           
     }

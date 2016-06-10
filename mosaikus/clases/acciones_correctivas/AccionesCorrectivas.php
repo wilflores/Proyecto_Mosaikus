@@ -4096,7 +4096,7 @@
                     $contenido_1["P_" . strtoupper($key)] =  $value;
                 }     
                 $contenido_1[RESPONSABLE_DESVIO] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(initcap(p.apellido_paterno), ' ',initcap(p.apellido_materno), ' ', initcap(p.nombres))  nombres
+                                                                        CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno))  nombres
                                                                             FROM mos_personal p WHERE interno = 1 AND workflow = 'S'
                                                                             ORDER BY apellido_paterno, apellido_materno, nombres"
                                                                     , 'cod_emp'
@@ -4107,11 +4107,28 @@
                                                                     , 'id'
                                                                     , 'descripcion', $value[valor]);
                 $contenido_1[RESPONSABLE_ANALISIS] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(initcap(p.apellido_paterno), ' ',initcap(p.apellido_materno), ' ', initcap(p.nombres))  nombres
+                                                                        CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno))  nombres
                                                                             FROM mos_personal p WHERE interno = 1 AND workflow = 'S'
                                                                             ORDER BY apellido_paterno, apellido_materno, nombres"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
+                if($_SESSION[SuperUser]=='S'){
+                    $sql = "SELECT cod_emp, 
+                            CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno))  nombres
+                                FROM mos_personal p WHERE interno = 1 AND workflow = 'S'
+                                ORDER BY nombres";
+                }
+                else
+                {
+                    $sql = "SELECT cod_emp, 
+                            CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno))  nombres
+                                FROM mos_personal p WHERE interno = 1 AND workflow = 'S' AND p.cod_emp = $_SESSION[CookCodEmp]
+                                ORDER BY nombres";
+                }
+                //echo $sql;
+                $contenido_1[REPORTADO_POR] .= $ut_tool->OptionsCombo($sql
+                                                                    , 'cod_emp'
+                                                                    , 'nombres', $_SESSION[CookCodEmp]);
                 if (count($this->campos_activos) <= 0){
                         $this->cargar_campos_activos();
                 } 

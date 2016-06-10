@@ -55,6 +55,15 @@
                                                     {CAMPOS_DINAMICOS}
                                     {ID_ORGANIZACIONES}
                                     {ID_PROCESOS}
+                                  <div class="form-group">
+                                        <label for="responsable_analisis" class="col-md-4 control-label">{N_REPORTADO_POR}</label>                                           
+                                      <div class="col-md-10">                                              
+                                                    <select name="reportado_por" id="reportado_por" >
+                                                        <option selected="" value="">-- Seleccione --</option>
+                                                        {REPORTADO_POR}
+                                                    </select>
+                                          </div>
+                                  </div>  
                                   
                                   <div class="form-group" id="tabla_fileUpload">
                                         <label for="archivo" class="col-md-4 control-label">{N_DOC_FISICO}</label>
