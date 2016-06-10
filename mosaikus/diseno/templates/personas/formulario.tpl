@@ -127,21 +127,16 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col-xs-10">
-                                    
-                                    <!--
-                                    <iframe id="iframearbol" src="pages/personas/emb_jstree_single_persona.php?id={ID_ORGANIZACION}&cod_cargo={COD_CARGO}" frameborder="0" width="100%" height="310px" scrolling="no"></iframe>
-                                    -->
+                                <div class="col-xs-10" id="arbol1">
+
                                     {DIV_ARBOL_ORGANIZACIONAL}
                                     <input type="hidden" id="cargar_cargo" name="cargar_cargo" value="{CARGAR_CARGO}">
                                 </div>
-                                <div class="col-xs-12">
-
-
-
-                                    {OTROS_CAMPOS}
-
+                                <div class="col-xs-10"  id="arbol2">Responsable de Area
+                                    <input type="hidden" value="{NODOS_RESPONSABLE}" name="nodos_responsable" id="nodos_responsable"/>
+                                        {DIV_ARBOL_ORGANIZACIONAL_RESPONSABLE}
                                 </div>
+
                             </div>
                         </div>
                         <div class="form-group">     
@@ -152,7 +147,10 @@
                                             <option value="">{OPCION_CARGO_VACIO}</option>
                                            {CARGOS} 
                                         </select>                                                                                                                              
-                                    </div>   
+                                    </div> 
+                                <div class="col-xs-12">
+                                    {OTROS_CAMPOS}
+                                </div>
                                 </div>
                         </div>
                         <div class="checkbox">
