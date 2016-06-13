@@ -194,36 +194,17 @@ function ao_multiple_responsable(){
        else
            $('#nodos_responsable').val('');        
    });
+   var to = false;
+    $('#demo_q_ao_resp').keyup(function () {                    
+            if(to) { clearTimeout(to); }
+            to = setTimeout(function () {
+                    var v = $('#demo_q_ao_resp').val();
+                    $('#div-ao-form-a-responsable').jstree(true).search(v);
+            }, 250);
+    });    
         
 } 
-function ao_multiple_responsableViejo(){
-    $('#div-ao-form-a-responsable').jstree(
-            {
-                "checkbox":{
-                    three_state : false,
-                        cascade : 'down'
-                },
-                "plugins": ["search", "types","checkbox"]
-            }
-        );
-    $('#div-ao-form-a-responsable').on("changed.jstree", function (e, data) {
-        if (data.selected.length > 0){
-            var arr;
-            var id = '';
-            for(i=0;i<data.selected.length;i++){
-                arr = data.selected[i].split("_");
-                id = id + arr[1] + ',';
-            }
-            id = id.substr(0,id.length-1);
-            $('#nodos_responsable').val(id);
-        }
-        else
-            $('#nodos_responsable').val('');
-        //alert($('#nodos_responsable').val());
-    });
-    $('#div-ao-form-a-responsable').jstree(true).open_all();               
-        
-}
+
     function validar(doc){
         if ($('#apellido_materno').val().length == 0) $('#apellido_materno').val(' ');
         if (($('#workflow').is(':checked'))||($('#reviso').is(':checked'))||($('#elaboro').is(':checked'))||($('#aprobo').is(':checked'))){ 
@@ -318,3 +299,18 @@ function ao_multiple_responsableViejo(){
         $("#ver_ficha_trabajador").trigger('click');        
     }
     
+    function MarcarArbolResponsable(chk){
+        //alert(document.getElementById("responsable_area").value);
+        
+        if(chk.checked){       
+            document.getElementById("nodos_responsable").value = document.getElementById("id_organizacion").value;
+            document.getElementById("responsable_area").value ='S';
+            $('#div-ao-form-a-responsable').jstree(true).select_node('phtml_'+document.getElementById("id_organizacion").value);
+        }
+        else{
+            document.getElementById("responsable_area").value ='';
+            $('#div-ao-form-a-responsable').jstree(true).deselect_node('phtml_'+document.getElementById("id_organizacion").value);
+        }
+        //alert(document.getElementById("responsable_area").value);
+
+    }
