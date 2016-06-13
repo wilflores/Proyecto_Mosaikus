@@ -1024,6 +1024,7 @@
          * @param int $contar Plus para informacion adicional 1=> Documentos, 2 => Registro, 3 => Acciones Correctivas
          */
         public function jstree_ao($contar=0,$parametros=array()){
+            //print_r($parametros);
             if(!class_exists('Template')){
                 import("clases.interfaz.Template");
             }            
@@ -1038,7 +1039,14 @@
                 else {
                     $template->setTemplate("jstree_ao");
                 }
-                
+            if($parametros[param_cambio_nombre]!=''){
+                $contenido_1[IDNAMEBUSCAR]=$parametros[id_nombre_arbol_buscar];
+                $contenido_1[NOMBREARBOL]=$parametros[param_cambio_nombre];
+            }   
+            else{
+                $contenido_1[NOMBREARBOL]='Árbol Organizacional';
+                $contenido_1[IDNAMEBUSCAR]='demo_q_ao';
+            }
             $template->setVars($contenido_1);            
 
             return $template->show();
