@@ -132,7 +132,7 @@
                                     {DIV_ARBOL_ORGANIZACIONAL}
                                     <input type="hidden" id="cargar_cargo" name="cargar_cargo" value="{CARGAR_CARGO}">
                                 </div>
-                                <div class="col-xs-10"  id="arbol2">Responsable de Area
+                                <div class="col-xs-10"  id="arbol2">
                                     <input type="hidden" value="{NODOS_RESPONSABLE}" name="nodos_responsable" id="nodos_responsable"/>
                                         {DIV_ARBOL_ORGANIZACIONAL_RESPONSABLE}
                                 </div>
@@ -154,10 +154,7 @@
                                 </div>
                         </div>
                         <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" name="responsable_area" value="S" id="responsable_area" {CHECKED_RESP_SI}>
-                                            {N_RESPONSABLE_AREA}
-                                        </label>
+
                                     </div>
 
                                                 <input type="hidden" class="form-control" id="id_organizacion" name="id_organizacion" value="{ID_ORGANIZACION}" placeholder="Id Organizacion"  data-validation="required"/>
