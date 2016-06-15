@@ -55,6 +55,10 @@
             case 'www.masisa.mosaikus.com':
                 $id_empresa = 8;
                 break;
+            case 'masisa.mosaikus.com':
+            case 'www.masisa.mosaikus.com':
+                $id_empresa = 9;
+                break;
             default:
                 $id_empresa = 6;
                 $id_empresa = 6;
@@ -117,12 +121,14 @@
 			//$CookNamUsuario=NombreUsuario($CookIdUsuario);
 			$Consulta="select id_usuario,super_usuario,usuario.email "
                                 //. ",CONCAT(UPPER(LEFT(nombres, 1)), LOWER(SUBSTRING(nombres, 2))) nombres"
-                                . ",initcap(usuario.nombres) nombres"
+                                . ",initcap(initcap(SUBSTR(usuario.nombres,1,IF(LOCATE(' ' ,usuario.nombres,1)=0,LENGTH(usuario.nombres),LOCATE(' ' ,usuario.nombres,1))))) nombres"
                                 . ",CONCAT(UPPER(LEFT(usuario.apellido_paterno, 1)), LOWER(SUBSTRING(usuario.apellido_paterno, 2))) apellido_paterno "
                                 . ",CONCAT(UPPER(LEFT(usuario.apellido_materno, 1)), LOWER(SUBSTRING(usuario.apellido_materno, 2))) apellido_materno "
-                                . ",cod_emp "
+                                . ",cod_emp"
+                                . ",c.descripcion cargo "
                                 . " from mos_usuario usuario LEFT JOIN mos_personal persona "
                                 . " on usuario.email = persona.email "
+                                . " LEFT JOIN mos_cargo c ON c.cod_cargo = persona.cod_cargo "
                                 . " where usuario.email='".$TxtUsuario."' and (password_1='".md5($TxtPwd)."')";
                        // echo $Consulta;
                         $data = $pagina2->query($Consulta, array());
@@ -133,10 +139,10 @@
                             exit();
                         }
 			$Fila2 = $data[0];
-			$_SESSION[CookNomEmpresaGeneralIni]=$Fila["businessName"];
+			//$_SESSION[CookNomEmpresaGeneralIni]=$Fila["businessName"];
 			$_SESSION[CookIdEmpresa]=$id_empresa;//$Fila["id_empresa"];
 			$_SESSION[CookIdUsuario]=$Fila2["id_usuario"];
-			$_SESSION[CookWeb]='S';
+			//$_SESSION[CookWeb]='S';
                         //cambio del 29/03/2016
                         //GUARDAMOS EL CORREO DEL USUARIO Y COD EMP SI LO POSEE
                         $_SESSION[CookEmail]=$Fila2["email"];
@@ -155,7 +161,7 @@
 			{
 				$_SESSION[SuperUser]=$Fila2[super_usuario];
                                 //$_SESSION[CookNamUsuario] = (ucfirst(strtolower(utf8_decode($Fila2["nombres"])." ".utf8_decode($Fila2["apellido_paterno"])." ".utf8_decode($Fila2["apellido_materno"]))));
-                                $_SESSION[CookNamUsuario] = (((($Fila2["nombres"])." ".($Fila2["apellido_paterno"])." ".($Fila2["apellido_materno"]))));
+                                //$_SESSION[CookNamUsuario] = $Fila2["nombres"]." ".$Fila2["apellido_paterno"];//." ".($Fila2["apellido_materno"]))));
                                 //echo (ucfirst(strtolower(utf8_decode($Fila2["nombres"])." ".utf8_decode($Fila2["apellido_paterno"])." ".utf8_decode($Fila2["apellido_materno"]))));
                                 //echo $_SESSION[CookNamUsuario];
 			}
@@ -204,7 +210,7 @@
                                 $Fila = $data[0];
 				//if($Fila=mysql_fetch_assoc($Resp))
 				{
-					$_SESSION[CookNomUnidad]=$Fila["unidad"];
+					//$_SESSION[CookNomUnidad]=$Fila["unidad"];
 					$_SESSION[CookNomEmpresa]=$Fila["nombre"];
 				}
                                 $Consulta="select t2.*,ultimo_acceso from mos_usuario_filial t1 left join mos_perfil t2 on t1.cod_perfil=t2.cod_perfil  where t1.id_usuario='".$_SESSION[CookIdUsuario]."' and  t1.id_filial='".$_SESSION[CookFilial]."' group by t1.cod_perfil";

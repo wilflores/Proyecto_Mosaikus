@@ -793,7 +793,7 @@ public function setData2($cssclass, $data, $funciones=array(), $colbotones=-1,$n
                 $html_pag_actual .= "<li><a href=\"#grid\"  onclick=\"". $nombre . '(' . $i .  ','. $para . ");\">$i</a></li>";
             }
         }*/
-        $html_pag_actual = '<div class="col-xs-10" style="padding-left: 0px;padding-right: 0px;float:right;">   
+        $html_pag_actual = '<div class="col-xs-14" style="padding-left: 0px;padding-right: 0px;float:right;">   
                                 <div style="float:right;">
                                 <label class="control-label">Página: &nbsp;</label>
                                     <select class="form-control" name="pag_actual" id="'.$nombre_pag_actual.'" onchange="'. $nombre . '(this.value,'. $para . ');" style="display:inline;width:inherit;">';
@@ -815,8 +815,8 @@ public function setData2($cssclass, $data, $funciones=array(), $colbotones=-1,$n
         $restar = $this->pagActual == $nroPag ? (($this->pagActual -1)*$this->regPagina + $this->regPagina) - $this->total_reg : 0;
         $linkpages ="<div class=\"col-xs-5\"><div class=\"col-xs-23\" style=\"padding-top: 8px;\"><label class=\"control-label\">". (($this->pagActual -1)*$this->regPagina + 1) . " - " . (($this->pagActual -1)*$this->regPagina + $this->regPagina - $restar). " de " . $this->total_reg . " Items</label></div></div>";
         $reg_x_pag = array(10,15,20,25,50);
-        $linkpages .= '<div class="col-xs-6"><!--<div class="row">--> 
-                                  <div class="col-xs-16">   
+        $linkpages .= '<div class="col-xs-7"><!--<div class="row">--> 
+                                  <div class="col-xs-24">   
                                   <label class="control-label">Visualizar:&nbsp;</label>
                                     <select class="form-control" name="reg_por_pag" id="'.$nombre_r_x_pag.'" onchange="'. $nombre . '(' . 1 .  ','. $para . ');" style="width:50px;padding-left: 3px; padding-right: 3px;display:inline;">';
         for($i=0;$i<count($reg_x_pag);$i++){
@@ -832,7 +832,7 @@ public function setData2($cssclass, $data, $funciones=array(), $colbotones=-1,$n
 //                            <span>P&aacute;gina ' . $this->pagActual . '/' . $nroPag . '</span> &nbsp; <span>Total ' . $this->total_reg . ' Registros </span>
 //                        </div>
 //                        <div class="page-control">';
-        $linkpages .= '<div class="col-xs-9">';
+        $linkpages .= '<div class="col-xs-8">';
         $linkpages .= $html_pag_actual;
         $linkpages .= '</div>';
         $linkpages .= '<div class="col-xs-4">

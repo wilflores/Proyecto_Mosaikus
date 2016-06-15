@@ -1,19 +1,4 @@
-<?
+<?php
 
-session_start();
-session_register("Cookdatabase");
-session_register("CookLogginBD");
-session_register("CookPasswordDB");
-session_register("CookIdEmpresa");
-session_register("CookIdUsuario");
-session_register("CookNamUsuario");
-session_register("CookNomUnidad");
-session_register("CookNomEmpresa");
-session_register("CookNomEmpresaGeneral");
-session_register("CookFilial");
-session_register("SuperUser");
-session_register("CookN");
-session_register("CookM");
-session_register("CookE");
-header("location:../mos_inicio.php");	
+	
 ?>

@@ -52,7 +52,7 @@
         <!-- .branding Fin Logotipo -->
         <!-- .status-bar -->
         <div class="status-bar">
-            <div class="user-menu dropdown" style="margin-top: -3px;">
+            <div class="user-menu dropdown" style="margin-top: -3px;margin-top: -3px;text-align:center">
               <span>{NOMBREMPRESA}</span><br/>
               <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                 <i class="glyphicon glyphicon-user"></i>

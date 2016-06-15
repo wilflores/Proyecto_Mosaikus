@@ -680,10 +680,22 @@ class Pagina{
         
         $template->PATH = PATH_TO_TEMPLATES.'index/';
         $template->setTemplate("index");
+        //CONSULTAMOS LA INFORMACION DEL USUARIO
+        $Consulta="select id_usuario,super_usuario,usuario.email "
+                                //. ",CONCAT(UPPER(LEFT(nombres, 1)), LOWER(SUBSTRING(nombres, 2))) nombres"
+                                . ",initcap(initcap(SUBSTR(usuario.nombres,1,IF(LOCATE(' ' ,usuario.nombres,1)=0,LENGTH(usuario.nombres),LOCATE(' ' ,usuario.nombres,1))))) nombres"
+                                . ",CONCAT(UPPER(LEFT(usuario.apellido_paterno, 1)), LOWER(SUBSTRING(usuario.apellido_paterno, 2))) apellido_paterno "
+                                . ",CONCAT(UPPER(LEFT(usuario.apellido_materno, 1)), LOWER(SUBSTRING(usuario.apellido_materno, 2))) apellido_materno "                                
+                                . ",c.descripcion cargo "
+                                . " from mos_usuario usuario LEFT JOIN mos_personal persona "
+                                . " on usuario.email = persona.email "
+                                . " LEFT JOIN mos_cargo c ON c.cod_cargo = persona.cod_cargo "
+                                . " where usuario.id_usuario=$_SESSION[CookIdUsuario]";
+        $data_usuario = $menu->dbl->query($Consulta, $atr);
         //$this->contenido['TITLE'] = '.:: D&Z DEVELOPS&TRAINS ::.';
-        $this->contenido['NOMBREMPRESA'] = (($_SESSION['CookNomEmpresa']));
+        $this->contenido['NOMBREMPRESA'] = strlen($data_usuario[0][cargo]) > 0 ? $data_usuario[0][cargo] : "Consultor Externo";//(($_SESSION['CookNomEmpresa']));
         $this->contenido['LOGO_EMPRESA'] = (($_SESSION['CookIdEmpresa']));
-        $this->contenido['USUARIO'] = (($_SESSION['CookNamUsuario']));
+        $this->contenido['USUARIO'] = $data_usuario[0]["nombres"]." ".$data_usuario[0]["apellido_paterno"];//(($_SESSION['CookNamUsuario']));
         $template->setVars($this->contenido);
         
         echo $template->show();
@@ -753,10 +765,22 @@ class Pagina{
         
         $template->PATH = PATH_TO_TEMPLATES.'index/';
         $template->setTemplate("index_portal");
+        //CONSULTAMOS LA INFORMACION DEL USUARIO
+        $Consulta="select id_usuario,super_usuario,usuario.email "
+                                //. ",CONCAT(UPPER(LEFT(nombres, 1)), LOWER(SUBSTRING(nombres, 2))) nombres"
+                                . ",initcap(initcap(SUBSTR(usuario.nombres,1,IF(LOCATE(' ' ,usuario.nombres,1)=0,LENGTH(usuario.nombres),LOCATE(' ' ,usuario.nombres,1))))) nombres"
+                                . ",CONCAT(UPPER(LEFT(usuario.apellido_paterno, 1)), LOWER(SUBSTRING(usuario.apellido_paterno, 2))) apellido_paterno "
+                                . ",CONCAT(UPPER(LEFT(usuario.apellido_materno, 1)), LOWER(SUBSTRING(usuario.apellido_materno, 2))) apellido_materno "                                
+                                . ",c.descripcion cargo "
+                                . " from mos_usuario usuario LEFT JOIN mos_personal persona "
+                                . " on usuario.email = persona.email "
+                                . " LEFT JOIN mos_cargo c ON c.cod_cargo = persona.cod_cargo "
+                                . " where usuario.id_usuario=$_SESSION[CookIdUsuario]";
+        $data_usuario = $menu->dbl->query($Consulta, $atr);
         //$this->contenido['TITLE'] = '.:: D&Z DEVELOPS&TRAINS ::.';
-        $this->contenido['NOMBREMPRESA'] = (($_SESSION['CookNomEmpresa']));
+        $this->contenido['NOMBREMPRESA'] = strlen($data_usuario[0][cargo]) > 0 ? $data_usuario[0][cargo] : "Consultor Externo";//(($_SESSION['CookNomEmpresa']));
         $this->contenido['LOGO_EMPRESA'] = (($_SESSION['CookIdEmpresa']));
-        $this->contenido['USUARIO'] = (($_SESSION['CookNamUsuario']));
+        $this->contenido['USUARIO'] = $data_usuario[0]["nombres"]." ".$data_usuario[0]["apellido_paterno"];//(($_SESSION['CookNamUsuario']));
         $template->setVars($this->contenido);
         
         echo $template->show();
