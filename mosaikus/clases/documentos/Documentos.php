@@ -418,7 +418,8 @@
             }
             public function verWFemail($id){
                 $atr=array();
-                $sql = "select mos_personal.email, mos_personal.nombres, mos_personal.apellido_paterno,etapa_workflow, estado_workflow, observacion_rechazo, 
+                $sql = "select mos_personal.email, 
+                    CONCAT(initcap(SUBSTR(mos_personal.nombres,1,IF(LOCATE(' ' ,mos_personal.nombres,1)=0,LENGTH(mos_personal.nombres),LOCATE(' ' ,mos_personal.nombres,1)-1))),' ',initcap(mos_personal.apellido_paterno)) nombres,etapa_workflow, estado_workflow, observacion_rechazo, 
                         IFNULL(recibe_notificaciones,'N') recibe_notificaciones,email_revisa,nombre_revisa,email_reponsable,nombre_responsable,
                         recibe_notificaciones_revisa,recibe_notificaciones_responsable, email_aprueba, nombre_aprueba,recibe_notificaciones_aprueba
                         from mos_personal inner join 
@@ -437,14 +438,14 @@
                                                 end	
                                 end
                                 end as id_persona,
-                                pers.email email_revisa,
-                                IFNULL(concat(pers.nombres,' ', pers.apellido_paterno),'N/A') nombre_revisa,
+                                pers.email email_revisa,                                
+                                IFNULL(CONCAT(initcap(SUBSTR(pers.nombres,1,IF(LOCATE(' ' ,pers.nombres,1)=0,LENGTH(pers.nombres),LOCATE(' ' ,pers.nombres,1)-1))),' ',initcap(pers.apellido_paterno)),'N/A') nombre_revisa,
                                 pers_r.email email_reponsable,
-                                concat(pers_r.nombres ,' ', pers_r.apellido_paterno) nombre_responsable,
+                                CONCAT(initcap(SUBSTR(pers_r.nombres,1,IF(LOCATE(' ' ,pers_r.nombres,1)=0,LENGTH(pers_r.nombres),LOCATE(' ' ,pers_r.nombres,1)-1))),' ',initcap(pers_r.apellido_paterno)) nombre_responsable,
                                 IFNULL(usu_rev.recibe_notificaciones,'N') recibe_notificaciones_revisa,
                                 IFNULL(usu_resp.recibe_notificaciones,'N') recibe_notificaciones_responsable,
                                 pers_apr.email email_aprueba,
-                                concat(pers_apr.nombres,' ', pers_apr.apellido_paterno) nombre_aprueba,
+                                CONCAT(initcap(SUBSTR(pers_apr.nombres,1,IF(LOCATE(' ' ,pers_apr.nombres,1)=0,LENGTH(pers_apr.nombres),LOCATE(' ' ,pers_apr.nombres,1)-1))),' ',initcap(pers_apr.apellido_paterno)) nombre_aprueba,
                                 IFNULL(usu_apr.recibe_notificaciones,'N') recibe_notificaciones_aprueba,
                                 mos_documentos.IDDoc,
                                 mos_documentos.etapa_workflow,
@@ -530,6 +531,7 @@
                                 ,d.reviso
                                 ,d.elaboro
                                 ,d.aprobo
+                                
                                 ,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) elaboro_a
                                 ,CONCAT(CONCAT(UPPER(LEFT(re.nombres, 1)), LOWER(SUBSTRING(re.nombres, 2))),' ', CONCAT(UPPER(LEFT(re.apellido_paterno, 1)), LOWER(SUBSTRING(re.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(re.apellido_materno, 1)), LOWER(SUBSTRING(re.apellido_materno, 2)))) reviso_a
                                 ,CONCAT(CONCAT(UPPER(LEFT(ap.nombres, 1)), LOWER(SUBSTRING(ap.nombres, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_paterno, 1)), LOWER(SUBSTRING(ap.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_materno, 1)), LOWER(SUBSTRING(ap.apellido_materno, 2)))) aprobo_a
@@ -1730,9 +1732,9 @@
                                     ,contentType                                    
                                     ,nom_visualiza                                    
                                     ,contentType_visualiza                                    
-                                    ,CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno), ' ', initcap(p.apellido_materno))  elaboro
-                                    ,CONCAT(initcap(re.nombres), ' ', initcap(re.apellido_paterno), ' ', initcap(re.apellido_materno)) reviso                                    
-                                    ,CONCAT(initcap(ap.nombres), ' ', initcap(ap.apellido_paterno), ' ', initcap(ap.apellido_materno)) aprobo
+                                    ,CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  elaboro
+                                    ,CONCAT(initcap(SUBSTR(re.nombres,1,IF(LOCATE(' ' ,re.nombres,1)=0,LENGTH(re.nombres),LOCATE(' ' ,re.nombres,1)-1))),' ',initcap(re.apellido_paterno)) reviso                                    
+                                    ,CONCAT(initcap(SUBSTR(ap.nombres,1,IF(LOCATE(' ' ,ap.nombres,1)=0,LENGTH(ap.nombres),LOCATE(' ' ,ap.nombres,1)-1))),' ',initcap(ap.apellido_paterno)) aprobo
                                     $campo_formulario
                                     ,v_meses                                    
                                     ,version
@@ -2592,18 +2594,19 @@
                 $contenido['PAGINADO'] = $grid['paginado'];
                 $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
                 $ut_tool = new ut_Tool();
+                
                 $contenido['REVISORES'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
+                                                                        CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  nombres
                                                                             FROM mos_personal p WHERE reviso = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val['cod_emp_relator']);
                 $contenido['ELABORO'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
+                                                                        CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  nombres
                                                                             FROM mos_personal p WHERE elaboro = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val['cod_emp_relator']);
                 $contenido['APROBO'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
+                                                                        CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  nombres
                                                                             FROM mos_personal p WHERE aprobo = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val['cod_emp_relator']);
@@ -3302,31 +3305,32 @@
                 $contenido_1['V_MESES'] = $ut_tool->combo_array("v_meses", $desc, $ids,false,24,false,false,false,false,'display:inline;width:70px');
                 //$_SESSION[CookEmail]
                 //$_SESSION[CookCodEmp]
+                $contenido_1["N_ELABORO"] .= ' &#8594;';
                 if($_SESSION[SuperUser]=='S'){
                     $sql="SELECT wf.id,
-                            CONCAT( 
-                            CONCAT(CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2)))) 
+                            CONCAT(CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno))
                             ,' &rarr; ', 
-                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))) ,'N/A')
-                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
+                           IF(perso_revisa.nombres is null,'N/A',CONCAT(initcap(SUBSTR(perso_revisa.nombres,1,IF(LOCATE(' ' ,perso_revisa.nombres,1)=0,LENGTH(perso_revisa.nombres),LOCATE(' ' ,perso_revisa.nombres,1)-1))),' ',initcap(perso_revisa.apellido_paterno))	) 
+                           ,' &rarr; ', 
+                            CONCAT(initcap(SUBSTR(perso_aprueba.nombres,1,IF(LOCATE(' ' ,perso_aprueba.nombres,1)=0,LENGTH(perso_aprueba.nombres),LOCATE(' ' ,perso_aprueba.nombres,1)-1))),' ',initcap(perso_aprueba.apellido_paterno))) as wf
                             FROM mos_workflow_documentos AS wf
                             left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
-                    $contenido_1["N_ELABORO"] .= ' &#8594;';
-                    $contenido_1["N_ELABORO"] = '';
                 }
                 else
                 {
                     $sql="SELECT wf.id,
-                            CONCAT( 
-                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
-                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
+                            CONCAT(CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno))
+                            ,' &rarr; ', 
+                           IF(perso_revisa.nombres is null,'N/A',CONCAT(initcap(SUBSTR(perso_revisa.nombres,1,IF(LOCATE(' ' ,perso_revisa.nombres,1)=0,LENGTH(perso_revisa.nombres),LOCATE(' ' ,perso_revisa.nombres,1)-1))),' ',initcap(perso_revisa.apellido_paterno))	) 
+                           ,' &rarr; ', 
+                            CONCAT(initcap(SUBSTR(perso_aprueba.nombres,1,IF(LOCATE(' ' ,perso_aprueba.nombres,1)=0,LENGTH(perso_aprueba.nombres),LOCATE(' ' ,perso_aprueba.nombres,1)-1))),' ',initcap(perso_aprueba.apellido_paterno))) as wf
                             FROM mos_workflow_documentos AS wf
-                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                           left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
+                           left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                           INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
                     WHERE wf.id_personal_responsable='".$_SESSION['CookCodEmp']."'";
-                    $contenido_1["N_ELABORO"] = '';
                     
                 }
                 //echo $sql;
@@ -3697,7 +3701,8 @@
                     }
                     foreach ( $this->placeholder as $key => $value) {
                         $contenido_1["P_" . strtoupper($key)] =  $value;
-                    }    
+                    }   
+                    $contenido_1["N_ELABORO"] .= ' &#8594;';
                     if($_SESSION[SuperUser]=='S'){
                         $sql="SELECT wf.id,
                                 CONCAT( 
@@ -3709,8 +3714,8 @@
                                 left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                                 left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                                 INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
-                        $contenido_1["N_ELABORO"] .= ' &#8594;';
-                        $contenido_1["N_ELABORO"] = ' ';
+                        
+                        
                     }
                     else
                     {
@@ -3722,7 +3727,7 @@
                                 left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                                 INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
                         WHERE wf.id_personal_responsable='".$_SESSION['CookCodEmp']."'";
-                        $contenido_1["N_ELABORO"] = ' ';
+                       
                     }
                     //echo $sql;
                     $contenido_1['ID_WORKFLOW_DOCUMENTO'] = $ut_tool->OptionsCombo($sql
@@ -3952,7 +3957,7 @@
                             $this->cargar_nombres_columnas();
                             $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                             if($correowf[email]!='' && $correowf[recibe_notificaciones]=='S'){
-                               $cuerpo = 'Sr(a). ' .$correowf[nombres].' '.$correowf[apellido_paterno] . '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br>';
+                               $cuerpo = 'Sr(a). ' .$correowf[nombres]. '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br>';
                                if($correowf[etapa_workflow]=='estado_pendiente_revision'){
                                    $anexo_adicional ='<br><strong>'. $this->nombres_columnas['elaboro'].'</strong>&nbsp;';
                                    $anexo_adicional .=$correowf[nombre_responsable].'.';
@@ -3965,7 +3970,7 @@
                                $cuerpo .= $anexo_adicional.'<br>'.APPLICATION_ROOT; 
                                $asunto = 'Documento '. $etapa . ': ' . $parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT);
                               //$correowf[email] = 'azambrano75@gmail.com';
-                               $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
+                               $nombres = $correowf[nombres];
                                $ut_tool = new ut_Tool();
                                //SE ENVIA EL CORREO
                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), $asunto, $cuerpo);
@@ -4167,7 +4172,7 @@
                                 $cuerpo = 'Usted tiene una notificación de un documento "'.$etapa.'"<br>';
                                 //$correowf[email] = 'azambrano75@gmail.com';
                                 $cuerpo .= '<br>'.APPLICATION_ROOT;
-                                $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
+                                $nombres = $correowf[nombres];
                                 $ut_tool = new ut_Tool();
                                 $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), 'Notificaciones de Flujo de Trabajo', $cuerpo);
                             } 
@@ -4331,7 +4336,7 @@
                     $ids[] = $i;
                 }
                // echo $_SESSION['CookCodEmp'].'-'.$_SESSION[SuperUser];
-                
+                $contenido_1["N_ELABORO"] .= ' &#8594;';
                 $contenido_1['V_MESES'] = $ut_tool->combo_array("v_meses", $desc, $ids,false,$val["v_meses"],false,false,false,false,'display:inline;width:70px');
                 if($_SESSION[SuperUser]=='S'){
                     $sql="SELECT wf.id,
@@ -4344,8 +4349,6 @@
                             left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
-                    $contenido_1["N_ELABORO"] .= ' &#8594;';
-                    $contenido_1["N_ELABORO"] = '';
                 }
                 else
                 {
@@ -4357,7 +4360,6 @@
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
                     WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."' or wf.id_personal_revisa='".$_SESSION['CookCodEmp']."')";
-                    $contenido_1["N_ELABORO"] = ' ';
                     
                 }
                 //echo $sql;
@@ -4590,7 +4592,7 @@
                 $contenido_1['ITEMS_ESP'] = $item;
                 $contenido_1['NUM_ITEMS_ESP'] = $i;
                 $sql = "SELECT fecha_registro f1,DATE_FORMAT(fecha_registro, '%d/%m/%Y %H:%m')fecha_registro, descripcion_operacion, "
-                        . "CONCAT(CONCAT(UPPER(LEFT(user.nombres, 1)), LOWER(SUBSTRING(user.nombres, 2))),' ', CONCAT(UPPER(LEFT(user.apellido_paterno, 1)), LOWER(SUBSTRING(user.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(user.apellido_materno, 1)), LOWER(SUBSTRING(user.apellido_materno, 2)))) usuario "
+                        . "CONCAT(initcap(SUBSTR(user.nombres,1,IF(LOCATE(' ' ,user.nombres,1)=0,LENGTH(user.nombres),LOCATE(' ' ,user.nombres,1)-1))),' ',initcap(user.apellido_paterno)) usuario "
                         . "FROM mos_historico_wf_documentos wf inner join mos_usuario user "
                         . " on wf.id_usuario = user.id_usuario "
                         . " WHERE IDDoc = $parametros[id] order by f1 desc";
@@ -4810,7 +4812,7 @@
                             $this->cargar_nombres_columnas();
                             $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                              if($correowf[email]!=''&& $correowf[recibe_notificaciones]=='S'){
-                               $cuerpo = 'Sr(a). ' .$correowf[nombres].' '. $correowf[apellido_paterno]. '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br>';
+                               $cuerpo = 'Sr(a). ' .$correowf[nombres]. '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br>';
                                $asunto = 'Documento '. $etapa . ': ' . $parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'. str_pad($parametros["version"], 2, "0", STR_PAD_LEFT);
                                //$correowf[email] = 'azambrano75@gmail.com';
                                if($correowf[etapa_workflow]=='estado_pendiente_revision'){
@@ -4824,7 +4826,7 @@
                                }
                                $cuerpo .= $anexo_adicional.'<br>'.APPLICATION_ROOT; 
                                //echo $cuerpo;
-                               $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
+                               $nombres = $correowf[nombres];
                                $ut_tool = new ut_Tool();
                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $correowf[email], 'nombres'=>$nombres)), $asunto, $cuerpo);
                            }
@@ -5198,7 +5200,7 @@
                 $contenido_1['MOSTRARRECHAZAR']='style="display:none"'; 
 
                 $sql = "SELECT fecha_registro f1,DATE_FORMAT(fecha_registro, '%d/%m/%Y %H:%m')fecha_registro, descripcion_operacion, "
-                        . "CONCAT(CONCAT(UPPER(LEFT(user.nombres, 1)), LOWER(SUBSTRING(user.nombres, 2))),' ', CONCAT(UPPER(LEFT(user.apellido_paterno, 1)), LOWER(SUBSTRING(user.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(user.apellido_materno, 1)), LOWER(SUBSTRING(user.apellido_materno, 2)))) usuario "                        
+                        . "CONCAT(initcap(SUBSTR(user.nombres,1,IF(LOCATE(' ' ,user.nombres,1)=0,LENGTH(user.nombres),LOCATE(' ' ,user.nombres,1)-1))),' ',initcap(user.apellido_paterno)) usuario "                        
                         . "FROM mos_historico_wf_documentos wf inner join mos_usuario user "
                         . " on wf.id_usuario = user.id_usuario "
                         . " WHERE IDDoc = $parametros[id] order by f1 desc";
@@ -5543,10 +5545,10 @@
                         $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
                         //echo $correowf[email];
                             
-                            $cuerpo = 'Sr(a). ' .$correowf[apellido_paterno].' '.$correowf[nombres] . '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br><br>';
+                            $cuerpo = 'Sr(a). ' .$correowf[nombres] . '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br><br>';
                             $asunto = 'Documento '. $etapa . ': ' . $val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
                            // $correowf[email] = 'azambrano75@gmail.com';
-                            $nombres = $correowf[apellido_paterno].' '.$correowf[nombres];
+                            $nombres = $correowf[nombres];
                             //echo $cuerpo;
                            // print_r($correowf);
                         if($correowf[etapa_workflow]=='estado_pendiente_aprobacion' && $correowf[estado_workflow]=='OK') {                            
@@ -5568,7 +5570,7 @@
                         }
                         
                         else if($correowf[estado_workflow]=='RECHAZADO'){
-                            $cuerpo = 'Rechazado por:&nbsp;'.$correowf[apellido_paterno].' '.$correowf[nombres];
+                            $cuerpo = 'Rechazado por:&nbsp;'.$correowf[nombres];
                             $cuerpo .= '<br><br>Motivo del Rechazo:<br><span style="color:red">'.$correowf[observacion_rechazo].'</span>';                            
                             $asunto = 'Documento RECHAZADO: ' . $val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
                             //echo $_SESSION[CookEmail].' '.$correowf[email_aprueba].' '.$correowf[recibe_notificaciones_revisa].' '.$correowf[recibe_notificaciones_responsable];
@@ -5616,7 +5618,14 @@
                                         }
                                         $contenido   = array();
                                         $contenido['ELABORADOR']=$correowf[nombre_responsable];
-                                        $contenido['DOCUMENTO']=$val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                                        if($val["version"]>1){
+                                            $contenido['MENSAJE']='Se ha actualizado el documento';
+                                            $contenido['DOCUMENTO']=$val[Codigo_doc].'-'.$val[nombre_doc].' a la versi&oacute;n '.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                                        }
+                                        else {
+                                            $contenido['MENSAJE']='Se ha publicado el documento';
+                                            $contenido['DOCUMENTO']=$val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                                        }
                                         $asunto = 'Documento Publicado: ' . $val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
                                         
                                         $template = new Template();
@@ -5667,6 +5676,17 @@
             $wf = new WorkflowDocumentos(); 
             $val = $this->verDocumentos($parametros[id]);
             $ut_tool = new ut_Tool(); 
+            $campos = "SELECT wf.id,
+                            CONCAT(CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno))
+                            ,' &rarr; ', 
+                           IF(perso_revisa.nombres is null,'N/A',CONCAT(initcap(SUBSTR(perso_revisa.nombres,1,IF(LOCATE(' ' ,perso_revisa.nombres,1)=0,LENGTH(perso_revisa.nombres),LOCATE(' ' ,perso_revisa.nombres,1)-1))),' ',initcap(perso_revisa.apellido_paterno))	) 
+                           ,' &rarr; ', 
+                            CONCAT(initcap(SUBSTR(perso_aprueba.nombres,1,IF(LOCATE(' ' ,perso_aprueba.nombres,1)=0,LENGTH(perso_aprueba.nombres),LOCATE(' ' ,perso_aprueba.nombres,1)-1))),' ',initcap(perso_aprueba.apellido_paterno))) as wf
+                            FROM mos_workflow_documentos AS wf
+                           left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
+                           left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                           INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp";
+            
             $sql = "SELECT
                     mos_personal.cod_emp, mos_personal.email, mos_organizacion.id id_organizacion
                     FROM
@@ -5714,40 +5734,19 @@
                         
                     }                 
                 //VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR
-                $sql="SELECT wf.id,
-                           CONCAT( 
-                           IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
-                           ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
-                           FROM mos_workflow_documentos AS wf
-                           left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-                           INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
-                           WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
+                $sql= $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
                 //echo 'query 1 VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR '.$sql;
                 $this->operacion($sql, $atr);
                 if(sizeof($this->dbl->data)>0){
                     //ESTE RESPONSABLE DE AREA TIENE WF COMO APROBADOR
                     $datos = $this->dbl->data;
-                    $sql .=" UNION ALL SELECT wf.id,
-                           CONCAT( 
-                           IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
-                           ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
-                           FROM mos_workflow_documentos AS wf
-                           left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-                           INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
-                           WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
+                    $sql .=" UNION ALL ".$campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
                     $seleccionar=$cod_emp;
                     //echo 'query 2 TIENE WF EL RESPONSABLE  '.$sql;
                 }
                 else{
 
-                    $sql="SELECT wf.id,
-                               CONCAT( 
-                               IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
-                               ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
-                               FROM mos_workflow_documentos AS wf
-                               left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-                               INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
-                               WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."')";
+                    $sql= $campos . " WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."')";
                     // echo 'query 2 NO TIENE WF EL RESPONSABLE  E INSERTAMOS '.$sql;
                 }
                 $sql_wf_sel="SELECT wf.id
@@ -5785,7 +5784,33 @@
                 if(sizeof($this->dbl->data)>0){
                 $cod_emp = implode(',', array_column($this->dbl->data,'cod_emp'));
                 }  
+                else{ 
+                    //SI NO TRAE NADA, SUBO UN NIVEL MAS
+                    $sql = "SELECT
+                        mos_personal.cod_emp, mos_personal.email, mos_organizacion.id id_organizacion
+                        FROM
+                        mos_organizacion inner join (SELECT
+                                min(mos_organizacion.level) level
+                                FROM
+                                mos_organizacion
+                                WHERE
+                                mos_organizacion.id in ((select parent_id from mos_organizacion where id IN (select parent_id from mos_organizacion where id IN (".$parametros[nodos].")) ))) nivel_minimo
+                        on nivel_minimo.`level`= mos_organizacion.`level` INNER JOIN mos_responsable_area AS resp 
+                        ON mos_organizacion.id = resp.id_organizacion INNER JOIN mos_personal 
+                        ON mos_personal.cod_emp = resp.cod_emp 
+                        WHERE
+                        resp.id_organizacion in ((select parent_id from mos_organizacion where id IN (select parent_id from mos_organizacion where id IN (".$parametros[nodos].")) )); 
+                        ";
+                    $this->operacion($sql, $atr);
+                    //echo $sql;
+                    //print_r($this->dbl->data);
+                    $empleados = $this->dbl->data;
+                    if(sizeof($this->dbl->data)>0){
+                    $cod_emp = implode(',', array_column($this->dbl->data,'cod_emp'));
+                    }                      
+                }
                 //print_r($empleados);
+                //echo $cod_emp;
                 if($cod_emp!=''){
                     $sql="SELECT wf.id_personal_aprueba
                               FROM mos_workflow_documentos AS wf
@@ -5794,7 +5819,7 @@
                               WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
                     $this->operacion($sql, $atr);
                     $emp_resp = $this->dbl->data;
-                    // print_r($empleados);
+                    // print_r($emp_resp);
                     $empl_inter = array();
                     $empl_inter = (array_diff(array_column($empleados,'cod_emp'), array_column($emp_resp,'id_personal_aprueba')));
                         //RECORREMOS LOS COD_EMP QUE NO TIENEN WF Y HAY QUE CREARLO
@@ -5811,39 +5836,18 @@
 
                        }                          
                     //VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR
-                    $sql="SELECT wf.id,
-                               CONCAT( 
-                               IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
-                               ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
-                               FROM mos_workflow_documentos AS wf
-                               left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-                               INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
-                               WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
+                    $sql = $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
                     $this->operacion($sql, $atr);
                     if(sizeof($this->dbl->data)>0){
                         //ESTE RESPONSABLE DE AREA TIENE WF COMO APROBADOR
                         $datos = $this->dbl->data;
-                        $sql .=" UNION ALL SELECT wf.id,
-                               CONCAT( 
-                               IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
-                               ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
-                               FROM mos_workflow_documentos AS wf
-                               left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-                               INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
-                               WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
+                        $sql .=" UNION ALL ". $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
                           //$this->operacion($sql, $atr);
                         //$datos = $this->dbl->data;
                         //$resultado = array_merge($datos, $this->dbl->data);
                     }
                     else{
-                        $sql="SELECT wf.id,
-                                   CONCAT( 
-                                   IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
-                                   ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
-                                   FROM mos_workflow_documentos AS wf
-                                   left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-                                   INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
-                                   WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."')";
+                        $sql=  $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."')";
                         $sql_wf_sel="SELECT wf.id
                                    FROM mos_workflow_documentos AS wf
                                    WHERE wf.id_personal_aprueba in (".$cod_emp.") and (wf.id_personal_responsable=".$_SESSION['CookCodEmp'].")"
@@ -5853,36 +5857,8 @@
                     }
                 }                
             }
-            ////////////////////////////////////////////////////////////////////////////
-//                if($_SESSION[SuperUser]=='S'){
-//                    $sql="SELECT wf.id,
-//                            CONCAT( 
-//                            CONCAT(CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2)))) 
-//                            ,' &rarr; ', 
-//                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))) ,'N/A')
-//                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
-//                            FROM mos_workflow_documentos AS wf
-//                            left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
-//                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-//                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
-//                            where 1=1 and  ".$sql_perso_aprueba."";
-//                            
-//                }
-//                else
-//                {
-//                    $sql="SELECT wf.id,
-//                            CONCAT( 
-//                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
-//                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
-//                            FROM mos_workflow_documentos AS wf
-//                            left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-//                            INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
-//                            WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."' or 
-//                            ".$sql_perso_aprueba;
-//
-//                }
 
-            //echo $seleccionar;    
+           // echo $sql;    
             if($val['id_workflow_documento']=='' && $seleccionar==''){
                 $js = "$('#id_workflow_documento option').eq(1).attr('selected', 'selected');";
             }
