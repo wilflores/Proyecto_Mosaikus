@@ -239,3 +239,28 @@ CREATE TABLE `mos_responsable_area` (
   CONSTRAINT `fk_respo_emp` FOREIGN KEY (`cod_emp`) REFERENCES `mos_personal` (`cod_emp`) ON DELETE CASCADE,
   CONSTRAINT `fk_respo_org` FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/****************************************/
+/*cambio del 14-06*/
+/****************************************/
+DROP TRIGGER IF EXISTS `registra_mos_historico_wf_documentos`;
+DELIMITER ;;
+CREATE TRIGGER `registra_mos_historico_wf_documentos` AFTER INSERT ON `mos_documentos`
+FOR EACH ROW BEGIN
+/*guarda historico al insertar un doc*/
+         DECLARE etapa text;  
+			IF(NEW.id_workflow_documento is not null)THEN
+				set etapa= (SELECT
+				IFNULL(mos_nombres_campos.texto,'')
+				FROM
+				mos_nombres_campos
+				WHERE
+				mos_nombres_campos.modulo = 6 AND
+				mos_nombres_campos.nombre_campo = NEW.etapa_workflow);
+
+        INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+				VALUES (NEW.IDDoc,'Documento Creado',NEW.id_usuario_workflow);
+			END IF;
+END;
+
+;;
+DELIMITER ;
