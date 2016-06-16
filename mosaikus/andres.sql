@@ -264,3 +264,6 @@ END;
 
 ;;
 DELIMITER ;
+
+insert into mos_nombres_campos (nombre_campo,texto,modulo,placeholder) values
+('estado_sin_asignar', 'No Asignado',6, 'No Asignado');
