@@ -55,8 +55,8 @@
             case 'www.masisa.mosaikus.com':
                 $id_empresa = 8;
                 break;
-            case 'masisa.mosaikus.com':
-            case 'www.masisa.mosaikus.com':
+            case 'masisa-qas.mosaikus.com':
+            case 'www.masisa-qas.mosaikus.com':
                 $id_empresa = 9;
                 break;
             default:
