@@ -1745,9 +1745,10 @@
                                     ,DATE_FORMAT(fecha_revision, '%d/%m/%Y') fecha_rev
                                     ,CASE d.vigencia WHEN 'S' Then 'Si' ELSE 'No' END vigencia
                                     ,dao.arbol_organizacional arbol_organizacional
-                                    ,(SELECT mos_nombres_campos.texto FROM mos_nombres_campos
+                                    ,IFNULL((SELECT mos_nombres_campos.texto FROM mos_nombres_campos
                                     WHERE mos_nombres_campos.nombre_campo = d.etapa_workflow AND mos_nombres_campos.modulo = 6
-                                    ) etapa_workflow
+                                    ),(SELECT mos_nombres_campos.texto FROM mos_nombres_campos
+                                    WHERE mos_nombres_campos.nombre_campo = 'estado_sin_asignar' AND mos_nombres_campos.modulo = 6)) etapa_workflow
                                      ,CASE d.publico WHEN 'S' Then 'Si' ELSE 'No' END publico                                    
                                     -- ,id_usuario
                                     ,d.observacion
@@ -5855,9 +5856,13 @@
                         $this->operacion($sql_wf_sel, $atr);
                         $seleccionar=$this->dbl->data[0][id];
                     }
-                }                
+                }  
+                else {
+                    $sql=  $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."')";
+                }
             }
-
+            //$sql .=" UNION ALL ".$campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
+            //$sql .=" UNION ALL ".$campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
            // echo $sql;    
             if($val['id_workflow_documento']=='' && $seleccionar==''){
                 $js = "$('#id_workflow_documento option').eq(1).attr('selected', 'selected');";
