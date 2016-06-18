@@ -160,6 +160,7 @@
                                         <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">
                                             <li id="li1"><a href="#hv-red-2" data-toggle="tab">Otros Datos</a></li>
                                             <li id="li2"><a href="#hv-orange-2" data-toggle="tab" id="tabs-form-reg" >Parámetros para Indexación de Registros</a></li>
+                                            <li id="li3"><a href="#hv-orange-3" data-toggle="tab" id="tabs-lista" >Lista de Distribución</a></li>
                                             <li id="li3"><a href="#hv-orange-3" data-toggle="tab" id="tabs-historico-wf" >Hist&oacute;rico Flujo de Datos</a></li>
                                         </ul>
                                         <div id="my-tab-content" class="tab-content" style="padding: 45px 15px;">
@@ -237,6 +238,23 @@
                                                             {ITEMS_ESP}
                                                         </tbody>
                                                     </table>
+                                               </div>
+                                            <div class="tab-pane active" id="hv-orange-3">
+                                                <div class="form-group">
+                                                    <label  class="col-md-6 control-label">{N_REQUIERE_LISTA_DISTRIBUCION}</label>                                                
+                                                    <div class="col-md-14">
+                                                        <select id="requiere_lista_distribucion" name="requiere_lista_distribucion" data-validation="required" onchange="CargaComboCargo(this.value)">
+                                                        <option {SELECTEDNO} value="N">NO</option>
+                                                        <option {SELECTEDSI} value="S">SI</option>
+                                                     </select>
+                                                  </div>   
+                                                </div>
+                                                <div class="form-group">
+                                                    <label  class="col-md-6 control-label">Cargos</label>                                                
+                                                    <div class="col-md-14" id="div_cargos">
+                                                     </select>
+                                                  </div>                                                       
+                                                </div>
                                                </div>
                                             <div class="tab-pane active" id="hv-orange-3">
                                                     <table id="table-histo" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">
