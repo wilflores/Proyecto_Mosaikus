@@ -219,6 +219,7 @@
 ,cuerpo
 ,fecha_leido
 ,modulo
+,id_entidad
 
                          FROM mos_notificaciones 
                          WHERE id = $id "; 
@@ -230,10 +231,12 @@
                     $atr = $this->dbl->corregir_parametros($atr);
                     /*Carga Acceso segun el arbol*/
                     //echo $sql;
-                    $sql = "INSERT INTO mos_notificaciones(fecha,email,asunto,cuerpo,modulo,funcion)
+                    if($atr[id_entidad]=='') $atr[id_entidad]='NULL';
+                    $sql = "INSERT INTO mos_notificaciones(fecha,email,asunto,cuerpo,modulo,funcion,id_entidad)
                             VALUES(
-                                now(),'$atr[email]','$atr[asunto]','$atr[cuerpo]','$atr[modulo]','$atr[funcion]'
+                                now(),'$atr[email]','$atr[asunto]','$atr[cuerpo]','$atr[modulo]','$atr[funcion]',$atr[id_entidad]
                                 )";
+                    //echo $sql;
                     $this->dbl->insert_update($sql);
                     /*
                     $this->registraTransaccion('Insertar','Ingreso el mos_notificaciones ' . $atr[descripcion_ano], 'mos_notificaciones');
@@ -346,6 +349,7 @@
 ,cuerpo
 ,fecha_leido
 ,modulo
+,id_entidad
 
                                      $sql_col_left
                             FROM mos_notificaciones $sql_left
@@ -418,6 +422,7 @@
                                     ,cuerpo
                                     ,DATE_FORMAT(fecha_leido, '%d/%m/%Y %H:%d') fecha_leido
                                     ,modulo
+                                    ,id_entidad estado
                                      $sql_col_left
                             FROM mos_notificaciones $sql_left
                             WHERE 1 = 1 and email='$_SESSION[CookEmail]'";
@@ -569,7 +574,8 @@
                array( "width"=>"30%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[asunto], "asunto", $parametros)),
                array( "width"=>"35%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[cuerpo], "cuerpo", $parametros)),
                array( "width"=>"15%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_leido], "fecha_leido", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[modulo], "modulo", $parametros))
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[modulo], "modulo", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[estado], "estado", $parametros))
                 );
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
@@ -789,7 +795,7 @@
                 if ($parametros['corder'] == null) $parametros['corder']="id";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="1-2-3-4-5-6-7-"; 
+                    $parametros['mostrar-col']="1-2-3-4-5-6-7-8"; 
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */               
