@@ -544,6 +544,7 @@
                                 ,wf.email_aprueba
                                 ,dao.id_organizacion
                                 ,d.actualizacion_activa
+                                ,requiere_lista_distribucion
                          FROM mos_documentos  d
                                 left join mos_personal p on d.elaboro=p.cod_emp
                                 left join mos_personal re on d.reviso=re.cod_emp
@@ -1006,7 +1007,44 @@
             
         }
             
-            
+             public function ResponsablesAreasOrganizacion($id_organizacion){
+                $atr=array();
+                $sql = "SELECT 
+                        CONCAT(initcap(SUBSTR(pers.nombres,1,IF(LOCATE(' ' ,pers.nombres,1)=0,LENGTH(pers.nombres),LOCATE(' ' ,pers.nombres,1)-1))),' ',initcap(pers.apellido_paterno)) AS nombres,
+                        pers.email correo,
+                        GROUP_CONCAT(resp.id_organizacion) id_organizacion,
+                        mos_usuario.recibe_notificaciones
+                        FROM
+                        mos_personal AS pers
+                        INNER JOIN mos_responsable_area AS resp ON pers.cod_emp = resp.cod_emp left join
+                        mos_usuario on pers.email = mos_usuario.email
+                        WHERE
+                        resp.id_organizacion IN ($id_organizacion)
+                        group by mos_usuario.recibe_notificaciones,
+                        CONCAT(initcap(SUBSTR(pers.nombres,1,IF(LOCATE(' ' ,pers.nombres,1)=0,LENGTH(pers.nombres),LOCATE(' ' ,pers.nombres,1)-1))),' ',initcap(pers.apellido_paterno)),
+                        pers.email 
+                        "; 
+                //echo $sql;
+                $this->operacion($sql, $atr);
+                return $this->dbl->data;
+            }
+             public function CargosPersonalDocumentos($id, $id_organizacion){
+                $atr=array();
+                $sql = "SELECT
+                        cargo.descripcion cargo,
+                        GROUP_CONCAT(CONCAT(initcap(SUBSTR(mos_personal.nombres,1,IF(LOCATE(' ' ,mos_personal.nombres,1)=0,LENGTH(mos_personal.nombres),LOCATE(' ' ,mos_personal.nombres,1)-1))),' ',initcap(mos_personal.apellido_paterno))) AS nombres
+                        FROM
+                        mos_documentos_cargos AS doc_cargo
+                        INNER JOIN mos_documentos_estrorg_arbolproc AS doc_org ON doc_org.IDDoc = doc_cargo.IDDoc
+                        INNER JOIN mos_cargo AS cargo ON doc_cargo.cod_cargo = cargo.cod_cargo
+                        INNER JOIN mos_personal  ON mos_personal.id_organizacion = doc_org.id_organizacion_proceso AND mos_personal.cod_cargo = doc_cargo.cod_cargo
+                        where doc_org.IDDoc=$id and mos_personal.id_organizacion in ($id_organizacion)
+                        group by cargo.descripcion     
+                        order by 1,2"; 
+               // echo $sql;
+                $this->operacion($sql, $atr);
+                return $this->dbl->data;
+            }            
             public function verArbol($id){
                 $atr=array();
                 $sql = "SELECT IDDoc
@@ -1206,10 +1244,10 @@
                         $atr[id_usuario_workflow]=$atr[id_usuario];
                     }   
                     //
-                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo,publico, id_workflow_documento,etapa_workflow,estado_workflow,id_usuario_workflow, actualizacion_activa)                            
+                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo,publico, id_workflow_documento,etapa_workflow,estado_workflow,id_usuario_workflow, actualizacion_activa, requiere_lista_distribucion)                            
                             VALUES(
                                 $atr[IDDoc],'$atr[Codigo_doc]','$atr[nombre_doc]',$atr[version],'$atr[fecha]','$atr[descripcion]','$atr[palabras_claves]','$atr[formulario]','$atr[vigencia]','$atr[doc_fisico]','$atr[contentType]',$atr[id_filial],'$atr[nom_visualiza]','$atr[doc_visualiza]','$atr[contentType_visualiza]',$atr[id_usuario],'$atr[observacion]','$atr[estrucorg]','$atr[arbproc]','$atr[apli_reg_estrorg]','$atr[apli_reg_arbproc]','$atr[workflow]',$atr[semaforo],$atr[v_meses],$atr[reviso],$atr[elaboro],$atr[aprobo]
-                                    ,'$atr[publico]',$atr[id_workflow_documento],$atr[etapa_workflow],$atr[estado_workflow],$atr[id_usuario_workflow] ,'$atr[actualizacion_activa]'
+                                    ,'$atr[publico]',$atr[id_workflow_documento],$atr[etapa_workflow],$atr[estado_workflow],$atr[id_usuario_workflow] ,'$atr[actualizacion_activa]','$atr[requiere_lista_distribucion]'
                                 )";
                     //echo $sql;
                     $this->dbl->insert_update($sql);
@@ -1348,7 +1386,25 @@
 
                 return true;
             }
-
+            public function CargaCargosDocumento($atr) {
+            //PARA GUARDAR LOS CARGOS ASOCIADOS A LOS NODOS DEL ARBOL
+                    //$atr[id] 
+                    $sql = "delete from mos_documentos_cargos  where IDDoc=".$atr[id];    
+                    $this->dbl->insert_update($sql);
+                    //echo $sql;
+                    $cargos = array();
+                    //print_r($atr);
+                    //print_r($cargos);
+                    if($atr[cod_cargo]){
+                        foreach ($atr[cod_cargo] as $value) {
+                            $sql = "insert into mos_documentos_cargos (IDDoc,cod_cargo) "
+                                    . " values (".$atr[id].",".$value."); ";
+                            //echo $sql;
+                            $this->dbl->insert_update($sql);
+                        }
+                    }
+                    //FIN GUARDAR LAS AREAS DONDE ES RESPONSABLE                
+            }
             public function modificarDocumentos($atr,$archivo,$doc_ver){
                 //print_r($atr);
                 try {
@@ -1447,12 +1503,12 @@
                                     descripcion = '$atr[descripcion]',palabras_claves = '$atr[palabras_claves]',formulario = '$atr[formulario]',vigencia = '$atr[vigencia]'"
                             . ",nom_visualiza = $atr[nom_visualiza],doc_visualiza = $atr[doc_visualiza],contentType_visualiza = $atr[contentType_visualiza],id_usuario = $atr[id_usuario],observacion = '$atr[observacion]',estrucorg = '$atr[estrucorg]',arbproc = '$atr[arbproc]'"
                             . ",apli_reg_estrorg = '$atr[apli_reg_estrorg]',apli_reg_arbproc = '$atr[apli_reg_arbproc]',workflow = '$atr[workflow]',semaforo = $atr[semaforo],v_meses = $atr[v_meses],reviso = $atr[reviso],elaboro = $atr[elaboro],aprobo = $atr[aprobo]
-                               ,publico = '$atr[publico]',actualizacion_activa= '$atr[actualizacion_activa]' $sql_wf $sql_doc_fisico
+                               ,requiere_lista_distribucion = '$atr[requiere_lista_distribucion]', publico = '$atr[publico]',actualizacion_activa= '$atr[actualizacion_activa]' $sql_wf $sql_doc_fisico
                             WHERE  IDDoc = $atr[id]";      
                    //echo $sql;
                    // die;
                     $val = $this->verDocumentos($atr[id]);
-                   
+                    $this->CargaCargosDocumento($atr);
                     $this->dbl->insert_update($sql);
                     $nuevo = "IDDoc: \'$atr[IDDoc]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza_aux]\',ContentType Visualiza: \'$atr[contentType_visualiza_aux]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Publico: \'$atr[publico]\'";
                     $anterior = "IDDoc: \'$val[IDDoc]\', Codigo Doc: \'$val[Codigo_doc]\', Nombre Doc: \'$val[nombre_doc]\', Version: \'$val[version]\', Fecha: \'$val[fecha]\', Descripcion: \'$val[descripcion]\', Palabras Claves: \'$val[palabras_claves]\', Formulario: \'$val[formulario]\', Vigencia: \'$val[vigencia]\', ContentType: \'$val[contentType]\', Id Filial: \'$val[id_filial]\', Nom Visualiza: \'$val[nom_visualiza]\', ContentType Visualiza: \'$val[contentType_visualiza]\', Id Usuario: \'$val[id_usuario]\', Observacion: \'$val[observacion]\', Muestra Doc: \'$val[muestra_doc]\', Estrucorg: \'$val[estrucorg]\', Arbproc: \'$val[arbproc]\', Apli Reg Estrorg: \'$val[apli_reg_estrorg]\', Apli Reg Arbproc: \'$val[apli_reg_arbproc]\', Workflow: \'$val[workflow]\', Semaforo: \'$val[semaforo]\', V Meses: \'$val[v_meses]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\', Publico: \'$val[publico]\' ";
@@ -3987,6 +4043,7 @@
                                 $atr[modulo]='DOCUMENTOS';
                                 $atr[asunto]='Tiene un documento '.$etapa.'';
                                 $atr[email]=$correowf[email];
+                                $atr[id_entidad]=$parametros[id];
                                 $mensaje=$noti->ingresarNotificaciones($atr);
 
                         }                        
@@ -4187,6 +4244,7 @@
                                 $atr[modulo]='DOCUMENTOS';
                                 $atr[asunto]='Tiene un documento '.$etapa.'';
                                 $atr[email]=$correowf[email];
+                                $atr[id_entidad]=$params[id_registro];
                                 $mensaje=$noti->ingresarNotificaciones($atr);
                             
                         }                        
@@ -4652,6 +4710,9 @@
                 $objResponse->addScriptCall("calcHeight");
                 $objResponse->addScriptCall("MostrarContenido2");    
                 $objResponse->addScriptCall('cargar_autocompletado');
+                
+                $objResponse->addScript("$('#requiere_lista_distribucion').val('".$val["requiere_lista_distribucion"]."');");
+               // $objResponse->addScriptCall('CargaComboCargoEditar',$val["requiere_lista_distribucion"],$val["IDDoc"],$organizacion);
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
@@ -4841,6 +4902,7 @@
                                 $atr[modulo]='DOCUMENTOS';
                                 $atr[asunto]='Tiene un documento '.$etapa.'';
                                 $atr[email]=$correowf[email];
+                                $atr[id_entidad]=$parametros[id];
                                 $mensaje=$noti->ingresarNotificaciones($atr);
                             
                         }
@@ -5528,6 +5590,68 @@
 
                 return $template->show();
             }
+            public function NotificacionListaDistribucion($parametros){
+                $ut_tool = new ut_Tool();
+                import('clases.notificaciones.Notificaciones');
+                $noti = new Notificaciones();
+                
+                $responsables = array();
+                $persocargos = array();
+                $responsables = $this->ResponsablesAreasOrganizacion($parametros[id_organizacion]);
+                //$persocargos = $this->CargosPersonalDocumentos($parametros[IDDoc]);
+                
+                $contenido   = array();
+                
+                if($parametros["version"]>1){
+                    $contenido['CODIGONOMBRE']=$parametros[Codigo_doc].'-'.$parametros[nombre_doc];
+                    $contenido['VERSION']= str_pad($parametros["version"], 2, "0", STR_PAD_LEFT);
+                    $nombretpl='cuerpo_notificacion_lista_version';
+                }
+                else {
+                    $contenido['CODIGONOMBREVERSION']=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-'.  str_pad($parametros["version"], 2, "0", STR_PAD_LEFT);
+                    $nombretpl='cuerpo_notificacion_lista_original';
+                }
+                $asunto = 'Documento Publicado: ' . $parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-V'.  str_pad($parametros["version"], 2, "0", STR_PAD_LEFT);
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'documentos/';
+                $template->setTemplate($nombretpl);
+                //print_r($responsables);
+                //echo $asunto;
+                //echo $cuerpo;
+                $atr[asunto]='Lista de distribución pendiente';
+                $atr[modulo]='DOCUMENTOS';
+                $atr[cuerpo]=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-'.  str_pad($parametros["version"], 2, "0", STR_PAD_LEFT);
+                //$atr[email]','$atr[asunto]','$atr[cuerpo]','$atr[modulo]','$atr[funcion]'
+                foreach ($responsables as $value) {
+                    $persocargos = $this->CargosPersonalDocumentos($parametros[IDDoc],$value[id_organizacion]);
+                    $cuerpo_cargos ='<table  border="1" cellpadding="0" cellspacing="0"   width=50%><tr>';
+                    $cuerpo_cargos .='<td align="center" bgcolor="#f6f8f1" style="border:0px 1px 1px 0px solid black" width=50%><strong>Cargo</strong></td>';
+                    $cuerpo_cargos .='<td align="center" bgcolor="#f6f8f1" style="border:0px 0px 1px 1px solid black" width=50%><strong>Personal</strong></td></tr>';
+                    foreach ($persocargos as $value2) {
+                        $cuerpo_cargos .='<tr>';
+                        $cuerpo_cargos .='<td style="border:1px 1px 0px 1px solid black">'.$value2[cargo].'</td>';
+                        $cuerpo_cargos .='<td style="border:1px 1px 0px 0px solid black">'.str_replace(",", "<br/>", $value2[nombres]).'</td>';
+                        $cuerpo_cargos .='</tr>';
+                    }
+                    $cuerpo_cargos .='</table>';
+                    $contenido['NOMBRES']= $value[nombres];
+                    $contenido['LISTADOCARGOS']= $cuerpo_cargos;
+                    $template->PATH = PATH_TO_TEMPLATES.'documentos/';
+                    $template->setTemplate($nombretpl);
+                    $template->setVars($contenido);
+                    $cuerpo = $template->show().'<br>'.APPLICATION_ROOT;
+                    //print_r($value);
+                    //echo $asunto;
+                    //echo $cuerpo;
+                    $from = array(array('correo' => $value[correo], 'nombres'=>$value[nombres]));
+                    if($value[recibe_notificaciones]=='S'){
+                        $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array());
+                    }
+                    $atr[email]=$value[correo];
+                    $atr[id_entidad]=$parametros[IDDoc];
+                    $mensaje=$noti->ingresarNotificaciones($atr);                
+                }
+            }
             public function cambiar_estado($parametros)
             {   //print_r($parametros);
                 $parametros['id_usuario']= $_SESSION['CookIdUsuario'];
@@ -5595,6 +5719,8 @@
                         
 
                         //SE CARGA LA NOTIFICACION
+                            //echo 'etapa:'.$correowf[etapa_workflow];
+                            //echo 'edo:'.$correowf[estado_workflow];
                             import('clases.notificaciones.Notificaciones');
                             $noti = new Notificaciones();
                             $atr[cuerpo] .=$val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT).'<br>';
@@ -5614,6 +5740,13 @@
                                     } else
                                     if($correowf[etapa_workflow]=='estado_aprobado') {
                                         //$atr[cuerpo] .='Tiene un documento Aprobado<br>';
+                                        //ESTE BLOQUE APLICA SI EL DOCUMENTO TIENE LISTA DE DISTR ACTIVA
+                                        //print_r($val);
+                                        if($val[requiere_lista_distribucion]=='S'){
+                                            //echo 'paso';
+                                            $this->NotificacionListaDistribucion($val);
+                                        }
+                                        
                                         if(!class_exists('Template')){
                                             import("clases.interfaz.Template");
                                         }
@@ -5660,6 +5793,7 @@
                             $atr[modulo]='DOCUMENTOS';
                             $atr[funcion] = "verWorkFlowPopup(".$val[IDDoc].");";
                             $atr[email]=$correowf[email];
+                            $atr[id_entidad]=$val[IDDoc];
                             $mensaje=$noti->ingresarNotificaciones($atr);
                         //die;
                     $objResponse->addScriptCall("MostrarContenido");
@@ -5697,7 +5831,7 @@
                             mos_organizacion
                             WHERE
                             mos_organizacion.id in (".$parametros[nodos].")) nivel_minimo
-                    on nivel_minimo.`level`= mos_organizacion.`level` INNER JOIN mos_responsable_area AS resp 
+                    on nivel_minimo.`level`= mos_organizacion.`level` INNER JOIN mos_documentos_cargos AS resp 
                     ON mos_organizacion.id = resp.id_organizacion INNER JOIN mos_personal 
                     ON mos_personal.cod_emp = resp.cod_emp 
                     WHERE
@@ -5770,7 +5904,7 @@
                             mos_organizacion
                             WHERE
                             mos_organizacion.id in ((select parent_id from mos_organizacion where id IN (".$parametros[nodos].") ))) nivel_minimo
-                    on nivel_minimo.`level`= mos_organizacion.`level` INNER JOIN mos_responsable_area AS resp 
+                    on nivel_minimo.`level`= mos_organizacion.`level` INNER JOIN mos_documentos_cargos AS resp 
                     ON mos_organizacion.id = resp.id_organizacion INNER JOIN mos_personal 
                     ON mos_personal.cod_emp = resp.cod_emp 
                     WHERE
@@ -5796,7 +5930,7 @@
                                 mos_organizacion
                                 WHERE
                                 mos_organizacion.id in ((select parent_id from mos_organizacion where id IN (select parent_id from mos_organizacion where id IN (".$parametros[nodos].")) ))) nivel_minimo
-                        on nivel_minimo.`level`= mos_organizacion.`level` INNER JOIN mos_responsable_area AS resp 
+                        on nivel_minimo.`level`= mos_organizacion.`level` INNER JOIN mos_documentos_cargos AS resp 
                         ON mos_organizacion.id = resp.id_organizacion INNER JOIN mos_personal 
                         ON mos_personal.cod_emp = resp.cod_emp 
                         WHERE
@@ -5884,6 +6018,37 @@
             $objResponse->addScript($js);
             return $objResponse;
 
+            }    
+            public function ComboCargoOrg($parametros){
+            $ut_tool = new ut_Tool(); 
+            $combosemp='';
+            if($parametros[valor]=='S'){
+                $sql = "SELECT DISTINCT
+                        mos_cargo.cod_cargo id,
+                        mos_cargo.descripcion,
+                        cargo.cod_cargo valor
+                        FROM
+                        mos_cargo_estrorg_arbolproc
+                        INNER JOIN mos_cargo ON mos_cargo.cod_cargo = mos_cargo_estrorg_arbolproc.cod_cargo left JOIN
+			(select cod_cargo from mos_documentos_cargos where IDDoc='".$parametros['id']."') as cargo on 	mos_cargo.cod_cargo = cargo.cod_cargo
+                         where mos_cargo_estrorg_arbolproc.id in (".$parametros['nodos'].")
+                                                            order by mos_cargo.descripcion";
+                //echo $sql;
+                $combosemp .= $ut_tool->OptionsComboMultiple($sql, 'id', 'descripcion','valor');      
+                $combo .= '<input type="hidden" name="campo_cargo" id="campo_cargo" value="" />';    
+                $combo .="<select size=7 onchange='ValidarSeleccion(this);' class='form-control' id=\"cod_cargo\" name=\"cod_cargo[]\"  data-validation=\"required\" multiple>
+                            <option value=''>-- Seleccione --</option>
+                            ".$combosemp."
+                        </select>";
+               // echo $combo;
+            }
+            
+            $objResponse = new xajaxResponse();            
+            
+            $objResponse->addAssign('div_cargos',"innerHTML",$combo);
+           // $objResponse->addScript("$('#requiere_lista_distribucion').val('".$parametros[valor]."');");
+            return $objResponse;
             }             
+
             
  }?>
