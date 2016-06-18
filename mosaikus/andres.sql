@@ -267,3 +267,24 @@ DELIMITER ;
 
 insert into mos_nombres_campos (nombre_campo,texto,modulo,placeholder) values
 ('estado_sin_asignar', 'No Asignado',6, 'No Asignado');
+/****************************************/
+/*cambio del 16-06*/
+/****************************************/
+insert into mos_nombres_campos (nombre_campo,texto,modulo,placeholder) values
+('requiere_lista_distribucion', 'Requiere Lista de Distribución',6, 'Requiere Lista de Distribución');
+
+ALTER TABLE `mos_documentos`
+ADD COLUMN `requiere_lista_distribucion`  char(1) NULL DEFAULT 'N' AFTER `actualizacion_activa`;
+
+ALTER TABLE `mos_notificaciones`
+ADD COLUMN `id_entidad`  int NULL AFTER `funcion`;
+
+DROP TABLE IF EXISTS `mos_documentos_cargos`;
+CREATE TABLE `mos_documentos_cargos` (
+  `IDDoc` int(11) NOT NULL DEFAULT '0',
+  `cod_cargo` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`IDDoc`,`cod_cargo`),
+  KEY `fk_cargo_doc` (`cod_cargo`),
+  CONSTRAINT `fk_cargo_doc` FOREIGN KEY (`cod_cargo`) REFERENCES `mos_cargo` (`cod_cargo`) ON DELETE CASCADE,
+  CONSTRAINT `fk_doc_cargo` FOREIGN KEY (`IDDoc`) REFERENCES `mos_documentos` (`IDDoc`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
