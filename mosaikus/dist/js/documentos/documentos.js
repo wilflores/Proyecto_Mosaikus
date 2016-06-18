@@ -765,7 +765,8 @@ function ao_multiple(){
            if(to_2) { clearTimeout(to_2); }
            to_2 = setTimeout(function () {
                    validar_codigo_version();
-                   CargarCombowf($('#nodos').val(),$('#id').val());                   
+                   CargarCombowf($('#nodos').val(),$('#id').val());    
+                   CargaComboCargo(document.getElementById('requiere_lista_distribucion').value);
            }, 250);
        }
        else
@@ -791,3 +792,39 @@ function validar_codigo_version(){
        xajax_Loading(array.getArray());
    }
 }
+
+    function CargaComboCargo(requiere_lista_distribucion){
+        var id='';
+        if($('#nodos').val()=='' && requiere_lista_distribucion=='S'){
+            alert('Seleccione al menos un nodo del arbol Organizacional');
+            array.setObjeto('Documentos','ComboCargoOrg');
+            array.addParametro('valor',requiere_lista_distribucion);
+            array.addParametro('import','clases.documentos.Documentos');
+            xajax_Loading(array.getArray());
+        }
+        else{
+            if(document.getElementById('id'))
+                id= document.getElementById('id').value;
+            array = new XArray();
+            array.setObjeto('Documentos','ComboCargoOrg');
+            array.addParametro('nodos',$('#nodos').val());
+            array.addParametro('id',id);
+            array.addParametro('valor',requiere_lista_distribucion);
+            array.addParametro('import','clases.documentos.Documentos');
+            xajax_Loading(array.getArray());
+        }
+        //alert('paso');
+    } 
+
+    function CargaComboCargoEditar(requiere_lista_distribucion,id,nodos){alert(2);
+       // alert(requiere_lista_distribucion+'-'+id+'-'+nodos)
+        if(requiere_lista_distribucion=='S'){
+            array = new XArray();
+            array.setObjeto('Documentos','ComboCargoOrg');
+            array.addParametro('nodos',nodos);
+            array.addParametro('id',id);
+            array.addParametro('valor','S');
+            array.addParametro('import','clases.documentos.Documentos');
+            xajax_Loading(array.getArray());
+        }
+    } 
