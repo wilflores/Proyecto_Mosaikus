@@ -288,3 +288,10 @@ CREATE TABLE `mos_documentos_cargos` (
   CONSTRAINT `fk_cargo_doc` FOREIGN KEY (`cod_cargo`) REFERENCES `mos_cargo` (`cod_cargo`) ON DELETE CASCADE,
   CONSTRAINT `fk_doc_cargo` FOREIGN KEY (`IDDoc`) REFERENCES `mos_documentos` (`IDDoc`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/****************************************/
+/*cambio del 19-06*/
+/****************************************/
+
+insert into mos_nombres_campos (nombre_campo,texto,modulo,placeholder) values
+('estado', 'Estado Entidad',24, 'Estado Entidad');
