@@ -417,14 +417,36 @@
                     $this->total_registros = $total_registros[0][total_registros];   
             
                     $sql = "SELECT id
-                                    ,DATE_FORMAT(fecha, '%d/%m/%Y') fecha
+                                    ,fecha
                                     ,asunto
                                     ,cuerpo
-                                    ,DATE_FORMAT(fecha_leido, '%d/%m/%Y %H:%d') fecha_leido
+                                    ,fecha_leido
                                     ,modulo
-                                    ,id_entidad estado
+                                    ,estado
                                      $sql_col_left
-                            FROM mos_notificaciones $sql_left
+                            FROM 
+                            /*SUB QUERY PARA DOCUMENTOS*/
+                               (SELECT id
+                                        ,DATE_FORMAT(mos_notificaciones.fecha, '%d/%m/%Y') fecha
+                                        ,asunto
+                                        ,cuerpo
+                                        ,DATE_FORMAT(fecha_leido, '%d/%m/%Y %H:%d') fecha_leido
+                                        ,modulo
+                                        ,case 
+                                            when mos_documentos.estado_workflow='RECHAZADO'  then 'RECHAZADO'
+                                         else 
+                                            IFNULL((SELECT mos_nombres_campos.texto FROM mos_nombres_campos
+                                            WHERE mos_nombres_campos.nombre_campo = mos_documentos.etapa_workflow AND mos_nombres_campos.modulo = 6
+                                            ),(SELECT mos_nombres_campos.texto FROM mos_nombres_campos
+                                            WHERE mos_nombres_campos.nombre_campo = 'estado_sin_asignar' AND mos_nombres_campos.modulo = 6))
+                                        end as estado
+                                        ,email
+                                         $sql_col_left
+                                FROM mos_notificaciones LEFT JOIN mos_documentos
+                                on mos_notificaciones.id_entidad = mos_documentos.IDDoc 
+                                where modulo='DOCUMENTOS')
+                            /*FIN SUB QUERY PARA DOCUMENTOS*/
+                            AS mos_notificaciones $sql_left
                             WHERE 1 = 1 and email='$_SESSION[CookEmail]'";
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND ((upper(asunto) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%') OR (upper(cuerpo) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
@@ -795,7 +817,7 @@
                 if ($parametros['corder'] == null) $parametros['corder']="id";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="1-2-3-4-5-6-7-8"; 
+                    $parametros['mostrar-col']="1-2-3-4-5-6-7-8-9"; 
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */               
