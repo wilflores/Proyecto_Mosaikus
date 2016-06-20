@@ -1256,6 +1256,8 @@
                     /*
                     $this->registraTransaccion('Insertar','Ingreso el mos_documentos ' . $atr[descripcion_ano], 'mos_documentos');
                       */
+                    $atr[id]=$atr[IDDoc];
+                    $this->CargaCargosDocumento($atr);
                     $nuevo = "IDDoc: \'$atr[IDDoc]\', Codigo Doc: \'$atr[Codigo_doc]\', Nombre Doc: \'$atr[nombre_doc]\', Version: \'$atr[version]\', Fecha: \'$atr[fecha]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', ContentType: \'$atr[contentType]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza]\', ContentType Visualiza: \'$atr[contentType_visualiza]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Publico: \'$atr[publico]\'";
                     $this->registraTransaccionLog(1,$nuevo,'', $atr[IDDoc]);
                    /*AUMENTAR CORRELATIVO SUGERIDO*/
@@ -6029,6 +6031,7 @@
 
             }    
             public function ComboCargoOrg($parametros){
+              //  print_r($parametros);
             $ut_tool = new ut_Tool(); 
             $js = $combosemp='';
             if($parametros[valor]=='S'){
@@ -6055,11 +6058,11 @@
                 $js = "$('#div_cargos').parent().hide()";
             
             $objResponse = new xajaxResponse();            
-            
+            //echo $combo;
             $objResponse->addAssign('div_cargos',"innerHTML",$combo);
-            $objResponse->addScript("$('#cod_cargo').selectpicker({
-                                            style: 'btn-combo'
-                                          });$js");
+            //$objResponse->addScript("$('#cod_cargo').selectpicker({
+                                         //   style: 'btn-combo'
+                                        //  });$js");
            // $objResponse->addScript("$('#requiere_lista_distribucion').val('".$parametros[valor]."');");
             return $objResponse;
             }             
