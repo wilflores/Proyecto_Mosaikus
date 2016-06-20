@@ -444,7 +444,21 @@
                                          $sql_col_left
                                 FROM mos_notificaciones LEFT JOIN mos_documentos
                                 on mos_notificaciones.id_entidad = mos_documentos.IDDoc 
-                                where modulo='DOCUMENTOS')
+                                where modulo='DOCUMENTOS'
+                                union all
+                                SELECT mos_notificaciones.id
+                                        ,DATE_FORMAT(mos_notificaciones.fecha, '%d/%m/%Y') fecha
+                                        ,asunto
+                                        ,cuerpo
+                                        ,DATE_FORMAT(fecha_leido, '%d/%m/%Y %H:%d') fecha_leido
+                                        ,modulo
+                                        ,mos_documentos_distribucion.estado estado
+                                        ,email
+                                         $sql_col_left
+                                FROM mos_notificaciones LEFT JOIN mos_documentos_distribucion
+                                on mos_notificaciones.id_entidad = mos_documentos_distribucion.id 
+                                where modulo='LISTA DISTRIBUCIÓN'
+                                )
                             /*FIN SUB QUERY PARA DOCUMENTOS*/
                             AS mos_notificaciones $sql_left
                             WHERE 1 = 1 and email='$_SESSION[CookEmail]'";
@@ -623,7 +637,8 @@
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
                     array_push($func,array('nombre'=> 'eliminarNotificaciones','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_eliminar.png' title='Eliminar Notificaciones'>"));
                */
-                $config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
+                //$config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
+                $config=array(array("width"=>"10%", "ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha], "fecha", $parametros)));
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
                 $array_columns =  explode('-', $parametros['mostrar-col']);
                 for($i=0;$i<count($config_col);$i++){
@@ -836,6 +851,7 @@
                     $k++;
                 }
                 $this->cargar_permisos($parametros);
+                
                 $grid = $this->verListaNotificacionesHistorico($parametros);
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['MODO'] = $parametros['modo'];
