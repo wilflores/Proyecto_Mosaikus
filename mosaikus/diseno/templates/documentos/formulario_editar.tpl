@@ -197,7 +197,7 @@
                                                 <div class="form-group">
                                                     <label  class="col-md-6 control-label">Cargos</label>                                                
                                                     <div class="col-md-14" id="div_cargos">
-                                                     </select>
+                        
                                                   </div>                                                       
                                                 </div>
                                                 <div class="form-group">
