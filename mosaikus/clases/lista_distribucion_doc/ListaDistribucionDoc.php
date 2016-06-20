@@ -961,6 +961,7 @@
                 $template->setVars($contenido_1);
 
                 $contenido['CAMPOS'] = $template->show();
+                
 
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
                 $template->setTemplate("formulario");
@@ -974,7 +975,14 @@
 
                 $template->setVars($contenido);
                 $objResponse = new xajaxResponse();
-                $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
+                $html = $template->show();
+                /*LLAMADA DESDE NOTIFICACIONES*/
+                if (isset($parametros[vienede])){
+                    $html = str_replace("div-titulo-for", "div-titulo-for-wf", $html); 
+                    $html = str_replace("validar(document);", "validar_ld_noti(document);", $html); 
+                }
+                /*FIN LLAMADA NOTIFICACION*/
+                $objResponse->addAssign('contenido-form',"innerHTML",$html);
                 $objResponse->addScriptCall("calcHeight");
                 $objResponse->addScriptCall("MostrarContenido2"); 
                 
@@ -990,6 +998,21 @@
                                             style: 'btn-combo'
                                           });");
                 $objResponse->addScriptCall("cargar_autocompletado");
+                /*LLAMADA DESDE NOTIFICACIONES*/
+                if (isset($parametros[vienede])){
+                    $objResponse->addIncludeScript(PATH_TO_JS . 'lista_distribucion_doc/lista_distribucion_doc_not.js');
+                    $objResponse->addScript("$('.pasar').click(function() { !$('#origen option:selected').remove().appendTo('#destino'); total_per_sel();});  
+                        $('.quitar').click(function() { !$('#destino option:selected').remove().appendTo('#origen'); total_per_sel();});
+                        $('.pasartodos').click(function() { $('#origen option').each(function() { $(this).remove().appendTo('#destino'); }); total_per_sel();});
+                        $('.quitartodos').click(function() { $('#destino option').each(function() { $(this).remove().appendTo('#origen'); }); total_per_sel();});
+                        $('.submit').click(function() { $('#destino option').prop('selected', 'selected'); });
+
+                        $('#origen').on('dblclick', 'option', function() {
+                            !$('#origen option:selected').remove().appendTo('#destino');
+                            total_per_sel();
+                        });  ");
+                }
+                /*FIN LLAMADA DESDE NOTIFICACIONES*/
                 $objResponse->addScript($js);
                 return $objResponse;
             }
