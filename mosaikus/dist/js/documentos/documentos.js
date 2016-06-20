@@ -795,6 +795,7 @@ function validar_codigo_version(){
 
     function CargaComboCargo(requiere_lista_distribucion){
         var id='';
+        $('#div_cargos').parent().hide();
         if($('#nodos').val()=='' && requiere_lista_distribucion=='S'){
             alert('Seleccione al menos un nodo del arbol Organizacional');
             array.setObjeto('Documentos','ComboCargoOrg');
@@ -806,6 +807,7 @@ function validar_codigo_version(){
             if(document.getElementById('id'))
                 id= document.getElementById('id').value;
             array = new XArray();
+            $('#div_cargos').parent().show();
             array.setObjeto('Documentos','ComboCargoOrg');
             array.addParametro('nodos',$('#nodos').val());
             array.addParametro('id',id);
