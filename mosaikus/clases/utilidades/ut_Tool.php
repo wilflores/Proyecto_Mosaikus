@@ -154,6 +154,24 @@ function OptionsComboMultiple($strSQL,$ids,$descs,$seleccionado=null,$parametros
 	return $strBuf;
 }
 
+
+function OptionsComboArrayMultiple($ids,$descs,$seleccionado=array(),$title=array())
+{
+        	$i = 0;
+                
+	while ($i < count($ids)) {
+		$strBuf .= "	<OPTION value='" . ($ids[$i]) . "'";
+                if (count($title)>0)
+                    $strBuf .= 'title="'.$title[$i].'"';
+		if (in_array($ids[$i],$seleccionado))
+                    $strBuf .= " SELECTED ";
+                $strBuf .= ">" . $descs[$i] . "</OPTION>";
+		$i = $i + 1;
+	}
+       // echo $strBuf;
+	return $strBuf;
+}
+
 function checkboxlist($strSQL,$nombre, $ids,$descs,$seleccionado=array(),$parametros=array(),$separador="&nbsp;")
 {
         include_once(dirname(dirname(dirname(__FILE__))).'/clases/bd/PostgreSQL.php');

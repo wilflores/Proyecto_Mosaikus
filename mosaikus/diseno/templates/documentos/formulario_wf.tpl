@@ -12,7 +12,7 @@
                 </div>
                 <div class="modal-body">
                     Observaciones de Rechazo de Documento
-                    <textarea  id="observacion_rechazo" cols="30" rows="2" name="observacion" class="form-control" placeholder="Indique comentarios de rechazo. Se enviara correo electrónico a {N_ELABORO}"></textarea>
+                    <textarea  id="observacion_rechazo" cols="30" rows="2" name="observacion" class="form-control" placeholder="Indique comentarios de rechazo. Se enviará correo electrónico a {N_ELABORO}"></textarea>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>                                  

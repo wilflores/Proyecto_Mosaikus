@@ -1499,6 +1499,11 @@ function getForm (frm){
     xajax_Loading(array.getArray());
     //PanelOperator.showDetail('');    
     }
+    
+    function verListaDistribucionPopup(id){
+        
+    }
+    
     function VerhistoricoNotificaciones(){
     array = new XArray();
     array.setObjeto('Notificaciones','indexNotificacionesHistorico');

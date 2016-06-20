@@ -1013,7 +1013,8 @@
                         CONCAT(initcap(SUBSTR(pers.nombres,1,IF(LOCATE(' ' ,pers.nombres,1)=0,LENGTH(pers.nombres),LOCATE(' ' ,pers.nombres,1)-1))),' ',initcap(pers.apellido_paterno)) AS nombres,
                         pers.email correo,
                         GROUP_CONCAT(resp.id_organizacion) id_organizacion,
-                        mos_usuario.recibe_notificaciones
+                        mos_usuario.recibe_notificaciones,
+                        pers.cod_emp
                         FROM
                         mos_personal AS pers
                         INNER JOIN mos_responsable_area AS resp ON pers.cod_emp = resp.cod_emp left join
@@ -1022,7 +1023,8 @@
                         resp.id_organizacion IN ($id_organizacion)
                         group by mos_usuario.recibe_notificaciones,
                         CONCAT(initcap(SUBSTR(pers.nombres,1,IF(LOCATE(' ' ,pers.nombres,1)=0,LENGTH(pers.nombres),LOCATE(' ' ,pers.nombres,1)-1))),' ',initcap(pers.apellido_paterno)),
-                        pers.email 
+                        pers.email,
+                        pers.cod_emp
                         "; 
                 //echo $sql;
                 $this->operacion($sql, $atr);
@@ -2063,13 +2065,13 @@
                              
                             if ($total+0 > 0){
                                 //echo $total; 
-                                return "- No se puede eliminar el documentos, existen registros asociados.";
+                                return "- No se puede eliminar el documento, existen registros asociados.";
                             }
                             $respuesta = $this->dbl->delete("mos_documentos", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documento_parametro_semaforo", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documento_revision", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documento_version", "IDDoc = " . $atr[id]);
-                            $respuesta = $this->dbl->delete("mos_documentos_categoria", "IDDoc = " . $atr[id]);
+                            //$respuesta = $this->dbl->delete("mos_documentos_categoria", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_datos_formulario", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_estrorg_arbolproc", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = " . $atr[cod_categoria] . " AND cod_categoria_aux = " . $atr[cod_categoria] . "");                         
@@ -2080,7 +2082,7 @@
                             $respuesta = $this->dbl->delete("mos_documento_parametro_semaforo", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documento_revision", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documento_version", "IDDoc = " . $atr[id]);
-                            $respuesta = $this->dbl->delete("mos_documentos_categoria", "IDDoc = " . $atr[id]);
+                            //$respuesta = $this->dbl->delete("mos_documentos_categoria", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = " . $atr[cod_categoria] . " AND cod_categoria_aux = " . $atr[cod_categoria] . "");
                             //$respuesta = $this->dbl->delete("mos_documentos_datos_formulario", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_estrorg_arbolproc", "IDDoc = " . $atr[id]);
@@ -2114,8 +2116,8 @@
                         return "ha sido eliminada con exito";
                     } catch(Exception $e) {
                         $error = $e->getMessage();                     
-                        if (preg_match("/alumno_inscrito_fk_id_ano_escolar_fkey/",$error ) == true) 
-                            return "No se puede eliminar el año escolar porque existen alumnos inscritos para el año seleccionado.";                        
+                        if (preg_match("/mos_documentos_distribucion/",$error ) == true) 
+                            return "- No se puede eliminar el documento, existen Lista de Distribuci&oacute;n asociados.";                        
                         return $error; 
                     }
              }
@@ -3406,6 +3408,7 @@
                     
                 $contenido_1[OTROS_CAMPOS] = $array[html];
                 $js = $array[js];
+                $js .="$('#div_cargos').parent().hide();";
 //                if (count($this->parametros) <= 0){
 //                        $this->cargar_parametros();
 //                }                
@@ -3445,7 +3448,7 @@
                 $contenido_1['OPC'] = "new";
                 $contenido_1['ID'] = "-1";
                 $contenido_1['TOK_NEW'] = time();
-                $contenido_1['DESC_OPERACION_NOTIFICAR'] = "Guardar y Notificar";
+                $contenido_1['DESC_OPERACION_NOTIFICAR'] = "Enviar a Revisión";//"Guardar y Notificar";
 
                 $template->setVars($contenido_1);
                 $objResponse = new xajaxResponse();               
@@ -4689,7 +4692,7 @@
                 $contenido_1['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Documentos";
                 $contenido_1['PAGINA_VOLVER'] = "listarDocumentos.php";
                 $contenido_1['DESC_OPERACION'] = "Guardar";
-                $contenido_1['DESC_OPERACION_NOTIFICAR'] = "Guardar y Notificar";
+                $contenido_1['DESC_OPERACION_NOTIFICAR'] = "Enviar a Revisión";//"Guardar y Notificar";
                 $contenido_1['OPC'] = "upd";
                 $contenido_1['ID'] = $val["IDDoc"];
 
@@ -5273,7 +5276,7 @@
                     $item_histo .="<thead><tr>";
                     $item_histo .="<th>Fecha</th>";
                     $item_histo .="<th>Operaci&oacute;n</th>";
-                    $item_histo .="<th>Usuario</th>";
+                    $item_histo .="<th>Usuario Responsable</th>";
                     $item_histo .="</tr></thead>";
                 foreach ($historia as $value) {
                     $item_histo .="<tr>";
@@ -5594,7 +5597,9 @@
                 $ut_tool = new ut_Tool();
                 import('clases.notificaciones.Notificaciones');
                 $noti = new Notificaciones();
-                
+                /*CLASE DE LISTA DE DISTRIBUCION*/
+                import('clases.lista_distribucion_doc.ListaDistribucionDoc');
+                $lista_distribucion = new ListaDistribucionDoc();
                 $responsables = array();
                 $persocargos = array();
                 $responsables = $this->ResponsablesAreasOrganizacion($parametros[id_organizacion]);
@@ -5619,7 +5624,7 @@
                 //echo $asunto;
                 //echo $cuerpo;
                 $atr[asunto]='Lista de distribución pendiente';
-                $atr[modulo]='DOCUMENTOS';
+                $atr[modulo]='LISTA DISTRIBUCIÓN';//'DOCUMENTOS';
                 $atr[cuerpo]=$parametros[Codigo_doc].'-'.$parametros[nombre_doc].'-'.  str_pad($parametros["version"], 2, "0", STR_PAD_LEFT);
                 //$atr[email]','$atr[asunto]','$atr[cuerpo]','$atr[modulo]','$atr[funcion]'
                 foreach ($responsables as $value) {
@@ -5648,7 +5653,11 @@
                         $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array());
                     }
                     $atr[email]=$value[correo];
-                    $atr[id_entidad]=$parametros[IDDoc];
+                    /*SE GUARDA REGISTRO EN LISTA DE DISTRIBUCION*/
+                    $id_entidad = $lista_distribucion->ingresarListaDistribucionDocNotioficacion($parametros[IDDoc],$value[id_organizacion], $value[cod_emp]);
+                    $atr[id_entidad]=$id_entidad;//$parametros[IDDoc];
+                    $atr[funcion] = "verListaDistribucionPopup(".$id_entidad.");";
+                    /**/
                     $mensaje=$noti->ingresarNotificaciones($atr);                
                 }
             }
@@ -6021,7 +6030,7 @@
             }    
             public function ComboCargoOrg($parametros){
             $ut_tool = new ut_Tool(); 
-            $combosemp='';
+            $js = $combosemp='';
             if($parametros[valor]=='S'){
                 $sql = "SELECT DISTINCT
                         mos_cargo.cod_cargo id,
@@ -6041,11 +6050,16 @@
                             ".$combosemp."
                         </select>";
                // echo $combo;
-            }
+                $js = "$('#div_cargos').parent().show()";
+            }else
+                $js = "$('#div_cargos').parent().hide()";
             
             $objResponse = new xajaxResponse();            
             
             $objResponse->addAssign('div_cargos',"innerHTML",$combo);
+            $objResponse->addScript("$('#cod_cargo').selectpicker({
+                                            style: 'btn-combo'
+                                          });$js");
            // $objResponse->addScript("$('#requiere_lista_distribucion').val('".$parametros[valor]."');");
             return $objResponse;
             }             

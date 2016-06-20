@@ -180,13 +180,14 @@ class Pagina{
         $this->asigna_script_vendor('alertifyjs/alertify.min.js');  //para alertas
         $this->asigna_script_vendor('Gallery/js/jquery.blueimp-gallery.min.js');  
         $this->asigna_script_vendor('Bootstrap-Image-Gallery/js/bootstrap-image-gallery.min.js');
+        $this->asigna_script_vendor('bootstrap-select/dist/js/bootstrap-select.min.js');
         
         
       
         $this->asigna_script('jquery/jquery-ui-1.10.3.custom.js');
         $this->asigna_script('jquery/jquery-ui-timepicker-addon.js');
         $this->asigna_script('jquery/jquery.form-validator.min.js'); 
-        $this->asigna_script('jquery/jquery.Rut.js'); 
+        //$this->asigna_script('jquery/jquery.Rut.js'); 
         $this->asigna_script('jquery/select2.min.js');
         $this->asigna_script('highcharts/highcharts.js');
         //$this->asigna_script('highcharts/exporting.js');
@@ -626,11 +627,12 @@ class Pagina{
         $this->asigna_css_vendor('alertifyjs/css/alertify.min.css');  //para alertas
         $this->asigna_css_vendor('alertifyjs/css/themes/bootstrap.min.css');  //para alertas
         $this->asigna_css_vendor('Gallery/css/blueimp-gallery.min.css');
-        $this->asigna_css_vendor('Bootstrap-Image-Gallery/css/bootstrap-image-gallery.min.css');
+        $this->asigna_css_vendor('Bootstrap-Image-Gallery/css/bootstrap-image-gallery.min.css');//para gallery
+        
         
         $this->asigna_css("jstree-mosaikus/style.css");
         $this->asigna_css("styles.css");
-        
+        $this->asigna_css_vendor('bootstrap-select/dist/css/bootstrap-select.min.css');//para select multiple
         $this->activar_jquery();
           
         //$this->asigna_script("jquery/jquery.fancybox-1.3.1.js");      
@@ -712,6 +714,9 @@ class Pagina{
         }
         $this->asigna_css_vendor('alertifyjs/css/alertify.min.css');  //para alertas
         $this->asigna_css_vendor('alertifyjs/css/themes/bootstrap.min.css');  //para alertas
+         $this->asigna_css_vendor('Gallery/css/blueimp-gallery.min.css');
+        $this->asigna_css_vendor('Bootstrap-Image-Gallery/css/bootstrap-image-gallery.min.css');//para gallery
+        $this->asigna_css_vendor('bootstrap-select/dist/css/bootstrap-select.min.css');//para select multiple
         
         $this->asigna_css("jstree-mosaikus/style.css");
         $this->asigna_css("styles.css");

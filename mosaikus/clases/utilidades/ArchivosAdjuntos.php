@@ -590,6 +590,19 @@
                 $this->dbl->insert_update($sql);
                 
             }
+            
+            public function contar_evidencias($parametros)
+            {
+                session_name("$GLOBALS[SESSION]");
+                session_start();
+                $sql = "SELECT COUNT(*) total_registros FROM mos_evidencias_temp WHERE tok = '$parametros[tok_new_edit]' AND id_usuario = $_SESSION[CookIdUsuario]"
+                                . " AND  estado IN (1,0) ";
+                //echo $sql;
+                $data_evi = $this->dbl->query($sql);
+                return $data_evi[0][total_registros];   
+                
+                
+            }
      
  
             public function editar($parametros)
@@ -706,7 +719,7 @@
                     //echo $sql;
                     $this->dbl->insert_update($sql);
                     if (strlen($val[id_md5])>0){
-                        if ((file_exists(APPLICATION_DOWNLOADS. 'temp/' . $value[id_md5]))){
+                        if ((file_exists(APPLICATION_DOWNLOADS. 'temp/' . $val[id_md5]))){
                              unlink(APPLICATION_DOWNLOADS. 'temp/' . $val[id_md5]);
                         }
                     }

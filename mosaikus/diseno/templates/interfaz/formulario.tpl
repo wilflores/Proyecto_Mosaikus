@@ -33,9 +33,20 @@
             <form id="idFormulario" class="form-horizontal form-horizontal-red" role="form">
                 <div class="panel-heading">
                     <div class="row">
-                        <div class="panel-title col-xs-12" id="div-titulo-for">
-                            {TITULO_FORMULARIO}                    
-                        </div>                        
+                            <div class="panel-title col-xs-20" id="div-titulo-for">
+                                {TITULO_FORMULARIO}                    
+                            </div>       
+                            <div class="panel-actions col-xs-4">
+                                    <ul class="navbar">                                          
+
+                                        <li class="">
+                                            <a href="#contenido"  onClick="MostrarContenido();">
+                                                <i class="glyphicon glyphicon-menu-left"></i>
+                                                <span>Volver</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                            </div>
                     </div>
                 </div>
                 <div class="row">

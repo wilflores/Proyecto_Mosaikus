@@ -571,21 +571,23 @@
             //,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))))  cod_emp_relator
                     $sql = "SELECT cod_emp
                                     ,id_personal
-                                    ,CONCAT(UPPER(LEFT(nombres, 1)), LOWER(SUBSTRING(nombres, 2))) nombres
-                                    ,CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))) apellido_paterno
-                                    ,CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))) apellido_materno
+                                    ,initcap(nombres) nombres
+                                    ,initcap(apellido_paterno) apellido_paterno
+                                    ,initcap(apellido_materno) apellido_materno
                                     ,id_organizacion
                                     ,DATE_FORMAT(fecha_nacimiento, '%d/%m/%Y') fecha_nacimiento
                                     ,CASE genero WHEN 1 THEN 'Masculino' ELSE 'Femenino' END genero
                                     ,c.descripcion cod_cargo
-                                                                 
+                                    ,c.cod_cargo id_cargo                             
                             FROM mos_personal p
                             LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo 
                             WHERE 1 = 1 ";
                     if (strlen($atr[valor])>0)
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
-                                 if (strlen($atr["b-cod_emp"])>0)
-                        $sql .= " AND cod_emp = '". $atr[b-cod_emp] . "'";
+                    if (strlen($atr["b-cod_emp"])>0)
+                        $sql .= " AND cod_emp IN (". $atr['b-cod_emp'] . ")";
+                    if (strlen($atr["b-no_cod_emp"])>0)
+                        $sql .= " AND NOT cod_emp IN (". $atr['b-no_cod_emp'] . ")";
                     if (strlen($atr["b-id_personal"])>0)
                                 $sql .= " AND upper(id_personal) like '%" . strtoupper($atr["b-id_personal"]) . "%'";
                     if (strlen($atr["b-nombres"])>0)
@@ -616,7 +618,11 @@
                     //           $sql .= " AND id_organizacion = '". $atr[b-id_organizacion] . "'";
                     if ((strlen($atr["b-id_organizacion"])>0) && ($atr["b-id_organizacion"] != "2")){                             
                         //$id_org = $this->BuscaOrgNivelHijos($atr[b-id_organizacion]);
-                        $sql .= " AND id_organizacion IN (". $id_org . ")";
+                        
+                        $sql .= " AND id_organizacion IN (". $atr["b-id_organizacion"] . ")";
+                    }
+                    if ((strlen($atr["b-id_cargo"])>0)){                             
+                        $sql .= " AND c.cod_cargo IN (". $atr["b-id_cargo"] . ")";
                     }
                     if (strlen($atr["b-cod_cargo"])>0)
                                $sql .= " AND c.descripcion = '". $atr[b-cod_cargo] . "'";
@@ -635,7 +641,8 @@
                     if (strlen($atr["b-extranjero"])>0)
                                 $sql .= " AND upper(extranjero) like '%" . strtoupper($atr["b-extranjero"]) . "%'";
 
-                    $sql .= " order by apellido_paterno asc ";                    
+                    if (!isset($atr[order])) $atr[order] = 'apellido_paterno asc';
+                    $sql .= " order by $atr[order] ";                    
                     //echo $sql;
                     $this->operacion($sql, $atr);
              }

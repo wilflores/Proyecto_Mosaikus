@@ -110,7 +110,8 @@ class Mysql{
     if($this->conectado()){
         //echo $sql;
         $this->db_conn->query("SET NAMES utf8");
-	  $temp = $this->db_conn->query($sql);          
+	  $temp = $this->db_conn->query($sql);  
+          
 //          print_r($temp);
       $res=array();
       if($temp !=false){
@@ -256,7 +257,7 @@ mysqli_close($con);
   function delete($table,$where){
     $return = false;
     if($where!=""){
-      $return = $this->query("DELETE FROM $table WHERE ($where)");
+      $return = $this->insert_update("DELETE FROM $table WHERE ($where)");
     }
     return $return;
   }

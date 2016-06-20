@@ -420,6 +420,7 @@ ALTER TABLE `mos_cargo_estrorg_arbolproc` DROP FOREIGN KEY `mos_cargo_estrorg_ar
 ALTER TABLE `mos_cargo_estrorg_arbolproc` ADD CONSTRAINT `mos_cargo_estrorg_arbolproc_ibfk_2` FOREIGN KEY (`id`) REFERENCES `mos_organizacion_nombres` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
+
 ALTER TABLE `mos_organizacion`
 ADD COLUMN `area_espejo`  int NULL AFTER `type`;
 
@@ -523,10 +524,179 @@ GROUP BY da.id_organizacion_proceso
 
 ) as d on d.id_organizacion_proceso = o.id;
 
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('id', 'id', '26', 'id');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('id_organizacion', 'Árbol Organizacional', '26', 'id_organizacion');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('codigo', 'Código', '26', 'codigo');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('bloqueo_codigo', 'Bloqueo Código', '26', 'bloqueo_codigo');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('bloqueo_version', 'Bloqueo Versión', '26', 'bloqueo_version');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('correlativo', 'correlativo', '26', 'correlativo');
+
 /**/
 
+/* ERROR ARBOL**/
+
+delete from mos_usuario_estructura
+where id_estructura not in (select id from mos_organizacion);
+
+DROP TABLE IF EXISTS `mos_usuario_estructura_temp`;
+CREATE TABLE `mos_usuario_estructura_temp` (  
+  `id_usuario_filial` int(11) NOT NULL,
+  `id_estructura` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `cod_perfil` int(11) NOT NULL,
+  `portal` char(1) DEFAULT NULL
+);
+
+INSERT into mos_usuario_estructura_temp
+select id_usuario_filial, id_estructura, id_usuario, cod_perfil, portal from mos_usuario_estructura
+where id_estructura in (select id from mos_organizacion)
+GROUP BY id_estructura, id_usuario_filial, id_usuario, cod_perfil, portal;
+
+DELETE from mos_usuario_estructura;
+
+ALTER TABLE `mos_usuario_estructura`
+AUTO_INCREMENT=1;
+
+
+INSERT into mos_usuario_estructura(id_usuario_filial, id_estructura, id_usuario, cod_perfil, portal) 
+select id_usuario_filial, id_estructura, id_usuario, cod_perfil, portal from mos_usuario_estructura_temp;
+DROP TABLE IF EXISTS `mos_usuario_estructura_temp`;
+
+ALTER TABLE `mos_organizacion_nombres`
+MODIFY COLUMN `id`  int(11) NOT NULL FIRST ;
+
+ALTER TABLE `mos_acciones_correctivas` DROP FOREIGN KEY `mos_acciones_correctivas_ibfk_1`;
+
+-- ALTER TABLE `mos_acciones_correctivas` ADD CONSTRAINT `mos_acciones_correctivas_ibfk_1` FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `mos_correcciones` DROP FOREIGN KEY `mos_correcciones_ibfk_1`;
+
+-- ALTER TABLE `mos_correcciones` ADD CONSTRAINT `mos_correcciones_ibfk_1` FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `mos_personal` DROP FOREIGN KEY `mos_personal_ibfk_1`;
+
+-- ALTER TABLE `mos_personal` ADD CONSTRAINT `mos_personal_ibfk_1` FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `mos_documentos_estrorg_arbolproc` DROP FOREIGN KEY `mos_documentos_estrorg_arbolproc_ibfk_1`;
+
+-- ALTER TABLE `mos_documentos_estrorg_arbolproc` ADD CONSTRAINT `mos_documentos_estrorg_arbolproc_ibfk_1` FOREIGN KEY (`id_organizacion_proceso`) REFERENCES `mos_organizacion` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+
+ALTER TABLE `mos_arbol_procesos` DROP FOREIGN KEY `mos_arbol_procesos_ibfk_1`;
+
+-- ALTER TABLE `mos_arbol_procesos` ADD CONSTRAINT `mos_arbol_procesos_ibfk_1` FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `mos_cargo_estrorg_arbolproc` DROP FOREIGN KEY `mos_cargo_estrorg_arbolproc_ibfk_2`;
+
+-- ALTER TABLE `mos_cargo_estrorg_arbolproc` ADD CONSTRAINT `mos_cargo_estrorg_arbolproc_ibfk_2` FOREIGN KEY (`id`) REFERENCES `mos_organizacion` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `mos_documentos_codigo` DROP FOREIGN KEY `mos_documentos_codigo_ibfk_1`;
+
+-- ALTER TABLE `mos_documentos_codigo` ADD CONSTRAINT `mos_documentos_codigo_ibfk_1` FOREIGN KEY (`id_organizacion`) REFERENCES `mos_organizacion` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+DELETE from mos_documentos_codigo;
+-- WHERE id_organizacion not IN (select id from mos_organizacion);
+ALTER TABLE `mos_documentos_codigo`
+AUTO_INCREMENT=1;
+insert into mos_documentos_codigo(id_organizacion,codigo,bloqueo_codigo,bloqueo_version,correlativo)
+select 
+o.id,
+concat(
+IFNULL(concat(UPPER(SUBSTR(p4.title, 1, 3)),'_'),''),
+IFNULL(concat(UPPER(SUBSTR(p3.title, 1, 3)),'_'),''),
+IFNULL(concat(UPPER(SUBSTR(p2.title, 1, 3)),'_'),''), 
+IFNULL(concat(UPPER(SUBSTR(p1.title, 1, 3)),'_'),''), 
+IFNULL(concat(UPPER(SUBSTR(padre.title, 1, 3)),'_'),''), 
+UPPER(SUBSTR(o.title, 1, 3)) 
+) codigo,
+'S',
+'S',
+IFNULL(d.total+1,1)
+from mos_organizacion o
+inner join mos_organizacion padre on padre.id = o.parent_id
+left join mos_organizacion p1 on p1.id = padre.parent_id
+left join mos_organizacion p2 on p2.id = p1.parent_id
+left join mos_organizacion p3 on p3.id = p2.parent_id
+left join mos_organizacion p4 on p4.id = p3.parent_id
+left join (
+	select da.id_organizacion_proceso, COUNT(DISTINCT d.IDDoc) total from mos_documentos_estrorg_arbolproc da
+  INNER JOIN mos_documentos d on d.IDDoc = da.IDDoc
+GROUP BY da.id_organizacion_proceso
+
+) as d on d.id_organizacion_proceso = o.id;
+
+DROP TRIGGER IF EXISTS `actualizar_nombre_area_ao`;
+
+DROP TRIGGER IF EXISTS `permisos_perfil_usuarios`;
+
+DELIMITER ;;
+CREATE TRIGGER `actualizar_nombre_area_ao` BEFORE INSERT ON `mos_organizacion`
+FOR EACH ROW Begin 
+      SET NEW.title = (SELECT title FROM mos_organizacion_nombres WHERE id = NEW.ID);
+
+      
+
+/*SET padre =  (SELECT parent_id FROM mos_organizacion WHERE id = NEW.id)
+ insert into mos_documentos_codigo (id_organizacion, codigo)
+      select NEW.id, codigo
+       from mos_documentos_codigo      
+      where id_organizacion =NEW.parent_id; 
+     */
+     
+END;
+;;
+DELIMITER ;
+DELIMITER ;;
+CREATE TRIGGER `permisos_perfil_usuarios` AFTER INSERT ON `mos_organizacion`
+FOR EACH ROW begin
+       IF NEW.id NOT IN ( SELECT id_estructura FROM mos_usuario_estructura WHERE id_estructura = NEW.id) THEN
+               INSERT into mos_usuario_estructura(id_usuario_filial,id_estructura, id_usuario,cod_perfil,portal)
+               select id_usuario_filial,NEW.id,id_usuario,cod_perfil,portal from mos_usuario_estructura 
+                where id_estructura = NEW.parent_id;
+      END IF; 
+end;
+;;
+DELIMITER ;
+
+DROP TRIGGER `actualizar_nombre_area_ins`;
+
+DROP TRIGGER `actualizar_nombre_area`;
+DELIMITER ;;
+CREATE TRIGGER `actualizar_nombre_area_ins` AFTER INSERT ON `mos_organizacion_nombres`
+FOR EACH ROW begin
+
+DECLARE padre INT;   
+UPDATE mos_organizacion SET title = NEW.title  WHERE id = NEW.id;
+
+    IF NEW.id NOT IN ( SELECT id_organizacion FROM mos_documentos_codigo WHERE id_organizacion = NEW.id) THEN
+           SET padre =  (SELECT parent_id FROM mos_organizacion WHERE id = NEW.id);
+           insert into mos_documentos_codigo (id_organizacion, codigo)
+           select NEW.id, codigo
+           from mos_documentos_codigo      
+           where id_organizacion =padre; 
+    END IF;
+
+end;
+;;
+DELIMITER ;
+DELIMITER ;;
+CREATE TRIGGER `actualizar_nombre_area` BEFORE UPDATE ON `mos_organizacion_nombres`
+FOR EACH ROW begin 
+ 
+       UPDATE mos_organizacion SET title = NEW.title, area_espejo = NEW.area_espejo WHERE id = NEW.id;
+       IF (NEW.title <> OLD.title) AND OLD.title = 'New Node' THEN
+                UPDATE mos_documentos_codigo SET codigo = CONCAT(codigo,'_', UPPER(SUBSTR(NEW.title, 1, 3))) WHERE id_organizacion = NEW.id;
+       END IF;
+
+end;
+;;
+/*FIN ERROR*/
+
 -- Cambios nuevos para inspecciones
-INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('descripcion_larga', 'Descripción Larga', '22', 'Descripción Larga')
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('descripcion_larga', 'Descripción Larga', '22', 'Descripción Larga');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('responsable_desvio', 'Responsable Desvío', '15', 'Responsable Desvío');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('reportado_por', 'Reportado Pór', '15', 'Reportado Pór');
+
 
 ALTER TABLE `mos_parametro_det`
 DROP PRIMARY KEY,
@@ -544,11 +714,29 @@ DROP INDEX `Ind05`;
 ALTER TABLE `mos_acciones_correctivas`
 ADD COLUMN `responsable_desvio`  int NULL AFTER `fecha_cambia_estado`;
 
+ALTER TABLE `mos_acciones_correctivas`
+ADD COLUMN `reportado_por`  int NULL AFTER `responsable_desvio`;
+
+
 
 rename table mos_acciones_evidencia TO mos_acciones_trazabilidad;
 
 insert into mos_acciones_evidencia(fk_id_trazabilidad, nomb_archivo,archivo,contenttype)
 select id, nomb_archivo, archivo, contenttype from mos_acciones_trazabilidad where LENGTH(archivo) > 0;
+
+DROP TABLE IF EXISTS `mos_evidencias_temp`;
+CREATE TABLE `mos_evidencias_temp` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_md5` varchar(250) DEFAULT NULL,
+  `nomb_archivo` varchar(250) DEFAULT NULL,
+  `contenttype` varchar(50) DEFAULT NULL,
+  `fecha` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `tok` int(11) DEFAULT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
+  `estado` int(11) DEFAULT NULL COMMENT '0 => Sin Cambios\r\n1 => Nuevo\r\n2 => Editar\r\n3 => Eliminar',
+  `clave_foranea` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /*Ejecutar solo en mosaikus_admin*/
 
@@ -558,9 +746,6 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `mos_admin_usuarios` AS sel
 
 
 
-INSERT INTO `mos_link` (`descripcion`, `nombre_link`) VALUES ('Parametros-indexParametrosInspecciones-clases.parametros.Parametros', 'Parametros de Inspecciones');
-UPDATE `mos_link` SET `dependencia`='83' WHERE (`cod_link`='0');
-UPDATE `mos_link` SET `cod_link`='86' WHERE (`cod_link`='0');
 
 
 
@@ -573,3 +758,137 @@ INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder
 INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ( 'id_organizacion', 'Árbol Organizacional', '25', 'id_organizacion');
 INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ( 'id_proceso', 'Árbol de Procesos', '25', 'id_proceso');
 INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('ubicacion', 'Ubicación', '25', 'ubicacion');
+
+INSERT INTO `mos_link` (`descripcion`, `nombre_link`) VALUES ('Parametros-indexParametrosInspecciones-clases.parametros.Parametros', 'Parametros de Inspecciones');
+UPDATE `mos_link` SET `dependencia`='83' WHERE (`cod_link`='0');
+UPDATE `mos_link` SET `cod_link`='86' WHERE (`cod_link`='0');
+
+/*FIN EJECUTADO BD Desarrollo*/
+
+/* LISTA de Distribucion 07/06/2016*/
+
+INSERT INTO `mos_link` (`cod_link`, `nombre_link`, `dependencia`, `tipo`, `orden`) VALUES ('91', 'Lista de Distribución', '3', '2', '59');
+UPDATE `mos_link` SET `descripcion`='ListaDistribucionDoc-indexListaDistribucionDoc-clases.lista_distribucion_doc.ListaDistribucionDoc' WHERE (`cod_link`='91');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('id', 'id', '27', 'id');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('estado', 'Estado Lista de Distribución', '27', 'estado');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('id_documento', 'Documento', '27', 'id_documento');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('fecha_notificacion', 'fecha_notificacion', '27', 'fecha_notificacion');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('fecha_ejecutada', 'Fecha de Ejecución', '27', 'dd/mm/yyyy');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('id_responsable', 'Responsable', '27', 'id_responsable');
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('evidencias', 'Evidencias', '27', null);
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('id_area', 'Árbol Organizacional', '27', null);
+INSERT INTO `mos_nombres_campos`(`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('id_cargo', 'Cargos', '27', null);
+
+DROP TABLE IF EXISTS `mos_documentos_distribucion`;
+CREATE TABLE `mos_documentos_distribucion` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `estado` varchar(50) DEFAULT 'Pendiente' COMMENT 'Pendiente\r\nCompletado',
+  `id_documento` int(11) DEFAULT NULL,
+  `fecha_notificacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `fecha_ejecutada` date DEFAULT NULL,
+  `id_responsable` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_documento` (`id_documento`),
+  KEY `id_responsable` (`id_responsable`),
+  CONSTRAINT `mos_documentos_distribucion_ibfk_1` FOREIGN KEY (`id_documento`) REFERENCES `mos_documentos` (`IDDoc`) ON UPDATE CASCADE,
+  CONSTRAINT `mos_documentos_distribucion_ibfk_2` FOREIGN KEY (`id_responsable`) REFERENCES `mos_personal` (`cod_emp`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+-- ----------------------------
+-- Records of mos_documentos_distribucion
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `mos_documentos_distribucion_area`
+-- ----------------------------
+DROP TABLE IF EXISTS `mos_documentos_distribucion_area`;
+CREATE TABLE `mos_documentos_distribucion_area` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_doc_distribucion` int(11) DEFAULT NULL,
+  `id_cargo` int(11) DEFAULT NULL,
+  `id_area` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_doc_distribucion` (`id_doc_distribucion`),
+  KEY `id_cargo` (`id_cargo`),
+  KEY `id_area` (`id_area`),
+  CONSTRAINT `mos_documentos_distribucion_area_ibfk_1` FOREIGN KEY (`id_doc_distribucion`) REFERENCES `mos_documentos_distribucion` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `mos_documentos_distribucion_area_ibfk_3` FOREIGN KEY (`id_cargo`) REFERENCES `mos_cargo` (`cod_cargo`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+-- ----------------------------
+-- Records of mos_documentos_distribucion_area
+-- ----------------------------
+-- ----------------------------
+-- Table structure for `mos_documentos_distribucion_evi`
+-- ----------------------------
+DROP TABLE IF EXISTS `mos_documentos_distribucion_evi`;
+CREATE TABLE `mos_documentos_distribucion_evi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `fk_id_doc_distribucion` int(11) DEFAULT NULL,
+  `nomb_archivo` varchar(250) DEFAULT NULL,
+  `archivo` longblob,
+  `contenttype` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_id_trazabilidad` (`fk_id_doc_distribucion`),
+  CONSTRAINT `mos_documentos_distribucion_evi_ibfk_1` FOREIGN KEY (`fk_id_doc_distribucion`) REFERENCES `mos_documentos_distribucion` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of mos_documentos_distribucion_evi
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `mos_documentos_distribucion_per`
+-- ----------------------------
+DROP TABLE IF EXISTS `mos_documentos_distribucion_per`;
+CREATE TABLE `mos_documentos_distribucion_per` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_doc_distribucion` int(11) DEFAULT NULL,
+  `id_persona` int(11) DEFAULT NULL,
+  `id_cargo` int(11) DEFAULT NULL,
+  `id_area` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_doc_distribucion` (`id_doc_distribucion`),
+  KEY `id_persona` (`id_persona`),
+  KEY `id_cargo` (`id_cargo`),
+  KEY `id_area` (`id_area`),
+  CONSTRAINT `mos_documentos_distribucion_per_ibfk_1` FOREIGN KEY (`id_doc_distribucion`) REFERENCES `mos_documentos_distribucion` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `mos_documentos_distribucion_per_ibfk_2` FOREIGN KEY (`id_persona`) REFERENCES `mos_personal` (`cod_emp`) ON UPDATE CASCADE,
+  CONSTRAINT `mos_documentos_distribucion_per_ibfk_3` FOREIGN KEY (`id_cargo`) REFERENCES `mos_cargo` (`cod_cargo`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
+
+delete from mos_historico_wf_documentos where IDDoc not in (select IDDoc from mos_documentos);
+ALTER TABLE `mos_historico_wf_documentos` ADD FOREIGN KEY (`IDDoc`) REFERENCES  ON DELETE CASCADE ON UPDATE CASCADE;
+
+DROP TRIGGER IF EXISTS `registra_mos_historico_wf_documentos`;
+DELIMITER ;;
+CREATE TRIGGER `registra_mos_historico_wf_documentos` AFTER INSERT ON `mos_documentos`
+FOR EACH ROW BEGIN
+/*guarda historico al insertar un doc*/
+         DECLARE etapa text;  
+			IF(NEW.id_workflow_documento is not null)THEN
+				set etapa= (SELECT
+				IFNULL(mos_nombres_campos.texto,'')
+				FROM
+				mos_nombres_campos
+				WHERE
+				mos_nombres_campos.modulo = 6 AND
+				mos_nombres_campos.nombre_campo = NEW.etapa_workflow);
+
+                                INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+				VALUES (NEW.IDDoc,'Documento Creado',NEW.id_usuario_workflow);
+                                IF (NEW.estado_workflow is NOT NULL) THEN
+                                     INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+                                     VALUES (NEW.IDDoc,CONCAT('ESTADO:',NEW.estado_workflow,' ',IFNULL(NEW.observacion_rechazo,''),',cambió a ',etapa),NEW.id_usuario_workflow);
+                                END IF;
+                        ELSE
+                                INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+				VALUES (NEW.IDDoc,'Documento Creado',NEW.id_usuario_workflow);
+			END IF;
+END;
+
+;;
+DELIMITER ;
+
+/*FIN LISTA DISTRIBUCION*/

@@ -9091,3 +9091,13 @@ body {
                 color: #ffffff; }
             .page-login #page .content-wrap .panels .row #login-form .login-t .body .login-form form button:hover {
               opacity: 1; }
+            /*Nuevos*/
+            .btn-combo{
+                border-radius: 2px;
+                background-color: #fafafa;
+                padding: 6px 12px;
+                border: 1px solid #cfd8dc;
+            }
+            .nav > li > a {
+      
+      padding: 8px 52px; }
