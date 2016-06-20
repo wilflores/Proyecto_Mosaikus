@@ -1501,7 +1501,12 @@ function getForm (frm){
     }
     
     function verListaDistribucionPopup(id){
-        
+        array = new XArray();
+        array.setObjeto('ListaDistribucionDoc','editar');
+        array.addParametro('id',id);
+        array.addParametro('vienede','mensaje');
+        array.addParametro('import','clases.lista_distribucion_doc.ListaDistribucionDoc');
+        xajax_Loading(array.getArray());
     }
     
     function VerhistoricoNotificaciones(){
