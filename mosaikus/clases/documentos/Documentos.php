@@ -3058,6 +3058,9 @@
                                         $('#myModal-Ventana-Titulo').html('');
                                         $('#myModal-Ventana').modal('show');
                                     });");
+                $objResponse->addScript("$('#tabs-visualiza').tab();"
+                        . "$('#tabs-visualiza a:first').tab('show');"); 
+                
                 $objResponse->addScript($js_flujo);
                 return $objResponse;
             }
@@ -3307,6 +3310,8 @@
                                                 $('#myModal-Ventana-Titulo').html('');
                                                 $('#myModal-Ventana').modal('show');
                                             });");
+                $objResponse->addScript("$('#tabs-visualiza').tab();"
+                        . "$('#tabs-visualiza a:first').tab('show');");                
                 $objResponse->addScript($js_flujo);
                 
                 //$objResponse->addScript('setTimeout(function(){ init_documentos(); }, 500);');
@@ -3412,6 +3417,15 @@
                 $contenido_1[OTROS_CAMPOS] = $array[html];
                 $js = $array[js];
                 $js .="$('#div_cargos').parent().hide();";
+
+                if(!class_exists('ArchivosAdjuntos')){
+                    import("clases.utilidades.ArchivosAdjuntos");
+                }
+                $adjuntos = new ArchivosAdjuntos();
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento');
+                $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
+                $js .= $array_nuevo[js];
+                
 //                if (count($this->parametros) <= 0){
 //                        $this->cargar_parametros();
 //                }                
@@ -4012,6 +4026,16 @@
                     //if (preg_match("/ha sido ingresado con exito/",$respuesta ) == true) {
                     if (strlen($respuesta ) < 10 ) {
                         $parametros[id] = $respuesta;
+                        
+                        if(!class_exists('ArchivosAdjuntos')){
+                            import("clases.utilidades.ArchivosAdjuntos");
+                        }
+                        $adjuntos = new ArchivosAdjuntos();                        
+                        $parametros[tabla] = 'mos_documentos_anexos';
+                        $parametros[clave_foranea] = 'id_documento';
+                        $parametros[valor_clave_foranea] = $parametros[id];
+                        $adjuntos->guardar($parametros);
+                        
                         //ENVIAR EMAIL SI ES GUARDAR Y NOTIFICAR
                         //print_r($parametros);
                         if($parametros['notificar']=='si'){
@@ -4669,7 +4693,15 @@
                     $item_histo .="<td>".$value[descripcion_operacion]."</td>";
                     $item_histo .="<td>".$value[usuario]."</td>";
                     $item_histo .="</tr>";
-                }                
+                }
+                if(!class_exists('ArchivosAdjuntos')){
+                    import("clases.utilidades.ArchivosAdjuntos");
+                }
+                $adjuntos = new ArchivosAdjuntos();
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento',$val["IDDoc"]);
+                $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
+                $js .= $array_nuevo[js];
+                
                 $contenido_1['ITEMS_HISTO'] = $item_histo;
                 $template->PATH = PATH_TO_TEMPLATES.'documentos/';
                 $template->setTemplate("formulario_editar");
@@ -4851,6 +4883,17 @@
                     $respuesta = $this->modificarDocumentos($parametros,$archivo,$doc_vis);
 
                     if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {  
+                        /* EVIDENCIAS ADJUNTADAS*/
+                        if(!class_exists('ArchivosAdjuntos')){
+                            import("clases.utilidades.ArchivosAdjuntos");
+                        }
+                        $adjuntos = new ArchivosAdjuntos();                        
+                        $parametros[tabla] = 'mos_documentos_anexos';
+                        $parametros[clave_foranea] = 'id_documento';
+                        $parametros[valor_clave_foranea] = $parametros[id];
+                        //print_r($parametros);
+                        $adjuntos->guardar($parametros);
+                        
                         //print_r($parametros);
                         //print_r($parametros[nodos]);
                         //ENVIAR EMAIL SI DESMARCA LA VIGENCIA Y ESTA APROBADO
@@ -5191,43 +5234,32 @@
                             <i class=\"icon icon-more\"></i>
                         </a>  </li>";
                 }
-                
-                $html = '<div class="content-panel panel">
-                <div class="content">
-                    <div class="info-container" style="height:90%;">
-                        <a class="close-detail" href="#detail-content">
-                            <i class="glyphicon glyphicon-remove"></i>
-                        </a>
-                        <div class="panel-heading">
-                        
-                            <div class="row">
-                                <div id="div-titulo-mod" class="panel-title col-xs-16">
-                                    '. $titulo_doc .'
-                                </div>
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                if(!class_exists('ArchivosAdjuntos')){
+                    import("clases.utilidades.ArchivosAdjuntos");
+                }
+                $adjuntos = new ArchivosAdjuntos();
+                $array_nuevo = $adjuntos->visualizar_archivos_adjuntos('mos_documentos_anexos', 'id_documento',$parametros["id"],24);
+                $contenido_2['ANEXOS'] = $array_nuevo[html];
+                $js .= $array_nuevo[js];
+                //echo $contenido_1['ANEXOS'];
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
+                $template->setTemplate("ver");
+                $contenido_1['TITULO']=$titulo_doc;
+                $contenido_1['OPCIONES']=$html_registro.$html;
+                $contenido_1['DATOS']=$iframe;                
+                $template->setVars($contenido_1);   
+                if($contenido_2['ANEXOS']!=''){
+                    $contenido_2['DOCUMENTOS']=$template->show();
+                    $template->PATH = PATH_TO_TEMPLATES.'documentos/';
+                    $template->setTemplate("visualizacion_documento_tab");
+                    $template->setVars($contenido_2);                
+                }
 
-                                <div class="panel-actions col-xs-8">
-                                    <ul class="navbar">                                
-                                        <li>'.$html_registro.'  
-                                            '. $html .'
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        
-                        
-                        </div>
-                    
-                  
-                        <div class="row" id="div-iframe-vis"  style="height:100%;">
-                            <!--<iframe id="iframe-vis" src="#" style="height:90%;width:100%;" frameborder="0"></iframe>-->
-                            <!--<iframe id="iframe-vis" src="'.$http.'://docs.google.com/gview?url='.$ruta_doc.'&embedded=true" style="height:90%;width:100%;" frameborder="0"></iframe>-->
-                            '.$iframe.'
-                        </div>
-                        <!--<textarea id="text-iframe">'.$http.'://docs.google.com/gview?url='.$ruta_doc.'</textarea>-->
-                        
-                    </div>
-              </div></div>';
-                $objResponse->addAssign('detail-content',"innerHTML",$html);
+                $objResponse->addAssign('detail-content',"innerHTML",$template->show());
                 //$objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
                 //$objResponse->addScript("PanelOperator.initPanels('');");
                 $objResponse->addScript("$('.close-detail').click(function (event) {
@@ -5243,6 +5275,7 @@
                 $objResponse->addScript("PanelOperator.showDetail('');");  
                 $objResponse->addScript("PanelOperator.resize();");
                 $objResponse->addScript("init_ver_registros();");
+                $objResponse->addScript($js);
                 //$objResponse->addScript('setTimeout(function(){ alert("vaaa");$(\'#iframe-vis\').attr("src",$("#text-iframe").html()+"&embedded=true");},1000);');
                 
                 return $objResponse;
