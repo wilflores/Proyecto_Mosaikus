@@ -52,3 +52,4 @@
                                     <input type="text" class="form-control" id="b-id_responsable" name="b-id_responsable" placeholder="{N_ID_RESPONSABLE}"/>
                                                              
                             </div>
+                                    <input type="hidden" id="b-id_organizacion" name="b-id_organizacion"/>

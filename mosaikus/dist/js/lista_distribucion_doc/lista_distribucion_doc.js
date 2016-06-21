@@ -16,7 +16,19 @@ function cargar_autocompletado(){
                 return this.charAt(0).toUpperCase() + this.slice(1);
             }
             
-            $('#b-id_personal').keyup(function() {
+            if ($("#opc").val() == "new"){                
+                $('#id_documento').change(function() {                    
+                    array = new XArray();
+                    array.setObjeto('ListaDistribucionDoc','cargar_data');
+                    array.addParametro('id_documento', this.value);    
+                    array.addParametro('modo',document.getElementById('modo').value);            
+                    array.addParametro('cod_link',document.getElementById('cod_link').value);
+                    array.addParametro('import','clases.lista_distribucion_doc.ListaDistribucionDoc');
+                    xajax_Loading(array.getArray());
+                });
+                
+            }
+            /*$('#b-id_personal').keyup(function() {
                 procesar_filtrar_arbol();
             });
             
@@ -28,7 +40,7 @@ function cargar_autocompletado(){
             });
             $('#b-apellido_materno').keyup(function() {
                 procesar_filtrar_arbol();
-            });
+            });*/
     }
     
     function total_per_sel(){
@@ -42,7 +54,7 @@ function cargar_autocompletado(){
     }
 
     function filtrar_mostrar_colums(){
-        var colums = '1-2-3-4-';
+        var colums = '0-';
          $('.checkbox-mos-col').each(function() {
                 if (this.checked){
                     colums = colums + this.value + '-';
@@ -58,12 +70,21 @@ function cargar_autocompletado(){
     function nuevo_ListaDistribucionDoc(){
             array = new XArray();
             array.setObjeto('ListaDistribucionDoc','crear');
+            array.addParametro('modo',document.getElementById('modo').value);            
+            array.addParametro('cod_link',document.getElementById('cod_link').value);
             array.addParametro('import','clases.lista_distribucion_doc.ListaDistribucionDoc');
             xajax_Loading(array.getArray());
     }
 
     function validar(doc){        
+        if ( $('#destino option').length <= 0 ){
+            $('#destino').attr('data-validation',"required");
+        }else {
+            $('#destino option').prop('selected', true);
+            $('#destino').removeAttr('data-validation');
+        }
         if($('#idFormulario').isValid()) {
+            
             $( "#btn-guardar" ).html('Procesando..');
             $( "#btn-guardar" ).prop( "disabled", true );
             array = new XArray();
@@ -73,6 +94,8 @@ function cargar_autocompletado(){
                 array.setObjeto('ListaDistribucionDoc','actualizar');
             array.addParametro('permiso',document.getElementById('permiso_modulo').value);
             array.getForm('idFormulario');
+            array.addParametro('modo',document.getElementById('modo').value);            
+            array.addParametro('cod_link',document.getElementById('cod_link').value);
             array.addParametro('import','clases.lista_distribucion_doc.ListaDistribucionDoc');
             xajax_Loading(array.getArray());
         }else{
@@ -123,13 +146,18 @@ function cargar_autocompletado(){
     }
 
     function verListaDistribucionDoc(id){
-        var src = 'pages/' +  document.getElementById("modulo_actual").value + '/verListaDistribucionDoc.php?id='+id;
-        $('a#ver_ficha_trabajador').fancybox({
-                    'titleShow': false,
-                    'href' : src,
-                    'autoDimensions' :true,
-                    'type':'iframe'                    
-                });        
-        $("#ver_ficha_trabajador").trigger('click');        
+//        var src = 'pages/' +  document.getElementById("modulo_actual").value + '/verListaDistribucionDoc.php?id='+id;
+//        $('a#ver_ficha_trabajador').fancybox({
+//                    'titleShow': false,
+//                    'href' : src,
+//                    'autoDimensions' :true,
+//                    'type':'iframe'                    
+//                });        
+//        $("#ver_ficha_trabajador").trigger('click');      
+        array = new XArray();
+        array.setObjeto('ListaDistribucionDoc','ver');
+        array.addParametro('id',id);
+        array.addParametro('import','clases.lista_distribucion_doc.ListaDistribucionDoc');
+        xajax_Loading(array.getArray());
     }
     

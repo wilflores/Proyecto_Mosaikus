@@ -36,7 +36,13 @@ function cargar_autocompletado(){
     }
     
     
-    function validar_ld_noti(doc){        
+    function validar_ld_noti(doc){    
+        if ( $('#destino option').length <= 0 ){
+            $('#destino').attr('data-validation',"required");
+        }else {
+             $('#destino option').prop('selected', true);
+            $('#destino').removeAttr('data-validation');
+        }
         if($('#idFormulario').isValid()) {
             $( "#btn-guardar" ).html('Procesando..');
             $( "#btn-guardar" ).prop( "disabled", true );
