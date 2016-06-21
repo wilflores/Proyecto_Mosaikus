@@ -511,7 +511,7 @@
                                         '</td>';
                         $html.= '</tr>' ;  
                         $return[html] = '<div class="col-md-'.$valor_col.'">
-                                            <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload2" name="fileUpload2"/>
+                                            <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload_adjuntos" name="fileUpload_adjuntos"/>
                                             <input type="hidden" id="num_items" name="num_items" value="0"/> 
                                             <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>                                            
                                             <br>    
@@ -542,7 +542,7 @@
                 else
                 {
                 $return[html] = '<div class="col-md-'.$valor_col.'">
-                                            <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload2" name="fileUpload2"/>
+                                            <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload_adjuntos" name="fileUpload_adjuntos"/>
                                             <input type="hidden" id="num_items" name="num_items" value="0"/> 
                                             <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>                                            
                                             <br>    
@@ -634,17 +634,7 @@
                 }
                 else
                 {
-                $return[html] = '<div class="col-md-'.$valor_col.'">
-                                            <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload2" name="fileUpload2"/>
-                                            <input type="hidden" id="num_items" name="num_items" value="0"/> 
-                                            <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>                                            
-                                            <br>    
-                                            <table id="table-items-esp" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
-                                                <tbody>
-                                                    
-                                                </tbody>
-                                            </table>    
-                                 </div>';
+                $return[html] = '';
                 //$return[js] = 'init_archivos_adjuntos();'; 
                 
                 }

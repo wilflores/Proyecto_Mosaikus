@@ -1,12 +1,13 @@
 function init_archivos_adjuntos(){
-    $("#fileUpload2").change(function (){
+    $("#fileUpload_adjuntos").change(function (){
                 var names = [];
                 var i = $('#num_items').val();
                 i = parseInt(i) + 1;    
-                var formData = new FormData(document.getElementById("formuploadajax"));
+                //var formData = new FormData(document.getElementById("formuploadajax"));
+                var formData = new FormData();
                 for (var k = 0; k < this.files.length; ++k) {
                     if(this.files[k].size>1024*1024*3){
-                        VerMensaje('error','El archivo ' + this.files[k].name + ' excede el tamaño permitido en este sitio, Tamaño máximo del archivo a subir: 1MB');
+                        VerMensaje('error','El archivo ' + this.files[k].name + ' excede el tama&ntilde;o permitido en este sitio, Tama&ntilde;o m&aacute;ximo del archivo a subir: 3MB');
                     }
                     else
                         names.push(k);
@@ -103,7 +104,7 @@ function init_archivos_adjuntos(){
                     
                     $('#num_items').val(i);
                 }
-                $('#fileUpload2').val('');       
+                $('#fileUpload_adjuntos').val('');       
 
 
             });
