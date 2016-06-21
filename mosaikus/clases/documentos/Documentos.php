@@ -2604,6 +2604,7 @@
                 else{
                     $cod_categoria = 1;
                 }
+                $parametros['b-vigencia'] = 'S';
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
@@ -6060,9 +6061,9 @@
             $objResponse = new xajaxResponse();            
             //echo $combo;
             $objResponse->addAssign('div_cargos',"innerHTML",$combo);
-            //$objResponse->addScript("$('#cod_cargo').selectpicker({
-                                         //   style: 'btn-combo'
-                                        //  });$js");
+            $objResponse->addScript("$('#cod_cargo').selectpicker({
+                                            style: 'btn-combo'
+                                          });$js");
            // $objResponse->addScript("$('#requiere_lista_distribucion').val('".$parametros[valor]."');");
             return $objResponse;
             }             

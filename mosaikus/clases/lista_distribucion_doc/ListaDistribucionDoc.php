@@ -765,7 +765,16 @@
                 }
                 foreach ( $this->placeholder as $key => $value) {
                     $contenido_1["P_" . strtoupper($key)] =  $value;
-                }     
+                } 
+                if (count($this->id_org_acceso_explicito) <= 0){
+                    $this->cargar_acceso_nodos_explicito($parametros);                    
+                }  
+                /*DOCUMENTOS DONDE SE TIENE ACCESO*/
+                $sql = "select IDDoc id,CONCAT(Codigo_doc,'-',nombre_doc,'-V',lpad(version,2,'0')) documento from mos_documentos
+                        where muestra_doc = 'S' and vigencia = 'S' and
+                        IDDoc in (select IDDoc from mos_documentos_estrorg_arbolproc 
+                        where id_organizacion_proceso in (".implode(',', array_keys($this->id_org_acceso))."))";
+                
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'lista_distribucion_doc/';
                 $template->setTemplate("formulario");

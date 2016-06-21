@@ -95,12 +95,7 @@
                                     <label class="checkbox-inline"> 
                                     <input type="checkbox" id="b-privado" name="b-privado" value="N"> Documento Privado </label> -->
                             <!--/div-->   
-<!--<div class="form-group">
-                                  <label for="vigencia" class="col-md-2 control-label">{N_VIGENCIA}</label>
-                                  <div class="col-md-2">
-                                    <input type="text" class="form-control" id="b-vigencia" name="b-vigencia" placeholder="{N_VIGENCIA}" />
-                                </div>                                
-                            </div>
+<!--
 <div class="form-group">
                                   <label for="doc_fisico" class="col-md-2 control-label">{N_DOC_FISICO}</label>
                                   <div class="col-md-2">
@@ -222,6 +217,22 @@
                                              <input type="hidden" name="b-ocultar-publico" id="b-ocultar-publico">
                                              <input type="hidden" id="b-area_espejo" name="b-area_espejo"/> 
                                         </div>
+                                             <div class="form-group">
+                                        <label for="vigencia" class="col-md-24 control-label">{N_VIGENCIA}</label>                                                                                                           
+                                        
+                                    </div>                                    
+                                    <div class="form-group"> 
+                                        <label class="checkbox-inline" style="padding-top: 0px;"> 
+                                            <input type="radio" checked="checked" value="S" id="b-vigencia" name="b-vigencia"> Si &nbsp; 
+                                            <input type="radio" value="N" id="b-vigencia" name="b-vigencia"> No &nbsp; 
+                                        </label>
+                                     </div>
+                            <!--<div class="form-group">
+                                  <label for="vigencia" class="col-md-2 control-label">{N_VIGENCIA}</label>
+                                  <div class="col-md-2">
+                                    <input type="text" class="form-control" id="b-vigencia" name="b-vigencia" placeholder="{N_VIGENCIA}" />
+                                </div>                                
+                            </div>
                                              <!--
 </div>
     <div class="tab-pane active" id="orange">
