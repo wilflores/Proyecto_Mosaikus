@@ -258,6 +258,10 @@
                                                     </table>
                                                </div>
                                             <div class="tab-pane active" id="hv-orange-4">
+                                                <div class="form-group" id="tabla_fileUpload">
+                                                        <label for="archivo_anexo" class="col-md-4 control-label">{N_EVIDENCIAS}</label>
+                                                        {ARCHIVOS_ADJUNTOS}                                          
+                                                 </div>                                                  
                                                 
                                                </div>
                                             <div class="tab-pane active" id="hv-orange-3">
