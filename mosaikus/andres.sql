@@ -295,3 +295,17 @@ CREATE TABLE `mos_documentos_cargos` (
 
 insert into mos_nombres_campos (nombre_campo,texto,modulo,placeholder) values
 ('estado', 'Estado Entidad',24, 'Estado Entidad');
+/****************************************/
+/*cambio del 21-06*/
+/****************************************/
+DROP TABLE IF EXISTS `mos_documentos_anexos`;
+CREATE TABLE `mos_documentos_anexos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_documento` int(11) DEFAULT NULL,
+  `nomb_archivo` varchar(250) DEFAULT NULL,
+  `archivo` longblob,
+  `contenttype` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_id_documento_mos_doc` (`id_documento`),
+  CONSTRAINT `fk_id_documento_mos_doc` FOREIGN KEY (`id_documento`) REFERENCES `mos_documentos` (`IDDoc`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
