@@ -557,6 +557,99 @@
                 }
                 return $return;
             }
+            
+            public function visualizar_archivos_adjuntos($tabla,$clave_foranea=null, $valor_clave_foranea=null,$valor_col=19)
+            {
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                $return = array();
+                $token = time();
+                $data_items = array();
+                //echo $valor_clave_foranea;
+                if (strlen($valor_clave_foranea)>0){
+                    $sql = "INSERT INTO mos_evidencias_temp(nomb_archivo, contenttype, clave_foranea, id_usuario, tok, estado, id_md5)"
+                                    . " SELECT nomb_archivo, contenttype, id, $_SESSION[CookIdUsuario],$token,0, '$tabla-$clave_foranea'"
+                                    . " FROM $tabla"
+                                    . " WHERE $clave_foranea = $valor_clave_foranea";
+                    //echo $sql;
+                            $this->dbl->insert_update($sql);
+                            $sql = "SELECT 
+                                    id,nomb_archivo, contenttype, (length(archivo))/(1024) tamano
+                            FROM $tabla 
+                            WHERE $clave_foranea = $valor_clave_foranea ";
+                            //echo $sql;
+                            $data_items = $this->dbl->query($sql);
+
+                }
+                if (count($data_items)>0){
+                    $i = 1;
+                    $html = '';
+                    $js = '';
+                    foreach ($data_items as $value) {
+                        $target = $value[contenttype] == 'application/pdf' ? 'target="_blank"' : 'data-gallery';
+                        $html .= '<tr id="tr-esp-' .$i. '">'; 
+                        $html.= '<td align="center">'.
+                                           ' ' .
+                                      '  </td>';
+                        $html.= '<td >'.
+                                            '<a id="a-img-'.$i.'" '. $target .' href="pages/evidencias/ver_evidencia.php?id='.$value[id].'&token='.$token.'" title="'.$value[nomb_archivo]. '" >'.
+                                                $value[nomb_archivo].
+                                            '</a>'.                                            
+                                       '</td>';
+                        $html.= '<td>' .
+                                            number_format($value[tamano]). ' KB ' .
+                                            
+                                        '</td>';
+
+                        $html.= '<td>' .'<a id="a-img-'.$i.'" target="_blank" href="pages/evidencias/ver_evidencia.php?id='.$value[id].'&token='.$token.'&des=1" title="'.$value[nomb_archivo]. '" >'.
+                                           '<i class="icon icon-download cursor-pointer" href="'.$i. '" id="ico_trash_img_'.$i. '" tok="'.$value[id]. '"></i>'.
+                                '</a>'.    
+                                        '</td>';
+                        $html.= '</tr>' ;  
+                        $return[html] = '
+                                            <table id="table-items-esp-vis" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
+                                                <tbody>
+                                                    ' . $html . '
+                                                </tbody>
+                                            </table>    
+                                 </div>';
+//                        $js .= "$('#ico_trash_img_$i').click(function(e){ 
+//                                        e.preventDefault();
+//                                        var id = $(this).attr('href');
+//                                        $('tr-esp-$i').remove();
+//                                        var parent = $(this).parents().parents().get(0);
+//                                            $(parent).remove();
+//                                        var id = $(this).attr('tok');            
+//                                        array = new XArray();
+//                                        array.setObjeto('ArchivosAdjuntos','actualizar_creada');
+//                                        array.addParametro('tok',id);                        
+//                                        array.addParametro('token', $('#tok_new_edit').val());
+//                                        array.addParametro('import','clases.utilidades.ArchivosAdjuntos');
+//                                        xajax_Loading(array.getArray());
+//                                    }); ";
+                        $i++;
+                    }
+                    //$return[js] = $js.'init_archivos_adjuntos();'; 
+                }
+                else
+                {
+                $return[html] = '<div class="col-md-'.$valor_col.'">
+                                            <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload2" name="fileUpload2"/>
+                                            <input type="hidden" id="num_items" name="num_items" value="0"/> 
+                                            <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>                                            
+                                            <br>    
+                                            <table id="table-items-esp" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
+                                                <tbody>
+                                                    
+                                                </tbody>
+                                            </table>    
+                                 </div>';
+                //$return[js] = 'init_archivos_adjuntos();'; 
+                
+                }
+                return $return;
+            }
      
  
             public function guardar($parametros)

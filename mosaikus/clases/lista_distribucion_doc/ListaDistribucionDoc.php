@@ -1489,62 +1489,34 @@
                     $ids_per[] = $value[id_persona];
                 }
                 /*FIN PERSONAL CAPACITADO*/
-                /*PERSONAS ORIGEN*/
-                $html = '';
-                $parametros['b-no_cod_emp'] = implode(',', $ids_per) ;
-                $parametros['order'] = 'nombres asc';
-                //AREAS QUE APLICA EL DOCUMENTO
-                //$parametros['b-id_organizacion'] = implode(',', $ids_areas);
-                //CARGOS QUE APLICA EL DOCUMENTO
-                $parametros['b-id_cargo'] = implode(',', $ids);
-                import("clases.personas.Personas");
-                $personas = new Personas();
-                $personas->listarPersonasSinFiltro($parametros);
-                $data=$personas->dbl->data;   
-                //print_r($data);
-                foreach ($data as $value) {
-                    $html .= '<option value="'.$value[cod_emp].'" rut="'.$value[id_personal].'"';
-                    /*$html .= ' nom="' .$value[nombres].'"' ;
-                    $html .= ' ap_p="' .$value[apellido_paterno].'"' ;
-                    $html .= ' ap_m="' .$value[apellido_materno].'"' ;*/
-                    $html .= ' arb="' . $value[id_organizacion] . '"';
-                    $html .= ' car="' . $value[id_cargo] . '"';
-                    $html .= '>' /*. completar_espacios($i,1).' - '*/. str_pad($value[id_personal], 9, '0',STR_PAD_LEFT).' - '.$value[nombres].' '.$value[apellido_paterno].' '.$value[apellido_materno].'</option>';
-                    $i++;
-                }
-                //$html .= '</select>';
-                $contenido_1[ORIGEN] = $html;
-                $contenido_1[TOTAl_PER_SEL] = 0;
-                $contenido_1[TOTAl_PER] = count($data);
+
                 /*FIN PERSONAL ORIGEN*/
                 /*CARGA PERSONAL CAPACITADO*/
                 $html = '';
                 $parametros['b-no_cod_emp'] = '';
-                $parametros['b-cod_emp'] = implode(',', $ids_per) == '' ? 0 : implode(',', $ids_per);                
+                $parametros['b-cod_emp'] = implode(',', $ids_per) == '' ? 0 : implode(',', $ids_per); 
+                import("clases.personas.Personas");
+                $personas = new Personas();
                 $personas->listarPersonasSinFiltro($parametros);
                 $data=$personas->dbl->data;        
                 //print_r($data);
                 foreach ($data as $value) {
-                    $html .= '<option value="'.$value[cod_emp].'" rut="'.$value[id_personal].'"';
-                    /*$html .= ' nom="' .$value[nombres].'"' ;
-                    $html .= ' ap_p="' .$value[apellido_paterno].'"' ;
-                    $html .= ' ap_m="' .$value[apellido_materno].'"' ;*/
-                    $html .= ' arb="' . $value[id_organizacion] . '"';
-                    $html .= ' car="' . $value[id_cargo] . '"';
-                    $html .= '>' /*. completar_espacios($i,1).' - '*/. str_pad($value[id_personal], 9, '0',STR_PAD_LEFT).' - '.$value[apellido_paterno].' '.$value[apellido_materno].' '.$value[nombres].'</option>';
-                    $i++;
+                    $html .= '<tr tok="1" onmouseover="TRMarkOver(this);" onmouseout="TRMarkOut(this);" class="DatosGrilla">
+                      <td align="">';
+                    $html .= str_pad($value[id_personal], 9, '0',STR_PAD_LEFT).' - '.$value[apellido_paterno].' '.$value[apellido_materno].' '.$value[nombres];
+                    $html .= '</td></tr>';
+
                 }
                 //$html .= '</select>';
                 $contenido_1[DESTINO] = $html;
-                $contenido_1[TOTAl_PER_SEL] = count($data);
-                $contenido_1[TOTAl_PER] = $contenido_1[TOTAl_PER] + count($data);
+                
                 /*FIN CARGA PERSONAL CAPACITADO*/
                 /* EVIDENCIAS ADJUNTADAS*/
                 if(!class_exists('ArchivosAdjuntos')){
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
                 $adjuntos = new ArchivosAdjuntos();
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_distribucion_evi', 'fk_id_doc_distribucion',$val["id"]);
+                $array_nuevo = $adjuntos->visualizar_archivos_adjuntos('mos_documentos_distribucion_evi', 'fk_id_doc_distribucion',$val["id"],24);
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
                 

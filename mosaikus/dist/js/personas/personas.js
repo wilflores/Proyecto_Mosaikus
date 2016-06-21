@@ -123,7 +123,7 @@
         
         //console.log(data.selected);
     });
-    $('#div-ao-form').jstree(true).open_all();               
+    //$('#div-ao-form').jstree(true).open_all();               
     var to = false;
     $('#demo_q_ao').keyup(function () {                    
             if(to) { clearTimeout(to); }
