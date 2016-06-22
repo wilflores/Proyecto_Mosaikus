@@ -492,12 +492,12 @@
                     $js = '';
                     foreach ($data_items as $value) {
                         $target = $value[contenttype] == 'application/pdf' ? 'target="_blank"' : 'data-gallery';
-                        $html .= '<tr id="tr-esp-' .$i. '">'; 
+                        $html .= '<tr id="tr-adj-' .$i. '">'; 
                         $html.= '<td align="center">'.
                                            ' ' .
                                       '  </td>';
                         $html.= '<td >'.
-                                            '<a id="a-img-'.$i.'" '. $target .' href="pages/evidencias/ver_evidencia.php?id='.$value[id].'&token='.$token.'" title="'.$value[nomb_archivo]. '" >'.
+                                            '<a id="a-img-adj-'.$i.'" '. $target .' href="pages/evidencias/ver_evidencia.php?id='.$value[id].'&token='.$token.'" title="'.$value[nomb_archivo]. '" >'.
                                                 $value[nomb_archivo].
                                             '</a>'.                                            
                                        '</td>';
@@ -512,10 +512,10 @@
                         $html.= '</tr>' ;  
                         $return[html] = '<div class="col-md-'.$valor_col.'">
                                             <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload_adjuntos" name="fileUpload_adjuntos"/>
-                                            <input type="hidden" id="num_items" name="num_items" value="0"/> 
+                                            <input type="hidden" id="num_items_adj" name="num_items" value="0"/> 
                                             <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>                                            
                                             <br>    
-                                            <table id="table-items-esp" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
+                                            <table id="table-items-adj" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
                                                 <tbody>
                                                     ' . $html . '
                                                 </tbody>
@@ -524,7 +524,7 @@
                         $js .= "$('#ico_trash_img_$i').click(function(e){ 
                                         e.preventDefault();
                                         var id = $(this).attr('href');
-                                        $('tr-esp-$i').remove();
+                                        $('tr-adj-$i').remove();
                                         var parent = $(this).parents().parents().get(0);
                                             $(parent).remove();
                                         var id = $(this).attr('tok');            
@@ -543,10 +543,10 @@
                 {
                 $return[html] = '<div class="col-md-'.$valor_col.'">
                                             <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload_adjuntos" name="fileUpload_adjuntos"/>
-                                            <input type="hidden" id="num_items" name="num_items" value="0"/> 
+                                            <input type="hidden" id="num_items_adj" name="num_items" value="0"/> 
                                             <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>                                            
                                             <br>    
-                                            <table id="table-items-esp" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
+                                            <table id="table-items-adj" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
                                                 <tbody>
                                                     
                                                 </tbody>

@@ -1,7 +1,7 @@
 function init_archivos_adjuntos(){
     $("#fileUpload_adjuntos").change(function (){
                 var names = [];
-                var i = $('#num_items').val();
+                var i = $('#num_items_adj').val();
                 i = parseInt(i) + 1;    
                 //var formData = new FormData(document.getElementById("formuploadajax"));
                 var formData = new FormData();
@@ -14,17 +14,17 @@ function init_archivos_adjuntos(){
                 }
                 var html;
                 for (var k = 0; k < names.length;++k){
-                    i = $('#num_items').val();
+                    i = $('#num_items_adj').val();
                     i = parseInt(i) + 1;   
-                    html = '<tr id="tr-esp-' + i + '">'; 
+                    html = '<tr id="tr-adj-' + i + '">'; 
                     html = html + '<td align="center">'+
                                        ' ' +
                                   '  </td>';
                     html = html + '<td >'+
-                                        '<a id="a-img-'+ i +'" href="#" title="'+ this.files[names[k]].name + '" >'+
+                                        '<a id="a-img-adj-'+ i +'" href="#" title="'+ this.files[names[k]].name + '" >'+
                                             this.files[names[k]].name + 
                                         '</a>'+
-                                        '<div id="a-img-msj-'+ i +'" style="color:red"></div>'
+                                        '<div id="a-img-adj-msj-'+ i +'" style="color:red"></div>'
                                    '</td>';
                     html = html + '<td>' +
                                        + Math.round(this.files[names[k]].size / 1024) + ' KB <br>' +
@@ -39,7 +39,7 @@ function init_archivos_adjuntos(){
                                        '<i class="glyphicon glyphicon-trash cursor-pointer" href="'+ i + '" id="ico_trash_img_'+ i + '" tok=""></i>'+
                                     '</td>';
                     html = html + '</tr>' ;       
-                    $("#table-items-esp tbody").append(html);  
+                    $("#table-items-adj tbody").append(html);  
                     
                     formData.append('fileUpload',this.files[names[k]]); 
                     formData.append('tok', $('#tok_new_edit').val());
@@ -70,15 +70,15 @@ function init_archivos_adjuntos(){
                                 respuesta = $.parseJSON(res);
                                 if (respuesta[0].exito == 1) {
                                     if (respuesta[0].gallery == 1)
-                                        $('#a-img-'+i).attr('data-gallery','');
+                                        $('#a-img-adj-'+i).attr('data-gallery','');
                                     if (respuesta[0].target == 1)
-                                        $('#a-img-'+i).attr('target','_blank');
-                                    $('#a-img-'+i).attr('href',respuesta[0].url);
+                                        $('#a-img-adj-'+i).attr('target','_blank');
+                                    $('#a-img-adj-'+i).attr('href',respuesta[0].url);
                                     $('#ico_trash_img_'+i).attr('tok',respuesta[0].id);
                                     $("#ico_trash_img_" + i).click(function(e){ 
                                         e.preventDefault();
                                         var id = $(this).attr('href');
-                                        $('tr-esp-' + id).remove();
+                                        $('tr-adj-' + id).remove();
                                         var parent = $(this).parents().parents().get(0);
                                             $(parent).remove();
                                         var id = $(this).attr('tok');            
@@ -91,10 +91,10 @@ function init_archivos_adjuntos(){
                                     }); 
                                 }
                                 else{
-                                    $('#a-img-msj-'+i).html(respuesta[0].msj);
+                                    $('#a-img-adj-msj-'+i).html(respuesta[0].msj);
                                 }
                             }catch (e) {
-                                $('#a-img-msj-'+i).html(respuesta[0].msj);
+                                $('#a-img-adj-msj-'+i).html(respuesta[0].msj);
                             }
 
                            $('#estado-progress-bar-'+i).parent().hide();
@@ -102,7 +102,7 @@ function init_archivos_adjuntos(){
                     };
                     ajaxloopreq(formData,i);
                     
-                    $('#num_items').val(i);
+                    $('#num_items_adj').val(i);
                 }
                 $('#fileUpload_adjuntos').val('');       
 

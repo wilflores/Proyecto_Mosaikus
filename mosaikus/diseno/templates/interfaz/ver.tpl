@@ -1,22 +1,6 @@
-<!--<div class="form-container" >
-        <fieldset class=" fieldset titled" style="height:350px">
-            <legend>
-                <span class="fieldset-title"></span>
-            </legend>
-            <div class="fieldset-content clear-block ">
-                <table class="detail-table" style="width:95%;">
-                    <tbody>
-                        {DATOS}                                             
-                    </tbody>
-                </table>
-
-            </div>
-        </fieldset>
-</div>-->
-
                     <div class="content-panel panel">
                 <div class="content">
-                    <div class="info-container" style="height:90%;">
+                    <div class="info-container">
                         <a class="close-detail" href="#detail-content">
                             <i class="glyphicon glyphicon-remove"></i>
                         </a>
@@ -40,11 +24,11 @@
                     
                   
                         <div class="row" id="div-iframe-vis"  style="height:100%;">
-                            <div class="col-xs-24">
+                          
                                
                                 {DATOS}  
                                
-                            </div>
+                            
                         </div>
                         
                         

@@ -5202,7 +5202,7 @@
 
                     $ruta_doc = $documento->ActivarDocumento();
                     $titulo_doc = $documento->getNombreArchivo();
-                    $iframe = '<iframe id="iframe-vis-aux" src="'.$ruta_doc.'" style="height:90%;width:100%;" frameborder="0"></iframe>';
+                    $iframe = '<iframe id="iframe-vis-aux" src="'.$ruta_doc.'" style="height:90%;width:100%;min-height:600px;" frameborder="0"></iframe>';
                 }
                 else{
                     $archivo_aux = $this->verDocumentoFuente($parametros[id]);
@@ -5225,7 +5225,7 @@
                             
                             <i class=\"icon icon-view-document\"></i>
                         </a>";
-                    $iframe = '<iframe id="iframe-vis" src="'.$http.'://docs.google.com/gview?url='.$ruta_doc.'&embedded=true" style="height:90%;width:100%;" frameborder="0"></iframe>';
+                    $iframe = '<iframe id="iframe-vis" src="'.$http.'://docs.google.com/gview?url='.$ruta_doc.'&embedded=true" style="height:90%;width:100%;min-height:600px;" frameborder="0"></iframe>';
                 }
                 $html_registro = '';
                 if ($archivo_aux[formulario]== 'S'){
@@ -5245,19 +5245,31 @@
                 $contenido_2['ANEXOS'] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
                 //echo $contenido_1['ANEXOS'];
+                
                 $template = new Template();
-                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
-                $template->setTemplate("ver");
-                $contenido_1['TITULO']=$titulo_doc;
-                $contenido_1['OPCIONES']=$html_registro.$html;
-                $contenido_1['DATOS']=$iframe;                
-                $template->setVars($contenido_1);   
                 if($contenido_2['ANEXOS']!=''){
-                    $contenido_2['DOCUMENTOS']=$template->show();
+                    $contenido_2['DOCUMENTOS']=$iframe;//$template->show();
                     $template->PATH = PATH_TO_TEMPLATES.'documentos/';
                     $template->setTemplate("visualizacion_documento_tab");
-                    $template->setVars($contenido_2);                
+                    $template->setVars($contenido_2); 
+                    $contenido_1['DATOS']= $template->show();     
+                    $contenido_1['TITULO']=$titulo_doc . "<br><a href=\"#anexos-doc\" title=\"Ver Anexos del Documento\">                            
+                                    <i class=\"	glyphicon glyphicon-paperclip\" style=\"\"></i>
+                                    Anexos
+                                </a>";
                 }
+                else{
+                    $contenido_1['DATOS']=$iframe;
+                    $contenido_1['TITULO']=$titulo_doc;
+                }
+                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
+                $template->setTemplate("ver");
+                
+                $contenido_1['OPCIONES']=$html_registro.$html;
+                
+                                
+                $template->setVars($contenido_1);   
+                
 
                 $objResponse->addAssign('detail-content',"innerHTML",$template->show());
                 //$objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
@@ -5275,7 +5287,7 @@
                 $objResponse->addScript("PanelOperator.showDetail('');");  
                 $objResponse->addScript("PanelOperator.resize();");
                 $objResponse->addScript("init_ver_registros();");
-                $objResponse->addScript($js);
+                //$objResponse->addScript($js);
                 //$objResponse->addScript('setTimeout(function(){ alert("vaaa");$(\'#iframe-vis\').attr("src",$("#text-iframe").html()+"&embedded=true");},1000);');
                 
                 return $objResponse;

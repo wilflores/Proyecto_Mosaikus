@@ -1,4 +1,5 @@
-<div class="row">
+<div class="col-xs-24">
+    <div class="row">
           <dl class="col-xs-12">
             <dt>{N_ESTADO} </dt>
             <dd> {ESTADO}</dd>
@@ -62,5 +63,5 @@
           </table>
           {ARCHIVOS_ADJUNTOS}
         </div>
-           
+ </div>
                             
