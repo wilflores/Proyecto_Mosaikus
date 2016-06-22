@@ -5202,7 +5202,7 @@
 
                     $ruta_doc = $documento->ActivarDocumento();
                     $titulo_doc = $documento->getNombreArchivo();
-                    $iframe = '<iframe id="iframe-vis-aux" src="'.$ruta_doc.'" style="height:90%;width:100%;min-height:600px;" frameborder="0"></iframe>';
+                    $iframe = '<iframe id="iframe-vis" src="'.$ruta_doc.'" style="height:90%;width:100%;min-height:600px;" frameborder="0"></iframe>';
                 }
                 else{
                     $archivo_aux = $this->verDocumentoFuente($parametros[id]);
@@ -5277,14 +5277,17 @@
                 $objResponse->addScript("$('.close-detail').click(function (event) {
                         event.preventDefault();
                         PanelOperator.hideDetail('');
+                        PanelOperator.resize();
                     })
 
                     $('.detail-show').click(function (event) {
                         event.preventDefault();
                         PanelOperator.showDetail('');
                         PanelOperator.hideSearch('');
-                    });");
+                    });
+                    ");
                 $objResponse->addScript("PanelOperator.showDetail('');");  
+                $objResponse->addScript("if (($('#grid').height() - 200) > 600) $('#iframe-vis').height($('#grid').height()  ); ");
                 $objResponse->addScript("PanelOperator.resize();");
                 $objResponse->addScript("init_ver_registros();");
                 //$objResponse->addScript($js);
