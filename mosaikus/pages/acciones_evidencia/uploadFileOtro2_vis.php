@@ -11,6 +11,8 @@
     $nombre = $_FILES['fileUpload']['name'];
     $data_galery = $target = 0;
     $extensiones = $_POST['extensiones'];
+    $ext = end(explode('.', $nombre));
+    if($ext=='rar' || $ext=='dwg') $type=$ext;
     //print_r($_FILES);
     // rar, office, zip, visio, autocad
     if (isset($_FILES['fileUpload']['name']) && ($_FILES['fileUpload']['size'] <= 1024*1024*3)) {
@@ -60,9 +62,12 @@
             case 'application/zip':
                 $tipo = $tipo == '' ? 'zip' : $tipo;
                 break;
-//            case 'application/octet-stream':
-//                $tipo = $tipo == '' ? 'rar' : $tipo;
-//                break;                
+            case 'rar':
+                $tipo = $tipo == '' ? 'rar' : $tipo;
+                break;                
+            case 'dwg':
+                $tipo = $tipo == '' ? 'dwg' : $tipo;
+                break;                
             default:  //echo $type;
                 //$funcion = "window.parent.VerMensaje('error', 'El archivo $nombre tiene un formato no permitido para el documento');";
                 $funcion = "El archivo tiene un formato no permitido para el documento";
@@ -78,7 +83,7 @@
         if($tipo!=''){
             //echo preg_match($tipo,$extensiones);
             if($extensiones!='' && preg_match("/".$tipo."/",$extensiones) == false) {
-               //$funcion = 'type:'.$type.' tipo:'.$tipo.' ';
+               //$funcion = 'type:'.$type.' tipo:'.$tipo.' ext='. $ext;
                $funcion = "El archivo tiene un formato no permitido para el documento. Solo se permiten ".$extensiones; 
             }
             else 
