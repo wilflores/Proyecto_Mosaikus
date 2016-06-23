@@ -10,27 +10,37 @@
     $type = $_FILES['fileUpload']['type'];
     $nombre = $_FILES['fileUpload']['name'];
     $data_galery = $target = 0;
+    $extensiones = $_POST['extensiones'];
     //print_r($_FILES);
+    // rar, office, zip, visio, autocad
     if (isset($_FILES['fileUpload']['name']) && ($_FILES['fileUpload']['size'] <= 1024*1024*3)) {
         switch (trim($type)){
-//            case 'application/msword':
-//                $tipo = 'doc';
-//            case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-//                $tipo = $tipo == '' ? 'docx' : $tipo;
-//            case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-//                $tipo = $tipo == '' ? 'xlsx' : $tipo;
-//            case 'application/vnd.ms-powerpoint':
-//                $tipo = $tipo == '' ? 'ppt' : $tipo;
-//            case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-//                $tipo = $tipo == '' ? 'pptx' : $tipo;
+            case 'application/msword':
+                $tipo = $tipo == '' ? 'doc' : $tipo;
+                break;            
+            case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                $tipo = $tipo == '' ? 'docx' : $tipo;
+                break;
+            case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                $tipo = $tipo == '' ? 'xlsx' : $tipo;
+                break;
+            case 'application/vnd.ms-powerpoint':
+                $tipo = $tipo == '' ? 'ppt' : $tipo;
+                break;
+            case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+                $tipo = $tipo == '' ? 'pptx' : $tipo;
+                break;
             case 'image/jpeg':
             case 'image/pjpeg':
                 $tipo = $tipo == '' ? 'jpg' : $tipo;
+                break;
             case 'image/png':
             case 'image/x-png':
                 $tipo = $tipo == '' ? 'png' : $tipo;
+                break;
             case 'application/pdf':
                 $tipo = $tipo == '' ? 'pdf' : $tipo;
+                break;
 //            case 'application/vnd.openxmlformats-officedocument.wordprocessingml.template':
 //                $tipo = $tipo == '' ? 'dotx' : $tipo;
 //            case 'application/vnd.ms-excel.sheet.binary.macroEnabled.12':
@@ -41,10 +51,38 @@
 //                $tipo = $tipo == '' ? 'xltx' : $tipo;
 //            case 'application/vnd.openxmlformats-officedocument.presentationml.slideshow':
 //                $tipo = $tipo == '' ? 'ppsx' : $tipo;
-//            case 'application/vnd.visio':
-//                $tipo = $tipo == '' ? 'vsd' : $tipo;
-//            case 'application/vnd.ms-excel':
-//                $tipo = $tipo == '' ? 'xls' : $tipo;
+            case 'application/vnd.visio':
+                $tipo = $tipo == '' ? 'vsd' : $tipo;
+                break;
+            case 'application/vnd.ms-excel':
+                $tipo = $tipo == '' ? 'xls' : $tipo;
+                break;
+            case 'application/zip':
+                $tipo = $tipo == '' ? 'zip' : $tipo;
+                break;
+//            case 'application/octet-stream':
+//                $tipo = $tipo == '' ? 'rar' : $tipo;
+//                break;                
+            default:  //echo $type;
+                //$funcion = "window.parent.VerMensaje('error', 'El archivo $nombre tiene un formato no permitido para el documento');";
+                $funcion = "El archivo tiene un formato no permitido para el documento";
+                $tipo ='';
+                break;
+                //$funcion = "alert('El archivo $nombre tiene un formato no permitido para el documento');";
+            
+
+        }
+        
+                
+        
+        if($tipo!=''){
+            //echo preg_match($tipo,$extensiones);
+            if($extensiones!='' && preg_match("/".$tipo."/",$extensiones) == false) {
+               //$funcion = 'type:'.$type.' tipo:'.$tipo.' ';
+               $funcion = "El archivo tiene un formato no permitido para el documento. Solo se permiten ".$extensiones; 
+            }
+            else 
+            {    
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $encryt = new EnDecryptText();
@@ -59,7 +97,6 @@
                 if (!copy($_FILES['fileUpload']['tmp_name'], APPLICATION_DOWNLOADS. 'temp/' . md5($data[0][id]).'.'.$tipo)){
                     $funcion = 'Error al Subir el Archivo';
                     $exito = 0;
-                    break;
                 }
                 else
                 {
@@ -75,13 +112,7 @@
                 }
                 $sql = "UPDATE mos_evidencias_temp SET id_md5 = '" . md5($data[0][id]).'.'.$tipo . "', estado = 1 where id = " . $data[0][id];
                 $dbl->insert_update($sql);
-                break;
-            default:  //echo $type;
-                //$funcion = "window.parent.VerMensaje('error', 'El archivo $nombre tiene un formato no permitido para el documento');";
-                $funcion = "El archivo tiene un formato no permitido para el documento";
-                //$funcion = "alert('El archivo $nombre tiene un formato no permitido para el documento');";
-
-
+            }
         }
     }
     else //$funcion = "window.parent.VerMensaje('error', 'El archivo $nombre no puedo cargarse');";
