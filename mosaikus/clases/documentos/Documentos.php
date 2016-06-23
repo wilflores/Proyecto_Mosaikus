@@ -3422,7 +3422,7 @@
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
                 $adjuntos = new ArchivosAdjuntos();
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento');
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento',null,null,'pdf,xlsx');
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
                 
@@ -4429,11 +4429,11 @@
                 $contenido_1['V_MESES'] = $ut_tool->combo_array("v_meses", $desc, $ids,false,$val["v_meses"],false,false,false,false,'display:inline;width:70px');
                 if($_SESSION[SuperUser]=='S'){
                     $sql="SELECT wf.id,
-                            CONCAT( 
-                            CONCAT(CONCAT(UPPER(LEFT(perso_responsable.nombres, 1)), LOWER(SUBSTRING(perso_responsable.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_responsable.apellido_paterno, 1)), LOWER(SUBSTRING(perso_responsable.apellido_paterno, 2)))) 
+                            CONCAT(CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno))
                             ,' &rarr; ', 
-                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))) ,'N/A')
-                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
+                           IF(perso_revisa.nombres is null,'N/A',CONCAT(initcap(SUBSTR(perso_revisa.nombres,1,IF(LOCATE(' ' ,perso_revisa.nombres,1)=0,LENGTH(perso_revisa.nombres),LOCATE(' ' ,perso_revisa.nombres,1)-1))),' ',initcap(perso_revisa.apellido_paterno))	) 
+                           ,' &rarr; ', 
+                            CONCAT(initcap(SUBSTR(perso_aprueba.nombres,1,IF(LOCATE(' ' ,perso_aprueba.nombres,1)=0,LENGTH(perso_aprueba.nombres),LOCATE(' ' ,perso_aprueba.nombres,1)-1))),' ',initcap(perso_aprueba.apellido_paterno))) as wf
                             FROM mos_workflow_documentos AS wf
                             left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
@@ -4441,11 +4441,13 @@
                 }
                 else
                 {
-                    $sql="SELECT wf.id,
-                            CONCAT( 
-                            IFNULL(CONCAT(CONCAT(UPPER(LEFT(perso_revisa.nombres, 1)), LOWER(SUBSTRING(perso_revisa.nombres, 2))), ' ', CONCAT(UPPER(LEFT(perso_revisa.apellido_paterno, 1)), LOWER(SUBSTRING(perso_revisa.apellido_paterno, 2)))),'N/A') 
-                            ,' &rarr; ', CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2)))) ) as wf
+                    $sql="SELECT  CONCAT(CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno))
+                            ,' &rarr; ', 
+                           IF(perso_revisa.nombres is null,'N/A',CONCAT(initcap(SUBSTR(perso_revisa.nombres,1,IF(LOCATE(' ' ,perso_revisa.nombres,1)=0,LENGTH(perso_revisa.nombres),LOCATE(' ' ,perso_revisa.nombres,1)-1))),' ',initcap(perso_revisa.apellido_paterno))	) 
+                           ,' &rarr; ', 
+                            CONCAT(initcap(SUBSTR(perso_aprueba.nombres,1,IF(LOCATE(' ' ,perso_aprueba.nombres,1)=0,LENGTH(perso_aprueba.nombres),LOCATE(' ' ,perso_aprueba.nombres,1)-1))),' ',initcap(perso_aprueba.apellido_paterno))) as wf
                             FROM mos_workflow_documentos AS wf
+                            left JOIN mos_personal AS perso_responsable ON wf.id_personal_responsable = perso_responsable.cod_emp
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
                     WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."' or wf.id_personal_revisa='".$_SESSION['CookCodEmp']."')";
