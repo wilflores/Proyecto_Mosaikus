@@ -3422,7 +3422,7 @@
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
                 $adjuntos = new ArchivosAdjuntos();
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento',null,null,'pdf,xlsx');
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento');
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
                 
