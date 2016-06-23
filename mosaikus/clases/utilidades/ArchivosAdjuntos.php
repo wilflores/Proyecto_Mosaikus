@@ -462,7 +462,7 @@
             }
          
  
-            public function crear_archivos_adjuntos($tabla,$clave_foranea=null, $valor_clave_foranea=null,$valor_col=19)
+            public function crear_archivos_adjuntos($tabla,$clave_foranea=null, $valor_clave_foranea=null,$valor_col=19, $extensiones='')
             {
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
@@ -513,7 +513,8 @@
                         $return[html] = '<div class="col-md-'.$valor_col.'">
                                             <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload_adjuntos" name="fileUpload_adjuntos"/>
                                             <input type="hidden" id="num_items_adj" name="num_items" value="0"/> 
-                                            <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>                                            
+                                            <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>
+                                            <input type="hidden" id="extensiones" name="extensiones" value="'.$extensiones.'"/>    
                                             <br>    
                                             <table id="table-items-adj" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
                                                 <tbody>
@@ -544,7 +545,8 @@
                 $return[html] = '<div class="col-md-'.$valor_col.'">
                                             <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload_adjuntos" name="fileUpload_adjuntos"/>
                                             <input type="hidden" id="num_items_adj" name="num_items" value="0"/> 
-                                            <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>                                            
+                                            <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>
+                                            <input type="hidden" id="extensiones" name="extensiones" value="'.$extensiones.'"/>    
                                             <br>    
                                             <table id="table-items-adj" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
                                                 <tbody>
