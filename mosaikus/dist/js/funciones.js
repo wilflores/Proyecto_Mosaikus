@@ -6,6 +6,7 @@ function init_archivos_adjuntos(){
                 //var formData = new FormData(document.getElementById("formuploadajax"));
                 var formData = new FormData();
                 for (var k = 0; k < this.files.length; ++k) {
+                    //alert(this.files[k].type);
                     if(this.files[k].size>1024*1024*3){
                         VerMensaje('error','El archivo ' + this.files[k].name + ' excede el tama&ntilde;o permitido en este sitio, Tama&ntilde;o m&aacute;ximo del archivo a subir: 3MB');
                     }
@@ -13,6 +14,7 @@ function init_archivos_adjuntos(){
                         names.push(k);
                 }
                 var html;
+                
                 for (var k = 0; k < names.length;++k){
                     i = $('#num_items_adj').val();
                     i = parseInt(i) + 1;   
@@ -43,6 +45,7 @@ function init_archivos_adjuntos(){
                     
                     formData.append('fileUpload',this.files[names[k]]); 
                     formData.append('tok', $('#tok_new_edit').val());
+                    formData.append('extensiones', $('#extensiones').val());
                     var ajaxloopreq = function (formData,i) {
                         $.ajax({
                             url: "pages/acciones_evidencia/uploadFileOtro2_vis.php",
@@ -84,7 +87,8 @@ function init_archivos_adjuntos(){
                                         var id = $(this).attr('tok');            
                                         array = new XArray();
                                         array.setObjeto('ArchivosAdjuntos','actualizar');
-                                        array.addParametro('tok',id);                        
+                                        array.addParametro('tok',id);   
+                                        array.addParametro('extensiones', $('#extensiones').val());
                                         array.addParametro('token', $('#tok_new_edit').val());
                                         array.addParametro('import','clases.utilidades.ArchivosAdjuntos');
                                         xajax_Loading(array.getArray());
