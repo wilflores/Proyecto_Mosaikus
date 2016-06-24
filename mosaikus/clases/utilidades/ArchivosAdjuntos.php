@@ -491,7 +491,19 @@
                     $html = '';
                     $js = '';
                     foreach ($data_items as $value) {
-                        $target = $value[contenttype] == 'application/pdf' ? 'target="_blank"' : 'data-gallery';
+                        //$target = $value[contenttype] == 'application/pdf' ? 'target="_blank"' : 'data-gallery';
+                        switch ($value[contenttype]) {
+                            case 'image/jpeg':
+                            case 'image/pjpeg':                
+                            case 'image/png':
+                            case 'image/x-png':                
+                                $target = 'data-gallery';
+                                break;
+
+                            default:
+                                $target = 'target="_blank"';
+                                break;
+                        }
                         $html .= '<tr id="tr-adj-' .$i. '">'; 
                         $html.= '<td align="center">'.
                                            ' ' .
@@ -590,6 +602,18 @@
                     $js = '';
                     foreach ($data_items as $value) {
                         $target = $value[contenttype] == 'application/pdf' ? 'target="_blank"' : 'data-gallery';
+                        switch ($value[contenttype]) {
+                            case 'image/jpeg':
+                            case 'image/pjpeg':                
+                            case 'image/png':
+                            case 'image/x-png':                
+                                $target = 'data-gallery';
+                                break;
+
+                            default:
+                                $target = 'target="_blank"';
+                                break;
+                        }
                         $html .= '<tr id="tr-esp-' .$i. '">'; 
                         $html.= '<td align="center">'.
                                            ' ' .
