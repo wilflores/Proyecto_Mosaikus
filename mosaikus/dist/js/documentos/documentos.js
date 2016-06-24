@@ -408,6 +408,8 @@ function cargar_autocompletado(){
         array.addParametro('permiso',document.getElementById('permiso_modulo').value);
         array.addParametro('pag',pag);
         array.setObjeto('Documentos','buscar');
+        if(document.getElementById('ver_histo').value=='S')
+            array.setObjeto('Documentos','buscarHistorico');        
         array.addParametro('import','clases.documentos.Documentos');
         $('#MustraCargando').show();
         xajax_Loading(array.getArray());
