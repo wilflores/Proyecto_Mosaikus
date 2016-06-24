@@ -11,8 +11,9 @@
     $nombre = $_FILES['fileUpload']['name'];
     $data_galery = $target = 0;
     $extensiones = $_POST['extensiones'];
-    $ext = end(explode('.', $nombre));
-    if($ext=='rar' || $ext=='dwg') $type=$ext;
+    $ext = $type == 'application/octet-stream' ? end(explode('.', $nombre)) : '';    
+    //$ext = end(explode('.', $nombre));
+    if($ext=='rar' || $ext=='dwg' || $ext=='zip') $type=$ext;
     //print_r($_FILES);
     // rar, office, zip, visio, autocad
     if (isset($_FILES['fileUpload']['name']) && ($_FILES['fileUpload']['size'] <= 1024*1024*3)) {
@@ -62,6 +63,9 @@
             case 'application/zip':
                 $tipo = $tipo == '' ? 'zip' : $tipo;
                 break;
+            case 'zip':
+                $tipo = $tipo == '' ? 'zip' : $tipo;
+                break;
             case 'rar':
                 $tipo = $tipo == '' ? 'rar' : $tipo;
                 break;                
@@ -108,7 +112,7 @@
                     $exito = 1;
                     $tamano = filesize(APPLICATION_DOWNLOADS. 'temp/' . md5($data[0][id]).'.'.$tipo);
                     $tamano_visual = number_format($tamano/ 1024, 2);
-                    if ($tipo != 'pdf'){
+                    if ($tipo == 'jpg' || $tipo == 'png'){
                         resizeImagen(APPLICATION_DOWNLOADS. 'temp/', md5($data[0][id]).'.'.$tipo, 800, 800,md5($data[0][id]).'.'.$tipo,$tipo);
                         $data_galery = 1;
                     }
