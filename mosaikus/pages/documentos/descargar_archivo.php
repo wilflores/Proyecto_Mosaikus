@@ -15,7 +15,9 @@ session_name('mosaikus');
 
             $pagina = new Documentos();
             if ((isset($_SESSION[CookIdUsuario]) ) && (md5($_GET[id]) == $_GET[token])){
-            
+                $accion = "Visualizó documento Fuente";
+                $pagina->registraTransaccionLog(89,$accion,'', $_GET[id]); 
+
                 $archivo_aux = $pagina->verDocumentoFuente($_GET[id]);
                 $sql = "SELECT extension FROM mos_extensiones WHERE extension = '$archivo_aux[contentType]' OR contentType = '$archivo_aux[contentType]'";
                 $total_registros = $pagina->dbl->query($sql, $atr);
