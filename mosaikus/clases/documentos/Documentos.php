@@ -368,8 +368,8 @@
                 $this->parametros = $this->dbl->query($sql, array());
             }
             
-            public function cargar_nombres_columnas(){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 6";
+            public function cargar_nombres_columnas($modulo=6){
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = $modulo";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
@@ -1381,6 +1381,14 @@
                         return $error; 
                     }
             }
+            public function registraCorreoTareaProgramada($id_entidad,$modulo, $asunto, $cuerpo, $email, $nombre){
+                session_name("mosaikus");
+                session_start();
+                $sql = "INSERT INTO mos_correos_temporales (id_entidad, modulo, asunto, cuerpo, email, nombre) "
+                        . "VALUES ($id_entidad,'$modulo', '$asunto', '$cuerpo', '$email', '$nombre')";            
+                $this->dbl->insert_update($sql);
+                return true;
+            }
             
             public function registraTransaccionLog($accion,$descr, $tabla, $id = 'NULL'){
                 session_name("mosaikus");
@@ -1518,6 +1526,7 @@
                     $anterior = "IDDoc: \'$val[IDDoc]\', Codigo Doc: \'$val[Codigo_doc]\', Nombre Doc: \'$val[nombre_doc]\', Version: \'$val[version]\', Fecha: \'$val[fecha]\', Descripcion: \'$val[descripcion]\', Palabras Claves: \'$val[palabras_claves]\', Formulario: \'$val[formulario]\', Vigencia: \'$val[vigencia]\', ContentType: \'$val[contentType]\', Id Filial: \'$val[id_filial]\', Nom Visualiza: \'$val[nom_visualiza]\', ContentType Visualiza: \'$val[contentType_visualiza]\', Id Usuario: \'$val[id_usuario]\', Observacion: \'$val[observacion]\', Muestra Doc: \'$val[muestra_doc]\', Estrucorg: \'$val[estrucorg]\', Arbproc: \'$val[arbproc]\', Apli Reg Estrorg: \'$val[apli_reg_estrorg]\', Apli Reg Arbproc: \'$val[apli_reg_arbproc]\', Workflow: \'$val[workflow]\', Semaforo: \'$val[semaforo]\', V Meses: \'$val[v_meses]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\', Publico: \'$val[publico]\' ";
                     $this->registraTransaccionLog(2,$nuevo,$anterior, $atr[id]);
                     /*
+                     * 
                     $this->registraTransaccion('Modificar','Modifico el Documentos ' . $atr[descripcion_ano], 'mos_documentos');
                     */
                     return "El Documento '$atr[info_nombre]' ha sido actualizado con exito";
@@ -4682,7 +4691,7 @@
                 }               
                 $contenido_1['ITEMS_ESP'] = $item;
                 $contenido_1['NUM_ITEMS_ESP'] = $i;
-                $sql = "SELECT fecha_registro f1,DATE_FORMAT(fecha_registro, '%d/%m/%Y %H:%m')fecha_registro, descripcion_operacion, "
+                $sql = "SELECT fecha_registro f1,DATE_FORMAT(fecha_registro, '%d/%m/%Y %H:%i')fecha_registro, descripcion_operacion, "
                         . "CONCAT(initcap(SUBSTR(user.nombres,1,IF(LOCATE(' ' ,user.nombres,1)=0,LENGTH(user.nombres),LOCATE(' ' ,user.nombres,1)-1))),' ',initcap(user.apellido_paterno)) usuario "
                         . "FROM mos_historico_wf_documentos wf inner join mos_usuario user "
                         . " on wf.id_usuario = user.id_usuario "
@@ -5205,6 +5214,8 @@
                     $ruta_doc = $documento->ActivarDocumento();
                     $titulo_doc = $documento->getNombreArchivo();
                     $iframe = '<iframe id="iframe-vis" src="'.$ruta_doc.'" style="height:90%;width:100%;min-height:600px;" frameborder="0"></iframe>';
+                    $accion = "Visualizó documento PDF";
+                    $this->registraTransaccionLog(89,$accion,'', $parametros[id]);                    
                 }
                 else{
                     $archivo_aux = $this->verDocumentoFuente($parametros[id]);
@@ -5228,6 +5239,9 @@
                             <i class=\"icon icon-view-document\"></i>
                         </a>";
                     $iframe = '<iframe id="iframe-vis" src="'.$http.'://docs.google.com/gview?url='.$ruta_doc.'&embedded=true" style="height:90%;width:100%;min-height:600px;" frameborder="0"></iframe>';
+                    $accion = "Visualizó documento Fuente";
+                    $this->registraTransaccionLog(89,$accion,'', $parametros[id]);                    
+                    
                 }
                 $html_registro = '';
                 if ($archivo_aux[formulario]== 'S'){
@@ -5655,6 +5669,30 @@
                 $lista_distribucion = new ListaDistribucionDoc();
                 $responsables = array();
                 $persocargos = array();
+                if($parametros[publico]=='S'){
+                //SI ES PUBLICO, CONVERTIMOS LOS NODOS EN UN ARRAY
+                    import('clases.organizacion.ArbolOrganizacional');
+                    $ao = new ArbolOrganizacional();
+                    $organizacion = array();
+                    $nuevo_organizacion = array();
+                    if(strpos($parametros[id_organizacion],',')){    
+                        $organizacion = explode(",", $parametros[id_organizacion]);
+                    }
+                    else{
+                        $organizacion[] = $parametros[id_organizacion];                                 
+                    }
+                //RECOERREMOS LOS NODOS Y BUSCAMOS SUS HIJOS DE HIJOS Y MAS
+                    foreach ($organizacion as $value){
+                        $hijos .= ','.$ao->BuscaOrgNivelHijos($value);
+                    }
+                    //echo $parametros[id_organizacion].'-';
+                    $parametros[id_organizacion] .= $hijos;
+                   // echo $parametros[id_organizacion].'-';
+                    $nuevo_organizacion = explode(",", $parametros[id_organizacion]);
+                    $nuevo_organizacion = array_unique($nuevo_organizacion);
+                    $parametros[id_organizacion] = implode(",", array_values($nuevo_organizacion));
+                    //echo $parametros[id_organizacion].'-';
+                }
                 $responsables = $this->ResponsablesAreasOrganizacion($parametros[id_organizacion]);
                 //$persocargos = $this->CargosPersonalDocumentos($parametros[IDDoc]);
                 
@@ -5701,9 +5739,11 @@
                     //print_r($value);
                     //echo $asunto;
                     //echo $cuerpo;
-                    $from = array(array('correo' => $value[correo], 'nombres'=>$value[nombres]));
+                    //$from = array(array('correo' => $value[correo], 'nombres'=>$value[nombres]));
                     if($value[recibe_notificaciones]=='S'){
-                        $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array());
+                        //$ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array());
+                        $this->registraCorreoTareaProgramada($id_entidad,$atr[modulo], $asunto, $cuerpo, $value[correo], $value[nombres]);
+                        $a=1;
                     }
                     $atr[email]=$value[correo];
                     /*SE GUARDA REGISTRO EN LISTA DE DISTRIBUCION*/
@@ -6118,5 +6158,236 @@
             return $objResponse;
             }             
 
+            public function indexBitacoraDocumentos($parametros)
+            {
+                $contenido[TITULO_MODULO] = 'Bitácora de acceso a Documentos';
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                if ($parametros['corder'] == null) $parametros['corder']="id";
+                if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
+                if ($parametros['mostrar-col'] == null) 
+                    $parametros['mostrar-col']="1-2-3-4-5-6-7-8-9"; 
+                /*if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                } */               
+                $k = 19;
+                $contenido[PARAMETROS_OTROS] = "";
+                foreach ($this->parametros as $value) {                    
+                    $parametros['mostrar-col'] .= "-$k";
+                    $contenido[PARAMETROS_OTROS] .= '<div class="form-group">
+                                  <label for="SelectAcc" class="col-md-9 control-label">' . $value[espanol] . '</label>
+                                  <div class="col-md-3">      
+                                      <label class="checkbox-inline">
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                      </label>
+                                  </div>
+                            </div>';
+                    $k++;
+                }
+               // $this->cargar_permisos($parametros);
+                
+                $grid = $this->verListaBitacoraDocumentos($parametros);
+                $contenido['CORDER'] = $parametros['corder'];
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];
+                $contenido['SORDER'] = $parametros['sorder'];
+                $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['OPCIONES_BUSQUEDA'] = " <option value='campo'>campo</option>";
+                //$contenido['JS_NUEVO'] = 'nuevo_Notificaciones();';
+                //$contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;Notificaciones';
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['PERMISO_INGRESAR'] = $this->per_crear == 'S' ? '' : 'display:none;';
+
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'documentos/';
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas(89);
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }  
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                } 
+
+                $template->setTemplate("busqueda");
+                $template->setVars($contenido);
+                $contenido['CAMPOS_BUSCAR'] = $template->show();
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'documentos/';
+
+                $template->setTemplate("mostrar_colums");
+                $template->setVars($contenido);
+                $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
+                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
+
+                $template->setTemplate("listar");
+                $template->setVars($contenido);
+                //$this->contenido['CONTENIDO']  = $template->show();
+                //$this->asigna_contenido($this->contenido);
+                //return $template->show();
+                if (isset($parametros['html']))
+                    return $template->show();
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('contenido',"innerHTML",$template->show());
+                $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
+                $objResponse->addAssign('modulo_actual',"value","documentos");
+                $objResponse->addIncludeScript(PATH_TO_JS . 'notificaciones/notificaciones.js');
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript('PanelOperator.initPanels("");
+                        ScrollBar.initScroll();
+                        init_filtro_rapido();
+                        init_filtro_ao_simple();');
+                return $objResponse;
+            }
+            public function verListaBitacoraDocumentos($parametros){
+                $grid= "";
+                $grid= new DataGrid();
+                if ($parametros['pag'] == null) 
+                    $parametros['pag'] = 1;
+                $reg_por_pagina = getenv("PAGINACION");
+                if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
+                $this->listarBitacoraDocumentos($parametros, $parametros['pag'], $reg_por_pagina);
+                $data=$this->dbl->data;
+                
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas(89);
+                }
+
+                $grid->SetConfiguracionMSKS("tblBitacoras", "");
+                $config_col=array(
+                    
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_hora], "fecha_hora", $parametros)),
+               array( "width"=>"30%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[accion], "accion", $parametros)),
+               array( "width"=>"35%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[codigo], "codigo", $parametros)),
+               array( "width"=>"15%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[usuario], "usuario", $parametros))
+                );
+                /*if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                }*/
+                $k = 1;
+                foreach ($this->parametros as $value) {                    
+                    array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>link_titulos(($value[espanol]), "p$k", $parametros)));
+                    $k++;
+                }
+
+                $func= array();
+
+                $columna_funcion = -1;
+                $config=array(array("width"=>"10%", "ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_hora], "fecha_hora", $parametros)));
+                $grid->setPaginado($reg_por_pagina, $this->total_registros);
+                $array_columns =  explode('-', $parametros['mostrar-col']);
+                for($i=0;$i<count($config_col);$i++){
+                    switch ($i) {                                             
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            array_push($config,$config_col[$i]);
+                            break;
+
+                        default:
+                            
+                            if (in_array($i, $array_columns)) {
+                                array_push($config,$config_col[$i]);
+                            }
+                            else                                
+                                $grid->hidden[$i] = true;
+                            
+                            break;
+                    }
+                }
+                $grid->setParent($this);
+                $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
+                $grid->setFuncion("id", "colum_admin");
+                //$grid->setFuncion("en_proceso_inscripcion", "enProcesoInscripcion");
+                //$grid->setAligns(1,"center");
+                //$grid->hidden = array(0 => true);
+    
+                $grid->setDataMSKS("td-table-data", $data, $func,$columna_funcion, $parametros['pag'] );
+                $out['tabla']= $grid->armarTabla();
+                //if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina))
+                {
+                    $out['paginado']=$grid->setPaginadohtmlMSKS("verPaginaBitacora", "document");
+                }
+                return $out;
+            }
+             public function listarBitacoraDocumentos($atr, $pag, $registros_x_pagina){
+                 //print_r($atr);
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $sql_left = $sql_col_left = "";
+                    
+                    $sql = "SELECT COUNT(*) total_registros
+                         FROM mos_log 
+                         WHERE log.codigo_accion = 89 ";
+                    if (strlen($atr['b-filtro-sencillo'])>0){
+                        $sql .= " AND ((upper(accion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%') OR (upper(codigo) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
+                    }
+            if (strlen($atr[valor])>0)
+                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
+            if (strlen($atr["b-fecha_hora"])>0)
+                        $sql .= " AND fecha_hora like '%" . strtoupper($atr["b-fecha_hora"]) . "%'";
+            if (strlen($atr["b-accion"])>0)
+                        $sql .= " AND upper(accion) like '%" . strtoupper($atr["b-accion"]) . "%'";
+            if (strlen($atr["b-codigo"])>0)
+                        $sql .= " AND upper(codigo) like '%" . strtoupper($atr["b-codigo"]) . "%'";
+            if (strlen($atr["b-usuario"])>0)
+                        $sql .= " AND upper(usuario) like '%" . strtoupper($atr["b-usuario"]) . "%'";
+
+                    $total_registros = $this->dbl->query($sql, $atr);
+                    $this->total_registros = $total_registros[0][total_registros];   
+            
+                    $sql = "SELECT id
+                                    ,fecha_hora
+                                    ,accion
+                                    ,codigo
+                                    ,usuario
+                                     $sql_col_left
+                            FROM 
+                            /*SUB QUERY PARA DOCUMENTOS*/
+                               (SELECT
+                                    log.id,
+                                    DATE_FORMAT(log.fecha_hora, '%d/%m/%Y %H:%i') fecha_hora,
+                                    log.accion,
+                                    CONCAT(doc.Codigo_doc,'-',doc.nombre_doc,'-V',doc.version) codigo,
+                                    CONCAT(initcap(SUBSTR(usr.nombres,1,IF(LOCATE(' ' ,usr.nombres,1)=0,LENGTH(usr.nombres),LOCATE(' ' ,usr.nombres,1)-1))),' ',initcap(usr.apellido_paterno)) usuario
+                                    FROM
+                                    mos_log AS log
+                                    INNER JOIN mos_usuario AS usr ON log.realizo = usr.id_usuario
+                                    INNER JOIN mos_documentos AS doc ON log.id_registro = doc.IDDoc
+                                    WHERE
+                                    log.codigo_accion = 89
+                                )
+                            /*FIN SUB QUERY PARA DOCUMENTOS*/
+                            AS log $sql_left
+                            WHERE 1 = 1 ";
+            if (strlen($atr['b-filtro-sencillo'])>0){
+                $sql .= " AND ((upper(accion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%') OR (upper(codigo) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
+            }
+            if (strlen($atr[valor])>0)
+                $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
+            if (strlen($atr["b-fecha_hora"])>0)
+                $sql .= " AND fecha_hora like '%" . strtoupper($atr["b-fecha_hora"]). "%'";
+            if (strlen($atr["b-accion"])>0)
+                        $sql .= " AND upper(accion) like '%" . strtoupper($atr["b-accion"]) . "%'";
+            if (strlen($atr["b-codigo"])>0)
+                        $sql .= " AND upper(codigo) like '%" . strtoupper($atr["b-codigo"]) . "%'";
+            if (strlen($atr["b-usuario"])>0)
+                        $sql .= " AND upper(usuario) like '%" . strtoupper($atr["b-usuario"]) . "%'";
+
+                    $sql .= " order by $atr[corder] $atr[sorder] ";
+                    $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                    //echo $sql;
+                    $this->operacion($sql, $atr);
+             }
+            
+            
             
  }?>
