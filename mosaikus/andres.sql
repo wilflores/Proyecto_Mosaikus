@@ -309,3 +309,28 @@ CREATE TABLE `mos_documentos_anexos` (
   KEY `fk_id_documento_mos_doc` (`id_documento`),
   CONSTRAINT `fk_id_documento_mos_doc` FOREIGN KEY (`id_documento`) REFERENCES `mos_documentos` (`IDDoc`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+/****************************************/
+/*cambio del 23-06*/
+/****************************************/
+insert into mos_nombres_campos (nombre_campo,texto,modulo,placeholder) values
+('fecha_hora', 'Fecha',89, 'Fecha');
+insert into mos_nombres_campos (nombre_campo,texto,modulo,placeholder) values
+('accion', 'Acciones',89, 'Acciones');
+insert into mos_nombres_campos (nombre_campo,texto,modulo,placeholder) values
+('codigo', 'Documento',89, 'Documento');
+insert into mos_nombres_campos (nombre_campo,texto,modulo,placeholder) values
+('usuario', 'Usuario',89, 'Usuario');
+
+DROP TABLE IF EXISTS `mos_correos_temporales`;
+CREATE TABLE `mos_correos_temporales` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_entidad` int(11) DEFAULT NULL,
+  `modulo` varchar(50) DEFAULT NULL,
+  `asunto` text,
+  `cuerpo` text,
+  `email` varchar(100) DEFAULT NULL,
+  `nombre` varchar(100) DEFAULT NULL,
+  `fecha_insert` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
