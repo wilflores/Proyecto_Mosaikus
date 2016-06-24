@@ -409,7 +409,7 @@
                     $nuevo = "Estado: \'$atr[estado]\', Id Documento: \'$atr[id_documento]\', Fecha Ejecutada: \'$atr[fecha_ejecutada]\', Id Responsable: \'$atr[id_responsable]\' ";
                     $this->registraTransaccionLog(11,$nuevo,'', $id_new);
                     
-                    return "El mos_documentos_distribucion '$atr[descripcion_ano]' ha sido ingresado con exito";
+                    return "La Lista de distribuci&oacute;n '$atr[descripcion_ano]' ha sido ingresado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
                         if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
@@ -494,7 +494,7 @@
                     /*
                     $this->registraTransaccion('Modificar','Modifico el ListaDistribucionDoc ' . $atr[descripcion_ano], 'mos_documentos_distribucion');
                     */
-                    return "El mos_documentos_distribucion '$atr[descripcion_ano]' ha sido actualizado con exito";
+                    return "La Lista de distribuci&oacute;n '$atr[descripcion_ano]' ha sido actualizado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
                         if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
@@ -970,7 +970,7 @@
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
                 $adjuntos = new ArchivosAdjuntos();
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_distribucion_evi', 'fk_id_doc_distribucion',$val["id"]);
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_distribucion_evi', 'fk_id_doc_distribucion',$val["id"],'jpg,png,pdf');
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];                
                 /*FIN EVIDENNCIAS*/
@@ -1258,7 +1258,7 @@
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
                 $adjuntos = new ArchivosAdjuntos();
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_distribucion_evi', 'fk_id_doc_distribucion',$val["id"]);
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_distribucion_evi', 'fk_id_doc_distribucion',$val["id"],'jpg,png,pdf');
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
                 
