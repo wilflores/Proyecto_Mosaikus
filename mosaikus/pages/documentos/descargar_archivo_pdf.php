@@ -15,6 +15,8 @@ session_name('mosaikus');
 
             $pagina = new Documentos();
             if ((isset($_SESSION[CookIdUsuario]) ) && (md5($_GET[id]) == $_GET[token])){
+                $accion = "Visualizó documento PDF";
+                $pagina->registraTransaccionLog(89,$accion,'', $_GET[id]); 
             
                 $archivo_aux = $pagina->verDocumentoPDF($_GET[id]);
                 $sql = "SELECT extension FROM mos_extensiones WHERE extension = '$archivo_aux[contentType_visualiza]' OR contentType = '$archivo_aux[contentType_visualiza]'";
