@@ -1556,4 +1556,12 @@ function CerrarNotificacionesSiOpen(){
            $("#messages").collapse("hide");
         }
     });
+} 
+function VerBitacoraDocumentos(){
+    array = new XArray();
+    array.setObjeto('Documentos','indexBitacoraDocumentos');
+    array.addParametro('import','clases.documentos.Documentos');
+    xajax_Loading(array.getArray());
+    //PanelOperator.showDetail('');    
+         
 }
