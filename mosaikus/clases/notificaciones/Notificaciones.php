@@ -1197,7 +1197,9 @@
                 $html .='<li id=verhistorial >';
                 $html .= "<a onclick='VerhistoricoNotificaciones()' ><strong>Ver&nbsp;Historial</strong></a>" ;
                 $html .='</li>';
-
+//                $html .='<li id=verbitacora >';
+//                $html .= "<a onclick='VerBitacoraDocumentos()' ><strong>Ver&nbsp;Bitácora</strong></a>" ;
+//                $html .='</li>';
                 $objResponse = new xajaxResponse();
                 $objResponse->addScript("document.getElementById('div-notificaciones').style.height='".$heightdiv."px';"); 
                 $objResponse->addAssign('popover-notificaciones',"innerHTML",$html);
