@@ -4450,7 +4450,7 @@
                 }
                 else
                 {
-                    $sql="SELECT  CONCAT(CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno))
+                    $sql="SELECT  wf.id,CONCAT(CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno))
                             ,' &rarr; ', 
                            IF(perso_revisa.nombres is null,'N/A',CONCAT(initcap(SUBSTR(perso_revisa.nombres,1,IF(LOCATE(' ' ,perso_revisa.nombres,1)=0,LENGTH(perso_revisa.nombres),LOCATE(' ' ,perso_revisa.nombres,1)-1))),' ',initcap(perso_revisa.apellido_paterno))	) 
                            ,' &rarr; ', 
@@ -5682,6 +5682,7 @@
                         $organizacion[] = $parametros[id_organizacion];                                 
                     }
                 //RECOERREMOS LOS NODOS Y BUSCAMOS SUS HIJOS DE HIJOS Y MAS
+                    $hijos = '0';
                     foreach ($organizacion as $value){
                         $hijos .= ','.$ao->BuscaOrgNivelHijos($value);
                     }
@@ -6126,6 +6127,31 @@
             $ut_tool = new ut_Tool(); 
             $js = $combosemp='';
             if($parametros[valor]=='S'){
+                if($parametros[publico]=='S'){
+                //SI ES PUBLICO, CONVERTIMOS LOS NODOS EN UN ARRAY
+                    import('clases.organizacion.ArbolOrganizacional');
+                    $ao = new ArbolOrganizacional();
+                    $organizacion = array();
+                    $nuevo_organizacion = array();
+                    if(strpos($parametros[nodos],',')){    
+                        $organizacion = explode(",", $parametros[nodos]);
+                    }
+                    else{
+                        $organizacion[] = $parametros[nodos];                                 
+                    }
+                //RECOERREMOS LOS NODOS Y BUSCAMOS SUS HIJOS DE HIJOS Y MAS
+                    $hijos = '0';
+                    foreach ($organizacion as $value){
+                        $hijos .= ','.$ao->BuscaOrgNivelHijos($value);
+                    }
+                    //echo $parametros[id_organizacion].'-';
+                    $parametros[nodos] .= $hijos;
+                   // echo $parametros[id_organizacion].'-';
+                    $nuevo_organizacion = explode(",", $parametros[nodos]);
+                    $nuevo_organizacion = array_unique($nuevo_organizacion);
+                    $parametros[nodos] = implode(",", array_values($nuevo_organizacion));
+                    //echo $parametros[id_organizacion].'-';
+                }
                 $sql = "SELECT DISTINCT
                         mos_cargo.cod_cargo id,
                         mos_cargo.descripcion,
@@ -6139,8 +6165,8 @@
                 //echo $sql;
                 $combosemp .= $ut_tool->OptionsComboMultiple($sql, 'id', 'descripcion','valor');      
                 $combo .= '<input type="hidden" name="campo_cargo" id="campo_cargo" value="" />';    
-                $combo .="<select size=7 onchange='ValidarSeleccion(this);' class='form-control' id=\"cod_cargo\" name=\"cod_cargo[]\"  data-validation=\"required\" multiple>
-                            <option value=''>-- Seleccione --</option>
+                $combo .="<select size=7 onchange='ValidarSeleccion(this);' class='form-control' id=\"cod_cargo\" name=\"cod_cargo[]\" title=\"-- Seleccione Cargos --\"  data-validation=\"required\" data-actions-box=\"true\" data-live-search=\"true\" multiple>
+                            <!--<option value=''>-- Seleccione --</option>-->
                             ".$combosemp."
                         </select>";
                // echo $combo;

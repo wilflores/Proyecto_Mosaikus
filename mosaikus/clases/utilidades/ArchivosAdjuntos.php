@@ -522,18 +522,7 @@
                                            '<i class="glyphicon glyphicon-trash cursor-pointer" href="'.$i. '" id="ico_trash_img_'.$i. '" tok="'.$value[id]. '"></i>'.
                                         '</td>';
                         $html.= '</tr>' ;  
-                        $return[html] = '<div class="col-md-'.$valor_col.'">
-                                            <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload_adjuntos" name="fileUpload_adjuntos"/>
-                                            <input type="hidden" id="num_items_adj" name="num_items" value="0"/> 
-                                            <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>
-                                            <input type="hidden" id="extensiones" name="extensiones" value="'.$extensiones.'"/>    
-                                            <br>    
-                                            <table id="table-items-adj" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
-                                                <tbody>
-                                                    ' . $html . '
-                                                </tbody>
-                                            </table>    
-                                 </div>';
+                        
                         $js .= "$('#ico_trash_img_$i').click(function(e){ 
                                         e.preventDefault();
                                         var id = $(this).attr('href');
@@ -550,6 +539,18 @@
                                     }); ";
                         $i++;
                     }
+                    $return[html] = '<div class="col-md-'.$valor_col.'">
+                                            <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload_adjuntos" name="fileUpload_adjuntos"/>
+                                            <input type="hidden" id="num_items_adj" name="num_items" value="'.$i.'"/> 
+                                            <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>
+                                            <input type="hidden" id="extensiones" name="extensiones" value="'.$extensiones.'"/>    
+                                            <br>    
+                                            <table id="table-items-adj" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
+                                                <tbody>
+                                                    ' . $html . '
+                                                </tbody>
+                                            </table>    
+                                 </div>';
                     $return[js] = $js.'init_archivos_adjuntos();'; 
                 }
                 else

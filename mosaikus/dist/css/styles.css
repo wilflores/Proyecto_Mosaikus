@@ -9101,3 +9101,9 @@ body {
             .nav > li > a {
       
       padding: 8px 52px; }
+            .bs-actionsbox .btn-default{
+                border-radius: 2px;
+                background-color: #fafafa;
+                padding: 6px 12px;
+                border: 1px solid #cfd8dc;
+            }

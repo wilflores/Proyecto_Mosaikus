@@ -197,6 +197,11 @@ function cargar_autocompletado(){
             row.insertAfter(row.next());         
             ordenar_tabla();
         });
+        
+        $('#publico').change(function () {
+            CargaComboCargo(document.getElementById('requiere_lista_distribucion').value);
+         });
+        
           
       }
       
@@ -408,7 +413,7 @@ function cargar_autocompletado(){
         array.addParametro('permiso',document.getElementById('permiso_modulo').value);
         array.addParametro('pag',pag);
         array.setObjeto('Documentos','buscar');
-        if(document.getElementById('ver_histo').value=='S')
+        if(( $("#ver_histo").length > 0 ) && (document.getElementById('ver_histo').value=='S'))
             array.setObjeto('Documentos','buscarHistorico');        
         array.addParametro('import','clases.documentos.Documentos');
         $('#MustraCargando').show();
@@ -812,6 +817,7 @@ function validar_codigo_version(){
             $('#div_cargos').parent().show();
             array.setObjeto('Documentos','ComboCargoOrg');
             array.addParametro('nodos',$('#nodos').val());
+            array.addParametro('publico',($('#publico').is(":checked") ? $('#publico').val() : '') );
             array.addParametro('id',id);
             array.addParametro('valor',requiere_lista_distribucion);
             array.addParametro('import','clases.documentos.Documentos');

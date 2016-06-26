@@ -96,9 +96,23 @@ function init_archivos_adjuntos(){
                                 }
                                 else{
                                     $('#a-img-adj-msj-'+i).html(respuesta[0].msj);
+                                    $("#ico_trash_img_" + i).click(function(e){ 
+                                        e.preventDefault();
+                                        var id = $(this).attr('href');
+                                        $('tr-adj-' + id).remove();
+                                        var parent = $(this).parents().parents().get(0);
+                                            $(parent).remove();                                        
+                                    });
                                 }
                             }catch (e) {
                                 $('#a-img-adj-msj-'+i).html(respuesta[0].msj);
+                                $("#ico_trash_img_" + i).click(function(e){ 
+                                        e.preventDefault();
+                                        var id = $(this).attr('href');
+                                        $('tr-adj-' + id).remove();
+                                        var parent = $(this).parents().parents().get(0);
+                                            $(parent).remove();                                        
+                                    });
                             }
 
                            $('#estado-progress-bar-'+i).parent().hide();

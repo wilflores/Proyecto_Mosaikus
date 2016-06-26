@@ -959,9 +959,11 @@
                 /*DOCUMENTOS DONDE SE TIENE ACCESO*/
                 $sql = "select IDDoc id,CONCAT(Codigo_doc,'-',nombre_doc,'-V',lpad(version,2,'0')) documento from mos_documentos
                         where muestra_doc = 'S' and vigencia = 'S' and requiere_lista_distribucion = 'S' and
-                        IDDoc in (select IDDoc from mos_documentos_estrorg_arbolproc 
-                        where id_organizacion_proceso in (".implode(',', array_keys($this->id_org_acceso_explicito))."))"
+                        (IDDoc in (select IDDoc from mos_documentos_estrorg_arbolproc 
+                        where id_organizacion_proceso in (".implode(',', array_keys($this->id_org_acceso_explicito)).")) "
+                        . " OR (publico = 'S' AND IDDoc in (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (" .implode(',', array_merge(array(0), array_diff (array_keys($this->id_org_acceso),array_keys($this->id_org_acceso_explicito)))) . " ))))"
                         . " ORDER BY Codigo_doc, nombre_doc,version";
+                //echo $sql;
                 $contenido_1[DOCUMENTOS] .= $ut_tool->OptionsCombo($sql
                                                                     , 'id'
                                                                     , 'documento');
@@ -970,7 +972,7 @@
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
                 $adjuntos = new ArchivosAdjuntos();
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_distribucion_evi', 'fk_id_doc_distribucion',$val["id"],'jpg,png,pdf');
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_distribucion_evi', 'fk_id_doc_distribucion',$val["id"],19,'jpg,png,pdf');
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];                
                 /*FIN EVIDENNCIAS*/
@@ -1021,14 +1023,55 @@
                 if (count($this->id_org_acceso_explicito) <= 0){
                     $this->cargar_acceso_nodos_explicito($parametros);                    
                 }  
-                /*CARGAMOS AREAS Y CARGOS DONDE SE TIENE ACCESO*/
-                $sql = "select ca.cod_cargo, c.descripcion cargo, o.id, o.title from mos_cargo_estrorg_arbolproc ca
-                           INNER JOIN mos_documentos_estrorg_arbolproc da ON da.id_organizacion_proceso = ca.id AND tipo = 'EO'
-                           INNER JOIN mos_organizacion o ON o.id = ca.id
-                           INNER JOIN mos_documentos_cargos dc ON dc.cod_cargo = ca.cod_cargo
-                           INNER JOIN mos_cargo c ON c.cod_cargo = ca.cod_cargo
-                            where da.IDDoc = $parametros[id_documento] AND da.id_organizacion_proceso in (".implode(',', array_keys($this->id_org_acceso_explicito)).")"
-                        . " group by ca.cod_cargo, c.descripcion, ca.id, o.title";                
+                $parametros = $this->dbl->corregir_parametros($parametros);
+                /*CONSULTAMOS SI EL DOCUMENTO ES PUBLICO*/
+                $sql = "SELECT d.IDDoc, GROUP_CONCAT(DISTINCT da.id_organizacion_proceso) id_organizacion, d.publico FROM mos_documentos d  "
+                        . "INNER JOIN  mos_documentos_estrorg_arbolproc da ON da.IDDoc = d.IDDoc AND tipo = 'EO' "
+                        . "WHERE d.IDDoc = $parametros[id_documento] GROUP BY d.IDDoc, d.publico";
+                $data = $this->dbl->query($sql);
+                $publico = $data[0][publico];
+                if ($publico == 'S'){
+                    import('clases.organizacion.ArbolOrganizacional');
+                    $ao = new ArbolOrganizacional();
+                    $organizacion = array();
+                    $nuevo_organizacion = array();
+                    if(strpos($data[0][id_organizacion],',')){    
+                        $organizacion = explode(",", $data[0][id_organizacion]);
+                    }
+                    else{
+                        $organizacion[] = $data[0][id_organizacion];                                 
+                    }
+                //RECOERREMOS LOS NODOS Y BUSCAMOS SUS HIJOS DE HIJOS Y MAS
+                    $hijos = '0';
+                    foreach ($organizacion as $value){
+                        $hijos .= ','.$ao->BuscaOrgNivelHijos($value);
+                    }
+                    //echo $parametros[id_organizacion].'-';
+                    $parametros[id_organizacion] .= $hijos;
+                   // echo $parametros[id_organizacion].'-';
+                    $nuevo_organizacion = explode(",", $parametros[id_organizacion]);
+                    $nuevo_organizacion = array_unique($nuevo_organizacion);
+                    $parametros[id_organizacion] = implode(",", array_values($nuevo_organizacion));
+                    /*CARGAMOS AREAS Y CARGOS DONDE SE TIENE ACCESO*/
+                    $sql = "select ca.cod_cargo, c.descripcion cargo, o.id, o.title from mos_cargo_estrorg_arbolproc ca                              
+                               INNER JOIN mos_organizacion o ON o.id = ca.id
+                               INNER JOIN mos_documentos_cargos dc ON dc.cod_cargo = ca.cod_cargo
+                               INNER JOIN mos_cargo c ON c.cod_cargo = ca.cod_cargo
+                                where dc.IDDoc = $parametros[id_documento] AND ca.id in (".implode(',', array_keys($this->id_org_acceso_explicito)).")"
+                            . "  AND ca.id in ($parametros[id_organizacion])"
+                            . " group by ca.cod_cargo, c.descripcion, ca.id, o.title";  
+                    //echo $sql;
+                }else{
+                    /*CARGAMOS AREAS Y CARGOS DONDE SE TIENE ACCESO*/
+                    $sql = "select ca.cod_cargo, c.descripcion cargo, o.id, o.title from mos_cargo_estrorg_arbolproc ca
+                               INNER JOIN mos_documentos_estrorg_arbolproc da ON da.id_organizacion_proceso = ca.id AND tipo = 'EO'
+                               INNER JOIN mos_organizacion o ON o.id = ca.id
+                               INNER JOIN mos_documentos_cargos dc ON dc.cod_cargo = ca.cod_cargo
+                               INNER JOIN mos_cargo c ON c.cod_cargo = ca.cod_cargo
+                                where da.IDDoc = $parametros[id_documento] AND da.id_organizacion_proceso in (".implode(',', array_keys($this->id_org_acceso_explicito)).")"
+                            . " group by ca.cod_cargo, c.descripcion, ca.id, o.title";      
+                }
+                
                 $data = $this->dbl->query($sql);
                 
                 $cargos = $areas = array();
@@ -1258,7 +1301,7 @@
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
                 $adjuntos = new ArchivosAdjuntos();
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_distribucion_evi', 'fk_id_doc_distribucion',$val["id"],'jpg,png,pdf');
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_distribucion_evi', 'fk_id_doc_distribucion',$val["id"],19,'jpg,png,pdf');
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
                 
