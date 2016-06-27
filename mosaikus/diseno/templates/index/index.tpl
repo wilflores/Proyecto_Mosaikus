@@ -100,6 +100,7 @@ function notifyBrowser(title,desc,url)
             <a class="logo" href="#">
                 <img src="dist/images/logo.png">
             </a>
+            <!--<h3 style="display:inline;">&nbsp;&nbsp; <b>AMBIENTE DE PRUEBAS</b></h3>-->
         </div>
         <!-- .branding Logotipo -->
         <div class="branding">
