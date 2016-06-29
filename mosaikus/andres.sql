@@ -334,3 +334,30 @@ CREATE TABLE `mos_correos_temporales` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+/****************************************/
+/*cambio del 29-06*/
+/****************************************/
+INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder) VALUES ( 'id_responsable_actual', 'Responsable Actual', '90', 'Responsable Actual');
+INSERT INTO `mos_nombres_campos` (nombre_campo,texto,modulo,placeholder) VALUES ( 'id_nuevo_responsable', 'Nuevo Responsable', '90', 'Nuevo Responsable');
+INSERT INTO `mos_nombres_campos` (nombre_campo,texto,modulo,placeholder) VALUES ( 'fecha_operacion', 'Fecha', '90', 'Fecha');
+INSERT INTO `mos_nombres_campos` (nombre_campo,texto,modulo,placeholder) VALUES ( 'migrar_responsable_doc', 'Migrar Responsable', '90', 'Migrar Responsable');
+INSERT INTO `mos_nombres_campos` (nombre_campo,texto,modulo,placeholder) VALUES ( 'migrar_wf_revisa', 'Migrar Revisor', '90', 'Migrar Revisor');
+INSERT INTO `mos_nombres_campos` (nombre_campo,texto,modulo,placeholder) VALUES ( 'id_revisa', 'Nuevo Revisor', '90', 'Nuevo Revisor');
+INSERT INTO `mos_nombres_campos` (nombre_campo,texto,modulo,placeholder) VALUES ( 'migrar_wf_aprueba', 'Migrar Aprobador', '90', 'Migrar Aprobador');
+INSERT INTO `mos_nombres_campos` (nombre_campo,texto,modulo,placeholder) VALUES ( 'id_aprueba', 'Nuevo Aprobador', '90', 'Nuevo Aprobador');
+
+DROP TABLE IF EXISTS `mos_documentos_migracion`;
+CREATE TABLE `mos_documentos_migracion` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_responsable_actual` int(11) DEFAULT NULL,
+  `id_nuevo_responsable` int(11) DEFAULT NULL,
+  `fecha_operacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `migrar_responsable_doc` varchar(1) DEFAULT NULL,
+  `migrar_wf_revisa` varchar(1) DEFAULT NULL,
+  `id_revisa` int(11) DEFAULT NULL,
+  `migrar_wf_aprueba` varchar(1) DEFAULT NULL,
+  `id_aprueba` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
+
+INSERT INTO `mos_link` VALUES ('92', 'DocumentosMigracion-indexDocumentosMigracion-clases.documentos_migracion.DocumentosMigracion', 'Migración de Responsabilidades', '89', '2', 'documentos_migracion.php', '56', null);
