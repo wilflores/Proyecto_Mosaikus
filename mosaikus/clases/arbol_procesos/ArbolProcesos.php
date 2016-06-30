@@ -194,14 +194,14 @@
                     for($k=2;$k<=$atr[niveles]+1;$k++) {
                         if ($k==2){
                             $sql_left .= "mos_arbol_procesos a$k ";  
-                            $sql_order = "a$k.id_organizacion,a$k.title";
+                            $sql_order = "a$k.id_organizacion,a$k.level,a$k.position";
                             $sql_col_left .= ",a$k.id_organizacion id_1,a$k.id id_$k, a$k.title nombre_$k";   
                             $sql_where .= " AND a$k.id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ") ";
                             
                         }
                         else{
                             $sql_left.= " LEFT JOIN mos_arbol_procesos a$k on a$k.parent_id = a".($k-1).".id   ";
-                            $sql_order .= ",a$k.title";
+                            $sql_order .= ",a$k.level,a$k.position";
                             $sql_col_left .= ",a$k.id id_$k, a$k.title nombre_$k";  
                         }
                                               
@@ -1387,7 +1387,7 @@
          */
         public function admin_jstree_ap($parametros){
             $atr = $this->dbl->corregir_parametros($parametros);
-            $sql = "SELECT * FROM mos_arbol_procesos where id_organizacion in ($atr[id_ao]) AND level = 2 ORDER BY position";
+            $sql = "SELECT * FROM mos_arbol_procesos where id_organizacion in ($atr[id_ao]) AND level = 2 ORDER BY level,position";
             //echo $sql;
             $data = $this->dbl->query($sql);
             if (count($data)==0) return array();
