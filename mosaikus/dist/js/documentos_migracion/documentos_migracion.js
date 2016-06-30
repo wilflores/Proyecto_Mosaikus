@@ -30,8 +30,11 @@
     }
 
     function validar(doc){
-        var ejecutar = function (){
-            if($('#idFormulario').isValid()) {
+        
+        
+        if($('#idFormulario').isValid()) {
+            var ejecutar = function (){
+            
                 $( "#btn-guardar" ).html('Procesando..');
                 $( "#btn-guardar" ).prop( "disabled", true );
                 array = new XArray();
@@ -46,18 +49,16 @@
                 array.addParametro('import','clases.documentos_migracion.DocumentosMigracion');
                 xajax_Loading(array.getArray());
             }        
-            else{
-        
-             }
-        }
-        bootbox.confirm("Al realizar esta operación, se va a migrar las responsabilidades del usuario"
-                       + $("#id_responsable_actual option:selected").text() + ","
+            bootbox.confirm("Al realizar esta operación, se va a migrar las responsabilidades del usuario <b>"
+                       + $("#id_responsable_actual option:selected").text() + "</b>, "
                        + "esto no se podrá deshacer. ¿Desea continuar?", function(result) {
                     if (result == true){
                         ejecutar();
                     }
 
                 }); 
+        }
+        
 
     }
 
@@ -117,8 +118,10 @@
        if (valor == 'N'){
            $('#'+obj).val('').change();
            $('#'+obj).prop('disabled', true);
+           $('#'+obj).removeAttr('data-validation');
        }
        else{
            $('#'+obj).prop('disabled', false);
+           $('#' +obj).attr('data-validation','required');  
        }
     }    

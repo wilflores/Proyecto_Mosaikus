@@ -731,19 +731,16 @@
                                                                     , 'id'
                                                                     , 'nombre');      
                  
-                $sqlsino = "SELECT 'SI' nombre,'S' id union SELECT 'NO' nombre,'N' id ";
-                //echo $sql;
-                $contenido_1[MIGRAR_RESPONSABLE_DOC] .= $ut_tool->OptionsCombo($sqlsino
+                $sqlsino = "SELECT 'No' nombre,'N' id  union SELECT 'Si' nombre,'S' id";
+                $option_combo = $ut_tool->OptionsCombo($sqlsino
                                                                     , 'id'
-                                                                    , 'nombre');                
+                                                                    , 'nombre');
                 //echo $sql;
-                $contenido_1[MIGRAR_WF_APRUEBA] .= $ut_tool->OptionsCombo($sqlsino
-                                                                    , 'id'
-                                                                    , 'nombre');                
+                $contenido_1[MIGRAR_RESPONSABLE_DOC] .= $option_combo;                
                 //echo $sql;
-                $contenido_1[MIGRAR_WF_REVISA] .= $ut_tool->OptionsCombo($sqlsino
-                                                                    , 'id'
-                                                                    , 'nombre');                
+                $contenido_1[MIGRAR_WF_APRUEBA] .= $option_combo;                
+                //echo $sql;
+                $contenido_1[MIGRAR_WF_REVISA] .= $option_combo;               
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'documentos_migracion/';
                 $template->setTemplate("formulario");
@@ -805,7 +802,7 @@
                 $validator = new FormValidator();
                 if($parametros[migrar_responsable_doc]!='S' && $parametros[migrar_wf_revisa]!='S' && $parametros[migrar_wf_aprueba]!='S'){
                     $validator = new FormValidator();
-                    $objResponse->addScriptCall('VerMensaje','error','Debe seleccionar migrar alguna opcion');
+                    $objResponse->addScriptCall('VerMensaje','error','Debe seleccionar migrar alguna opción');
                     $objResponse->addScript("$('#MustraCargando').hide();"); 
                     $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
                         $( '#btn-guardar' ).prop( 'disabled', false );
