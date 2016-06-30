@@ -537,7 +537,7 @@
                         if ($value["id_$i"] != ''){
                             if ($value["id_$i"] != $id_aux[$i]){
                                 if ($i == 1){
-                                    $nombre_area = $ao->BuscaOrganizacional(array('id_organizacion'=>$value[$i]));
+                                    $nombre_area = $ao->BuscaOrganizacional(array('id_organizacion'=>$value["id_$i"]));
                                     if ($ids[$value["id_$i"].'-'.$i] > 0)
                                         $html .= '<td rowspan="'. $ids[$value["id_$i"].'-'.$i] .'">'.$nombre_area.'</td>';
                                     else
