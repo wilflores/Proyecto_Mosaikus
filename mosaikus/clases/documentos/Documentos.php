@@ -4440,7 +4440,7 @@
                     $sql="SELECT wf.id,
                             CONCAT(CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno))
                             ,' &rarr; ', 
-                           IF(perso_revisa.nombres is null,'N/A',CONCAT(initcap(SUBSTR(perso_revisa.nombres,1,IF(LOCATE(' ' ,perso_revisa.nombres,1)=0,LENGTH(perso_revisa.nombres),LOCATE(' ' ,perso_revisa.nombres,1)-1))),' ',initcap(perso_revisa.apellido_paterno))	) 
+                           IF(perso_revisa.nombres is null,CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno)),CONCAT(initcap(SUBSTR(perso_revisa.nombres,1,IF(LOCATE(' ' ,perso_revisa.nombres,1)=0,LENGTH(perso_revisa.nombres),LOCATE(' ' ,perso_revisa.nombres,1)-1))),' ',initcap(perso_revisa.apellido_paterno))	) 
                            ,' &rarr; ', 
                             CONCAT(initcap(SUBSTR(perso_aprueba.nombres,1,IF(LOCATE(' ' ,perso_aprueba.nombres,1)=0,LENGTH(perso_aprueba.nombres),LOCATE(' ' ,perso_aprueba.nombres,1)-1))),' ',initcap(perso_aprueba.apellido_paterno))) as wf
                             FROM mos_workflow_documentos AS wf
@@ -4452,7 +4452,7 @@
                 {
                     $sql="SELECT  wf.id,CONCAT(CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno))
                             ,' &rarr; ', 
-                           IF(perso_revisa.nombres is null,'N/A',CONCAT(initcap(SUBSTR(perso_revisa.nombres,1,IF(LOCATE(' ' ,perso_revisa.nombres,1)=0,LENGTH(perso_revisa.nombres),LOCATE(' ' ,perso_revisa.nombres,1)-1))),' ',initcap(perso_revisa.apellido_paterno))	) 
+                           IF(perso_revisa.nombres is null,CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno)),CONCAT(initcap(SUBSTR(perso_revisa.nombres,1,IF(LOCATE(' ' ,perso_revisa.nombres,1)=0,LENGTH(perso_revisa.nombres),LOCATE(' ' ,perso_revisa.nombres,1)-1))),' ',initcap(perso_revisa.apellido_paterno))	) 
                            ,' &rarr; ', 
                             CONCAT(initcap(SUBSTR(perso_aprueba.nombres,1,IF(LOCATE(' ' ,perso_aprueba.nombres,1)=0,LENGTH(perso_aprueba.nombres),LOCATE(' ' ,perso_aprueba.nombres,1)-1))),' ',initcap(perso_aprueba.apellido_paterno))) as wf
                             FROM mos_workflow_documentos AS wf
@@ -5917,7 +5917,7 @@
             $campos = "SELECT wf.id,
                             CONCAT(CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno))
                             ,' &rarr; ', 
-                           IF(perso_revisa.nombres is null,'N/A',CONCAT(initcap(SUBSTR(perso_revisa.nombres,1,IF(LOCATE(' ' ,perso_revisa.nombres,1)=0,LENGTH(perso_revisa.nombres),LOCATE(' ' ,perso_revisa.nombres,1)-1))),' ',initcap(perso_revisa.apellido_paterno))	) 
+                           IF(perso_revisa.nombres is null,CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno)),CONCAT(initcap(SUBSTR(perso_revisa.nombres,1,IF(LOCATE(' ' ,perso_revisa.nombres,1)=0,LENGTH(perso_revisa.nombres),LOCATE(' ' ,perso_revisa.nombres,1)-1))),' ',initcap(perso_revisa.apellido_paterno))	) 
                            ,' &rarr; ', 
                             CONCAT(initcap(SUBSTR(perso_aprueba.nombres,1,IF(LOCATE(' ' ,perso_aprueba.nombres,1)=0,LENGTH(perso_aprueba.nombres),LOCATE(' ' ,perso_aprueba.nombres,1)-1))),' ',initcap(perso_aprueba.apellido_paterno))) as wf
                             FROM mos_workflow_documentos AS wf

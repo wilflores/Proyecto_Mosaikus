@@ -242,7 +242,17 @@
                         return '- Acceso denegado para registrar persona en el &aacute;rea seleccionada.';
                     if (!(($this->id_org_acceso_explicito[$val[id_organizacion]][modificar] == S)))
                         return '- Acceso denegado para registrar persona en el &aacute;rea ' . $this->id_org_acceso_explicito[$val[id_organizacion]][title] . '.';
-
+                    /*VALIDACION CODIGOS DISTINTOS*/
+                    $sql = "SELECT COUNT(*) total_registros
+                                        FROM mos_documentos_codigo 
+                                        WHERE codigo = '$atr[codigo]' AND id <> $atr[id]";                    
+                    $total_registros = $this->dbl->query($sql);
+                    $total = $total_registros[0][total_registros];  
+                    if ($total > 0){
+                        return "- Ya existe una área registrada con el mismo código";
+                    }
+                    /*FIN VALIDACION CODIGOS DISTINTOS*/
+                    
                     $sql = "UPDATE mos_documentos_codigo SET                            
                                     codigo = '$atr[codigo]',bloqueo_codigo = '$atr[bloqueo_codigo]',bloqueo_version = '$atr[bloqueo_version]'
                             WHERE  id = $atr[id]";      
