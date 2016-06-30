@@ -1177,7 +1177,7 @@
                            $atr[Codigo_doc] = $val_codigo_doc["codigo"] . '_' . str_pad($val_codigo_doc["correlativo"], 3, "0", STR_PAD_LEFT);
                        }
                        if ($val_codigo_doc[bloqueo_version] == 'S'){
-                           $atr[version] = 1;
+                           $atr[version] = 1; 
                        }
                    
                    }
