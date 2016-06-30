@@ -752,7 +752,7 @@
 
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
                 $template->setTemplate("formulario");
-                $contenido['TITULO_FORMULARIO'] = "Crear&nbsp;DocumentosMigracion";
+                $contenido['TITULO_FORMULARIO'] = "Ejecutar&nbsp;Migración";
                 $contenido['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;DocumentosMigracion";
                 $contenido['PAGINA_VOLVER'] = "listarDocumentosMigracion.php";
                 $contenido['DESC_OPERACION'] = "Guardar";

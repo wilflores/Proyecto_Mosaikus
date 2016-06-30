@@ -11,7 +11,7 @@
 <div class="form-group">
     <label for="migrar_responsable_doc" class="col-md-4 control-label">{N_MIGRAR_RESPONSABLE_DOC}</label>
     <div class="col-md-10">
-        <select onchange="ActivaPersonal(this.value,'id_nuevo_responsable')" name="migrar_responsable_doc" id="migrar_responsable_doc" data-validation="required">
+        <select class="form-control" onchange="ActivaPersonal(this.value,'id_nuevo_responsable')" name="migrar_responsable_doc" id="migrar_responsable_doc" data-validation="required">
                     {MIGRAR_RESPONSABLE_DOC}
       </select>      
   </div>                                
@@ -19,7 +19,7 @@
 <div class="form-group">
     <label for="id_nuevo_responsable" class="col-md-4 control-label">{N_ID_NUEVO_RESPONSABLE}</label>
     <div class="col-md-10">
-        <select name="id_nuevo_responsable" id="id_nuevo_responsable" >
+        <select   name="id_nuevo_responsable" id="id_nuevo_responsable" >
                     <option selected="" value="">-- Seleccione --</option>
                     {ID_NUEVO_RESPONSABLE}
       </select>
@@ -28,7 +28,7 @@
 <div class="form-group">
     <label for="migrar_wf_revisa" class="col-md-4 control-label">{N_MIGRAR_WF_REVISA}</label>
     <div class="col-md-10">
-      <select onchange="ActivaPersonal(this.value,'id_revisa')" name="migrar_wf_revisa" id="migrar_wf_revisa" data-validation="required">
+      <select class="form-control"  onchange="ActivaPersonal(this.value,'id_revisa')" name="migrar_wf_revisa" id="migrar_wf_revisa" data-validation="required">
                     {MIGRAR_WF_REVISA}
       </select>      
       
@@ -47,7 +47,7 @@
 <div class="form-group">
     <label for="migrar_wf_aprueba" class="col-md-4 control-label">{N_MIGRAR_WF_APRUEBA}</label>
     <div class="col-md-10">
-      <select  onchange="ActivaPersonal(this.value,'id_aprueba')" name="migrar_wf_aprueba" id="migrar_wf_aprueba" data-validation="required">
+      <select  class="form-control" onchange="ActivaPersonal(this.value,'id_aprueba')" name="migrar_wf_aprueba" id="migrar_wf_aprueba" data-validation="required">
                     {MIGRAR_WF_APRUEBA}
       </select>      
       
