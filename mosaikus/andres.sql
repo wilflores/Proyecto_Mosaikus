@@ -361,3 +361,13 @@ CREATE TABLE `mos_documentos_migracion` (
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
 
 INSERT INTO `mos_link` VALUES ('92', 'DocumentosMigracion-indexDocumentosMigracion-clases.documentos_migracion.DocumentosMigracion', 'Migración de Responsabilidades', '89', '2', 'documentos_migracion.php', '56', null);
+/****************************************/
+/*cambio del 01-07*/
+/****************************************/
+DROP TABLE IF EXISTS `mos_documentos_relacionados`;
+CREATE TABLE `mos_documentos_relacionados` (
+  `IDDoc` int(11) NOT NULL DEFAULT '0',
+  `IDDoc_relacionado` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`IDDoc`,`IDDoc_relacionado`),
+  CONSTRAINT `fk_iddoc_doc_relacionado` FOREIGN KEY (`IDDoc`) REFERENCES `mos_documentos` (`IDDoc`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
