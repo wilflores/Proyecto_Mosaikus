@@ -499,7 +499,39 @@
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }
-     
+             public function verVisualizaDocumentosRelacionados($id){
+                $atr=array();
+                $sql = "SELECT
+                        mos_documentos_relacionados.IDDoc_relacionado AS id,
+                        CONCAT(mos_documentos.Codigo_doc,'-',mos_documentos.nombre_doc) AS nombre
+                        FROM
+                        mos_documentos_relacionados
+                        INNER JOIN mos_documentos ON mos_documentos_relacionados.IDDoc_relacionado = mos_documentos.IDDoc
+                        WHERE
+                        mos_documentos_relacionados.IDDoc = $id order by 2"; 
+                //echo $sql;
+                $this->operacion($sql, $atr);
+                $i = 1;
+                foreach($this->dbl->data as $value){
+                    $html .= '<tr id="tr-esp-' .$i. '">'; 
+                    $html.= '<td >'.$value[nombre].'</td>';
+                    $html.= '<td align="center">';
+                    $html .= "<a target=\"_blank\"  title=\"Ver Documento PDF\" href=\"pages/documentos/descargar_archivo_pdf.php?id=$value[id]&token=" . md5($value[id]) ."&des=1\">
+                            <i class=\"icon icon-view-document\"></i>
+                        </a>";                      
+                    $html.= '</td>';                    
+                    $html .= '<tr>'; 
+                    $i ++;
+                }
+                
+                $html = '<table id="table-items-esp-vis" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
+                            <tbody>
+                                ' . $html . '
+                            </tbody>
+                        </table>';                
+                
+                return $html;
+            }    
 
              public function verDocumentos($id){
                 $atr=array();
@@ -1258,6 +1290,7 @@
                       */
                     $atr[id]=$atr[IDDoc];
                     $this->CargaCargosDocumento($atr);
+                    $this->CargaDocumentosRelacionados($atr);
                     $nuevo = "IDDoc: \'$atr[IDDoc]\', Codigo Doc: \'$atr[Codigo_doc]\', Nombre Doc: \'$atr[nombre_doc]\', Version: \'$atr[version]\', Fecha: \'$atr[fecha]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', ContentType: \'$atr[contentType]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza]\', ContentType Visualiza: \'$atr[contentType_visualiza]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Publico: \'$atr[publico]\'";
                     $this->registraTransaccionLog(1,$nuevo,'', $atr[IDDoc]);
                    /*AUMENTAR CORRELATIVO SUGERIDO*/
@@ -1320,6 +1353,16 @@
                     $sql = "UPDATE mos_documentos SET muestra_doc='N' "
                             . "WHERE IDDoc = $atr[id]  ";
                     $this->dbl->insert_update($sql);
+                    //actualizar documentos relacionados con esta nueva version
+                     $sql = "update mos_documentos_relacionados
+                            set IDDoc_relacionado=$atr[IDDoc]
+                            WHERE IDDoc_relacionado = $atr[id]  ";
+                    $this->dbl->insert_update($sql);  
+                     $sql = "update mos_documentos_relacionados
+                            set IDDoc=$atr[IDDoc]
+                            WHERE IDDoc = $atr[id]  ";
+                    $this->dbl->insert_update($sql);  
+                    
                     $sql = "Insert Into mos_documentos_estrorg_arbolproc (IDDoc, id_organizacion_proceso, tipo, aplica_subnivel)
 						Select ".$atr[IDDoc].",  id_organizacion_proceso, tipo, aplica_subnivel From mos_documentos_estrorg_arbolproc
 							Where IDDoc = $atr[id]";
@@ -1417,6 +1460,25 @@
                     }
                     //FIN GUARDAR LAS AREAS DONDE ES RESPONSABLE                
             }
+            public function CargaDocumentosRelacionados($atr) {
+            //PARA GUARDAR LOS CARGOS ASOCIADOS A LOS NODOS DEL ARBOL
+                    //$atr[id] 
+                    $sql = "delete from mos_documentos_relacionados  where IDDoc=".$atr[id];    
+                    $this->dbl->insert_update($sql);
+                    //echo $sql;
+                    $cargos = array();
+                    //print_r($atr);
+                    //print_r($cargos);
+                    if($atr[documento_relacionado]){
+                        foreach ($atr[documento_relacionado] as $value) {
+                            $sql = "insert into mos_documentos_relacionados (IDDoc,IDDoc_relacionado) "
+                                    . " values (".$atr[id].",".$value."); ";
+                           // echo $sql;
+                            $this->dbl->insert_update($sql);
+                        }
+                    }
+                    //FIN GUARDAR LAS AREAS DONDE ES RESPONSABLE                
+            }            
             public function modificarDocumentos($atr,$archivo,$doc_ver){
                 //print_r($atr);
                 try {
@@ -1521,6 +1583,7 @@
                    // die;
                     $val = $this->verDocumentos($atr[id]);
                     $this->CargaCargosDocumento($atr);
+                    $this->CargaDocumentosRelacionados($atr);
                     $this->dbl->insert_update($sql);
                     $nuevo = "IDDoc: \'$atr[IDDoc]\', Descripcion: \'$atr[descripcion]\', Palabras Claves: \'$atr[palabras_claves]\', Formulario: \'$atr[formulario]\', Vigencia: \'$atr[vigencia]\', Id Filial: \'$atr[id_filial]\', Nom Visualiza: \'$atr[nom_visualiza_aux]\',ContentType Visualiza: \'$atr[contentType_visualiza_aux]\', Id Usuario: \'$atr[id_usuario]\', Observacion: \'$atr[observacion]\', Muestra Doc: \'$atr[muestra_doc]\', Estrucorg: \'$atr[estrucorg]\', Arbproc: \'$atr[arbproc]\', Apli Reg Estrorg: \'$atr[apli_reg_estrorg]\', Apli Reg Arbproc: \'$atr[apli_reg_arbproc]\', Workflow: \'$atr[workflow]\', Semaforo: \'$atr[semaforo]\', V Meses: \'$atr[v_meses]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\', Publico: \'$atr[publico]\'";
                     $anterior = "IDDoc: \'$val[IDDoc]\', Codigo Doc: \'$val[Codigo_doc]\', Nombre Doc: \'$val[nombre_doc]\', Version: \'$val[version]\', Fecha: \'$val[fecha]\', Descripcion: \'$val[descripcion]\', Palabras Claves: \'$val[palabras_claves]\', Formulario: \'$val[formulario]\', Vigencia: \'$val[vigencia]\', ContentType: \'$val[contentType]\', Id Filial: \'$val[id_filial]\', Nom Visualiza: \'$val[nom_visualiza]\', ContentType Visualiza: \'$val[contentType_visualiza]\', Id Usuario: \'$val[id_usuario]\', Observacion: \'$val[observacion]\', Muestra Doc: \'$val[muestra_doc]\', Estrucorg: \'$val[estrucorg]\', Arbproc: \'$val[arbproc]\', Apli Reg Estrorg: \'$val[apli_reg_estrorg]\', Apli Reg Arbproc: \'$val[apli_reg_arbproc]\', Workflow: \'$val[workflow]\', Semaforo: \'$val[semaforo]\', V Meses: \'$val[v_meses]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\', Publico: \'$val[publico]\' ";
@@ -1554,8 +1617,70 @@
             }
             return $OrgNom;
         }
-        
+              public function listarDocumentosComboRelacion($atr){
+                    //print_r($atr);
+                  $ut_tool = new ut_Tool();
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);                    
+                    }
+                    if (count($this->id_org_acceso_todos_nivel) <= 0){
+                        $this->cargar_acceso_nodos_todos_nivel($atr);                    
+                    }
+                  if($atr[operacion]=='crear'){  
+                    $sql = "SELECT
+                        d.IDDoc id,
+                        CONCAT(d.Codigo_doc,'-',
+                        d.nombre_doc) descripcion
+                        FROM
+                        mos_documentos d left join mos_personal p on d.elaboro=p.cod_emp 
+                        WHERE
+                        d.etapa_workflow = 'estado_aprobado' AND
+                        d.muestra_doc = 'S' ";
+                  }else {                  
+                      $sql = "SELECT
+                        d.IDDoc id,
+                        CONCAT(d.Codigo_doc,'-',
+                        d.nombre_doc) descripcion,
+                        rel.IDDoc_relacionado valor
+                        FROM
+                        mos_documentos d left join mos_personal p on d.elaboro=p.cod_emp left join
+                        (select IDDoc,IDDoc_relacionado
+                        from mos_documentos_relacionados 
+                        where IDDoc=".$atr[id].") rel on d.IDDoc = rel.IDDoc_relacionado 
+                        WHERE
+                        d.etapa_workflow = 'estado_aprobado' AND
+                        d.muestra_doc = 'S' and
+                        d.IDDoc <>$atr[id]";
+                        }
+                    if($atr[formulario]=='S')
+                        $sql .= " and formulario = 'S'";
+                    else
+                        $sql .= " and formulario = 'N' ";
+                    if(($_SESSION[SuperUser]!='S')){
+                        $sql .= " and ((p.email='".$atr["email_usuario"]."') ";
+                            if (count($this->id_org_acceso))
+                                $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ") $sql_filtro_area_espejo) )"; 
+                            if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-ocultar-publico"])==0))
+                                $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso)))) . ") $sql_filtro_area_espejo) )"; 
+                        $sql .= ")";
+                    }
+                            if (($_SESSION[SuperUser]=='S')){
+                                    $sql .= " and ((p.email='".$atr["email_usuario"]."') ";
+
+                                    if (count($this->id_org_acceso))
+                                        $sql .= " OR ( d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ") $sql_filtro_area_espejo) )"; 
+                                    if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-ocultar-publico"])==0))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso)))) . ") $sql_filtro_area_espejo) )"; 
+                                    $sql .= ")";
+//                                }
+                            }                        
+                    $sql .= " ORDER BY 2 ASC " ;                
+                    //echo $sql;
+                    $combosemp = $ut_tool->OptionsComboMultiple($sql, 'id', 'descripcion','valor');      
+                    return ($combosemp);
+              }
              public function listarDocumentos($atr, $pag, $registros_x_pagina){
+                 //print_r($atr);
                  // HABILIYAR LA COLUMNA ESYAD0
                     //print_r($atr);
                     if(!class_exists('Parametros')){
@@ -3330,16 +3455,17 @@
          
  
             public function crear($parametros)
-            {    session_name("$GLOBALS[SESSION]");
-                session_start();            
+            {              
                 import('clases.organizacion.ArbolOrganizacional');
                 $ao = new ArbolOrganizacional();
                 $parametros[opcion] = 'simple';
                 if($_SESSION[ParamAdic]=='formulario') {
+                    $parametros[formulario]='S';
                     $cod_categoria = 15;
                 }
                 else{
                     $cod_categoria = 1;
+                    $parametros[formulario]='N';
                 }                
                 
                 if(!class_exists('Template')){
@@ -3434,7 +3560,11 @@
                 $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento');
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
-                
+                //echo $_SESSION['CookEmail'];
+                $parametros['email_usuario']= $_SESSION['CookEmail'];
+                $parametros[operacion]='crear';
+                $contenido_1[DOCUMENTOS_RELACIONADOS]=$this->listarDocumentosComboRelacion($parametros);
+
 //                if (count($this->parametros) <= 0){
 //                        $this->cargar_parametros();
 //                }                
@@ -3495,6 +3625,10 @@
                 {
                     $objResponse->addScript("$($('#tabs-hv-2').find('#li2')).hide();");
                 }
+                $objResponse->addScript("$('#documento_relacionado').selectpicker({
+                                                style: 'btn-combo'
+                                              });$js");
+                
                 $objResponse->addScript($js);
                 return $objResponse;
             }
@@ -4412,6 +4546,10 @@
                 $contenido_1['WORKFLOW'] = ($val["workflow"]);
                 $contenido_1['SEMAFORO'] = $val["semaforo"];
                 $contenido_1['V_MESES'] = $val["v_meses"];
+                $parametros['email_usuario']= $_SESSION['CookEmail'];
+                $parametros[operacion]='editar';
+                $contenido_1[DOCUMENTOS_RELACIONADOS]=$this->listarDocumentosComboRelacion($parametros);
+                
 //                $contenido_1['REVISO'] = $val["reviso"];
 //                $contenido_1['ELABORO'] = $val["elaboro"];
 //                $contenido_1['APROBO'] = $val["aprobo"];
@@ -4773,6 +4911,10 @@
                 {
                     $objResponse->addScript("$($('#tabs-hv-2').find('#li2')).hide();");
                 }
+                $objResponse->addScript("$('#documento_relacionado').selectpicker({
+                                                style: 'btn-combo'
+                                              });$js");
+                
                 //echo $_SESSION[ParamAdic];
                 $objResponse->addScript("$js");
                 $objResponse->addScript("$jswf");
@@ -5259,6 +5401,7 @@
                 $adjuntos = new ArchivosAdjuntos();
                 $array_nuevo = $adjuntos->visualizar_archivos_adjuntos('mos_documentos_anexos', 'id_documento',$parametros["id"],24);
                 $contenido_2['ANEXOS'] = $array_nuevo[html];
+                $contenido_2['DOCUMENTOSRELACIONADOS'] = $this->verVisualizaDocumentosRelacionados($parametros[id]);
                 $js .= $array_nuevo[js];
                 //echo $contenido_1['ANEXOS'];
                 
