@@ -2254,7 +2254,10 @@
                         $error = $e->getMessage();                     
                         if (preg_match("/mos_documentos_distribucion/",$error ) == true) 
                             return "- No se puede eliminar el documento, existen Lista de Distribuci&oacute;n asociados.";                        
+                        if (preg_match("/mos_documentos_relacionados/",$error ) == true) 
+                            return "- No se puede eliminar el documento, esta asociado a otros Documentos.";
                         return $error; 
+                                
                     }
              }
              public function cambiarestadowf($atr){
