@@ -141,7 +141,7 @@
                                         <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">
                                             <li id="li1"><a href="#hv-red-2" data-toggle="tab">Otros Datos</a></li>
                                             <li id="li2"><a href="#hv-orange-2" data-toggle="tab" id="tabs-form-reg" >Parámetros para Indexación de Registros </a></li>
-                                            <li id="li3"><a href="#hv-orange-3" data-toggle="tab" id="tabs-lista" >Anexos</a></li>
+                                            <li id="li3"><a href="#hv-orange-3" data-toggle="tab" id="tabs-lista" >Documentos Relacionados / Anexos</a></li>
                                         </ul>
                                         <div id="my-tab-content" class="tab-content" style="padding: 45px 15px;">
                                             <div class="tab-pane active" id="hv-red-2">
@@ -240,9 +240,18 @@
                                                </div>
                                              <div class="tab-pane active" id="hv-orange-3">
                                                 <div class="form-group" id="tabla_fileUpload_anexo">
-                                                        <label for="archivo" class="col-md-4 control-label"></label>
+                                                        <label for="archivo" class="col-md-4 control-label">Anexos</label>
                                                         {ARCHIVOS_ADJUNTOS}                                          
-                                                 </div>                                                  
+                                                 </div> 
+                                                <div class="form-group">
+                                                    <label  class="col-md-6 control-label">Documentos Relacionados</label>                                                
+                                                    <div class="col-md-14" id="div_doc_relacionados">
+                                                        <select id="documento_relacionado" name="documento_relacionado[]" data-actions-box="true" data-live-search="true" multiple>
+                                                        {DOCUMENTOS_RELACIONADOS}
+                                                     </select>
+                                                  </div>                                                       
+                                                </div>
+                                                 
                                              </div>
                                             </div>
                                         </div>             
