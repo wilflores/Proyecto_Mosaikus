@@ -369,5 +369,5 @@ CREATE TABLE `mos_documentos_relacionados` (
   `IDDoc` int(11) NOT NULL DEFAULT '0',
   `IDDoc_relacionado` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`IDDoc`,`IDDoc_relacionado`),
-  CONSTRAINT `fk_iddoc_doc_relacionado` FOREIGN KEY (`IDDoc`) REFERENCES `mos_documentos` (`IDDoc`) ON DELETE CASCADE
+  CONSTRAINT `fk_iddoc_doc_relacionado` FOREIGN KEY (`IDDoc`) REFERENCES `mos_documentos` (`IDDoc`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
