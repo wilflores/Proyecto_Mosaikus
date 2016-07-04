@@ -54,11 +54,9 @@
                         {CAMPOS}
 
                         <div class="form-group">
-                            <div class="col-lg-offset-2 col-lg-10">
-                                <!--<input class="button save" name="guardar" type="button" value="{DESC_OPERACION}" onClick="validar(document);">
-                                <input class="button " type="button" value="Cancelar" onclick="funcion_volver('{PAGINA_VOLVER}');">
-                                -->
-                                <button type="button" id="btn-guardar" class="btn btn-primary" onClick="validar(document);">{DESC_OPERACION}</button>                                
+                            <div class="col-lg-offset-2 col-lg-20">
+                                <button type="button" id="btn-guardar" class="btn btn-primary" onClick="{JS_PREVIO_GUARDAR}validar(document);">{DESC_OPERACION}</button>
+                                {OTRO_BOTON_PRINCIPAL}
                                 <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">Cancelar</button>
 
                                 <input type="hidden" id="opc" name="opc" value="{OPC}">

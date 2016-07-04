@@ -951,8 +951,9 @@
                     }                
                 }
                 
-                $js = $html = "";
-                foreach ($this->parametros as $value) {    
+                $js = $html = $nombre_campos = "";
+                foreach ($this->parametros as $value) { 
+                    $nombre_campos .= "campo_".$value[cod_parametro].",";
                     switch ($value[tipo]) {
                         case '1':
                             $sql = "select cod_parametro_det,descripcion from  mos_parametro_det where cod_categoria='$modulo' and cod_parametro='".$value[cod_parametro]."' and vigencia='S'";
@@ -1041,6 +1042,7 @@
                     
                     
                 }
+                $array[nombre_campos] = $nombre_campos;
                 $array[html] = $html;
                 $array[js] = $js;
                 return $array;

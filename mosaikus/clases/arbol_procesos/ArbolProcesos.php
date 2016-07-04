@@ -1387,7 +1387,7 @@
          */
         public function admin_jstree_ap($parametros){
             $atr = $this->dbl->corregir_parametros($parametros);
-            $sql = "SELECT * FROM mos_arbol_procesos where id_organizacion in ($atr[id_ao]) AND level = 2 ORDER BY level,position";
+            $sql = "SELECT * FROM mos_arbol_procesos where id_organizacion in ($atr[id_ao]) AND level = 2 ORDER BY id_organizacion,level,position";
             //echo $sql;
             $data = $this->dbl->query($sql);
             if (count($data)==0) return array();

@@ -2210,7 +2210,12 @@
                             //$respuesta = $this->dbl->delete("mos_documentos_categoria", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_datos_formulario", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_estrorg_arbolproc", "IDDoc = " . $atr[id]);
-                            $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = " . $atr[cod_categoria] . " AND cod_categoria_aux = " . $atr[cod_categoria] . "");                         
+                            //$respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = " . $atr[cod_categoria] . " AND cod_categoria_aux = " . $atr[cod_categoria] . "");                         
+                            if($_SESSION[ParamAdic]=='formulario')                                 
+                                $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = 15 AND cod_categoria_aux = 15");
+                            else                                
+                                $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = 1 AND cod_categoria_aux = 1");                         
+
                             //$respuesta = $this->dbl->delete("mos_registro", "IDDoc = " . $atr[id]);
                         }
                         else{
@@ -2219,7 +2224,12 @@
                             $respuesta = $this->dbl->delete("mos_documento_revision", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documento_version", "IDDoc = " . $atr[id]);
                             //$respuesta = $this->dbl->delete("mos_documentos_categoria", "IDDoc = " . $atr[id]);
-                            $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = " . $atr[cod_categoria] . " AND cod_categoria_aux = " . $atr[cod_categoria] . "");
+//                            $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = " . $atr[cod_categoria] . " AND cod_categoria_aux = " . $atr[cod_categoria] . "");
+                            if($_SESSION[ParamAdic]=='formulario')                                 
+                                $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = 15 AND cod_categoria_aux = 15");
+                            else                                
+                                $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = 1 AND cod_categoria_aux = 1");                         
+
                             //$respuesta = $this->dbl->delete("mos_documentos_datos_formulario", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_estrorg_arbolproc", "IDDoc = " . $atr[id]);
                             //$respuesta = $this->dbl->delete("mos_registro", "IDDoc = " . $atr[id]);
@@ -3560,7 +3570,7 @@
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
                 $adjuntos = new ArchivosAdjuntos();
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento');
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento', null, 18);
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
                 //echo $_SESSION['CookEmail'];
@@ -4850,7 +4860,7 @@
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
                 $adjuntos = new ArchivosAdjuntos();
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento',$val["IDDoc"]);
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento',$val["IDDoc"],18);
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
                 
