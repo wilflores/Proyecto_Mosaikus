@@ -523,13 +523,13 @@
                     $html .= '<tr>'; 
                     $i ++;
                 }
-                
-                $html = '<table id="table-items-esp-vis" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
+                if($this->dbl->data){
+                    $html = '<table id="table-items-esp-vis" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
                             <tbody>
                                 ' . $html . '
                             </tbody>
                         </table>';                
-                
+                }
                 return $html;
             }    
 
@@ -2210,12 +2210,7 @@
                             //$respuesta = $this->dbl->delete("mos_documentos_categoria", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_datos_formulario", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_estrorg_arbolproc", "IDDoc = " . $atr[id]);
-                            //$respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = " . $atr[cod_categoria] . " AND cod_categoria_aux = " . $atr[cod_categoria] . "");                         
-                            if($_SESSION[ParamAdic]=='formulario')                                 
-                                $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = 15 AND cod_categoria_aux = 15");
-                            else                                
-                                $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = 1 AND cod_categoria_aux = 1");                         
-
+                            $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = " . $atr[cod_categoria] . " AND cod_categoria_aux = " . $atr[cod_categoria] . "");                         
                             //$respuesta = $this->dbl->delete("mos_registro", "IDDoc = " . $atr[id]);
                         }
                         else{
@@ -2224,12 +2219,7 @@
                             $respuesta = $this->dbl->delete("mos_documento_revision", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documento_version", "IDDoc = " . $atr[id]);
                             //$respuesta = $this->dbl->delete("mos_documentos_categoria", "IDDoc = " . $atr[id]);
-//                            $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = " . $atr[cod_categoria] . " AND cod_categoria_aux = " . $atr[cod_categoria] . "");
-                            if($_SESSION[ParamAdic]=='formulario')                                 
-                                $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = 15 AND cod_categoria_aux = 15");
-                            else                                
-                                $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = 1 AND cod_categoria_aux = 1");                         
-
+                            $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = " . $atr[cod_categoria] . " AND cod_categoria_aux = " . $atr[cod_categoria] . "");
                             //$respuesta = $this->dbl->delete("mos_documentos_datos_formulario", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_estrorg_arbolproc", "IDDoc = " . $atr[id]);
                             //$respuesta = $this->dbl->delete("mos_registro", "IDDoc = " . $atr[id]);
@@ -3570,7 +3560,7 @@
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
                 $adjuntos = new ArchivosAdjuntos();
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento', null, 18);
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento');
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
                 //echo $_SESSION['CookEmail'];
@@ -4860,7 +4850,7 @@
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
                 $adjuntos = new ArchivosAdjuntos();
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento',$val["IDDoc"],18);
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento',$val["IDDoc"]);
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
                 
@@ -5419,16 +5409,27 @@
                 //echo $contenido_1['ANEXOS'];
                 
                 $template = new Template();
-                if($contenido_2['ANEXOS']!=''){
+                if($contenido_2['ANEXOS']!='' || $contenido_2['DOCUMENTOSRELACIONADOS']!=''){
                     $contenido_2['DOCUMENTOS']=$iframe;//$template->show();
                     $template->PATH = PATH_TO_TEMPLATES.'documentos/';
                     $template->setTemplate("visualizacion_documento_tab");
-                    $template->setVars($contenido_2); 
-                    $contenido_1['DATOS']= $template->show();     
-                    $contenido_1['TITULO']=$titulo_doc . "<br><a href=\"#anexos-doc\" title=\"Ver Anexos del Documento\">                            
-                                    <i class=\"	glyphicon glyphicon-paperclip\" style=\"\"></i>
-                                    Anexos
-                                </a>";
+                    $template->setVars($contenido_2);
+                    $contenido_1['DATOS']= $template->show(); 
+                    $contenido_1['TITULO']=$titulo_doc;
+                    if($contenido_2['ANEXOS']!=''){
+                        //$contenido_1['DATOS']= $template->show();     
+                        $contenido_1['TITULO'].= "<br><a href=\"#anexos-doc\" title=\"Ver Anexos del Documento\">                            
+                                        <i class=\"	glyphicon glyphicon-paperclip\" style=\"\"></i>
+                                        Anexos
+                                    </a>";
+                    }
+                    if($contenido_2['DOCUMENTOSRELACIONADOS']!=''){
+                        //$contenido_1['DATOS']= $template->show();     
+                        $contenido_1['TITULO'].="<br><a href=\"#anexos-doc\" title=\"Ver Documentos relacionados\">                            
+                                        <i class=\"	glyphicon glyphicon-paperclip\" style=\"\"></i>
+                                        Documentos Relacionados
+                                    </a>";
+                    }
                 }
                 else{
                     $contenido_1['DATOS']=$iframe;
