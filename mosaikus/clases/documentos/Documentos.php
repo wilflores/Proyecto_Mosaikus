@@ -3560,7 +3560,7 @@
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
                 $adjuntos = new ArchivosAdjuntos();
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento');
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento', null, 18);
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
                 //echo $_SESSION['CookEmail'];
@@ -4850,7 +4850,7 @@
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
                 $adjuntos = new ArchivosAdjuntos();
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento',$val["IDDoc"]);
+                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_documentos_anexos', 'id_documento',$val["IDDoc"],18);
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
                 
