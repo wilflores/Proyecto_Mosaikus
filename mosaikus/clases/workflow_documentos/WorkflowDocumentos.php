@@ -8,8 +8,12 @@
         private $nombres_columnas;
         private $placeholder;
         private $id_org_acceso;
-            
-            public function WorkflowDocumentos(){
+        private $modifica_tercero;
+        public $restricciones;
+        
+
+
+        public function WorkflowDocumentos(){
                 parent::__construct();
                 $this->asigna_script('workflow_documentos/workflow_documentos.js');                                             
                 $this->dbl = new Mysql($this->encryt->Decrypt_Text($_SESSION[BaseDato]), $this->encryt->Decrypt_Text($_SESSION[LoginBD]), $this->encryt->Decrypt_Text($_SESSION[PwdBD]) );
@@ -120,27 +124,42 @@
                 return true;
             }
         public function colum_admin($tupla)
-        {   //print_r($this->id_org_acceso);
+        {   //print_r($tupla);
             //echo $tupla[id_organizacion];
             //if($_SESSION[CookM] == 'S')
             //AGARRAR EL ID_ORG DE LA PERSONA QUE ELABORA PARA ESTAS ACCIONES
      
-            if ($this->id_org_acceso[$tupla[id_organizacion]][modificar] == 'S')
+            if ($this->restricciones->per_editar == 'S' && $tupla[cod_responsable]==$_SESSION[CookCodEmp])    
             {
-                //<img title=\"Modificar Documento $tupla[nombre_doc]\" src=\"diseno/images/ico_modificar.png\" style=\"cursor:pointer\">
                 $html = "<a href=\"#\" onclick=\"javascript:editarWorkflowDocumentos('". $tupla[id] . "');\"  title=\"Editar Personas\">                            
                             <i class=\"icon icon-edit\"></i>
                         </a>";
             }
-            //if($_SESSION[CookE] == 'S')
-            if ($this->id_org_acceso[$tupla[id_organizacion]][eliminar] == 'S')
-            {
-                //<img title="Eliminar '.$tupla[nombre_doc].'" src="diseno/images/ico_eliminar.png" style="cursor:pointer">
-                $html .= '<a href="#" onclick="javascript:eliminarWorkflowDocumentos(\''. $tupla[id] . '\');" title="Eliminar Personas">
-                        <i class="icon icon-remove"></i>
-                        
-                    </a>'; 
+            else{
+                if($tupla[cod_responsable]!=$_SESSION[CookCodEmp]){
+                    if ($this->restricciones->id_org_acceso_explicito[$tupla[id_organizacion]][modificar_terceros] == 'S'){
+                        $html = "<a href=\"#\" onclick=\"javascript:editarWorkflowDocumentos('". $tupla[id] . "');\"  title=\"Editar Personas\">                            
+                                    <i class=\"icon icon-edit\"></i>
+                                </a>";                        
+                    }
+                }
             }
+            //if($_SESSION[CookE] == 'S')
+            if ($this->restricciones->per_eliminar == 'S' && $tupla[cod_responsable]==$_SESSION[CookCodEmp])
+            {
+                $html .= '<a href="#" onclick="javascript:eliminarWorkflowDocumentos(\''. $tupla[id] . '\');" title="Eliminar Personas">
+                        <i class="icon icon-remove"></i>                        
+                    </a>'; 
+            }else{
+                if($tupla[cod_responsable]!=$_SESSION[CookCodEmp] && $_SESSION[CookE] == 'S'){
+                    if ($this->restricciones->id_org_acceso_explicito[$tupla[id_organizacion]][modificar_terceros] == 'S'){
+                        $html .= '<a href="#" onclick="javascript:eliminarWorkflowDocumentos(\''. $tupla[id] . '\');" title="Eliminar Personas">
+                                <i class="icon icon-remove"></i>                        
+                            </a>'; 
+                    }
+                }
+            }
+             
             return $html;
             
         }
@@ -189,6 +208,20 @@
                             left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
                          WHERE 1 = 1 ";
+                    if($this->restricciones->per_viz_terceros!='S'){
+                        $sql .="and wf.id_personal_responsable=".$_SESSION['CookCodEmp'];
+                    }
+                    else{
+                        $sql .="and (wf.id_personal_responsable=".$_SESSION['CookCodEmp']." or "
+                        ." wf.id_personal_responsable in (SELECT
+                        mos_personal.cod_emp
+                        FROM
+                        mos_personal
+                        WHERE
+                        mos_personal.id_organizacion IN (".implode(',', array_keys($this->restricciones->id_org_acceso_viz_terceros))."))"
+                        . ")";
+                    }
+                    //echo $sql;
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         //$sql .= " AND ((upper(id_personal) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
                         $sql .= ' AND (';
@@ -293,6 +326,7 @@
                                 ,CONCAT(CONCAT(UPPER(LEFT(perso_aprueba.apellido_paterno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(perso_aprueba.apellido_materno, 1)), LOWER(SUBSTRING(perso_aprueba.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(perso_aprueba.nombres, 1)), LOWER(SUBSTRING(perso_aprueba.nombres, 2)))) id_personal_aprueba
                                 ,email_aprueba
                                 ,perso_resp.id_organizacion
+                                ,perso_resp.cod_emp cod_responsable
                                      $sql_col_left
                             FROM mos_workflow_documentos AS wf
                             INNER JOIN mos_personal AS perso_resp ON wf.id_personal_responsable = perso_resp.cod_emp
@@ -300,6 +334,21 @@
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
                             $sql_left
                             WHERE 1 = 1 ";
+                    if($this->restricciones->per_viz_terceros!='S'){
+                        $sql .="and wf.id_personal_responsable=".$_SESSION['CookCodEmp'];
+                    }
+                    else{
+                        $sql .="and (wf.id_personal_responsable=".$_SESSION['CookCodEmp']." or "
+                        ." wf.id_personal_responsable in (SELECT
+                        mos_personal.cod_emp
+                        FROM
+                        mos_personal
+                        WHERE
+                        mos_personal.id_organizacion IN (".implode(',', array_keys($this->restricciones->id_org_acceso_viz_terceros))."))"
+                        . ")";
+                    }
+
+                    
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         //$sql .= " AND ((upper(id_personal) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
                         $sql .= ' AND (';
@@ -492,6 +541,7 @@
                 $grid->setFuncion("id", "colum_admin");
                 $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
                 $grid->hidden[7]= true;
+                $grid->hidden[8] = true;
                 //$grid->setFuncion("en_proceso_inscripcion", "enProcesoInscripcion");
                 //$grid->setAligns(1,"center");
                 //$grid->hidden = array(0 => true);
@@ -565,6 +615,17 @@
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
+                import('clases.utilidades.NivelAcceso');
+                $this->restricciones = new NivelAcceso();
+                $this->restricciones->cargar_acceso_nodos_explicito($parametros);
+                $this->restricciones->cargar_permisos($parametros);
+                if ($this->restricciones->per_viz_terceros == 'S'){
+                    if (count($this->restricciones->id_org_acceso_viz_terceros) <= 0){
+                        $this->restricciones->cargar_acceso_nodos_visualiza_terceros($parametros);
+                        }
+                }
+                
+                //print_r($parametros);
                 if ($parametros['corder'] == null) $parametros['corder']="id";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
@@ -668,12 +729,23 @@
                 if (count($this->id_org_acceso) <= 0){
                     $this->cargar_acceso_nodos($parametros);                    
                 }                
-                
+
+                import('clases.utilidades.NivelAcceso');
+                $this->restricciones = new NivelAcceso();
+                $this->restricciones->cargar_acceso_nodos_explicito($parametros);
+                $this->restricciones->cargar_permisos($parametros);
+                $sql_nodos="";
+                if ($this->restricciones->per_mod_terceros == 'S'){
+                    if (count($this->restricciones->id_org_acceso_viz_terceros) <= 0){
+                        $this->restricciones->cargar_acceso_nodos_visualiza_terceros($parametros);
+                        $sql_nodos=" or id_organizacion IN (". implode(',', array_keys($this->restricciones->id_org_acceso_viz_terceros)) . ")";
+                        }
+                }
                 $contenido_1[ID_PERSONAL_RESPONSABLE] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
                                                                             FROM mos_personal p WHERE interno = 1 and elaboro = 'S'
-                                                                            AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
+                                                                            AND (cod_emp = ".$_SESSION['CookCodEmp'].$sql_nodos.")"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                 $contenido_1[ID_PERSONAL_REVISA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
@@ -782,23 +854,43 @@
                 }
                 foreach ( $this->placeholder as $key => $value) {
                     $contenido_1["P_" . strtoupper($key)] =  $value;
-                }    
+                }   
+                
+                if (count($this->id_org_acceso) <= 0){
+                    $this->cargar_acceso_nodos($parametros);                    
+                }                
+                
+                import('clases.utilidades.NivelAcceso');
+                $this->restricciones = new NivelAcceso();
+                $this->restricciones->cargar_acceso_nodos_explicito($parametros);
+                $this->restricciones->cargar_permisos($parametros);
+                $sql_nodos="";
+                if ($this->restricciones->per_mod_terceros == 'S'){
+                    if (count($this->restricciones->id_org_acceso_viz_terceros) <= 0){
+                        $this->restricciones->cargar_acceso_nodos_visualiza_terceros($parametros);
+                        $sql_nodos=" or id_organizacion IN (". implode(',', array_keys($this->restricciones->id_org_acceso_viz_terceros)) . ")";
+                        }
+                }
+                
                 $contenido_1[ID_PERSONAL_RESPONSABLE] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
-                                                                            FROM mos_personal p WHERE interno = 1 and elaboro = 'S'"
+                                                                            FROM mos_personal p WHERE interno = 1 and elaboro = 'S'
+                                                                            AND (cod_emp = ".$_SESSION['CookCodEmp'].$sql_nodos.")"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val["id_personal_responsable"]);
                 $contenido_1[ID_PERSONAL_REVISA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
-                                                                            FROM mos_personal p WHERE interno = 1 and reviso = 'S'"
+                                                                            FROM mos_personal p WHERE interno = 1 and reviso = 'S'
+                                                                            AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val["id_personal_revisa"]);
                 $contenido_1[ID_PERSONAL_APRUEBA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
-                                                                            FROM mos_personal p WHERE interno = 1 and aprobo = 'S'"
+                                                                            FROM mos_personal p WHERE interno = 1 and aprobo = 'S'
+                                                                            AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val["id_personal_aprueba"]);
 
@@ -904,7 +996,18 @@
      
  
                 public function buscar($parametros)
-            {
+            {   // cargar aqui...
+                import('clases.utilidades.NivelAcceso');
+                $nivel = new NivelAcceso();
+                $this->restricciones = new NivelAcceso();
+                $this->restricciones->cargar_acceso_nodos_explicito($parametros);
+                $this->restricciones->cargar_permisos($parametros);
+                if ($this->restricciones->per_viz_terceros == 'S'){
+                    if (count($this->restricciones->id_org_acceso_viz_terceros) <= 0){
+                        $this->restricciones->cargar_acceso_nodos_visualiza_terceros($parametros);
+                        }
+                }
+                    
                 $grid = $this->verListaWorkflowDocumentos($parametros);                
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
