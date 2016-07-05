@@ -2,7 +2,7 @@
 if(!defined('CONFIGURACION')){
   //::::: Datos Varios :::::
   define('HOME',dirname(dirname(__FILE__)));
-  define('RUTA',"mosaikus/mosaikus/");
+  define('RUTA',"mosaikusapps/mosaikus/");
   if (isset($_SERVER['HTTPS'])) {
     define('APPLICATION_HOST',"https://".$_SERVER['SERVER_NAME']);
     define('APPLICATION_ADDR',"https://localhost/".RUTA);

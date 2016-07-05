@@ -1,1 +1,6 @@
-<?php header('Location: msks/index.php'); ?>
+<?php 
+
+header('Location: msks/index.php'); 
+//echo "cgfdfd";
+
+?>
