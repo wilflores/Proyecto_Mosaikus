@@ -71,10 +71,10 @@ CREATE TABLE IF NOT EXISTS `mos_matriz_organizacion` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci AUTO_INCREMENT=46 ;
 
 
-INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id_area', 'Arbol Organizacional', 28, 'Arbol Organizacional'),
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id_area', 'Arbol Organizacional', 28, 'Arbol Organizacional');
 INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('codigo', 'Código', 28, 'Ingrese Código');
-INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('descripcion', 'Descripción', 28, 'Descripcion de la Matriz'),
-INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id', 'id', 28, 'id'),
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('descripcion', 'Descripción', 28, 'Descripcion de la Matriz');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id', 'id', 28, 'id');
 INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('categoria', 'Categoría', 28, 'Categoría');
 
 /********** asignar modulo en el menu*****/

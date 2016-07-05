@@ -547,7 +547,7 @@ WHERE 1 =1";
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[codigo], "codigo", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[descripcion], "descripcion", $parametros)),
                array( "width"=>"20%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[id_area], ENT_QUOTES, "UTF-8")),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[categoria], ENT_QUOTES, "UTF-8"))
+               array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[categoria], ENT_QUOTES, "UTF-8"))
                 );
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
@@ -1267,6 +1267,9 @@ WHERE 1 =1";
  
                 public function buscar($parametros)
             {
+                    /*ARBOL ORGANIZACIONAL*/
+                import('clases.organizacion.ArbolOrganizacional');
+                $this->arbol = new ArbolOrganizacional();
                 /*Permisos en caso de que no se use el arbol organizacional*/
                 $this->cargar_permisos($parametros);
                 $grid = $this->verListaMatrizCompetencias($parametros);                
