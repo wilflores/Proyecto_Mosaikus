@@ -52,6 +52,9 @@
         array = new XArray();
         array.setObjeto('WorkflowDocumentos','editar');
         array.addParametro('id',id);
+        array.addParametro('modo',document.getElementById('modo').value);            
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
+        
         array.addParametro('import','clases.workflow_documentos.WorkflowDocumentos');
         xajax_Loading(array.getArray());
     }
