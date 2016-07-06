@@ -579,12 +579,12 @@ WHERE 1 =1";
                 $array_columns =  explode('-', $parametros['mostrar-col']);
                 for($i=0;$i<count($config_col);$i++){
                     switch ($i) {                                             
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                            array_push($config,$config_col[$i]);
-                            break;
+                        //case 1:
+                        //case 2:
+                        //case 3:
+                        //case 4:
+                           // array_push($config,$config_col[$i]);
+                           // break;
 
                         default:
                             
@@ -836,7 +836,6 @@ WHERE 1 =1";
                 unset ($parametros['opc']);
                 unset ($parametros['id']);
                 $parametros['id_usuario']= $_SESSION['USERID'];
-
                 $validator = new FormValidator();
                 if(!$validator->ValidateForm($parametros)){
                         $error_hash = $validator->GetErrors();
@@ -846,7 +845,14 @@ WHERE 1 =1";
                         }
                          $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
                 }else{
-                    
+                    //VAALIDAR QUE LLENO AL MENOS UNA CATEGORIA - RAQUEL+++/
+                      $cant_familias=0;/// cuadrar desde aquiiiiii
+                        for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
+                            if ((isset($parametros["nombre_din_$i"]))&&(isset($parametros["codigo_din_$i"]))&&(isset($parametros["orden_din_$i"])))
+                                $cant_familias++;
+                            }
+
+                    if($cant_familias>0){// SI LLENO ALGUNA FAMILIA SE PUEDE REGISTRAR
                     $respuesta = $this->ingresarMatrizCompetencias($parametros);
                     if (strlen($respuesta ) < 10 ) 
                     {
@@ -857,7 +863,7 @@ WHERE 1 =1";
                                 $params[id] = $temp;
                                 $this->ingresarArbol($params);
                         }
-/************************** INSERTAR CATEGORIAS DE LA MATRIZ - RAQUEL ****************/
+/******************** INSERTAR CATEGORIAS DE LA MATRIZ - RAQUEL ****************/                       
                         for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
                             //echo $parametros["nro_pts_$i"];
                             if (isset($parametros["nombre_din_$i"])){                                                                
@@ -888,13 +894,24 @@ WHERE 1 =1";
                     }
                     else
                         $objResponse->addScriptCall('VerMensaje','error',$respuesta);
-                }
+                
                           
                 $objResponse->addScript("$('#MustraCargando').hide();"); 
                 $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
                                         $( '#btn-guardar' ).prop( 'disabled', false );");
-                        
-                return $objResponse;
+                        }
+                        else{
+                    $objResponse->addScriptCall('VerMensaje','error','Debe ingresar al menos una Familia para la matriz');
+                    $objResponse->addScript("$('#MustraCargando').hide();"); 
+                    $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                        $( '#btn-guardar' ).prop( 'disabled', false );
+                        $('#btn-guardar-not' ).html('Guardar');
+                        $( '#btn-guardar-not' ).prop( 'disabled', false );");                    
+                        }
+                
+            }
+return $objResponse;
+
             }
      
  /******* iNGRESAR ARBOL RELACION CON MATRIZ DE COMPETENCIA - RAQUEL ************/
@@ -943,7 +960,6 @@ WHERE 1 =1";
 
                 $sql="SELECT GROUP_CONCAT(DISTINCT id_area) arbol_organizacional 
                                 FROM mos_matriz_organizacion where id_matriz=".$parametros[id];
-
                 //echo $sql;
                $data_areas=$this->dbl->query($sql);
                 //print_r($data_areas);
@@ -954,7 +970,6 @@ WHERE 1 =1";
                         $organizacion[] = $data_areas[0][arbol_organizacional];                    
                     }
                 $parametros[nodos_seleccionados] = $organizacion;
-
                 $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
@@ -1139,7 +1154,15 @@ WHERE 1 =1";
                         }
                          $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
                 }else{
-                    
+
+                    /**** verificar si se han eliminado categorias al editar. debe haber al menos 1-raquel***/
+                    $cant_familias=0;
+                        for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
+                            if ((isset($parametros["nombre_din_$i"]))&&(isset($parametros["codigo_din_$i"]))&&(isset($parametros["orden_din_$i"])))
+                                $cant_familias++;
+                            }
+                    if($cant_familias>0){
+
                     $respuesta = $this->modificarMatrizCompetencias($parametros);
 
                     if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
@@ -1154,7 +1177,7 @@ WHERE 1 =1";
 /**************desde aqui para empezar a editar parecido a plantillas con lo de categorias -RAQUEL ****/
                         if (strlen($parametros[id_unico_del])>0){
                             $parametros[id_unico_del] = substr($parametros[id_unico_del], 0, strlen($parametros[id_unico_del]) - 1);
-                            $sql = "DELETE FROM mos_matriz_categorias WHERE id IN ($parametros[id_unico_del]) ";
+                            $sql = "DELETE FROM mos_matriz_categorias WHERE id IN ($parametros[id_unico_del])";
                                 //. " AND NOT id_unico IN (SELECT id_unico FROM mos_registro_formulario WHERE IDDoc = $parametros[id]) ";                               
                             $this->dbl->insert_update($sql);
                         }
@@ -1221,6 +1244,19 @@ WHERE 1 =1";
                     }
                     else
                         $objResponse->addScriptCall('VerMensaje','error',$respuesta);
+
+                }
+                else{//no se agrego ninguna categoria
+                     $objResponse->addScriptCall('VerMensaje','error','Debe ingresar al menos una Familia para la matriz');
+                    $objResponse->addScript("$('#MustraCargando').hide();"); 
+                    $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                        $( '#btn-guardar' ).prop( 'disabled', false );
+                        $('#btn-guardar-not' ).html('Guardar');
+                        $( '#btn-guardar-not' ).prop( 'disabled', false );");
+                        return $objResponse;
+
+
+                }
                 }
                           
                 $objResponse->addScript("$('#MustraCargando').hide();"); 
@@ -1293,6 +1329,7 @@ WHERE 1 =1";
 
                 $contenido_1['CODIGO'] = ($val["codigo"]);
             $contenido_1['DESCRIPCION'] = ($val["descripcion"]);
+            //$contenido_1['ARBOL_ORG'] = ($val[""]);
 ;
                 import("clases.organizacion.ArbolOrganizacional");
                 $arbol = new ArbolOrganizacional();

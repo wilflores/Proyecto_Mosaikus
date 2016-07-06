@@ -36,6 +36,11 @@
                 VerMensaje('error','Debe Ingresar el Arbol Organizacional');
                 return;
             }
+            var i = $('#num_items_esp').val();
+            if(i==0){// para validar que al menos deben agregar una categoria
+                VerMensaje('error','Debe Agregar al menos una familia');
+                return;
+            }
             $( "#btn-guardar" ).html('Procesando..');
             $( "#btn-guardar" ).prop( "disabled", true );
             array = new XArray();

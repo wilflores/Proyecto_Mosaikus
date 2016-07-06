@@ -26,7 +26,7 @@
 <div class="form-group">
                                     <div class="tabs">
                                         <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">
-                                            <li><a href="#hv-red-2" data-toggle="tab">Categorías/Familias</a></li>
+                                            <li><a href="#hv-red-2" data-toggle="tab">Familias</a></li>
                                             
                                         </ul>
                                         <div id="my-tab-content" class="tab-content" style="padding: 45px 15px;">
@@ -35,7 +35,7 @@
                                                    <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="{TOK_NEW}"/>
                                                    <input type="hidden" id="id_unico_del" name="id_unico_del" value=""/>
                                                    <!--<input type="button" class="button add" value="Agregar" onClick="agregar_esp();" >-->
-                                                   <button type="button" style="margin-bottom: 10px;" onClick="agregar_esp();" class="btn btn-primary "><i class="glyphicon glyphicon-asterisk"></i>Agregar Categoría</button>
+                                                   <button type="button" style="margin-bottom: 10px;" id="boton_cat" onClick="agregar_esp();" class="btn btn-primary "><i class="glyphicon glyphicon-asterisk"></i>Agregar Familia</button>
                                                    
                                                     <table id="table-items-esp" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">
                                                         <thead>
