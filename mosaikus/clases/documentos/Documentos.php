@@ -1729,6 +1729,7 @@
                     //echo implode(',',  array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))));
                     /*FILTRO NO INCLUIR AREA ESPEJO*/
                     import('clases.organizacion.ArbolOrganizacional');
+                    
                     $ao = new ArbolOrganizacional();
                     //$ao->jstree_ao(0,$parametros);                    
                     $sql_filtro_area_espejo = "";
