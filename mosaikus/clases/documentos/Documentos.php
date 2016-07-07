@@ -1728,17 +1728,36 @@
                     //print_r(array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso)));
                     //echo implode(',',  array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))));
                     /*FILTRO NO INCLUIR AREA ESPEJO*/
+                    import('clases.organizacion.ArbolOrganizacional');
+                    $ao = new ArbolOrganizacional();
+                    //$ao->jstree_ao(0,$parametros);                    
                     $sql_filtro_area_espejo = "";
                     if ((strlen($atr["b-area_espejo"])>0)){ 
-                        $sql = "SELECT id FROM mos_organizacion_nombres WHERE NOT area_espejo IS NULL AND id IN (" . implode(',', array_keys($this->id_org_acceso)) . ")";
+                        $sql ="SELECT distinct id
+                                FROM mos_organizacion
+                                where  area_espejo is not null and 
+                                id not in (SELECT id
+                                FROM mos_organizacion
+                                where area_espejo in (select id_organizacion
+                                                      from mos_responsable_area
+                                                      WHERE cod_emp =". $_SESSION['CookCodEmp'].")
+                                           );";
+                        //$sql = "SELECT id FROM mos_organizacion_nombres WHERE NOT area_espejo IS NULL AND id IN (" . implode(',', array_keys($this->id_org_acceso)) . ")";
                         //echo $sql;
                         $data_area_espejo = $this->dbl->query($sql);
                         $ids_area_espejo = array();
+                        $cad_id_nodos_vinc_norespo='';
                         foreach ($data_area_espejo as $value) {
                             $ids_area_espejo[] = $value[id];
+                            $cad_id_nodos_vinc_norespo .= $ao->BuscaOrgNivelHijos($value[id]).',';
                         }
-                        if (count($ids_area_espejo)>0){
-                            $sql_filtro_area_espejo = " AND NOT id_organizacion_proceso IN (". implode(',', $ids_area_espejo) . ")";
+                        $cad_id_nodos_vinc_norespo .='-1';
+                        //print_r($ids_area_espejo);
+                        //echo $cad_id_nodos_vinc_norespo;
+                        //if (count($ids_area_espejo)>0){
+                        if ($cad_id_nodos_vinc_norespo !='-1'){
+                            //$sql_filtro_area_espejo = " AND NOT id_organizacion_proceso IN (". implode(',', $ids_area_espejo) . ")";
+                            $sql_filtro_area_espejo = " AND NOT id_organizacion_proceso IN (". $cad_id_nodos_vinc_norespo . ")";
                         }
                     } 
                     $filtro_ao ='';
@@ -1913,7 +1932,7 @@
                                                                       
                        $sql .= ")";
                     }
-                    
+                    //echo $sql;
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
             
