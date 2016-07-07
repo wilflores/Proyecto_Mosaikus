@@ -8,6 +8,7 @@
         private $nombres_columnas;
         private $placeholder;
         private $campos_activos;
+        private $restricciones;
             
             public function Cargos(){
                 parent::__construct();
@@ -62,8 +63,9 @@
                     ,observacion
                     ,interno
                     ,vigencia
-
+                    ,id_organizacion
                          FROM mos_cargo 
+                         left JOIN (select mos_cargo_estrorg_arbolproc.cod_cargo id_cargo , GROUP_CONCAT(id) id_organizacion from mos_cargo_estrorg_arbolproc GROUP BY mos_cargo_estrorg_arbolproc.cod_cargo) AS dao ON  cod_cargo = dao.id_cargo
                          WHERE cod_cargo = $id "; 
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
@@ -180,24 +182,26 @@
                         $sql_col_left .= ",p$k.nom_detalle p$k ";
                         $k++;
                     }*/
+                    $sql_where = '';
+                    if (strlen($atr['b-filtro-sencillo'])>0){
+                        $sql_where .= " AND (upper(descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
+                    }
+                    if (strlen($atr[valor])>0)
+                        $sql_where .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
+                                 if (strlen($atr["b-cod_cargo"])>0)
+                        $sql_where .= " AND cod_cargo = '". $atr[b-cod_cargo] . "'";
+                    if (strlen($atr["b-descripcion"])>0)
+                        $sql_where .= " AND upper(descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
+                    if (strlen($atr["b-observacion"])>0)
+                        $sql_where .= " AND observacion = '". $atr[b-observacion] . "'";
+                    if (strlen($atr["b-interno"])>0)
+                        $sql_where .= " AND upper(interno) like '%" . strtoupper($atr["b-interno"]) . "%'";
+                    if (strlen($atr["b-vigencia"])>0)
+                        $sql_where .= " AND upper(vigencia) like '%" . strtoupper($atr["b-vigencia"]) . "%'";
                     $sql = "SELECT COUNT(*) total_registros
                          FROM mos_cargo 
                          WHERE 1 = 1 ";
-                    if (strlen($atr['b-filtro-sencillo'])>0){
-                        $sql .= " AND (upper(descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
-                    }
-                    if (strlen($atr[valor])>0)
-                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
-                                 if (strlen($atr["b-cod_cargo"])>0)
-                        $sql .= " AND cod_cargo = '". $atr[b-cod_cargo] . "'";
-                    if (strlen($atr["b-descripcion"])>0)
-                        $sql .= " AND upper(descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
-                    if (strlen($atr["b-observacion"])>0)
-                        $sql .= " AND observacion = '". $atr[b-observacion] . "'";
-                    if (strlen($atr["b-interno"])>0)
-                        $sql .= " AND upper(interno) like '%" . strtoupper($atr["b-interno"]) . "%'";
-                    if (strlen($atr["b-vigencia"])>0)
-                        $sql .= " AND upper(vigencia) like '%" . strtoupper($atr["b-vigencia"]) . "%'";
+                    
 
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
@@ -433,6 +437,12 @@
                             </div>';
                     $k++;
                 }
+                
+                import('clases.utilidades.NivelAcceso');
+                $this->restricciones = new NivelAcceso();
+                //$this->restricciones->cargar_acceso_nodos_explicito($parametros);
+                $this->restricciones->cargar_permisos($parametros);
+                
                 $grid = $this->verListaCargos($parametros);
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
@@ -444,7 +454,7 @@
                 $contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;Cargos';
                 $contenido['TABLA'] = $grid['tabla'];
                 $contenido['PAGINADO'] = $grid['paginado'];
-                $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
+                $contenido['PERMISO_INGRESAR'] = $this->restricciones->per_crear == 'S' ? '' : 'display:none;';
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'cargo/';
@@ -512,6 +522,12 @@
                 }    
                 $contenido_1[CHECKED_INTERNO] = 'checked="checked"';
                 $contenido_1[CHECKED_VIGENCIA] = 'checked="checked"';
+                /*OBJETO ARBOL ORGANIZACIONAL*/
+                import('clases.organizacion.ArbolOrganizacional');
+                $ao = new ArbolOrganizacional();
+                $parametros[opcion] = 'simple';
+                $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
+                
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'cargo/';
                 $template->setTemplate("formulario");
@@ -537,10 +553,7 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");   
-                $objResponse->addScript('$("#id_pais").combobox({
-                                            select: function( event, ui ) {alert(123);}
-                                            }
-                                );');
+                $objResponse->addScript('ao_multiple();');
                 return $objResponse;
             }
      
@@ -615,11 +628,27 @@
                 $contenido_1['OBSERVACION'] = $val["observacion"];
                 $contenido_1['INTERNO'] = ($val["interno"]);
                 $contenido_1['VIGENCIA'] = ($val["vigencia"]);
+                
+                
                 //$contenido_1['VIGENCIA'] = ($val["vigencia"]);
                 $contenido_1[CHECKED_VIGENCIA] = $val["vigencia"] == 'S' ? 'checked="checked"' : '';
                 //$contenido_1['INTERNO'] = ($val["interno"]);
                 $contenido_1[CHECKED_INTERNO] = $val["interno"] == '1' ? 'checked="checked"' : '';
 
+                 /*OBJETO ARBOL ORGANIZACIONAL*/
+                $organizacion = array();
+                if(strpos($val[id_organizacion],',')){    
+                        $organizacion = explode(",", $val[id_organizacion]);
+                    }
+                    else{
+                        $organizacion[] = $val[id_organizacion];                    
+                    }
+                $parametros[nodos_seleccionados] = $organizacion;
+                import('clases.organizacion.ArbolOrganizacional');
+                $ao = new ArbolOrganizacional();
+                $parametros[opcion] = 'simple';
+                $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
+                
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'cargo/';
                 $template->setTemplate("formulario");
@@ -645,7 +674,9 @@
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
-                          });");  return $objResponse;
+                          });");  
+                $objResponse->addScript('ao_multiple();');
+                return $objResponse;
             }
      
  
