@@ -29,15 +29,13 @@
                                       </label>                              
                                   </div>
                                 <div class="form-group">
-                                    
-                                    <div class="col-md-10">
-                                        <label for="vigencia" class="col-md-10 control-label" style="text-align: left;">Árbol organizacional</label>
+                                    <br>
+                                    <div class="col-md-offset-2 col-md-12">
+                                        <!--<label for="vigencia" class="col-md-10 control-label" style="text-align: left;">Árbol organizacional</label>-->
                                         <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
-                                        <iframe id="iframearbol" src="pages/cargo/prueba_arbolV4.php?cod_cargo={COD_CARGO}" frameborder="0" width="100%" height="350px" scrolling="no"></iframe>
+                                        <!--<iframe id="iframearbol" src="pages/cargo/prueba_arbolV4.php?cod_cargo={COD_CARGO}" frameborder="0" width="100%" height="350px" scrolling="no"></iframe>
+                                        -->
+                                        {DIV_ARBOL_ORGANIZACIONAL}
                                     </div>
-                                    <div class="col-md-12">
-                                        
-                                                {OTROS_CAMPOS}
-                                        
-                                    </div>
+                                    
                                 </div>

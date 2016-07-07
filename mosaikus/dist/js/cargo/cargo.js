@@ -1,146 +1,3 @@
-function prueba(){
-    
-    (function( $ ) {
-    $.widget( "custom.combobox", {
-      _create: function() {
-        this.wrapper = $( "<span>" )
-          .addClass( "custom-combobox" )
-          .insertAfter( this.element );
- 
-        this.element.hide();
-        this._createAutocomplete();
-        this._createShowAllButton();
-      },
- 
-      _createAutocomplete: function() {
-        var selected = this.element.children( ":selected" ),
-          value = selected.val() ? selected.text() : "";
- 
-        this.input = $( "<input>" )
-          .appendTo( this.wrapper )
-          .val( value )
-          .attr( "title", "" )
-          .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
-          .autocomplete({
-            delay: 0,
-            minLength: 0,
-            source: $.proxy( this, "_source" )
-          })
-          .tooltip({
-            tooltipClass: "ui-state-highlight"
-          });
- 
-        this._on( this.input, {
-          autocompleteselect: function( event, ui ) {
-            ui.item.option.selected = true;
-            this._trigger( "select", event, {
-              item: ui.item.option
-            });
-          },
- 
-          autocompletechange: "_removeIfInvalid"
-        });
-      },
- 
-      _createShowAllButton: function() {
-        var input = this.input,
-          wasOpen = false;
- 
-        $( "<a>" )
-          .attr( "tabIndex", -1 )
-          .attr( "title", "Ver todos los Items" )
-          .tooltip()
-          .appendTo( this.wrapper )
-          .button({
-            icons: {
-              primary: "ui-icon-triangle-1-s"
-            },
-            text: false
-          })
-          .removeClass( "ui-corner-all" )
-          .addClass( "custom-combobox-toggle ui-corner-right" )
-          .mousedown(function() {
-            wasOpen = input.autocomplete( "widget" ).is( ":visible" );
-          })
-          .click(function() {
-            input.focus();
- 
-            // Close if already visible
-            if ( wasOpen ) {
-              return;
-            }
- 
-            // Pass empty string as value to search for, displaying all results
-            input.autocomplete( "search", "" );
-          });
-      },
- 
-      _source: function( request, response ) {
-        var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
-        response( this.element.children( "option" ).map(function() {
-          var text = $( this ).text();
-          if ( this.value && ( !request.term || matcher.test(text) ) )
-            return {
-              label: text,
-              value: text,
-              option: this
-            };
-        }) );
-      },
- 
-      _removeIfInvalid: function( event, ui ) {
- 
-        // Selected an item, nothing to do
-        if ( ui.item ) {
-          return;
-        }
- 
-        // Search for a match (case-insensitive)
-        var value = this.input.val(),
-          valueLowerCase = value.toLowerCase(),
-          valid = false;
-        this.element.children( "option" ).each(function() {
-          if ( $( this ).text().toLowerCase() === valueLowerCase ) {
-            this.selected = valid = true;
-            return false;
-          }
-        });
- 
-        // Found a match, nothing to do
-        if ( valid ) {
-          return;
-        }
- 
-        // Remove invalid value
-        this.input
-          .val( "" )
-          .attr( "title", value + " no encontró ningún elemento" )
-          .tooltip( "open" );
-        this.element.val( "" );
-        this._delay(function() {
-          this.input.tooltip( "close" ).attr( "title", "" );
-        }, 2500 );
-        this.input.autocomplete( "instance" ).term = "";
-      },
- 
-      _destroy: function() {
-        this.wrapper.remove();
-        this.element.show();
-      }
-    });
-  })( jQuery );
-    
-    
-    $(function() {
-        $( "#id_pais" ).combobox({
-                select: function (event, ui) { 
-                     alert(this.value);
-                 } 
-            }
-         );   
-    });
-    
-}
 
     
     function filtrar_mostrar_colums(){
@@ -176,10 +33,10 @@ function prueba(){
         
         if($('#idFormulario').isValid()) {
             
-            var iframe = document.getElementById("iframearbol");
-            iframe.contentWindow.submitMe();
+            //var iframe = document.getElementById("iframearbol");
+            //iframe.contentWindow.submitMe();
 
-            var _TxtIdNodos = document.getElementById("nodos").value = iframe.contentWindow.document.getElementById('jsfields').value;
+            var _TxtIdNodos = document.getElementById("nodos").value;
             if (_TxtIdNodos == ''){
                 VerMensaje('error','Debe Ingresar el Arbol Organizacional');
                 return;
@@ -254,4 +111,50 @@ function prueba(){
                 });        
         $("#ver_ficha_trabajador").trigger('click');        
     }
-    
+
+function ao_multiple(){    
+    $('#div-ao-form').jstree(
+            {
+                "checkbox":{
+                    three_state : false,
+                        cascade : ''
+                },
+                "plugins": ["search", "types","checkbox"]
+            }
+        );
+    $("#div-ao-form").on("select_node.jstree", function (e, data) {
+        if(data.event) { 
+            data.instance.select_node(data.node.children_d);
+        }
+    });
+    $("#div-ao-form").on("deselect_node.jstree", function (e, data) {
+        if(data.event) { data.instance.deselect_node(data.node.children_d); }
+    });
+    var to_2 = false;
+   $('#div-ao-form').on("changed.jstree", function (e, data) {
+       if (data.selected.length > 0){
+           var arr;
+           var id = '';
+           for(i=0;i<data.selected.length;i++){
+               arr = data.selected[i].split("_");
+               id = id + arr[1] + ',';
+           }
+           id = id.substr(0,id.length-1);
+           $('#nodos').val(id);
+           
+           
+       }
+       else
+           $('#nodos').val('');        
+   });
+    var to = false;
+    $('#demo_q_ao').keyup(function () {                    
+            if(to) { clearTimeout(to); }
+            to = setTimeout(function () {
+                    var v = $('#demo_q_ao').val();
+                    $('#div-ao-form').jstree(true).search(v);
+            }, 250);
+    });  
+//    $('#div-ao-form').jstree(true).open_all();               
+        
+}    
