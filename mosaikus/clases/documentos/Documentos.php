@@ -1733,32 +1733,58 @@
                     $ao = new ArbolOrganizacional();
                     //$ao->jstree_ao(0,$parametros);                    
                     $sql_filtro_area_espejo = "";
-                    if ((strlen($atr["b-area_espejo"])>0)){ 
-                        $sql ="SELECT distinct id
-                                FROM mos_organizacion
-                                where  area_espejo is not null and 
-                                id not in (SELECT id
-                                FROM mos_organizacion
-                                where area_espejo in (select id_organizacion
-                                                      from mos_responsable_area
-                                                      WHERE cod_emp =". $_SESSION['CookCodEmp'].")
-                                           );";
+                    if (strlen($atr["b-area_espejo"])>0){
+                        if(strlen($_SESSION['CookCodEmp'])>0){
+                            $sql ="SELECT distinct id
+                                    FROM mos_organizacion
+                                    where  area_espejo is not null and 
+                                    id not in (SELECT id
+                                    FROM mos_organizacion
+                                    where area_espejo in (select id_organizacion
+                                                          from mos_responsable_area
+                                                          WHERE cod_emp =". $_SESSION['CookCodEmp'].")
+                                               );";  
+                            $sql_resp="select id_organizacion
+                                        from mos_responsable_area
+                                        WHERE cod_emp =". $_SESSION['CookCodEmp']."";
+                        }else{
+                            $sql ="SELECT distinct id
+                                    FROM mos_organizacion
+                                    where  area_espejo is not null;";                        
+                            
+                        }
+                        //$empl_inter = array();
+                        //$empl_inter = (array_diff(array_column($empleados,'cod_emp'), array_column($emp_resp,'id_personal_aprueba')));
                         //$sql = "SELECT id FROM mos_organizacion_nombres WHERE NOT area_espejo IS NULL AND id IN (" . implode(',', array_keys($this->id_org_acceso)) . ")";
                         //echo $sql;
                         $data_area_espejo = $this->dbl->query($sql);
                         $ids_area_espejo = array();
                         $cad_id_nodos_vinc_norespo='';
+                        //PRIMERO LOS NODOS VINCULADOS DONDE NO SE ES RESPONSABLE Y SUS HIJOS
                         foreach ($data_area_espejo as $value) {
                             $ids_area_espejo[] = $value[id];
                             $cad_id_nodos_vinc_norespo .= $ao->BuscaOrgNivelHijos($value[id]).',';
                         }
                         $cad_id_nodos_vinc_norespo .='-1';
-                        //print_r($ids_area_espejo);
-                        //echo $cad_id_nodos_vinc_norespo;
-                        //if (count($ids_area_espejo)>0){
+                        $nodos_vinc_no_resp = array();
+                        $nodos_vinc_no_resp = explode(",", $cad_id_nodos_vinc_norespo);
+                        if(strlen($_SESSION['CookCodEmp'])>0){
+                            $data_area_resp = $this->dbl->query($sql_resp);
+                            //SEGUNDO LOS NODOS DONDE SE ES RESPONSABLE Y SUS HIJOS
+                            $cad_id_nodos_respo='';
+                            //print_r($data_area_resp);
+                            foreach ($data_area_resp as $value) {
+                                $cad_id_nodos_respo .= $ao->BuscaOrgNivelHijos($value[id_organizacion]).',';
+                            }
+                            $cad_id_nodos_respo .='-2';
+                            $nodos_resp = array();
+                            $nodos_resp = explode(",", $cad_id_nodos_respo);
+                            // quitamos los nodos que coincidan
+                            $nodos_vinc_no_resp = (array_diff($nodos_vinc_no_resp, $nodos_resp));
+                        }
                         if ($cad_id_nodos_vinc_norespo !='-1'){
                             //$sql_filtro_area_espejo = " AND NOT id_organizacion_proceso IN (". implode(',', $ids_area_espejo) . ")";
-                            $sql_filtro_area_espejo = " AND NOT id_organizacion_proceso IN (". $cad_id_nodos_vinc_norespo . ")";
+                            $sql_filtro_area_espejo = " AND NOT id_organizacion_proceso IN (". implode(',', $nodos_vinc_no_resp) . ")";
                         }
                     } 
                     $filtro_ao ='';
