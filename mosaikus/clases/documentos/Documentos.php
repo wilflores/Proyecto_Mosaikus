@@ -2498,6 +2498,7 @@
          
         
             public function verListaDocumentosReporte($parametros){
+               // print_r($parametros);
                 if($_SESSION[ParamAdic]=='formulario') $parametros['formulario']='S';
                 $grid= "";
                 $grid= new DataGrid();
@@ -2645,7 +2646,12 @@
                 }
                 return $out;
             }
- 
+        public function exportarPHPExcel($parametros){
+        $grid= new DataGrid();
+        $this->listarDocumentos($parametros, 1, 100000);
+        return $this->dbl->data;
+        
+        }
         public function exportarExcel($parametros){
 
 
@@ -2771,7 +2777,7 @@
                 $grid->setAligns(6,"center");
             $grid->SetTitulosTabla("td-titulo-tabla-row", $config);
             $grid->setData2("td-table-data", $data);
-
+           // print_r($data);die;
             return $grid->armarTabla();
         }
  
@@ -3250,7 +3256,7 @@
                    
             
             public function indexDocumentosReporte($parametros)
-            {
+            { 
                 $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
                 $contenido[TITULO_MODULO] .= '<br><label class="checkbox-inline"> 
                                     <input type="checkbox" class="b-mi-ocultar-publico" value="S"> Ocultar P&uacute;blicos </label>';
@@ -6147,112 +6153,13 @@
                 //echo $sql;
             $empleados = $this->dbl->data;
             $cod_emp = implode(",", array_column($empleados,'cod_emp'));
-            
-             if($cod_emp!=''){
-                 //echo $cod_emp;
-                 // CONSULTAMOS SI ESTOS COD_EMP TIENEN WF
-                 $sql="SELECT wf.id_personal_aprueba
-                           FROM mos_workflow_documentos AS wf
-                           left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
-                           INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
-                           WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
-                 $this->operacion($sql, $atr);
-                 $emp_resp = $this->dbl->data;
-                 // print_r($empleados);
-                 $empl_inter = array();
-                 $empl_inter = (array_diff(array_column($empleados,'cod_emp'), array_column($emp_resp,'id_personal_aprueba')));
-                     //RECORREMOS LOS COD_EMP QUE NO TIENEN WF Y HAY QUE CREARLO
-                    foreach($empleados as $value){
-                        if (in_array($value[cod_emp], $empl_inter)){
-                            $atr =array();
-                            $atr[id_personal_responsable]=$_SESSION['CookCodEmp'];
-                            $atr[email_responsable]=$_SESSION['CookEmail'];
-                            $atr[id_personal_aprueba]=$value[cod_emp];
-                            $atr[email_aprueba]=$value[email];
-                            $wf->ingresarWorkflowDocumentos($atr);
-                          //  print_r($atr);
-                        }
-                        
-                    }                 
-                //VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR
-                $sql= $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
-                //echo 'query 1 VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR '.$sql;
-                $this->operacion($sql, $atr);
-                if(sizeof($this->dbl->data)>0){
-                    //ESTE RESPONSABLE DE AREA TIENE WF COMO APROBADOR
-                    $datos = $this->dbl->data;
-                    $sql .=" UNION ALL ".$campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
-                    $seleccionar=$cod_emp;
-                    //echo 'query 2 TIENE WF EL RESPONSABLE  '.$sql;
-                }
-                else{
-
-                    $sql= $campos . " WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."')";
-                    // echo 'query 2 NO TIENE WF EL RESPONSABLE  E INSERTAMOS '.$sql;
-                }
-                $sql_wf_sel="SELECT wf.id
-                   FROM mos_workflow_documentos AS wf
-                   WHERE wf.id_personal_aprueba in (".$cod_emp.") and (wf.id_personal_responsable=".$_SESSION['CookCodEmp'].")"
-                . " limit 0,1";
-                $this->operacion($sql_wf_sel, $atr);
-                $seleccionar=$this->dbl->data[0][id];
-
+            if($_SESSION['CookCodEmp'] == '' AND ($_SESSION[SuperUser]=='S')){
+                $sql = $campos;
             }
             else{
-                //EL AREA NO TIENE RESPONSABLE Y BUSCAMOS EL REPONSABLE DEL AREA SUPERIOR
-                //select min(level) nivel from mos_organizacion where id IN
-                $sql = "SELECT
-                    mos_personal.cod_emp, mos_personal.email, mos_organizacion.id id_organizacion
-                    FROM
-                    mos_organizacion inner join (SELECT
-                            min(mos_organizacion.level) level
-                            FROM
-                            mos_organizacion
-                            WHERE
-                            mos_organizacion.id in ((select parent_id from mos_organizacion where id IN (".$parametros[nodos].") ))) nivel_minimo
-                    on nivel_minimo.`level`= mos_organizacion.`level` INNER JOIN mos_documentos_cargos AS resp 
-                    ON mos_organizacion.id = resp.id_organizacion INNER JOIN mos_personal 
-                    ON mos_personal.cod_emp = resp.cod_emp 
-                    WHERE
-                    resp.id_organizacion in ((select parent_id from mos_organizacion where id IN (".$parametros[nodos].") )); 
-                    ";
-                //echo $sql;
-                //echo 'query 1 SINO VERIFICAMOS SI EL RESPONSABLE SUPERIOR DE AREA TIENE WF ASIGNADO COMO APROBADOR '.$sql;
-                $this->operacion($sql, $atr);
-                //echo $sql;
-                //print_r($this->dbl->data);
-                $empleados = $this->dbl->data;
-                if(sizeof($this->dbl->data)>0){
-                $cod_emp = implode(',', array_column($this->dbl->data,'cod_emp'));
-                }  
-                else{ 
-                    //SI NO TRAE NADA, SUBO UN NIVEL MAS
-                    $sql = "SELECT
-                        mos_personal.cod_emp, mos_personal.email, mos_organizacion.id id_organizacion
-                        FROM
-                        mos_organizacion inner join (SELECT
-                                min(mos_organizacion.level) level
-                                FROM
-                                mos_organizacion
-                                WHERE
-                                mos_organizacion.id in ((select parent_id from mos_organizacion where id IN (select parent_id from mos_organizacion where id IN (".$parametros[nodos].")) ))) nivel_minimo
-                        on nivel_minimo.`level`= mos_organizacion.`level` INNER JOIN mos_documentos_cargos AS resp 
-                        ON mos_organizacion.id = resp.id_organizacion INNER JOIN mos_personal 
-                        ON mos_personal.cod_emp = resp.cod_emp 
-                        WHERE
-                        resp.id_organizacion in ((select parent_id from mos_organizacion where id IN (select parent_id from mos_organizacion where id IN (".$parametros[nodos].")) )); 
-                        ";
-                    $this->operacion($sql, $atr);
-                    //echo $sql;
-                    //print_r($this->dbl->data);
-                    $empleados = $this->dbl->data;
-                    if(sizeof($this->dbl->data)>0){
-                    $cod_emp = implode(',', array_column($this->dbl->data,'cod_emp'));
-                    }                      
-                }
-                //print_r($empleados);
-                //echo $cod_emp;
                 if($cod_emp!=''){
+                    //echo $cod_emp;
+                    // CONSULTAMOS SI ESTOS COD_EMP TIENEN WF
                     $sql="SELECT wf.id_personal_aprueba
                               FROM mos_workflow_documentos AS wf
                               left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
@@ -6260,7 +6167,7 @@
                               WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
                     $this->operacion($sql, $atr);
                     $emp_resp = $this->dbl->data;
-                    // print_r($emp_resp);
+                    // print_r($empleados);
                     $empl_inter = array();
                     $empl_inter = (array_diff(array_column($empleados,'cod_emp'), array_column($emp_resp,'id_personal_aprueba')));
                         //RECORREMOS LOS COD_EMP QUE NO TIENEN WF Y HAY QUE CREARLO
@@ -6272,34 +6179,137 @@
                                $atr[id_personal_aprueba]=$value[cod_emp];
                                $atr[email_aprueba]=$value[email];
                                $wf->ingresarWorkflowDocumentos($atr);
-                               //print_r($atr);
+                             //  print_r($atr);
                            }
 
-                       }                          
-                    //VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR
-                    $sql = $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
-                    $this->operacion($sql, $atr);
-                    if(sizeof($this->dbl->data)>0){
-                        //ESTE RESPONSABLE DE AREA TIENE WF COMO APROBADOR
-                        $datos = $this->dbl->data;
-                        $sql .=" UNION ALL ". $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
-                          //$this->operacion($sql, $atr);
-                        //$datos = $this->dbl->data;
-                        //$resultado = array_merge($datos, $this->dbl->data);
-                    }
-                    else{
-                        $sql=  $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."')";
-                        $sql_wf_sel="SELECT wf.id
-                                   FROM mos_workflow_documentos AS wf
-                                   WHERE wf.id_personal_aprueba in (".$cod_emp.") and (wf.id_personal_responsable=".$_SESSION['CookCodEmp'].")"
-                                . " limit 1,1";
-                        $this->operacion($sql_wf_sel, $atr);
-                        $seleccionar=$this->dbl->data[0][id];
-                    }
-                }  
-                else {
-                    $sql=  $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."')";
-                }
+                       }                 
+                   //VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR
+                   $sql= $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
+                   //echo 'query 1 VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR '.$sql;
+                   $this->operacion($sql, $atr);
+                   if(sizeof($this->dbl->data)>0){
+                       //ESTE RESPONSABLE DE AREA TIENE WF COMO APROBADOR
+                       $datos = $this->dbl->data;
+                       $sql .=" UNION ALL ".$campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
+                       $seleccionar=$cod_emp;
+                       //echo 'query 2 TIENE WF EL RESPONSABLE  '.$sql;
+                   }
+                   else{
+
+                       $sql= $campos . " WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."')";
+                       // echo 'query 2 NO TIENE WF EL RESPONSABLE  E INSERTAMOS '.$sql;
+                   }
+                   $sql_wf_sel="SELECT wf.id
+                      FROM mos_workflow_documentos AS wf
+                      WHERE wf.id_personal_aprueba in (".$cod_emp.") and (wf.id_personal_responsable=".$_SESSION['CookCodEmp'].")"
+                   . " limit 0,1";
+                   $this->operacion($sql_wf_sel, $atr);
+                   $seleccionar=$this->dbl->data[0][id];
+
+               }
+               else{
+                   //EL AREA NO TIENE RESPONSABLE Y BUSCAMOS EL REPONSABLE DEL AREA SUPERIOR
+                   //select min(level) nivel from mos_organizacion where id IN
+                   $sql = "SELECT
+                       mos_personal.cod_emp, mos_personal.email, mos_organizacion.id id_organizacion
+                       FROM
+                       mos_organizacion inner join (SELECT
+                               min(mos_organizacion.level) level
+                               FROM
+                               mos_organizacion
+                               WHERE
+                               mos_organizacion.id in ((select parent_id from mos_organizacion where id IN (".$parametros[nodos].") ))) nivel_minimo
+                       on nivel_minimo.`level`= mos_organizacion.`level` INNER JOIN mos_documentos_cargos AS resp 
+                       ON mos_organizacion.id = resp.id_organizacion INNER JOIN mos_personal 
+                       ON mos_personal.cod_emp = resp.cod_emp 
+                       WHERE
+                       resp.id_organizacion in ((select parent_id from mos_organizacion where id IN (".$parametros[nodos].") )); 
+                       ";
+                   //echo $sql;
+                   //echo 'query 1 SINO VERIFICAMOS SI EL RESPONSABLE SUPERIOR DE AREA TIENE WF ASIGNADO COMO APROBADOR '.$sql;
+                   $this->operacion($sql, $atr);
+                   //echo $sql;
+                   //print_r($this->dbl->data);
+                   $empleados = $this->dbl->data;
+                   if(sizeof($this->dbl->data)>0){
+                   $cod_emp = implode(',', array_column($this->dbl->data,'cod_emp'));
+                   }  
+                   else{ 
+                       //SI NO TRAE NADA, SUBO UN NIVEL MAS
+                       $sql = "SELECT
+                           mos_personal.cod_emp, mos_personal.email, mos_organizacion.id id_organizacion
+                           FROM
+                           mos_organizacion inner join (SELECT
+                                   min(mos_organizacion.level) level
+                                   FROM
+                                   mos_organizacion
+                                   WHERE
+                                   mos_organizacion.id in ((select parent_id from mos_organizacion where id IN (select parent_id from mos_organizacion where id IN (".$parametros[nodos].")) ))) nivel_minimo
+                           on nivel_minimo.`level`= mos_organizacion.`level` INNER JOIN mos_documentos_cargos AS resp 
+                           ON mos_organizacion.id = resp.id_organizacion INNER JOIN mos_personal 
+                           ON mos_personal.cod_emp = resp.cod_emp 
+                           WHERE
+                           resp.id_organizacion in ((select parent_id from mos_organizacion where id IN (select parent_id from mos_organizacion where id IN (".$parametros[nodos].")) )); 
+                           ";
+                       $this->operacion($sql, $atr);
+                       //echo $sql;
+                       //print_r($this->dbl->data);
+                       $empleados = $this->dbl->data;
+                       if(sizeof($this->dbl->data)>0){
+                       $cod_emp = implode(',', array_column($this->dbl->data,'cod_emp'));
+                       }                      
+                   }
+                   //print_r($empleados);
+                   //echo $cod_emp;
+                   if($cod_emp!=''){
+                       $sql="SELECT wf.id_personal_aprueba
+                                 FROM mos_workflow_documentos AS wf
+                                 left JOIN mos_personal AS perso_revisa ON wf.id_personal_revisa = perso_revisa.cod_emp
+                                 INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
+                                 WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
+                       $this->operacion($sql, $atr);
+                       $emp_resp = $this->dbl->data;
+                       // print_r($emp_resp);
+                       $empl_inter = array();
+                       $empl_inter = (array_diff(array_column($empleados,'cod_emp'), array_column($emp_resp,'id_personal_aprueba')));
+                           //RECORREMOS LOS COD_EMP QUE NO TIENEN WF Y HAY QUE CREARLO
+                          foreach($empleados as $value){
+                              if (in_array($value[cod_emp], $empl_inter)){
+                                  $atr =array();
+                                  $atr[id_personal_responsable]=$_SESSION['CookCodEmp'];
+                                  $atr[email_responsable]=$_SESSION['CookEmail'];
+                                  $atr[id_personal_aprueba]=$value[cod_emp];
+                                  $atr[email_aprueba]=$value[email];
+                                  $wf->ingresarWorkflowDocumentos($atr);
+                                  //print_r($atr);
+                              }
+
+                          }                          
+                       //VERIFICAMOS SI EL RESPONSABLE DE AREA TIENE WF ASIGNADO COMO APROBADOR
+                       $sql = $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba in (".$cod_emp." )";
+                       $this->operacion($sql, $atr);
+                       if(sizeof($this->dbl->data)>0){
+                           //ESTE RESPONSABLE DE AREA TIENE WF COMO APROBADOR
+                           $datos = $this->dbl->data;
+                           $sql .=" UNION ALL ". $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
+                             //$this->operacion($sql, $atr);
+                           //$datos = $this->dbl->data;
+                           //$resultado = array_merge($datos, $this->dbl->data);
+                       }
+                       else{
+                           $sql=  $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."')";
+                           $sql_wf_sel="SELECT wf.id
+                                      FROM mos_workflow_documentos AS wf
+                                      WHERE wf.id_personal_aprueba in (".$cod_emp.") and (wf.id_personal_responsable=".$_SESSION['CookCodEmp'].")"
+                                   . " limit 1,1";
+                           $this->operacion($sql_wf_sel, $atr);
+                           $seleccionar=$this->dbl->data[0][id];
+                       }
+                   }  
+                   else {
+                       $sql=  $campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."')";
+                   }
+               }
             }
             //$sql .=" UNION ALL ".$campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
             //$sql .=" UNION ALL ".$campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
