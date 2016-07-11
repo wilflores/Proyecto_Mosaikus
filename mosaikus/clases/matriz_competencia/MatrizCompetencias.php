@@ -132,27 +132,66 @@
                 }
                 return $html;
             }
-            /*
+/*funcion para permisos de eliminar o editar en areas asociadas a la matriz****/
             public function colum_admin_arbol($tupla)
             {        
-            //print_r($tupla);        
-                if ($this->id_org_acceso_explicito[$tupla[id_mat]][modificar] == 'S')
-                {                    
+            //print_r($tupla);
+                $organizacion = array();
+                if(strpos($tupla[id_area],',')){    
+                    $organizacion = explode(",", $tupla[id_area]);
+                }
+                else{
+                    $organizacion[] = $tupla[id_area];                                 
+                }        
+
+                    /*SE VALIDA QUE PUEDE EDITAR EN TODAS LAS AREAS*/
+                    foreach ($organizacion as $value_2) {
+                        if ((isset($this->id_org_acceso_explicito[$value_2]))&& ($this->id_org_acceso_explicito[$value_2][modificar]=='S')){
+                                $editar = true;
+                        } else{
+                            $editar = false;
+                            break;
+                        }
+                    }
+                    if (($editar == true)||($_SESSION[SuperUser] == 'S'))
+                    //if ($this->id_org_acceso_explicito[$tupla[id_organizacion]][modificar] == 'S')
+                    {                    
                     $html = "<a href=\"#\" onclick=\"javascript:editarMatrizCompetencias('". $tupla[id_mat] . "');\"  title=\"Editar MatrizCompetencias\">                            
                                 <i class=\"icon icon-edit\"></i>
                             </a>";
-                }
-                if ($this->id_org_acceso_explicito[$tupla[id_mat]][eliminar] == 'S')
-                {
-                    $html .= "<a href=\"#\" onclick=\"javascript:eliminarMatrizCompetencias('". $tupla[id_mat] . "');\" title=\"Eliminar MatrizCompetencias\">
-                            <i class=\"icon icon-remove\"></i>
-
-                        </a>"; 
-                }
+                    }
+                    $editar = false;                        
+                    $organizacion = array();
+                    if(strpos($tupla[id_area],',')){    
+                        $organizacion = explode(",", $tupla[id_area]);
+                    }
+                    else{
+                        $organizacion[] = $tupla[id_area];                                 
+                    }
+                    /*SE VALIDA QUE PUEDE ELIMINAR EN TODAS LAS AREAS*/
+                    foreach ($organizacion as $value_2) {
+                        if ((isset($this->id_org_acceso_explicito[$value_2]))&&($this->id_org_acceso_explicito[$value_2][eliminar]=='S')){
+                                $eliminar = true;
+                        } else{
+                            $eliminar = false;
+                            break;
+                        }
+                    }
+                    if (($eliminar == true)||($_SESSION[SuperUser] == 'S'))                  
+                    //if ($this->id_org_acceso_explicito[$tupla[id_organizacion]][eliminar] == 'S')
+                    {
+                        $html .= '<a onclick="javascript:eliminarMatrizCompetencias(\''.$tupla[id_mat].'\');;">
+                                    <i style="cursor:pointer" class="icon icon-remove" title="Eliminar MatrizCompetencias" style="cursor:pointer"></i>
+                                </a>';
+                    }
+                
+                   
                 return $html;
+
+
             }
 
-*/
+/***** adaptacion de column_admin_arbol- FIN ******/
 
        
      
@@ -415,57 +454,44 @@
              }
 
              public function listarMatrizCompetencias($atr, $pag, $registros_x_pagina){
-                    
+                    //print_r($atr);
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
-                    /* if (count($this->parametros) <= 0){
+                     if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                     }                    
                     $k = 1;                    
-                    foreach ($this->parametros as $value) {
-                        $sql_left .= " LEFT JOIN(select t1.id_registro, t2.descripcion as nom_detalle from mos_parametro_modulos t1
-                                inner join mos_parametro_det t2 on t1.cod_categoria=t2.cod_categoria and t1.cod_parametro=t2.cod_parametro and t1.cod_parametro_det=t2.cod_parametro_det
-                        where t1.cod_categoria='3' and t1.cod_parametro='$value[cod_parametro]' ) AS p$k ON p$k.id_registro = p.cod_emp "; 
-                        $sql_col_left .= ",p$k.nom_detalle p$k ";
-                        $k++;
-                    }
-                    */
+
                     if (count($this->id_org_acceso_explicito) <= 0){
                         $this->cargar_acceso_nodos_explicito($atr);
                     }
-/*$sql = "SELECT COUNT( * ) total_registros
-FROM mos_matriz_competencia 
-WHERE 1 =1";*/
+
+
                     $sql = "SELECT COUNT( * ) total_registros
 FROM mos_matriz_competencia AS ma
 INNER JOIN mos_matriz_organizacion AS mo ON mo.id_matriz = ma.id
 INNER JOIN mos_matriz_categorias AS mcat ON mcat.id_matriz = ma.id
 WHERE 1 =1";
 //echo $sql;
-                  /*  if (strlen($atr['b-filtro-sencillo'])>0){
-                        $sql .= " AND ((upper(mc.codigo) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
-                        $sql .= " OR (1 = 1";
-                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);                                                  
-                       // foreach ($nombre_supervisor as $supervisor_aux) {
-                        //   $sql .= " AND (upper(concat(nombres, ' ', apellido_paterno, ' ' , apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
-                       // } 
-                        $sql .= " ) ";
-                        $sql .= " OR (upper(mc.descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
+                    if (strlen($atr['b-filtro-sencillo'])>0){
+                        $sql .= " AND ((upper(ma.codigo) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
+                        $sql .= " OR (upper(ma.descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
                     }
                     if (strlen($atr[valor])>0)
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
-                                if (strlen($atr["b-codigo"])>0)
-                        $sql .= " AND upper(mc.codigo) like '%" . strtoupper($atr["b-codigo"]) . "%'";
-            if (strlen($atr["b-descripcion"])>0)
-                        $sql .= " AND upper(mc.descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
-*/
-                    if (count($this->id_org_acceso)>0){                            
-                        $sql .= " AND id_area IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
+                    if (strlen($atr["b-codigo"])>0)
+                        $sql .= " AND upper(ma.codigo) like '%" . strtoupper($atr["b-codigo"]) . "%'";
+                    if (strlen($atr["b-descripcion"])>0)
+                        $sql .= " AND upper(ma.descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
+                    /*FILTRO PARA EL ARBOL ORGANIZACIONAL*/
+                    if ((strlen($atr["b-id_organizacion"])>0)){  
+                        $id_org = ($atr["b-id_organizacion"]);
+                        $sql .= " AND mo.id_area in (". $id_org . ") ";//" AND id_organizacion IN (". $id_org . ")";
                     }
                     $total_registros = $this->dbl->query($sql, $atr);
-                    $this->total_registros = $total_registros[0][total_registros];   
-            
-                   /* $sql = "SELECT   id,codigo
+                    $this->total_registros = $total_registros[0][total_registros];
+                    //echo $sql;       
+           /* $sql = "SELECT   id,codigo
                                     ,descripcion
                                      $sql_col_left
                             FROM mos_matriz_competencia $sql_left
@@ -476,32 +502,32 @@ WHERE 1 =1";
                             INNER JOIN (select id_matriz, GROUP_CONCAT(distinct id_area) arbol_organizacional 
                                 from mos_matriz_organizacion GROUP BY id_matriz) AS mo ON mo.id_matriz = ma.id 
                              INNER JOIN mos_matriz_categorias AS mcat ON mcat.id_matriz= ma.id $sql_left  WHERE 1 = 1";*/
-
+                    /*FILTRO PARA EL ARBOL ORGANIZACIONAL*/
+                    $filtro_ao='';
+                    if ((strlen($atr["b-id_organizacion"])>0)){ // filtro para el arbol organizacional
+                        $id_org = ($atr["b-id_organizacion"]);
+                        $filtro_ao= " where id_area in (". $id_org . ") ";
+                   }
                              $sql="SELECT ma.id id_mat, ma.codigo codigo_mat, ma.descripcion descripcion_mat, arbol_organizacional id_area, categoria id
                                 $sql_col_left FROM mos_matriz_competencia AS ma 
                                 INNER JOIN (SELECT id_matriz, GROUP_CONCAT( DISTINCT id_area ) arbol_organizacional 
-                                FROM mos_matriz_organizacion GROUP BY id_matriz) AS mo ON mo.id_matriz = ma.id
+                                FROM mos_matriz_organizacion $filtro_ao GROUP BY id_matriz) AS mo ON mo.id_matriz = ma.id
                                 INNER JOIN (SELECT id_matriz, GROUP_CONCAT( DISTINCT id ) categoria
                                 FROM mos_matriz_categorias GROUP BY id_matriz) AS mcat ON mcat.id_matriz = ma.id $sql_left
                                 WHERE 1 =1";
                             
-                    /*if (strlen($atr['b-filtro-sencillo'])>0){
-                        $sql .= " AND ((upper(mc.codigo) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
-                        $sql .= " OR (1 = 1";
-                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);                                                  
-                        //foreach ($nombre_supervisor as $supervisor_aux) {
-                         //  $sql .= " AND (upper(concat(nombres, ' ', apellido_paterno, ' ' , apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
-                       //} 
-                        $sql .= " ) ";
-                        $sql .= " OR (upper(mc.descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
+                    if (strlen($atr['b-filtro-sencillo'])>0){
+                        $sql .= " AND ((upper(ma.codigo) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
+
+                        $sql .= " OR (upper(ma.descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
                     }
                     if (strlen($atr[valor])>0)
-                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
+                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
                                 if (strlen($atr["b-codigo"])>0)
-                        $sql .= " AND upper(mc.codigo) like '%" . strtoupper($atr["b-codigo"]) . "%'";
-            if (strlen($atr["b-descripcion"])>0)
-                        $sql .= " AND upper(mc.descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
-*/
+                        $sql .= " AND upper(ma.codigo) like '%" . strtoupper($atr["b-codigo"]) . "%'";
+                    if (strlen($atr["b-descripcion"])>0)
+                        $sql .= " AND upper(ma.descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
+
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                      //echo $sql;
@@ -599,8 +625,8 @@ WHERE 1 =1";
                 }
                 $grid->setParent($this);
                 $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
-                $grid->setFuncion("id_mat", "colum_admin");
-                //$grid->setFuncion("id_mat", "colum_admin_arbol");/**** Agregue funcion para arbol - Raquel ****/
+               // $grid->setFuncion("id_mat", "colum_admin");
+                $grid->setFuncion("id_mat", "colum_admin_arbol");/**** Agregue funcion para arbol - Raquel ****/
                 $grid->setFuncion("id_area", "BuscaOrganizacionalTodosVerMas");
                  $grid->setFuncion("id", "BuscaCategoriasMatriz");
                 //$grid->setFuncion("en_proceso_inscripcion", "enProcesoInscripcion");
@@ -758,7 +784,7 @@ WHERE 1 =1";
                 $objResponse->addScript('PanelOperator.initPanels("");
                         ScrollBar.initScroll();
                         init_filtro_rapido();
-                        init_filtro_ao_simple();');
+                        init_filtro_ao_multiple();');
 
                 $objResponse->addScript("$('.ver-mas').on('click', function (event) {
                                     event.preventDefault();
@@ -1358,6 +1384,23 @@ return $objResponse;
 
                 return $template->show();
             }
+//copioado de personas para buscar hijos del arbol -Raquel **/
+        public function BuscaOrgNivelHijos($IDORG)
+        {
+            $OrgNom = $IDORG;
+            //$Consulta3="select id_organizacion,organizacion_padre,identificacion from mos_organizacion where organizacion_padre='".$IDORG."' and id_filial='".$Filial."' order by id_organizacion";
+            $Consulta3="select id as id_organizacion, parent_id as organizacion_padre, title as identificacion from mos_organizacion where parent_id='".$IDORG."' order by id";
+            //echo $Consulta3;
+            //$Resp3=mysql_query($Consulta3);
+            //while($Fila3=mysql_fetch_assoc($Resp3))
+            $data = $this->dbl->query($Consulta3,array());
+            foreach( $data as $Fila3)
+            {
+                    //$OrgNom=$OrgNom.",".$Fila3[id_organizacion];
+                    $OrgNom .= ",".$this->BuscaOrgNivelHijos($Fila3[id_organizacion]);
+            }
+            return $OrgNom;
+        }
      
  }
  ?>

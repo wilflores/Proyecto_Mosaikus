@@ -80,4 +80,8 @@ INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES(
 /********** asignar modulo en el menu*****/
 UPDATE `santateresa`.`mos_link` SET `descripcion` = 'MatrizCompetencias-indexMatrizCompetencias-clases.matriz_competencia.MatrizCompetencias' WHERE `mos_link`.`cod_link` =58;
 
+/******* actualizar categoria por familia en la vista matriz competencia***********/
+UPDATE `santateresa`.`mos_nombres_campos` SET texto = 'Familias',placeholder='Familias' WHERE id =388;
+
+
 

@@ -4,6 +4,7 @@
             PanelOperator.initPanels('');
             ScrollBar.initScroll();
             init_filtro_rapido();
+            init_filtro_ao_simple();
     }
 
     function filtrar_mostrar_colums(){

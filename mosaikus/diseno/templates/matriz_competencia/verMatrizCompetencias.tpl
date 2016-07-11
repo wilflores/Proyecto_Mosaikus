@@ -9,9 +9,9 @@
                             </tr>
                             <tr>
                                 <td width="30%" class="title">Arbol Organizacional:</td>
-                                <td class="td-table-data">{id_area}</td>
+                                <td class="td-table-data">{ID_AREA}</td>
                             </tr>
                             <tr>
                                 <td width="30%" class="title">Familias:</td>
-                                <td class="td-table-data">{categoria}</td>
+                                <td class="td-table-data">{CATEGORIA}</td>
                             </tr>
