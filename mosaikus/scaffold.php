@@ -210,6 +210,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
         private \$per_crear;
         private \$per_editar;
         private \$per_eliminar;
+        private \$restricciones;
         
             
             public function $nombre_clase(){
@@ -217,7 +218,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 \$this->asigna_script('$nombre_fisico/$nombre_fisico.js');                                             
                 \$this->dbl = new Mysql(\$this->encryt->Decrypt_Text(\$_SESSION[BaseDato]), \$this->encryt->Decrypt_Text(\$_SESSION[LoginBD]), \$this->encryt->Decrypt_Text(\$_SESSION[PwdBD]) );
                 \$this->parametros = \$this->nombres_columnas = \$this->placeholder = array();
-                \$this->id_org_acceso = \$this->id_org_acceso_explicito = array();
+                //\$this->id_org_acceso = \$this->id_org_acceso_explicito = array();
                 \$this->per_crear = \$this->per_editar = \$this->per_eliminar = 'N';
                 \$this->contenido = array();
             }
@@ -252,7 +253,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
 
             /**
             * Activa los nodos donde se tiene acceso
-            */
+            
            public function cargar_acceso_nodos(\$parametros){
                if (strlen(\$parametros[cod_link])>0){
                    if(!class_exists('mos_acceso')){
@@ -265,10 +266,10 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                    }                                            
                }
            }
-
+            */
            /**
             * Activa los nodos donde se tiene acceso
-            */
+            
            private function cargar_acceso_nodos_explicito(\$parametros){
                if (strlen(\$parametros[cod_link])>0){
                    if(!class_exists('mos_acceso')){
@@ -281,7 +282,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                    }                                            
                }
            }
-           
+           */
             /**
              * Busca los permisos que tiene el usuario en el modulo
              */
@@ -333,13 +334,13 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
             
             public function colum_admin_arbol(\$tupla)
             {                
-                if (\$this->id_org_acceso_explicito[\$tupla[id_organizacion]][modificar] == 'S')
+                if (\$this->restricciones->id_org_acceso_explicito[\$tupla[id_organizacion]][modificar] == 'S')
                 {                    
                     \$html = \"<a href=\\\"#\\\" onclick=\\\"javascript:editar$nombre_clase('\". \$tupla[id] . \"');\\\"  title=\\\"Editar $nombre_clase\\\">                            
                                 <i class=\\\"icon icon-edit\\\"></i>
                             </a>\";
                 }
-                if (\$this->id_org_acceso_explicito[\$tupla[id_organizacion]][eliminar] == 'S')
+                if (\$this->restricciones->id_org_acceso_explicito[\$tupla[id_organizacion]][eliminar] == 'S')
                 {
                     \$html .= \"<a href=\\\"#\\\" onclick=\\\"javascript:eliminar$nombre_clase('\". \$tupla[id] . \"');\\\" title=\\\"Eliminar $nombre_clase\\\">
                             <i class=\\\"icon icon-remove\\\"></i>
@@ -429,14 +430,14 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 try {
                     \$atr = \$this->dbl->corregir_parametros(\$atr);
                     /*Carga Acceso segun el arbol*/
-                    if (count(\$this->id_org_acceso_explicito) <= 0){
-                        \$this->cargar_acceso_nodos_explicito(\$atr);
+                    if (count(\$this->restricciones->id_org_acceso_explicito) <= 0){
+                        \$this->restricciones->cargar_acceso_nodos_explicito(\$atr);
                     }                    
                     /*Valida Restriccion*/
-                    if (!isset(\$this->id_org_acceso_explicito[\$atr[id_organizacion]]))
+                    if (!isset(\$this->restricciones->id_org_acceso_explicito[\$atr[id_organizacion]]))
                         return '- Acceso denegado para registrar persona en el &aacute;rea seleccionada.';
-                    if (!((\$this->id_org_acceso_explicito[\$atr[id_organizacion]][nuevo]== 'S') || (\$this->id_org_acceso_explicito[\$atr[id_organizacion]][modificar] == S)))
-                        return '- Acceso denegado para registrar persona en el &aacute;rea ' . \$this->id_org_acceso_explicito[\$atr[id_organizacion]][title] . '.';
+                    if (!((\$this->restricciones->id_org_acceso_explicito[\$atr[id_organizacion]][nuevo]== 'S') || (\$this->restricciones->id_org_acceso_explicito[\$atr[id_organizacion]][modificar] == S)))
+                        return '- Acceso denegado para registrar persona en el &aacute;rea ' . \$this->restricciones->id_org_acceso_explicito[\$atr[id_organizacion]][title] . '.';
 
                     \$sql = \"INSERT INTO $tabla($sql_insertar_nombres)
                             VALUES(
@@ -473,14 +474,14 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 try {
                     \$atr = \$this->dbl->corregir_parametros(\$atr);                    
                     /*Carga Acceso segun el arbol*/
-                    if (count(\$this->id_org_acceso_explicito) <= 0){
-                        \$this->cargar_acceso_nodos_explicito(\$atr);
+                    if (count(\$this->restricciones->id_org_acceso_explicito) <= 0){
+                        \$this->restricciones->cargar_acceso_nodos_explicito(\$atr);
                     }                    
                     /*Valida Restriccion*/
-                    if (!isset(\$this->id_org_acceso_explicito[\$atr[id_organizacion]]))
+                    if (!isset(\$this->restricciones->id_org_acceso_explicito[\$atr[id_organizacion]]))
                         return '- Acceso denegado para registrar persona en el &aacute;rea seleccionada.';
-                    if (!((\$this->id_org_acceso_explicito[\$atr[id_organizacion]][nuevo]== 'S') || (\$this->id_org_acceso_explicito[\$atr[id_organizacion]][modificar] == S)))
-                        return '- Acceso denegado para registrar persona en el &aacute;rea ' . \$this->id_org_acceso_explicito[\$atr[id_organizacion]][title] . '.';
+                    if (!((\$this->restricciones->id_org_acceso_explicito[\$atr[id_organizacion]][nuevo]== 'S') || (\$this->restricciones->id_org_acceso_explicito[\$atr[id_organizacion]][modificar] == S)))
+                        return '- Acceso denegado para registrar persona en el &aacute;rea ' . \$this->restricciones->id_org_acceso_explicito[\$atr[id_organizacion]][title] . '.';
 
                     \$sql = \"UPDATE $tabla SET                            
                                     $sql_modificar
@@ -516,8 +517,8 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                         \$k++;
                     }
                     
-                    if (count(\$this->id_org_acceso) <= 0){
-                        \$this->cargar_acceso_nodos(\$atr);
+                    if (count(\$this->restricciones->id_org_acceso) <= 0){
+                        \$this->restricciones->cargar_acceso_nodos(\$atr);
                     }*/
                     
                     \$sql = \"SELECT COUNT(*) total_registros
@@ -536,8 +537,8 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                     if (strlen(\$atr[valor])>0)
                         \$sql .= \" AND upper(\$atr[campo]) like '%\" . strtoupper(\$atr[valor]) . \"%'\";      
                     $filtro_listar
-                    if (count(\$this->id_org_acceso)>0){                            
-                        \$sql .= \" AND id_organizacion IN (\". implode(',', array_keys(\$this->id_org_acceso)) . \")\";
+                    if (count(\$this->restricciones->id_org_acceso)>0){                            
+                        \$sql .= \" AND id_organizacion IN (\". implode(',', array_keys(\$this->restricciones->id_org_acceso)) . \")\";
                     }
                     \$total_registros = \$this->dbl->query(\$sql, \$atr);
                     \$this->total_registros = \$total_registros[0][total_registros];   
@@ -587,6 +588,8 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 if(!class_exists('Template')){
                     import(\"clases.interfaz.Template\");
                 }
+                import('clases.utilidades.NivelAcceso');
+                \$this->restricciones = new NivelAcceso();
                 if (\$parametros['corder'] == null) \$parametros['corder']=\"descripcion_ano\";
                 if (\$parametros['sorder'] == null) \$parametros['sorder']=\"desc\"; 
                 if (\$parametros['mostrar-col'] == null) 
@@ -608,7 +611,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                             </div>';
                     \$k++;
                 }
-                \$this->cargar_permisos(\$parametros);
+                \$this->restricciones->cargar_permisos(\$parametros);
                 \$grid = \$this->verLista$nombre_clase(\$parametros);
                 \$contenido['CORDER'] = \$parametros['corder'];
                 \$contenido['MODO'] = \$parametros['modo'];
@@ -901,7 +904,9 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 public function buscar(\$parametros)
             {
                 /*Permisos en caso de que no se use el arbol organizacional*/
-                \$this->cargar_permisos(\$parametros);
+                import('clases.utilidades.NivelAcceso');                
+                \$this->restricciones = new NivelAcceso();
+                \$this->restricciones->cargar_permisos(\$parametros);
                 \$grid = \$this->verLista$nombre_clase(\$parametros);                
                 \$objResponse = new xajaxResponse();
                 \$objResponse->addAssign('grid',\"innerHTML\",\$grid[tabla]);
