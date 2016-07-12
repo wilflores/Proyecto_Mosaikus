@@ -209,10 +209,10 @@
                             INNER JOIN mos_personal AS perso_aprueba ON wf.id_personal_aprueba = perso_aprueba.cod_emp
                          WHERE 1 = 1 ";
                     if($this->restricciones->per_viz_terceros!='S'){
-                        $sql .="and wf.id_personal_responsable=".$_SESSION['CookCodEmp'];
+                        $sql .="and wf.id_personal_responsable=".(strlen($_SESSION['CookCodEmp'])>0?$_SESSION['CookCodEmp']:-1);
                     }
                     else{
-                        $sql .="and (wf.id_personal_responsable=".$_SESSION['CookCodEmp']." or "
+                        $sql .="and (wf.id_personal_responsable=".(strlen($_SESSION['CookCodEmp'])>0?$_SESSION['CookCodEmp']:-1)." or "
                         ." wf.id_personal_responsable in (SELECT
                         mos_personal.cod_emp
                         FROM
@@ -335,10 +335,10 @@
                             $sql_left
                             WHERE 1 = 1 ";
                     if($this->restricciones->per_viz_terceros!='S'){
-                        $sql .="and wf.id_personal_responsable=".$_SESSION['CookCodEmp'];
+                        $sql .="and wf.id_personal_responsable=".(strlen($_SESSION['CookCodEmp'])>0?$_SESSION['CookCodEmp']:-1);
                     }
                     else{
-                        $sql .="and (wf.id_personal_responsable=".$_SESSION['CookCodEmp']." or "
+                        $sql .="and (wf.id_personal_responsable=".(strlen($_SESSION['CookCodEmp'])>0?$_SESSION['CookCodEmp']:-1)." or "
                         ." wf.id_personal_responsable in (SELECT
                         mos_personal.cod_emp
                         FROM
