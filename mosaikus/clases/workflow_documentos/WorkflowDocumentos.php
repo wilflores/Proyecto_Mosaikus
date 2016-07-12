@@ -745,7 +745,7 @@
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
                                                                             FROM mos_personal p WHERE interno = 1 and elaboro = 'S'
-                                                                            AND (cod_emp = ".$_SESSION['CookCodEmp'].$sql_nodos.")"
+                                                                            AND (cod_emp = ".(strlen($_SESSION['CookCodEmp'])>0?$_SESSION['CookCodEmp']:-1).$sql_nodos.")"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $value[valor]);
                 $contenido_1[ID_PERSONAL_REVISA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
@@ -876,7 +876,7 @@
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
                                                                             FROM mos_personal p WHERE interno = 1 and elaboro = 'S'
-                                                                            AND (cod_emp = ".$_SESSION['CookCodEmp'].$sql_nodos.")"
+                                                                            AND (cod_emp = ".(strlen($_SESSION['CookCodEmp'])>0?$_SESSION['CookCodEmp']:-1).$sql_nodos.")"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val["id_personal_responsable"]);
                 $contenido_1[ID_PERSONAL_REVISA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
