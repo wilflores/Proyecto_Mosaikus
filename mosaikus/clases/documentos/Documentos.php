@@ -577,6 +577,7 @@
                                 ,dao.id_organizacion
                                 ,d.actualizacion_activa
                                 ,requiere_lista_distribucion
+                                ,tipo_documento
                          FROM mos_documentos  d
                                 left join mos_personal p on d.elaboro=p.cod_emp
                                 left join mos_personal re on d.reviso=re.cod_emp
@@ -1233,12 +1234,14 @@
                 /*VALIDAR CODIGO SUGERIDO*/
                    import('clases.documento_codigos.DocumentoCodigos');
                    $pagina = new DocumentoCodigos();
-                   $val_codigo_doc = $pagina->verDocumentoCodigosArea($atr['nodo_area']);
+                   $atr[id_organizacion] = $atr['nodo_area'];
+                   $atr[tipo] = $atr['tipo_documento'];
+                   $val_codigo_doc = $pagina->codigo_sugerido(array('id_organizacion'=>$atr['nodo_area'], 'tipo'=>$atr['tipo_documento']));
                    if (count($val_codigo_doc) > 0){
                        //$val = $this->verDocumentoCodigosArea($data[0][id]);
                        //print_r($val);
-                       if ($val_codigo_doc[bloqueo_codigo] == 'S'){
-                           $atr[Codigo_doc] = $val_codigo_doc["codigo"] . '_' . str_pad($val_codigo_doc["correlativo"], 3, "0", STR_PAD_LEFT);
+                       if (($val_codigo_doc[bloqueo_codigo] == 'S')&&($_SESSION[SuperUser]!='S')){
+                           $atr[Codigo_doc] = $val_codigo_doc["codigo"];
                        }
                        if ($val_codigo_doc[bloqueo_version] == 'S'){
                            $atr[version] = 1; 
@@ -1310,10 +1313,12 @@
                         $atr[id_usuario_workflow]=$atr[id_usuario];
                     }   
                     //
-                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo,publico, id_workflow_documento,etapa_workflow,estado_workflow,id_usuario_workflow, actualizacion_activa, requiere_lista_distribucion)                            
+                    $sql = "INSERT INTO mos_documentos(IDDoc,Codigo_doc,nombre_doc,version,fecha,descripcion,palabras_claves,formulario,vigencia,doc_fisico,contentType,id_filial,nom_visualiza,doc_visualiza,contentType_visualiza,id_usuario,observacion,estrucorg,arbproc,apli_reg_estrorg,apli_reg_arbproc,workflow,semaforo,v_meses,reviso,elaboro,aprobo,publico, id_workflow_documento,etapa_workflow,estado_workflow,id_usuario_workflow, actualizacion_activa, requiere_lista_distribucion
+                        , tipo_documento)                            
                             VALUES(
                                 $atr[IDDoc],'$atr[Codigo_doc]','$atr[nombre_doc]',$atr[version],'$atr[fecha]','$atr[descripcion]','$atr[palabras_claves]','$atr[formulario]','$atr[vigencia]','$atr[doc_fisico]','$atr[contentType]',$atr[id_filial],'$atr[nom_visualiza]','$atr[doc_visualiza]','$atr[contentType_visualiza]',$atr[id_usuario],'$atr[observacion]','$atr[estrucorg]','$atr[arbproc]','$atr[apli_reg_estrorg]','$atr[apli_reg_arbproc]','$atr[workflow]',$atr[semaforo],$atr[v_meses],$atr[reviso],$atr[elaboro],$atr[aprobo]
                                     ,'$atr[publico]',$atr[id_workflow_documento],$atr[etapa_workflow],$atr[estado_workflow],$atr[id_usuario_workflow] ,'$atr[actualizacion_activa]','$atr[requiere_lista_distribucion]'
+                                    ,$atr[tipo_documento]
                                 )";
                     //echo $sql;
                     $this->dbl->insert_update($sql);
@@ -1610,6 +1615,7 @@
                             . ",nom_visualiza = $atr[nom_visualiza],doc_visualiza = $atr[doc_visualiza],contentType_visualiza = $atr[contentType_visualiza],id_usuario = $atr[id_usuario],observacion = '$atr[observacion]',estrucorg = '$atr[estrucorg]',arbproc = '$atr[arbproc]'"
                             . ",apli_reg_estrorg = '$atr[apli_reg_estrorg]',apli_reg_arbproc = '$atr[apli_reg_arbproc]',workflow = '$atr[workflow]',semaforo = $atr[semaforo],v_meses = $atr[v_meses],reviso = $atr[reviso],elaboro = $atr[elaboro],aprobo = $atr[aprobo]
                                ,requiere_lista_distribucion = '$atr[requiere_lista_distribucion]', publico = '$atr[publico]',actualizacion_activa= '$atr[actualizacion_activa]' $sql_wf $sql_doc_fisico
+                               ,tipo_documento = $atr[tipo_documento]
                             WHERE  IDDoc = $atr[id]";      
                    //echo $sql;
                    // die;
@@ -1624,7 +1630,7 @@
                      * 
                     $this->registraTransaccion('Modificar','Modifico el Documentos ' . $atr[descripcion_ano], 'mos_documentos');
                     */
-                    return "El Documento '$atr[info_nombre]' ha sido actualizado con exito";
+                    return "El Documento '$atr[Codigo_doc]' ha sido actualizado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
                         if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
@@ -3580,10 +3586,15 @@
                 if($_SESSION[ParamAdic]=='formulario') {
                     $parametros[formulario]='S';
                     $cod_categoria = 15;
+                    //FILTRO PARA COMBO TIPOS DOC
+                    $sql_where_tipo_documentos = " WHERE id = 1";
                 }
                 else{
                     $cod_categoria = 1;
                     $parametros[formulario]='N';
+                    //FILTRO PARA COMBO TIPOS DOC
+                    $sql_where_tipo_documentos = " WHERE id <> 1";
+
                 }                
                 
                 if(!class_exists('Template')){
@@ -3592,7 +3603,7 @@
                 
                 $ut_tool = new ut_Tool();
                 $contenido_1   = array();
-                $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
+                $contenido_1[DIV_ARBOL_ORGANIZACIONAL] = str_replace("Árbol Organizacional", "", $ao->jstree_ao(0,$parametros)) ;
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
                 }
@@ -3612,6 +3623,10 @@
                     $desc[] = str_pad($i, 2, "0", STR_PAD_LEFT);                    
                     $ids[] = $i*7;
                 }
+                //TIPO DE DOCUMENTOS
+                $contenido_1['TIPOS_DOCUMENTOS'] = $ut_tool->OptionsCombo("SELECT id, descripcion FROM mos_documentos_tipos $sql_where_tipo_documentos "
+                                                                    , 'id'
+                                                                    , 'descripcion', $val['tipo_documento']);
                 $contenido_1[NUM_ITEMS_ESP] = 0;
                 $contenido_1[CHECKED_VIGENCIA] = 'checked="checked"';
                 $contenido_1['SEMAFORO'] = $ut_tool->combo_array("semaforo", $desc, $ids,false,56,false,false,false,false,'display:inline;width:70px');
@@ -4624,7 +4639,7 @@
                         $organizacion[] = $val[id_organizacion];                    
                     }
                 $parametros[nodos_seleccionados] = $organizacion;
-                $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
+                $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  str_replace("Árbol Organizacional", "", $ao->jstree_ao(0,$parametros));
 
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
@@ -4638,6 +4653,13 @@
                 foreach ( $this->placeholder as $key => $value) {
                     $contenido_1["P_" . strtoupper($key)] =  $value;
                 }    
+                //TIPO DE DOCUMENTOS
+                if($_SESSION[ParamAdic]=='formulario') 
+                    $sql_where_tipo_documentos = " WHERE id = 1";                    
+                else $sql_where_tipo_documentos = " WHERE id <> 1";  
+                $contenido_1['TIPOS_DOCUMENTOS'] = $ut_tool->OptionsCombo("SELECT id, descripcion FROM mos_documentos_tipos $sql_where_tipo_documentos "
+                                                                    , 'id'
+                                                                    , 'descripcion', $val['tipo_documento']);
                 $contenido_1['IDDOC'] = $val["IDDoc"];
                 $contenido_1['CODIGO_DOC'] = ($val["Codigo_doc"]);
                 $contenido_1['NOMBRE_DOC'] = ($val["nombre_doc"]);
@@ -5349,7 +5371,7 @@
                     $parametros[cod_categoria]=15;
                 }
                 else{
-                    $parametros[cod_categoria]==1;
+                    $parametros[cod_categoria]=1;
                 }
                 //$val = $this->verDocumentos($parametros[id]);
                 $respuesta = $this->eliminarDocumentos($parametros);
@@ -6380,10 +6402,11 @@
             if($val['id_workflow_documento']=='' && $seleccionar==''){
                 $js = "$('#id_workflow_documento option').eq(1).attr('selected', 'selected');";
             }
+            //$js .= '$( "#id_workflow_documento" ).select2(); ';
             //echo $sql;
             $combosemp .= $ut_tool->OptionsCombo($sql, 'id', 'wf', $seleccionar);    
             $combo .="<select class='form-control' id=\"id_workflow_documento\" name=\"id_workflow_documento\"  data-validation=\"required\" >
-                        <option value=''>-- No Asignado --</option>
+                        <option value=\"\">-- No Asignado --</option>
                         ".$combosemp."
                     </select>    ";
 
@@ -6393,7 +6416,9 @@
             if($mensaje!=''){
                 $objResponse->addScriptCall('VerMensaje','exito',$mensaje);
             }
+            //$objResponse->addAssign('div_combo_wf',"innerHTML","");
             $objResponse->addAssign('div_combo_wf',"innerHTML",$combo);
+            
             $objResponse->addScript($js);
             return $objResponse;
 

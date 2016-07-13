@@ -172,7 +172,7 @@
             }
             
             public function verDocumentoCodigosArea($id){
-                $atr=array();
+                //$atr = $this->dbl->corregir_parametros($atr);
                 $sql = "SELECT id
                         ,id_organizacion
                         ,codigo
@@ -278,9 +278,9 @@
                     $atr = $this->dbl->corregir_parametros($atr);                    
                     /*Carga Acceso segun el arbol*/
                     
-                    $sql = "UPDATE mos_documentos_codigo SET                            
+                    $sql = "UPDATE mos_documentos_codigo_correlativo SET                            
                                     correlativo = correlativo + 1
-                            WHERE  id = $atr[id]";      
+                            WHERE  id_organizacion = $atr[id_organizacion] AND tipo = $atr[tipo]";      
                     
                     $this->dbl->insert_update($sql);
 //                    $nuevo = "Id Organizacion: \'$atr[id_organizacion]\', Codigo: \'$atr[codigo]\', Bloqueo Codigo: \'$atr[bloqueo_codigo]\', Bloqueo Version: \'$atr[bloqueo_version]\', Correlativo: \'$atr[correlativo]\', ";
@@ -741,29 +741,56 @@
             }
      
  */
+            
+            public function codigo_sugerido($parametros){
+                $val = $this->verDocumentoCodigosArea($parametros[id_organizacion]);                    
+                $sql = "select correlativo from mos_documentos_codigo_correlativo where id_organizacion = " .$parametros[id_organizacion] . " AND tipo = $parametros[tipo]"; 
+                $data_correlativo = $this->dbl->query($sql);
+                if (count($data_correlativo)>0){
+                    $correlativo = $data_correlativo[0][correlativo];
+                }
+                else{
+                    $sql = "insert into mos_documentos_codigo_correlativo(id_organizacion, tipo) values (".$parametros[id_organizacion] . ",$parametros[tipo])";
+                    $this->dbl->insert_update($sql);
+                    $correlativo = 1;
+                }
+                $sql = "select codigo from mos_documentos_tipos where id = $parametros[tipo]";
+                $data_tipo = $this->dbl->query($sql);
+
+                $val[codigo] = $val["codigo"] . '_' . $data_tipo[0][codigo] . '_' . str_pad($correlativo, 3, "0", STR_PAD_LEFT);
+                $val[id_organizacion] = $parametros[id_organizacion];
+                $val[tipo] = $parametros[tipo];
+                
+                return $val;
+            }
+                    
+                    
+                    
             public function validar_codigo_version($parametros)
             {
                 $objResponse = new xajaxResponse();   
                 $sql = "select min(level), id from mos_organizacion where id >= 2 and id in(".$parametros['nodos'].")";
                 $data = $this->dbl->query($sql);
                 if (count($data) > 0){
-                    $val = $this->verDocumentoCodigosArea($data[0][id]);
-                    //print_r($val);
-                    $codigo = $val["codigo"] . '_' . str_pad($val["correlativo"], 3, "0", STR_PAD_LEFT);
+                    $parametros[id_organizacion] = $data[0][id];
+                    $val = $this->codigo_sugerido($parametros);                    
+                    
+                    
+                    $codigo = $val["codigo"];
                     if (($val[bloqueo_codigo] == 'S')&&($_SESSION[SuperUser]!='S')){
                         $objResponse->addScript("$('#Codigo_doc').val('$codigo');");
                         $objResponse->addScript("$('#Codigo_doc').attr('readonly', true);");
                     }
                     else{ 
-                        $objResponse->addScript("if ($('#Codigo_doc').val().length == 0) $('#Codigo_doc').val('$codigo');");
+                        $objResponse->addScript("cambiar_codigo('$codigo',1);");
                         $objResponse->addScript("$('#Codigo_doc').removeAttr('readonly');");
                     }
                     if ($val[bloqueo_version] == 'S'){
-                        $objResponse->addScript("$('#version').val('1');");
+                        $objResponse->addScript("$('#version').val('01');");
                         $objResponse->addScript("$('#version').attr('readonly', true);");
                     }
                     else {
-                        $objResponse->addScript("if ($('#version').val().length == 0) $('#version').val('1');");
+                        $objResponse->addScript("if ($('#version').val().length == 0) $('#version').val('01');");
                          $objResponse->addScript("$('#version').removeAttr('readonly');");
                     }
                     

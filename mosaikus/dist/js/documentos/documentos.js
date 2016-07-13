@@ -201,6 +201,11 @@ function cargar_autocompletado(){
         $('#publico').change(function () {
             CargaComboCargo(document.getElementById('requiere_lista_distribucion').value);
          });
+         
+         $('#tipo_documento').change(function () {
+            validar_codigo_version();
+         });
+         
         
           
       }
@@ -372,6 +377,32 @@ function cargar_autocompletado(){
         }else{
         
         }
+    }
+    
+    function cambiar_codigo(codigo,ope){
+        switch (ope){
+            case 1:
+                ejecutar_si = function(){
+                    $('#Codigo_doc').val(codigo);
+                }
+                //alert($('#estado_actual').val());
+                if ((!($('#estado_actual').val() == -1)) && (!($('#estado_actual').val() == ''))  &&($('#Codigo_doc').val().length > 0) && ($('#Codigo_doc').val() != codigo)){
+                    bootbox.confirm("El " + $('#Codigo_doc').val() + ", no corresponde con el código sugerido " + codigo + "  <br>¿Desea Continuar?", function(result) {
+                    if (result == true){
+                        ejecutar_si();
+                    }else{
+                        cancelar_archivo_otro();
+                    }
+
+                }); 
+                }
+                else
+                    ejecutar_si();
+                break;
+            default:
+                break;
+        }
+        
     }
 
     function editarDocumentos(id){
@@ -791,10 +822,11 @@ function ao_multiple(){
         
 }    
 function validar_codigo_version(){
-   if (($('#nodos').val().length > 0) && ($('#opc').val() == 'new')){
+   if (($('#nodos').val().length > 0) && ($('#opc').val() == 'new') && ($('#tipo_documento').val().length > 0)){
        array = new XArray();
        array.setObjeto('DocumentoCodigos','validar_codigo_version');
        array.addParametro('nodos',$('#nodos').val());        
+       array.addParametro('tipo',$('#tipo_documento').val());  
        array.addParametro('import','clases.documento_codigos.DocumentoCodigos');
        xajax_Loading(array.getArray());
    }

@@ -1,19 +1,38 @@
 <div id="main-content" class="panel-container col-xs-24 ">
-              <div class="content-panel panel">
-                  <div class="content">
+    <div class="content-panel panel">
+        <div class="content">
                       
-    <form id="idFormulario" class="form-horizontal form-horizontal-red" role="form">
-        <div class="panel-heading">
-            <div class="row">
-                <div class="panel-title col-xs-12" id="div-titulo-for">
-                    {TITULO_FORMULARIO}                    
-                </div>                
+            <form id="idFormulario" class="form-horizontal form-horizontal-red" role="form">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="panel-title col-xs-12" id="div-titulo-for">
+                            {TITULO_FORMULARIO}                    
+                        </div>                
 
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-24">
-
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-24">
+                        <div class="form-group">
+                            <label for="archivo" class="col-md-4 control-label">Árbol Organizacional </label>
+                            <div class="col-md-10" >
+                                <!--label for="vigencia" class="col-md-10 control-label" style="text-align: left;">Árbol organizacional</label>
+                                <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
+                                <iframe id="iframearbol" src="pages/cargo/prueba_arbolV4.php?IDDoc={IDDOC}" frameborder="0" width="100%" height="310px" scrolling="no"></iframe-->
+                                 <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
+                                {DIV_ARBOL_ORGANIZACIONAL}
+                                <input type="hidden" name="nodo_area" id="nodo_area"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label  class="col-md-4 control-label">{N_TIPO_DOCUMENTO}</label>                                                
+                            <div class="col-md-10">
+                                <select id="tipo_documento" name="tipo_documento" class="form-control" data-validation="required">
+                                    <option  value="">-- Selecione --</option>
+                                    {TIPOS_DOCUMENTOS}
+                                </select>
+                          </div>   
+                        </div>
                             <div class="form-group" id="tabla_fileUpload"  style="{CSS_TABLA_FILEUPLOAD}">
                                     <label for="archivo" class="col-md-4 control-label">{N_DOC_FISICO}</label>
                                     <div class="col-md-12">
@@ -128,15 +147,8 @@
                                   </div>
                                   <div class="form-group">
                                     
-                                    <div class="col-md-9" >
-                                        <!--label for="vigencia" class="col-md-10 control-label" style="text-align: left;">Árbol organizacional</label>
-                                        <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
-                                        <iframe id="iframearbol" src="pages/cargo/prueba_arbolV4.php?IDDoc={IDDOC}" frameborder="0" width="100%" height="310px" scrolling="no"></iframe-->
-                                         <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
-                                        {DIV_ARBOL_ORGANIZACIONAL}
-                                        <input type="hidden" name="nodo_area" id="nodo_area"/>
-                                    </div>
-                                    <div class="col-md-15">
+                                    
+                                    <div class="col-md-24">
                                         <div class="tabs">
                                         <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">
                                             <li id="li1"><a href="#hv-red-2" data-toggle="tab" style="padding: 8px 32px;">Otros Datos</a></li>
