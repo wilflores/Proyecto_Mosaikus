@@ -669,6 +669,28 @@
             return $Nivls;
 
         }
+        public function BuscaOrganizacionalTodosXLS($tupla)
+        {
+            //$encryt = new EnDecryptText();
+            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
+            $Nivls = "";
+            {                                           
+                    //$Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
+                    $Consulta3="select * from mos_documentos_estrorg_arbolproc where IDDoc='".$tupla[IDDoc]."' and tipo='EO'";                    
+                    $Resp3 = $this->dbl->query($Consulta3,array());                    
+                    foreach ($Resp3 as $Fila3) 
+                    {                                                        
+                        $Nivls .= $this->BuscaOrganizacional(array('id_organizacion' => $Fila3[id_organizacion_proceso]))."\n";
+                    }
+                    if($Nivls!='')
+                            $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+                    else
+                            $Nivls='-- Sin información --';
+            }
+            
+            return $Nivls;
+
+        }
         
         function BuscaOrganizacional($tupla)
         {
@@ -852,6 +874,16 @@
             }
             return "<img class=\"SinBorde\" title=\"Revisión ok\" src=\"diseno/images/verde.png\"> $tupla[dias_vig]";
         }
+        public function semaforo_reporte_xls($tupla)
+        {
+            if (($tupla[dias_vig])<0){
+                return "L";
+            }
+            if ($tupla[dias_vig]<$tupla[semaforo]){
+                return "K";
+            }
+            return "J";
+        }        
         
         public  function semaforo_excel($tupla)
         {
@@ -2649,8 +2681,39 @@
         public function exportarPHPExcel($parametros){
         $grid= new DataGrid();
         $this->listarDocumentos($parametros, 1, 100000);
-        return $this->dbl->data;
+        $data = $this->dbl->data;
+        $dataxls =  array();
+        $array_columns =  explode('-', $parametros['mostrar-col']);            
+        //print_r($data);
+        $col = 0;
+        $nombre_colum = array();
+        //SE EXTRAE LOS NOMBRES DE COLUMNAS
+        foreach ($data[0] as $key => $value)
+        {
+           if(!is_integer($key)){
+               $nombre_colum[$col] = $key;
+               $col++;
+           }
+        }
+        $dataxls[estado]=array();
+         foreach ($array_columns as $key => $col){
+            $dataxls[$nombre_colum[$col]]= array_column($data,$col);              
+         }
+         $dias_caritas= array(); 
+         $version = array(); 
+         $arbol = array(); 
+         $i=0;
+         foreach ($data as $value){
+             $dias_caritas[] =$this->semaforo_reporte_xls($value);
+             $version[]=$this->version($value);
+             $arbol[]=$this->BuscaOrganizacionalTodosXLS($value);
+        }
+        $dataxls[estado]=$dias_caritas;
+        $dataxls[version]=$version;
+        $dataxls[arbol_organizacional]=$arbol;
+        //print_r($dataxls);
         
+        return $dataxls;
         }
         public function exportarExcel($parametros){
 
