@@ -376,6 +376,17 @@
                 }
                 
             }
+            public function cargar_nombres_columnas_xls($campo,$modulo=6){
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE nombre_campo='$campo' and modulo = $modulo";
+                $nombres_campos = $this->dbl->query($sql, array());
+                foreach ($nombres_campos as $value) {
+                    $texto = $value[texto];
+                }
+                if($texto!='')
+                    return $texto;
+                else
+                    return $campo;
+            }            
             /**
              * Activa los nodos donde se tiene explicitamente acceso
              */
@@ -692,6 +703,16 @@
             return $Nivls;
 
         }
+        public function BuscaOrganizacionalTodosXLSIndividualNodo($id_organizacion_proceso)
+        {
+            $Nivls = "";
+            $Nivls .= $this->BuscaOrganizacional(array('id_organizacion' => $id_organizacion_proceso))."\n";
+            if($Nivls!='')
+                    $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+            else
+                    $Nivls='-- Sin información --';
+            return $Nivls;
+        }
         
         function BuscaOrganizacional($tupla)
         {
@@ -875,15 +896,26 @@
             }
             return "<img class=\"SinBorde\" title=\"Revisión ok\" src=\"diseno/images/verde.png\"> $tupla[dias_vig]";
         }
-        public function semaforo_reporte_xls($tupla)
+        public function semaforo_reporte_xls($tupla,$modocarita='si')
         {
-            if (($tupla[dias_vig])<0){
-                return "L";
+            if($modocarita=='si'){
+                if (($tupla[dias_vig])<0){
+                    return "L";
+                }
+                if ($tupla[dias_vig]<$tupla[semaforo]){
+                    return "K";
+                }
+                return "J";
             }
-            if ($tupla[dias_vig]<$tupla[semaforo]){
-                return "K";
+            else{
+                if (($tupla[dias_vig])<0){
+                    return "Vencido";
+                }
+                if ($tupla[dias_vig]<$tupla[semaforo]){
+                    return "Por Vencer";
+                }
+                return "Vigente";
             }
-            return "J";
         }        
         
         public  function semaforo_excel($tupla)
@@ -2222,6 +2254,300 @@
                     $this->operacion($sql, $atr);
                     
              }
+
+             public function listarDocumentosXLS($atr, $pag, $registros_x_pagina){
+                 //print_r($atr);
+                 // HABILIYAR LA COLUMNA ESYAD0
+                    //print_r($atr);
+                    if(!class_exists('Parametros')){
+                        import("clases.parametros.Parametros");
+                    }                 
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $sql_left = $sql_col_left = "";
+                    if($atr[formulario]=='S') {
+                        $cod_categoria = 15;
+                        $campo_formulario=',formulario ';
+                    }
+                    else{
+                        $cod_categoria = 1;
+                        $campo_formulario=',formulario ';
+                    }                       
+                    if (count($this->parametros) <= 0){
+                        $this->cargar_parametros($cod_categoria);
+                    }                    
+                    $k = 1;
+
+                    $campos_dinamicos = new Parametros();
+                    $valores = $campos_dinamicos->ArmaSqlParamsDinamicos($cod_categoria,$k,$this->parametros,'d.IDDoc');
+                    $sql_left = $valores[sql_left];
+                    $sql_col_left = $valores[sql_col_left];
+                    $k = $valores[k];
+                    //$k = 1;
+                    //$sql_left = $sql_col_left = "";
+//                    foreach ($this->parametros as $value) {
+//                        $sql_left .= " LEFT JOIN(select t1.id_registro, t2.descripcion as nom_detalle from mos_parametro_modulos t1
+//                                inner join mos_parametro_det t2 on t1.cod_categoria=t2.cod_categoria and t1.cod_parametro=t2.cod_parametro and t1.cod_parametro_det=t2.cod_parametro_det
+//                        where t1.cod_categoria='$cod_categoria' and t1.cod_parametro='$value[cod_parametro]' ) AS p$k ON p$k.id_registro = d.IDDoc "; 
+//                        $sql_col_left .= ",p$k.nom_detalle p$k ";
+//                        $k++;
+//                    }
+                    //echo $sql_left;
+                                        
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);                    
+                    }
+                    if (count($this->id_org_acceso_todos_nivel) <= 0){
+                        $this->cargar_acceso_nodos_todos_nivel($atr);                    
+                    }
+                    //print_r(array_keys($this->id_org_acceso));
+                    //print_r(array_keys($this->id_org_acceso_todos_nivel));
+                    //print_r(array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso)));
+                    //echo implode(',',  array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso))));
+                    /*FILTRO NO INCLUIR AREA ESPEJO*/
+                    import('clases.organizacion.ArbolOrganizacional');
+                    
+                    $ao = new ArbolOrganizacional();
+                    //$ao->jstree_ao(0,$parametros);                    
+                    $sql_filtro_area_espejo = "";
+                    if (strlen($atr["b-area_espejo"])>0){
+                        if(strlen($_SESSION['CookCodEmp'])>0){
+                            $sql ="SELECT distinct id
+                                    FROM mos_organizacion
+                                    where  area_espejo is not null and 
+                                    id not in (SELECT id
+                                    FROM mos_organizacion
+                                    where area_espejo in (select id_organizacion
+                                                          from mos_responsable_area
+                                                          WHERE cod_emp =". $_SESSION['CookCodEmp'].")
+                                               );";  
+                            $sql_resp="select id_organizacion
+                                        from mos_responsable_area
+                                        WHERE cod_emp =". $_SESSION['CookCodEmp']."";
+                        }else{
+                            $sql ="SELECT distinct id
+                                    FROM mos_organizacion
+                                    where  area_espejo is not null;";                        
+                            
+                        }
+
+                        $data_area_espejo = $this->dbl->query($sql);
+                        $ids_area_espejo = array();
+                        $cad_id_nodos_vinc_norespo='';
+                        //PRIMERO LOS NODOS VINCULADOS DONDE NO SE ES RESPONSABLE Y SUS HIJOS
+                        foreach ($data_area_espejo as $value) {
+                            $ids_area_espejo[] = $value[id];
+                            $cad_id_nodos_vinc_norespo .= $ao->BuscaOrgNivelHijos($value[id]).',';
+                        }
+                        $cad_id_nodos_vinc_norespo .='-1';
+                        $nodos_vinc_no_resp = array();
+                        $nodos_vinc_no_resp = explode(",", $cad_id_nodos_vinc_norespo);
+                        if(strlen($_SESSION['CookCodEmp'])>0){
+                            $data_area_resp = $this->dbl->query($sql_resp);
+                            //SEGUNDO LOS NODOS DONDE SE ES RESPONSABLE Y SUS HIJOS
+                            $cad_id_nodos_respo='';
+                            //print_r($data_area_resp);
+                            foreach ($data_area_resp as $value) {
+                                $cad_id_nodos_respo .= $ao->BuscaOrgNivelHijos($value[id_organizacion]).',';
+                            }
+                            $cad_id_nodos_respo .='-2';
+                            $nodos_resp = array();
+                            $nodos_resp = explode(",", $cad_id_nodos_respo);
+                            // quitamos los nodos que coincidan
+                            $nodos_vinc_no_resp = (array_diff($nodos_vinc_no_resp, $nodos_resp));
+                        }
+                        if ($cad_id_nodos_vinc_norespo !='-1'){
+                            //$sql_filtro_area_espejo = " AND NOT id_organizacion_proceso IN (". implode(',', $ids_area_espejo) . ")";
+                            $sql_filtro_area_espejo = " AND NOT id_organizacion_proceso IN (". implode(',', $nodos_vinc_no_resp) . ")";
+                        }
+                    } 
+                    $filtro_ao ='';
+                    if ((strlen($atr["b-id_organizacion"])>0)){                             
+                        //$id_org = $this->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
+                        $id_org = ($atr["b-id_organizacion"]);
+                        $filtro_ao .= " INNER JOIN ("
+                                . " select IDDoc from mos_documentos_estrorg_arbolproc where id_organizacion_proceso in (". $id_org . ") $sql_filtro_area_espejo GROUP BY IDDoc) as ao ON ao.IDDoc = d.IDDoc ";//" AND id_organizacion IN (". $id_org . ")";
+                    }
+                    /*FIN FILTRO AREA ESPEJO*/
+            
+                    $sql = "SELECT 
+                                    ifnull(DATEDIFF(DATE_ADD(fecha_revision,INTERVAL v_meses MONTH),CURRENT_DATE()),DATEDIFF(DATE_ADD(fecha,INTERVAL v_meses MONTH),CURRENT_DATE())) Días
+                                    ,Codigo_doc
+                                    ,0 Cantidad_codigo
+                                    ,nombre_doc
+                                   ,CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  elaboro
+                                    ,CONCAT(initcap(SUBSTR(re.nombres,1,IF(LOCATE(' ' ,re.nombres,1)=0,LENGTH(re.nombres),LOCATE(' ' ,re.nombres,1)-1))),' ',initcap(re.apellido_paterno)) reviso                                    
+                                    ,CONCAT(initcap(SUBSTR(ap.nombres,1,IF(LOCATE(' ' ,ap.nombres,1)=0,LENGTH(ap.nombres),LOCATE(' ' ,ap.nombres,1)-1))),' ',initcap(ap.apellido_paterno)) aprobo
+                                    ,v_meses                                    
+                                    ,version
+                                    ,DATE_FORMAT(fecha, '%d/%m/%Y') Fecha                                    
+                                    ,d.descripcion
+                                    -- ,palabras_claves
+                                    ,num_rev
+                                    ,DATE_FORMAT(fecha_revision, '%d/%m/%Y') fecha_rev
+                                    ,dao.arbol_organizacional id_organizacion
+                                    ,CASE d.publico WHEN 'S' Then 'Si' ELSE 'No' END publico    
+                                    ,tipo.descripcion tipo_documento
+                                    $sql_col_left    
+                            FROM mos_documentos d
+                                left join mos_documentos_tipos tipo on d.tipo_documento=tipo.id
+                                left join mos_personal p on d.elaboro=p.cod_emp
+                                left join mos_personal re on d.reviso=re.cod_emp
+                                left join mos_personal ap on d.aprobo=ap.cod_emp
+                                left join mos_workflow_documentos wf on d.id_workflow_documento = wf.id
+                                left join (select IDDoc, count(*) num_rev, max(fechaRevision) fecha_revision from mos_documento_revision GROUP BY IDDoc) as rev ON rev.IDDoc = d.IDDoc
+                                INNER JOIN (select IDDoc id , id_organizacion_proceso arbol_organizacional from mos_documentos_estrorg_arbolproc ) AS dao ON dao.id = d.IDDoc
+                            $sql_left
+                                $filtro_ao
+                            WHERE muestra_doc='S' ";
+                            if($atr[formulario]=='S')
+                                $sql .= " and formulario = 'S'";
+                            else
+                                $sql .= " and formulario = 'N' ";
+                    
+                            if(($_SESSION[SuperUser]!='S')&&(isset($atr[terceros]))){
+                                $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
+                                $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
+                                $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";    
+                                /*SI NO ESTA EL FILTRO VER SOLO FLUJO DE TRABAJO*/                                
+                                //if (strlen($atr["b-flujo-trabajo"])== 0)
+                                {
+                                    if (count($this->id_org_acceso))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ") $sql_filtro_area_espejo) )"; 
+                                    /*DOCUMENTOS PUBLICOS*/
+                                    if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-ocultar-publico"])==0))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S'  and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso)))) . ") $sql_filtro_area_espejo) )"; 
+                                }
+                                $sql .= ")";
+                            }
+                            if (($_SESSION[SuperUser]=='S')){
+                                    $sql .= " and ((p.email='".$atr["email_usuario"]."') or ";
+                                    $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') or ";    
+                                    $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' OR d.etapa_workflow='estado_aprobado') and d.estado_workflow='OK') ";    
+
+                                    if (count($this->id_org_acceso))
+                                        $sql .= " OR ( d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ") $sql_filtro_area_espejo) )"; 
+                                    if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-ocultar-publico"])==0))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso)))) . ") $sql_filtro_area_espejo) )"; 
+                                     $sql .= ")";
+//                                }
+                            }
+                    /*FILTRO VER SOLO FLUJO DE TRABAJO*/
+                    if (strlen($atr["b-flujo-trabajo"])> 0){
+                        $sql .= " and ((p.email='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' ) and d.estado_workflow='RECHAZADO') or ";
+                        $sql .= " (wf.email_revisa ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_revision' ) and d.estado_workflow='OK') or ";    
+                        $sql .= " (wf.email_aprueba ='".$atr["email_usuario"]."' and (d.etapa_workflow='estado_pendiente_aprobacion' ) and d.estado_workflow='OK') )";    
+
+                    }
+                            //FILTRO PARA MOSTRAR TODOS LOS DOC SI ES SUPERUSER O ESTA EN ALGUNA ETAPA DEL WF
+                    if (strlen($atr['b-filtro-sencillo'])>0){
+                        $sql .= " AND (upper(Codigo_doc) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%' OR upper(nombre_doc) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
+                    }
+                    if (strlen($atr[valor])>0)
+                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
+                                 if (strlen($atr["b-IDDoc"])>0)
+                        $sql .= " AND IDDoc = '". $atr["b-IDDoc"] . "'";
+                    if (strlen($atr["b-Codigo_doc"])>0)
+                                $sql .= " AND upper(Codigo_doc) like '%" . strtoupper($atr["b-Codigo_doc"]) . "%'";
+                    if (strlen($atr["b-nombre_doc"])>0)
+                        $sql .= " AND upper(nombre_doc) like '%" . strtoupper($atr["b-nombre_doc"]) . "%'";
+                    if (strlen($atr["b-version"])>0)
+                               $sql .= " AND version = '". $atr["b-version"] . "'";
+                    if (strlen($atr['b-fecha-desde'])>0)                        
+                    {
+                        //$atr['b-fecha-desde'] = formatear_fecha($atr['b-fecha-desde']);                        
+                        $sql .= " AND fecha >= '" . ($atr['b-fecha-desde']) . "'";                        
+                    }
+                    if (strlen($atr['b-fecha-hasta'])>0)                        
+                    {
+                        //$atr['b-fecha-hasta'] = formatear_fecha($atr['b-fecha-hasta']);                        
+                        $sql .= " AND fecha <= '" . ($atr['b-fecha-hasta']) . "'";                        
+                    }
+                    if (strlen($atr['b-fecha_rev-desde'])>0)                        
+                    {
+                        //$atr['b-fecha_rev-desde'] = formatear_fecha($atr['b-fecha_rev-desde']);                        
+                        $sql .= " AND fecha_revision >= '" . ($atr['b-fecha_rev-desde']) . "'";                        
+                    }
+                    if (strlen($atr['b-fecha_rev-hasta'])>0)                        
+                    {
+                        //$atr['b-fecha_rev-hasta'] = formatear_fecha($atr['b-fecha_rev-hasta']);                        
+                        $sql .= " AND rev.fecha_revision <= '" . ($atr['b-fecha_rev-hasta']) . "'";                        
+                    }
+                    if (strlen($atr["b-descripcion"])>0)
+                                $sql .= " AND upper(descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
+                    if (strlen($atr["b-palabras_claves"])>0)
+                                $sql .= " AND upper(palabras_claves) like '%" . strtoupper($atr["b-palabras_claves"]) . "%'";
+//                    if (strlen($atr["b-formulario"])>0)
+//                                $sql .= " AND upper(formulario) like '%" . strtoupper($atr["b-formulario"]) . "%'";
+                    if (strlen($atr["b-vigencia"])>0)
+                        $sql .= " AND (d.vigencia) = '" . ($atr["b-vigencia"]) . "'";
+                    if (strlen($atr["b-doc_fisico"])>0)
+                        $sql .= " AND doc_fisico = '". $atr["b-doc_fisico"] . "'";
+                    if (strlen($atr["b-contentType"])>0)
+                        $sql .= " AND upper(contentType) like '%" . strtoupper($atr["b-contentType"]) . "%'";
+                    if (strlen($atr["b-id_filial"])>0)
+                        $sql .= " AND id_filial = '". $atr["b-id_filial"] . "'";
+                    if (strlen($atr["b-nom_visualiza"])>0)
+                        $sql .= " AND upper(nom_visualiza) like '%" . strtoupper($atr["b-nom_visualiza"]) . "%'";
+                    if (strlen($atr["b-doc_visualiza"])>0)
+                        $sql .= " AND doc_visualiza = '". $atr["b-doc_visualiza"] . "'";
+                    if (strlen($atr["b-contentType_visualiza"])>0)
+                        $sql .= " AND upper(contentType_visualiza) like '%" . strtoupper($atr["b-contentType_visualiza"]) . "%'";
+                    if (strlen($atr["b-id_usuario"])>0)
+                        $sql .= " AND id_usuario = '". $atr["b-id_usuario"] . "'";
+                    if (strlen($atr["b-observacion"])>0)
+                        $sql .= " AND observacion = '". $atr["b-observacion"] . "'";
+                    if (strlen($atr["b-muestra_doc"])>0)
+                        $sql .= " AND upper(muestra_doc) like '%" . strtoupper($atr["b-muestra_doc"]) . "%'";
+                    if (strlen($atr["b-estrucorg"])>0)
+                        $sql .= " AND upper(estrucorg) like '%" . strtoupper($atr["b-estrucorg"]) . "%'";
+                    if (strlen($atr["b-arbproc"])>0)
+                                $sql .= " AND upper(arbproc) like '%" . strtoupper($atr["b-arbproc"]) . "%'";
+                    if (strlen($atr["b-apli_reg_estrorg"])>0)
+                                $sql .= " AND upper(apli_reg_estrorg) like '%" . strtoupper($atr["b-apli_reg_estrorg"]) . "%'";
+                    if (strlen($atr["b-apli_reg_arbproc"])>0)
+                                $sql .= " AND upper(apli_reg_arbproc) like '%" . strtoupper($atr["b-apli_reg_arbproc"]) . "%'";
+                    if (strlen($atr["b-workflow"])>0)
+                        $sql .= " AND upper(workflow) like '%" . strtoupper($atr["b-workflow"]) . "%'";
+                    if (strlen($atr["b-semaforo-desde"])>0)
+                               $sql .= " AND ifnull(DATEDIFF(DATE_ADD(fecha_revision,INTERVAL v_meses MONTH),CURRENT_DATE()),DATEDIFF(DATE_ADD(fecha,INTERVAL v_meses MONTH),CURRENT_DATE())) >= ". $atr["b-semaforo-desde"] . "";
+                    if (strlen($atr["b-semaforo-hasta"])>0)
+                               $sql .= " AND ifnull(DATEDIFF(DATE_ADD(fecha_revision,INTERVAL v_meses MONTH),CURRENT_DATE()),DATEDIFF(DATE_ADD(fecha,INTERVAL v_meses MONTH),CURRENT_DATE())) <= ". $atr["b-semaforo-hasta"] . "";
+                    if (strlen($atr["b-v_meses"])>0)
+                               $sql .= " AND v_meses = '". $atr["b-v_meses"] . "'";
+                    if (strlen($atr["b-reviso"])>0)
+                               $sql .= " AND d.reviso = '". $atr["b-reviso"] . "'";
+                    if (strlen($atr["b-elaboro"])>0)
+                               $sql .= " AND d.elaboro = '". $atr["b-elaboro"] . "'";
+                    if (strlen($atr["b-aprobo"])>0)
+                        $sql .= " AND d.aprobo = '". $atr["b-aprobo"] . "'";
+                    if (strlen($atr["nodos"])>0)
+                        $sql .= " AND d.IDDoc in (SELECT DISTINCT IDDoc
+                                                    FROM mos_registro_item 
+                                                    where valor in (".$atr["nodos"].") and tipo='11')";
+                    if (strlen($atr["nodosp"])>0)
+                        $sql .= " AND d.IDDoc in (SELECT DISTINCT IDDoc
+                                                    FROM mos_registro_item 
+                                                    where valor in (".$atr["nodosp"].") and tipo='12')";
+                    
+                    /*Acceso a los documentos segun el arbol, no aplica para el administrador de documentos*/
+                    if ((!isset($atr[terceros]))){                            
+                       $sql .= " AND d.etapa_workflow ='estado_aprobado' "; 
+                       
+                       $sql .= " AND  (d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_keys($this->id_org_acceso)) . ") $sql_filtro_area_espejo)"; 
+                       if ((count($this->id_org_acceso_todos_nivel))&&(strlen($atr["b-ocultar-publico"])==0))
+                                        $sql .= " OR ( d.etapa_workflow ='estado_aprobado' and d.vigencia = 'S' and d.publico ='S' and d.IDDoc IN (select IDDoc FROM mos_documentos_estrorg_arbolproc where id_organizacion_proceso IN (-1,". implode(',', array_merge(array(0), array_diff (array_keys($this->id_org_acceso_todos_nivel),array_keys($this->id_org_acceso)))) . ") $sql_filtro_area_espejo) )"; 
+                                                                      
+                       $sql .= ")";
+                    }
+                    $sql .= " order by Codigo_doc ";
+                    //$sql .= " order by $atr[corder] $atr[sorder] ";
+                    $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                    //print_r(array_keys($this->id_org_acceso));
+                    //print_r($atr);
+                   // echo $sql;
+                    $this->operacion($sql, $atr);
+                    
+             }
              
              public function listarCamposFormulario($atr){       
                     $atr = $this->dbl->corregir_parametros($atr);
@@ -2684,7 +3010,7 @@
                 }
                 return $out;
             }
-        public function exportarPHPExcel($parametros){
+        public function exportarPHPExcelMaestro($parametros){
         $grid= new DataGrid();
         $this->listarDocumentos($parametros, 1, 100000);
         $data = $this->dbl->data;
@@ -2721,6 +3047,63 @@
         
         return $dataxls;
         }
+
+        public function exportarPHPExcelDatosBD($parametros){
+        $grid= new DataGrid();
+        $this->listarDocumentosXLS($parametros, 1, 100000);
+        $data = $this->dbl->data;
+        $dataxls =  array();
+        $dataxls[Estado]=array();
+        $version = array(); 
+        $arbol = array(); 
+        $codigos = array();
+        $i=0;
+        $col = 0;
+        $nombre_colum = array();
+        //SE EXTRAE LOS NOMBRES DE COLUMNAS
+        foreach ($data[0] as $key => $value)
+        {
+           if(!is_integer($key)){
+               $nombre_colum[$col] = $key;
+               $col++;
+           }
+        }
+        foreach ($nombre_colum as $key => $col){
+            $dataxls[$col]= array_column($data,$col);              
+         } 
+        import('clases.organizacion.ArbolOrganizacional');
+        $ao = new ArbolOrganizacional();
+        foreach (array_column($data,'id_organizacion') as $value){
+            $arbol[] = str_replace('&#8594;','->',$ao->BuscaOrganizacional(array('id_organizacion' => $value)));
+        }
+        $cod='';
+        foreach (array_column($data,'Codigo_doc') as $value){
+            if($cod=='') {
+                $cod=$value;
+                $codigos[] = 1;
+            }
+            else{
+                if($cod==$value)
+                    $codigos[] = 0;
+                else{
+                    $codigos[] = 1;
+                    $cod=$value;
+                }
+            }             
+        }
+        $dataxls[Cantidad_codigo]=$codigos;
+        foreach ($data as $value){
+             $dias_caritas[] =$this->semaforo_reporte_xls($value,'no');
+             $version[]=$this->version($value);
+        }
+        $dataxls[Estado]=$dias_caritas;
+        $dataxls[version]=$version;
+        $dataxls[id_organizacion]=$arbol;
+//        print_r($dataxls);
+//        die;
+        return $dataxls;
+        }
+        
         public function exportarExcel($parametros){
 
 
@@ -3226,6 +3609,7 @@
 
                 $template->setTemplate("mostrar_colums_reporte_reg");
                 $template->setVars($contenido);
+                $contenido['FORMULARIO'] = $parametros['b-formulario'];
                 $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
 
@@ -3496,6 +3880,7 @@
 
                 $template->setTemplate("mostrar_colums_reporte");
                 $template->setVars($contenido);
+
                 $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
 
