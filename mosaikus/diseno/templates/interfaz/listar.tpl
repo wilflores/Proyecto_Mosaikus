@@ -49,6 +49,7 @@
                                         <input type="hidden" name="sorder" id="sorder" value="{SORDER}"/>
                                         <input type="hidden" name="cod_link" id="cod_link" value="{COD_LINK}"/>
                                         <input type="hidden" name="modo" id="modo" value="{MODO}"/>
+                                        <input type="hidden" name="formulario" id="formulario" value="{FORMULARIO}"/>
                                       </form>
                                       <div class="searh-footer">
 
