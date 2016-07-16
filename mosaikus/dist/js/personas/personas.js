@@ -63,6 +63,21 @@
                     $("#aprobo").prop("checked", true);
                 }                       
             });
+          $('#promover_cargo').change(function() {
+                if($(this).is(":checked")) {
+                    if (document.getElementById("opc").value != "new"){
+                        $("#div_fecha_promocion").show();
+                        $('#fecha_promocion').attr('data-validation',"required");
+                    }
+                    $('#promover_cargo').val('S');
+                 
+                }
+                else{
+                    $("#div_fecha_promocion").hide();
+                    $('#promover_cargo').val('N');
+                    $('#fecha_promocion').attr('data-validation',"");
+                }
+            });            
     }
     
     function cargar_cargos(id_arbol,cod_cargo) {            
