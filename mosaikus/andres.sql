@@ -417,3 +417,8 @@ FOR EACH ROW BEGIN
 				VALUES (NEW.cod_emp, NEW.id_organizacion, NEW.cod_cargo, NEW.id_organizacion, NEW.cod_cargo, NEW.fecha_ingreso);
 			END IF;
 END;
+
+INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder) VALUES ( 'dias_vig', 'Días', '6', 'Días');
+INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder) VALUES ( 'num_rev', 'Revisión', '6', 'Revisión');
+INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder) VALUES ( 'arbol_organizacional', 'Árbol Organizacional (Niveles)', '6', 'Árbol Organizacional (Niveles)');
+INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder) VALUES ( 'fecha_rev', 'Fecha de Revisión', '6', 'Fecha de Revisión');
