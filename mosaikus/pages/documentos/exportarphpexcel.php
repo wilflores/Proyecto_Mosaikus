@@ -1,22 +1,13 @@
 <?php
-header('Content-Type: image/png');
-header('Content-Type: application/vnd.ms-excel');
-header('Content-Disposition: attachment;filename="listproduct.xls"'); // file name of excel
-header('Cache-Control: max-age=0');
-// If you're serving to IE 9, then the following may be needed
-header('Cache-Control: max-age=1');
-// If you're serving to IE over SSL, then the following may be needed
-header ('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
-header ('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT'); // always modified
-header ('Cache-Control: cache, must-revalidate'); // HTTP/1.1
-header ('Pragma: public'); // HTTP/1.0
-?>
-<?php
 
 session_name('mosaikus');            
 session_start();
 chdir('..');
 chdir('..');
+if (!isset($_SESSION[CookIdUsuario])) {
+        echo "<h1>Acceso denegado</h1>";
+        exit();
+}
 include_once('clases/clases.php');
 include_once('configuracion/import.php');
 include_once('configuracion/configuracion.php');
@@ -199,7 +190,7 @@ $objActSheet->setCellValue('B7', $vigentes+$porvencer+$vencidas);
 $objActSheet->mergeCells('E1:F1'); 
 ////PARA LAS IMAGENES 
 $objDrawing = new PHPExcel_Worksheet_Drawing();
-$objDrawing->setPath('diseno/images/logo_word_pdf_excel.png');
+$objDrawing->setPath('dist/images/logo_report.png');
 $objDrawing->setName('Sample image');
 $objDrawing->setDescription('Sample image');
 $objDrawing->setWidthAndHeight(68,68);
@@ -241,10 +232,7 @@ $objActSheet = $objPHPExcel->getActiveSheet();
 foreach (array_keys($datosBd) as $value){
     //$nombre = $doc->cargar_nombres_columnas_xls($value);
     if($value=='Cantidad_codigo')$col_cod=$col;
-    if($value=='id_organizacion')
-        $objActSheet->setCellValueByColumnAndRow($col++,$fila, $doc->cargar_nombres_columnas_xls('Árbol Organizacional (Niveles)')); 
-    else
-        $objActSheet->setCellValueByColumnAndRow($col++,$fila, $doc->cargar_nombres_columnas_xls($value)); 
+    $objActSheet->setCellValueByColumnAndRow($col++,$fila, $doc->cargar_nombres_columnas_xls($value)); 
     $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col-1,$fila)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
     $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col-1,$fila)->applyFromArray( $style_header_resumen_head ); // give style to header
 }
@@ -277,7 +265,24 @@ foreach ($datosBd as $fila){
 $objPHPExcel->setActiveSheetIndex(0); 
 $objActSheet = $objPHPExcel->getActiveSheet(); 
 
-$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+//$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+$objWriter =new PHPExcel_Writer_Excel2007($objPHPExcel);
+
+if($_GET['formulario']=='S'){
+    $filename= 'maestro_registros.xlsx';    
+}
+else {
+    $filename= 'maestro_documentos.xlsx';    
+}
+header('Content-Type: image/png');
+header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+header('Cache-Control: max-age=0');
+// If you're serving to IE 9, then the following may be needed
+header('Cache-Control: max-age=1');
+// If you're serving to IE over SSL, then the following may be needed
+header ('Cache-Control: cache, must-revalidate'); // HTTP/1.1
+header ('Pragma: public'); // HTTP/1.0
+header("Content-Disposition: attachment;filename=$filename");
 $objWriter->save('php://output');
 exit;            
             
