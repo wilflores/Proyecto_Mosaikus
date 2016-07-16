@@ -102,6 +102,12 @@
                                             {N_RELATOR}
                                         </label>
                                     </div> 
+                                    <div class="checkbox">
+                                        <label>                                            
+                                            <input type="checkbox" value="{PROMOVER_CARGO}" id="promover_cargo" name="promover_cargo" {CHECKED_PROMOVER_CARGO}>
+                                            {N_PROMOVER_CARGO}
+                                        </label>
+                                    </div> 
                                     <div >                                                                               
                                            Gestión en Modulo de Documentos                                        
                                     </div>
@@ -148,11 +154,16 @@
                                            {CARGOS} 
                                         </select>                                                                                                                              
                                     </div> 
+                                <div class="form-group col-xs-8" id="div_fecha_promocion" style="display:{MOSTRAR_FECHA_PROMOCION}" >
+                                        <label for="fecha_promocion"  class="">{N_FECHA_PROMOCION}</label>
+                                        <input style="" type="text" class="form-control" value="" id="fecha_promocion" name="fecha_promocion" placeholder="{P_FECHA_PROMOCION}" />
+                                    </div> 
                                 <div class="col-xs-12">
                                     {OTROS_CAMPOS}
                                 </div>
                                 </div>
                         </div>
+                                                   
                         <div class="checkbox">
 
                                     </div>
