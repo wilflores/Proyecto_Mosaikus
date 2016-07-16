@@ -897,7 +897,8 @@
             return "<img class=\"SinBorde\" title=\"Revisión ok\" src=\"diseno/images/verde.png\"> $tupla[dias_vig]";
         }
         public function semaforo_reporte_xls($tupla,$modocarita='si')
-        {
+        {  // print_r($tupla);
+            //echo $tupla[dias_vig].'-'.$tupla[semaforo].'//';
             if($modocarita=='si'){
                 if (($tupla[dias_vig])<0){
                     return "L";
@@ -2370,7 +2371,7 @@
                     /*FIN FILTRO AREA ESPEJO*/
             
                     $sql = "SELECT 
-                                    ifnull(DATEDIFF(DATE_ADD(fecha_revision,INTERVAL v_meses MONTH),CURRENT_DATE()),DATEDIFF(DATE_ADD(fecha,INTERVAL v_meses MONTH),CURRENT_DATE())) Días
+                                    ifnull(DATEDIFF(DATE_ADD(fecha_revision,INTERVAL v_meses MONTH),CURRENT_DATE()),DATEDIFF(DATE_ADD(fecha,INTERVAL v_meses MONTH),CURRENT_DATE())) dias_vig
                                     ,Codigo_doc
                                     ,0 Cantidad_codigo
                                     ,nombre_doc
@@ -2379,14 +2380,15 @@
                                     ,CONCAT(initcap(SUBSTR(ap.nombres,1,IF(LOCATE(' ' ,ap.nombres,1)=0,LENGTH(ap.nombres),LOCATE(' ' ,ap.nombres,1)-1))),' ',initcap(ap.apellido_paterno)) aprobo
                                     ,v_meses                                    
                                     ,version
-                                    ,DATE_FORMAT(fecha, '%d/%m/%Y') Fecha                                    
+                                    ,DATE_FORMAT(fecha, '%d/%m/%Y') fecha                                    
                                     ,d.descripcion
                                     -- ,palabras_claves
                                     ,num_rev
                                     ,DATE_FORMAT(fecha_revision, '%d/%m/%Y') fecha_rev
-                                    ,dao.arbol_organizacional id_organizacion
+                                    ,dao.arbol_organizacional 
                                     ,CASE d.publico WHEN 'S' Then 'Si' ELSE 'No' END publico    
                                     ,tipo.descripcion tipo_documento
+                                    ,semaforo
                                     $sql_col_left    
                             FROM mos_documentos d
                                 left join mos_documentos_tipos tipo on d.tipo_documento=tipo.id
@@ -3073,8 +3075,8 @@
          } 
         import('clases.organizacion.ArbolOrganizacional');
         $ao = new ArbolOrganizacional();
-        foreach (array_column($data,'id_organizacion') as $value){
-            $arbol[] = str_replace('&#8594;','->',$ao->BuscaOrganizacional(array('id_organizacion' => $value)));
+        foreach (array_column($data,'arbol_organizacional') as $value){
+            $arbol[] = str_replace('&#8594;','->',$ao->BuscaOrganizacional(array('arbol_organizacional' => $value)));
         }
         $cod='';
         foreach (array_column($data,'Codigo_doc') as $value){
@@ -3092,15 +3094,17 @@
             }             
         }
         $dataxls[Cantidad_codigo]=$codigos;
+        $dias_caritas= array();
         foreach ($data as $value){
              $dias_caritas[] =$this->semaforo_reporte_xls($value,'no');
              $version[]=$this->version($value);
         }
         $dataxls[Estado]=$dias_caritas;
         $dataxls[version]=$version;
-        $dataxls[id_organizacion]=$arbol;
+        $dataxls[arbol_organizacional]=$arbol;
 //        print_r($dataxls);
 //        die;
+        unset($dataxls[semaforo]);
         return $dataxls;
         }
         
