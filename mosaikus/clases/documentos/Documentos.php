@@ -3031,7 +3031,7 @@
         }
         $dataxls[estado]=array();
          foreach ($array_columns as $key => $col){
-            $dataxls[$nombre_colum[$col]]= array_column($data,$col);              
+            $dataxls[$nombre_colum[$col]]= array_column($data,$nombre_colum[$col]);              
          }
          $dias_caritas= array(); 
          $version = array(); 
