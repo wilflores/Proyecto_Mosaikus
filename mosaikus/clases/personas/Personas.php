@@ -118,6 +118,7 @@
                             ,DATE_FORMAT(fecha_egreso, '%d/%m/%Y') fecha_egreso
                             ,responsable_area
                             ,id_organizacion_resp
+                            ,promover_cargo
                          FROM mos_personal p
                         LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo left join
                         (select cod_emp,
@@ -191,10 +192,10 @@
                     else $atr[email] = "NULL";
                     
                     $sql = "INSERT INTO mos_personal(cod_emp,id_personal,nombres,apellido_paterno,apellido_materno,genero,fecha_nacimiento,vigencia,interno,id_filial,id_organizacion,cod_cargo,workflow,email,relator,reviso,elaboro,aprobo,extranjero, fecha_ingreso, fecha_egreso
-                        , responsable_area)
+                        , responsable_area, promover_cargo)
                             VALUES(
                                 $atr[cod_emp],'$atr[id_personal]','$atr[nombres]','$atr[apellido_paterno]','$atr[apellido_materno]','$atr[genero]',$atr[fecha_nacimiento],'$atr[vigencia]','$atr[interno]',$atr[id_filial],$atr[id_organizacion],$atr[cod_cargo],'$atr[workflow]',$atr[email],'$atr[relator]','$atr[reviso]','$atr[elaboro]','$atr[aprobo]','$atr[extranjero]'
-                                    ,$atr[fecha_ingreso],$atr[fecha_egreso],'$atr[responsable_area]'
+                                    ,$atr[fecha_ingreso],$atr[fecha_egreso],'$atr[responsable_area]','$atr[promover_cargo]'
                                 )";
                     $this->dbl->insert_update($sql);
                     //PARA GUARDAR LAS AREAS DONDE ES RESPONSABLE
@@ -315,6 +316,12 @@
                         $atr[fecha_nacimiento] = "'$atr[fecha_nacimiento]'";                        
                     }
                     else $atr[fecha_nacimiento] = "NULL";
+                    
+                    if (strlen($atr[fecha_promocion])== 10){
+                        $atr[fecha_promocion] = "'$atr[fecha_promocion]'";                        
+                    }                    
+                    else $atr[fecha_promocion] = "NULL";
+                    
                     if (strlen($atr[email])!= ''){
                         $atr[email] = "'$atr[email]'";                        
                     }
@@ -330,7 +337,7 @@
                     $sql = "UPDATE mos_personal SET                            
                                     id_personal = '$atr[id_personal]',nombres = '$atr[nombres]',apellido_paterno = '$atr[apellido_paterno]',apellido_materno = '$atr[apellido_materno]',genero = '$atr[genero]',fecha_nacimiento = $atr[fecha_nacimiento],vigencia = '$atr[vigencia]',interno = '$atr[interno]',id_organizacion = $atr[id_organizacion],cod_cargo = $atr[cod_cargo],workflow = '$atr[workflow]',email = $atr[email],relator = '$atr[relator]',reviso = '$atr[reviso]',elaboro = '$atr[elaboro]',aprobo = '$atr[aprobo]'                            
                                         ,fecha_ingreso=$atr[fecha_ingreso], fecha_egreso=$atr[fecha_egreso]
-                                        ,responsable_area = '$atr[responsable_area]'
+                                        ,responsable_area = '$atr[responsable_area]',promover_cargo = '$atr[promover_cargo]',fecha_promocion = $atr[fecha_promocion]
                             WHERE  cod_emp = ".$atr[id];
                     //echo $sql;
                     $this->dbl->insert_update($sql);
@@ -1125,6 +1132,7 @@
                 $contenido_1[CHECKED_EXT_NO] = 'checked="checked"';
                 $contenido_1[CHECKED_INTERNO] = 'checked="checked"';
                 $contenido_1[CHECKED_VIGENCIA] = 'checked="checked"';
+                $contenido_1[MOSTRAR_FECHA_PROMOCION] = 'none';
                 $ids = array('', '1', '2'); 
                 $desc = array('Seleccione', 'Masculino', 'Femenino');
                 $contenido_1['GENERO'] = $ut_tool->combo_array("genero", $desc, $ids, $genero_validacion);
@@ -1419,8 +1427,9 @@
                 //$contenido_1['EXTRANJERO'] = ($val["extranjero"]);
                 $contenido_1[CHECKED_EXT_NO] = $val["extranjero"] == 'NO' ? 'checked="checked"' : '';
                 $contenido_1[CHECKED_EXT_SI] = $val["extranjero"] == 'SI' ? 'checked="checked"' : '';
-                
-
+                $contenido_1[CHECKED_PROMOVER_CARGO] = $val["promover_cargo"] == 'S' ? 'checked="checked"' : '';
+                $contenido_1[MOSTRAR_FECHA_PROMOCION] = $val["promover_cargo"] == 'S' ? '' : 'none';
+                $contenido_1[PROMOVER_CARGO] = $val["promover_cargo"];
                 import('clases.organizacion.ArbolOrganizacional');
                 $ao = new ArbolOrganizacional();
                 $parametros[opcion] = 'simple';
@@ -1533,6 +1542,11 @@
                         yearRange: '-100:+0',
                         changeYear: true
                       });");
+                $objResponse->addScript("$('#fecha_promocion').datepicker({
+                        changeMonth: true,
+                        yearRange: '-100:+0',
+                        changeYear: true
+                      });");
                 $objResponse->addScript($js);
                 $objResponse->addScript('ao_simple();');
                 $objResponse->addScript('ao_multiple_responsable();');
@@ -1541,7 +1555,7 @@
      
  
             public function actualizar($parametros)
-            {
+            { //print_r($parametros);
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $objResponse = new xajaxResponse();
@@ -1560,7 +1574,8 @@
                 }else{
                     $parametros["fecha_nacimiento"] = strlen($parametros["fecha_nacimiento"]) >=10 ? formatear_fecha($parametros["fecha_nacimiento"]) : '';                    
                     $parametros["fecha_egreso"] = strlen($parametros["fecha_egreso"]) >=10 ? formatear_fecha($parametros["fecha_egreso"]) : '';   
-                    $parametros["fecha_ingreso"] = strlen($parametros["fecha_ingreso"]) >=10 ? formatear_fecha($parametros["fecha_ingreso"]) : '';   
+                    $parametros["fecha_ingreso"] = strlen($parametros["fecha_ingreso"]) >=10 ? formatear_fecha($parametros["fecha_ingreso"]) : '';
+                    $parametros["fecha_promocion"] = strlen($parametros["fecha_promocion"]) >=10 ? formatear_fecha($parametros["fecha_promocion"]) : '';
                     $parametros[id_personal] = str_replace(".", "" , $parametros[id_personal]);
                     $parametros[id_personal] = str_replace("-", "" , $parametros[id_personal]);
                     if (!isset($parametros[interno])) $parametros[interno] = 0;
