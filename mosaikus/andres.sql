@@ -371,3 +371,49 @@ CREATE TABLE `mos_documentos_relacionados` (
   PRIMARY KEY (`IDDoc`,`IDDoc_relacionado`),
   CONSTRAINT `fk_iddoc_doc_relacionado` FOREIGN KEY (`IDDoc`) REFERENCES `mos_documentos` (`IDDoc`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/****************************************/
+/*cambio del 15-07*/
+/****************************************/
+DROP TABLE IF EXISTS `mos_historico_cargos_promocion`;
+CREATE TABLE `mos_historico_cargos_promocion` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `cod_emp` int(11) DEFAULT NULL,
+  `id_organizacion` int(11) DEFAULT NULL,
+  `cod_cargo` int(11) DEFAULT NULL,
+  `id_organizacion_promovida` int(11) DEFAULT NULL,
+  `cod_cargo_promovido` int(11) DEFAULT NULL,
+  `fecha_promocion` datetime DEFAULT NULL,
+  `fecha_registro` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+
+ALTER TABLE `mos_personal`
+ADD COLUMN `promover_cargo`  varchar(1) NULL DEFAULT 'N' AFTER `responsable_area`;
+ALTER TABLE `mos_personal`
+ADD COLUMN `fecha_promocion`  date NULL AFTER `promover_cargo`;
+
+INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder) VALUES ( 'fecha_promocion', 'Fecha de promoción', '1', 'Fecha de promoción');
+INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder) VALUES ( 'promover_cargo', 'Promover Cargo', '1', 'Promover Cargo');
+
+DROP TRIGGER IF EXISTS `registra_mos_historico_cargos_promocion_upd`;
+
+CREATE TRIGGER `registra_mos_historico_cargos_promocion_upd` BEFORE UPDATE ON `mos_personal`
+FOR EACH ROW BEGIN
+/*guarda historico de la promocion de los cargos*/
+			IF(NEW.promover_cargo='S') THEN
+        INSERT into mos_historico_cargos_promocion (cod_emp, id_organizacion, cod_cargo, id_organizacion_promovida, cod_cargo_promovido, fecha_promocion) 
+				VALUES (NEW.cod_emp, OLD.id_organizacion, OLD.cod_cargo, NEW.id_organizacion, NEW.cod_cargo, NEW.fecha_promocion);
+			END IF;
+END;
+
+DROP TRIGGER IF EXISTS `registra_mos_historico_cargos_promocion_ins`;
+
+CREATE TRIGGER `registra_mos_historico_cargos_promocion_ins` AFTER INSERT ON `mos_personal`
+FOR EACH ROW BEGIN
+/*guarda historico de la promocion de los cargos*/
+			IF(NEW.promover_cargo='S') THEN
+        INSERT into mos_historico_cargos_promocion (cod_emp, id_organizacion, cod_cargo, id_organizacion_promovida, cod_cargo_promovido, fecha_promocion) 
+				VALUES (NEW.cod_emp, NEW.id_organizacion, NEW.cod_cargo, NEW.id_organizacion, NEW.cod_cargo, NEW.fecha_ingreso);
+			END IF;
+END;
