@@ -70,7 +70,7 @@ function CambiaSinAcento($Texto)
                     $exito = 1;
                     $tamano = filesize(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($_FILES['fileUpload']['name']));
                     $tamano_visual = number_format($tamano/ 1024, 2);
-                    $nombres_aux = explode('-', $nombre);
+                    $nombres_aux = explode('-', Normalizer::normalize($nombre));
 //                    if (count($nombres_aux) != 3){
 //                        $funcion = '- Documento no contiene formato apropiado: Código-Nombre archivo-Versión.Extension';
 //                        $exito = 0;
