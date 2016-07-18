@@ -166,10 +166,12 @@
             return $Nivls;
 
         }
-        
+        //genesis/ mirian kiareli/ 0212 2580498/2580228
+
+
         function BuscaRegistrosReporte($tupla)
         {
-            If ($tupla[formulario] == 'N')
+            If ($tupla[formulario] != 'S')
                 return 'No Aplica';
             
             $encryt = new EnDecryptText();
@@ -181,7 +183,7 @@
                     $Resp3 = $dbl->query($Consulta3,array());                    
                     $resp3 = $Resp3[0][cant];
                     $html = str_pad($resp3, 5, '0', STR_PAD_LEFT);
-
+echo $Consulta3;
                     return  $html;
             }
             
@@ -860,8 +862,8 @@
         }
         
         public function BuscaRegistrosReporte($tupla)
-        {
-            If ($tupla[formulario] == 'N')
+        {   //print_r($tupla);
+            If ($tupla[formulario] != 'S')
                 return 'No Aplica';
             
             $encryt = new EnDecryptText();
@@ -873,7 +875,6 @@
                     $Resp3 = $dbl->query($Consulta3,array());                    
                     $resp3 = $Resp3[0][cant];
                     $html = str_pad($resp3, 5, '0', STR_PAD_LEFT);
-
                     return  $html;
             }
             
@@ -2400,6 +2401,7 @@
                                    ,CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  elaboro
                                     ,CONCAT(initcap(SUBSTR(re.nombres,1,IF(LOCATE(' ' ,re.nombres,1)=0,LENGTH(re.nombres),LOCATE(' ' ,re.nombres,1)-1))),' ',initcap(re.apellido_paterno)) reviso                                    
                                     ,CONCAT(initcap(SUBSTR(ap.nombres,1,IF(LOCATE(' ' ,ap.nombres,1)=0,LENGTH(ap.nombres),LOCATE(' ' ,ap.nombres,1)-1))),' ',initcap(ap.apellido_paterno)) aprobo
+                                    $campo_formulario
                                     ,v_meses                                    
                                     ,version
                                     ,DATE_FORMAT(fecha, '%d/%m/%Y') fecha                                    
@@ -2411,6 +2413,7 @@
                                     ,CASE d.publico WHEN 'S' Then 'Si' ELSE 'No' END publico    
                                     ,tipo.descripcion tipo_documento
                                     ,semaforo
+                                    ,d.IDDoc
                                     $sql_col_left    
                             FROM mos_documentos d
                                 left join mos_documentos_tipos tipo on d.tipo_documento=tipo.id
@@ -3040,7 +3043,7 @@
         $data = $this->dbl->data;
         $dataxls =  array();
         $array_columns =  explode('-', $parametros['mostrar-col']);            
-        //print_r($data);
+        //print_r($parametros);
         $col = 0;
         $nombre_colum = array();
         //SE EXTRAE LOS NOMBRES DE COLUMNAS
@@ -3057,18 +3060,29 @@
          }
          $dias_caritas= array(); 
          $version = array(); 
+         $formulario = array(); 
          $arbol = array(); 
          $i=0;
          foreach ($data as $value){
              $dias_caritas[] =$this->semaforo_reporte_xls($value);
              $version[]=$this->version($value);
+             $formulario[]=$this->BuscaRegistrosReporte($value);
              $arbol[]=$this->BuscaOrganizacionalTodosXLS($value);
         }
+
         $dataxls[estado]=$dias_caritas;
         $dataxls[version]=$version;
         $dataxls[arbol_organizacional]=$arbol;
         //print_r($dataxls);
-        
+        if($parametros['formulario']=='S'){
+            unset($dataxls[contentType]);
+            unset($dataxls[nom_visualiza]);
+            unset($dataxls[contentType_visualiza]);
+            $dataxls[formulario]=$formulario;
+        }  
+        else{
+            unset($dataxls[formulario]);
+        }
         return $dataxls;
         }
 
@@ -3117,16 +3131,32 @@
         }
         $dataxls[Cantidad_codigo]=$codigos;
         $dias_caritas= array();
+        $formulario = array();
+
         foreach ($data as $value){
              $dias_caritas[] =$this->semaforo_reporte_xls($value,'no');
              $version[]=$this->version($value);
+             $formulario[]=$this->BuscaRegistrosReporte($value);
         }
+
         $dataxls[Estado]=$dias_caritas;
+        
         $dataxls[version]=$version;
         $dataxls[arbol_organizacional]=$arbol;
-//        print_r($dataxls);
-//        die;
+
+
         unset($dataxls[semaforo]);
+        unset($dataxls[IDDoc]);
+        if($parametros['formulario']=='S'){
+            unset($dataxls[contentType]);
+            unset($dataxls[nom_visualiza]);
+            unset($dataxls[contentType_visualiza]);
+            $dataxls[formulario]=$formulario;
+        }
+        else{
+            unset($dataxls[formulario]);
+        }
+            //   print_r($dataxls);    
         return $dataxls;
         }
         
