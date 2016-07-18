@@ -20,7 +20,16 @@ $datos = $doc->exportarPHPExcelMaestro($_GET);
 //print_r($datos);
 //die;
 $datosBd = $doc->exportarPHPExcelDatosBD($_GET);
-
+if($_GET['formulario']=='S'){
+    $filename= 'maestro_registros.xlsx';    
+    $titulo1='Maestro de Registros';
+    $titulo2='Registros BD';
+}
+else {
+    $filename= 'maestro_documentos.xlsx';  
+    $titulo1='Maestro de Documentos';
+    $titulo2='Documentos BD';
+}
 $objPHPExcel = new PHPExcel(); // Create new PHPExcel object
 $objPHPExcel->getProperties()->setCreator("Sigit prasetya n")
                              ->setLastModifiedBy("Sigit prasetya n")
@@ -32,7 +41,7 @@ $objPHPExcel->getProperties()->setCreator("Sigit prasetya n")
 // create style
 $objPHPExcel->setActiveSheetIndex(0); 
 $objActSheet = $objPHPExcel->getActiveSheet();
-$objActSheet->setCellValue('A1', 'Maestro de Documentos'); 
+$objActSheet->setCellValue('A1', $titulo1); 
 $objActSheet->setCellValue('A2', 'Fecha: '.date('d/m/Y')); 
 $style_titulo = array(
     'font' => array(
@@ -136,11 +145,13 @@ $style_content = array(
 $col = 0;
 $fila=11;
 //$objActSheet = $objPHPExcel->getActiveSheet();
+  
+                    
 $objPHPExcel->setActiveSheetIndex(0); 
 $objActSheet = $objPHPExcel->getActiveSheet(); 
 foreach (array_keys($datos) as $value){
     //$nombre = $doc->cargar_nombres_columnas_xls($value);
-    $objActSheet->setCellValueByColumnAndRow($col++,$fila, $doc->cargar_nombres_columnas_xls($value)); 
+    $objActSheet->setCellValueByColumnAndRow($col++,$fila, $doc->cargar_nombres_columnas_xls($value,$_GET['formulario'])); 
     $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col-1,$fila)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
     $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col-1,$fila)->applyFromArray( $style_header_resumen_head ); // give style to header
 }
@@ -212,7 +223,7 @@ $objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
 $objDrawing2->setWorksheet($objPHPExcel->getActiveSheet());
 $objPHPExcel->setActiveSheetIndex(0); 
 $objActSheet = $objPHPExcel->getActiveSheet(); 
-$objActSheet->setTitle('Maestro de Documentos');
+$objActSheet->setTitle($titulo1);
 ////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 ///////////////FIN TABLA CON ESTILOS//////////////////////////////////////
@@ -223,7 +234,7 @@ $objActSheet->setTitle('Maestro de Documentos');
 ///////////////TABLA SIN ESTILOS PARA LA DINAMICA//////////////////////////////////////
 
 $objPHPExcel->createSheet(); 
-$objPHPExcel->getSheet(1)->setTitle('Documentos BD'); 
+$objPHPExcel->getSheet(1)->setTitle($titulo2); 
 
 /////PARA HACER EL ENCABEZADO DE LA TABLA
 $col = 0;
@@ -234,7 +245,7 @@ $objActSheet = $objPHPExcel->getActiveSheet();
 foreach (array_keys($datosBd) as $value){
     //$nombre = $doc->cargar_nombres_columnas_xls($value);
     if($value=='Cantidad_codigo')$col_cod=$col;
-    $objActSheet->setCellValueByColumnAndRow($col++,$fila, $doc->cargar_nombres_columnas_xls($value)); 
+    $objActSheet->setCellValueByColumnAndRow($col++,$fila, $doc->cargar_nombres_columnas_xls($value,$_GET['formulario'])); 
     $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col-1,$fila)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
     $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col-1,$fila)->applyFromArray( $style_header_resumen_head ); // give style to header
 }
@@ -270,12 +281,7 @@ $objActSheet = $objPHPExcel->getActiveSheet();
 //$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 $objWriter =new PHPExcel_Writer_Excel2007($objPHPExcel);
 
-if($_GET['formulario']=='S'){
-    $filename= 'maestro_registros.xlsx';    
-}
-else {
-    $filename= 'maestro_documentos.xlsx';    
-}
+
 header('Content-Type: image/png');
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Cache-Control: max-age=0');
