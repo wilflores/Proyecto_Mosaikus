@@ -81,11 +81,11 @@ class visualizador_documentos {
                         $this->nombre_archivo = $this->Codigo."-".$this->NombreDoc.".".$this->Ext2;
                         break;                    
                     case "HOJA_VIDA":
-                        $this->nombre_archivo = utf8_decode(CambiaSinAcento($this->NombreDoc));
+                        $this->nombre_archivo = (CambiaSinAcento($this->NombreDoc));
                         //echo $this->nombre_archivo;
                         break;
                     default:
-                        $this->nombre_archivo = $this->Codigo."-".utf8_decode($this->NombreDoc)."-V".str_pad($this->version,2,0,STR_PAD_LEFT).".".$this->Ext2;
+                        $this->nombre_archivo = $this->Codigo."-".($this->NombreDoc)."-V".str_pad($this->version,2,0,STR_PAD_LEFT).".".$this->Ext2;
                         break;
                 }
 /*		if ($this->version=="evidencia")
