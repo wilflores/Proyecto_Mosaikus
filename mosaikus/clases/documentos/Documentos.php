@@ -363,7 +363,7 @@
                 //echo     $this->nivel_area;
             }
             
-            private function cargar_parametros($cod_categoria){
+            public function cargar_parametros($cod_categoria){
                 $sql = "SELECT cod_parametro, espanol, tipo FROM mos_parametro WHERE cod_categoria = '$cod_categoria' AND vigencia = 'S' ORDER BY cod_parametro";
                 $this->parametros = $this->dbl->query($sql, array());
             }
@@ -376,16 +376,38 @@
                 }
                 
             }
-            public function cargar_nombres_columnas_xls($campo,$modulo=6){
+            public function cargar_nombres_columnas_xls($campo,$formulario,$modulo=6){
                 $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE nombre_campo='$campo' and modulo = $modulo";
                 $nombres_campos = $this->dbl->query($sql, array());
+                if($formulario=='S') {
+                    $cod_categoria = 15;
+                }
+                else{
+                    $cod_categoria = 1;
+                }                       
+                if (count($this->parametros) <= 0){
+                    $this->cargar_parametros($cod_categoria);
+                }  
+                $k=1; 
+                $arrayp= array();
+                foreach ($this->parametros as $value) {                    
+                    $arrayp['p'.$k]=  utf8_decode($value[espanol]);
+                    $k++;
+                }
+                
                 foreach ($nombres_campos as $value) {
                     $texto = $value[texto];
                 }
+                
+                
                 if($texto!='')
                     return $texto;
-                else
-                    return $campo;
+                else{
+                    if($arrayp[$campo]!='')
+                        return $arrayp[$campo];
+                    else
+                        return $campo;
+                }
             }            
             /**
              * Activa los nodos donde se tiene explicitamente acceso
