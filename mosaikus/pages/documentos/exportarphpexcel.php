@@ -17,8 +17,8 @@ include_once('clases/excel/PHPExcel.php');
 $doc = new Documentos();
 $datos = array();
 $datos = $doc->exportarPHPExcelMaestro($_GET);
-print_r($datos);
-die;
+//print_r($datos);
+//die;
 $datosBd = $doc->exportarPHPExcelDatosBD($_GET);
 
 $objPHPExcel = new PHPExcel(); // Create new PHPExcel object

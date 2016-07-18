@@ -227,7 +227,7 @@ function cargar_autocompletado(){
         $("#ver_ficha_trabajador").trigger('click');        
     }
     
-function exportarExcel(){
+function exportarExcel_maestro(){
 var params =  getForm('busquedaFrm');
 window.open('pages/' +  document.getElementById("modulo_actual").value + '/exportarphpexcel.php?'+params,null,'toolbar=no, location=no, menubar=no, width=600,height=400');
 }

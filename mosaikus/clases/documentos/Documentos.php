@@ -3625,7 +3625,7 @@
                 if (isset($parametros['html']))
                     return $template->show();
                 $objResponse = new xajaxResponse();
-                $objResponse->addAssign('contenido',"innerHTML",$template->show());
+                $objResponse->addAssign('contenido',"innerHTML",str_replace('exportarExcel()', 'exportarExcel_maestro()', $template->show()));
                 $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
                 $objResponse->addAssign('modulo_actual',"value","documentos");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'documentos/documentos_reporte_reg.js?'.  rand());
@@ -3896,7 +3896,7 @@
                 if (isset($parametros['html']))
                     return $template->show();
                 $objResponse = new xajaxResponse();
-                $objResponse->addAssign('contenido',"innerHTML",$template->show());
+                $objResponse->addAssign('contenido',"innerHTML",  str_replace('exportarExcel()', 'exportarExcel_maestro()', $template->show()));
                 $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
                 $objResponse->addAssign('modulo_actual',"value","documentos");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'documentos/documentos_reporte.js?'.  rand());
