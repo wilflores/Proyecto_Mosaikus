@@ -575,6 +575,7 @@ WHERE 1 =1";
                array( "width"=>"20%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[id_area], ENT_QUOTES, "UTF-8")),
                array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[categoria], ENT_QUOTES, "UTF-8"))
                 );
+                
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 }*/
@@ -673,12 +674,12 @@ WHERE 1 =1";
                 $array_columns =  explode('-', $parametros['mostrar-col']);            
                 for($i=0;$i<count($config_col);$i++){
                     switch ($i) {                                             
-                        case 1:
+                        /*case 1:
                         case 2:
                         case 3:
                         case 4:
                             array_push($config,$config_col[$i]);
-                            break;
+                            break;*/
                         default:                            
                             if (in_array($i, $array_columns)) {
                                 array_push($config,$config_col[$i]);
@@ -872,7 +873,7 @@ WHERE 1 =1";
                          $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
                 }else{
                     //VAALIDAR QUE LLENO AL MENOS UNA CATEGORIA - RAQUEL+++/
-                      $cant_familias=0;/// cuadrar desde aquiiiiii
+                      $cant_familias=0;
                         for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
                             if ((isset($parametros["nombre_din_$i"]))&&(isset($parametros["codigo_din_$i"]))&&(isset($parametros["orden_din_$i"])))
                                 $cant_familias++;
