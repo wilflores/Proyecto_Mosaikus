@@ -719,7 +719,7 @@ echo $Consulta3;
                         $Nivls .= $this->BuscaOrganizacional(array('id_organizacion' => $Fila3[id_organizacion_proceso]))."\n";
                     }
                     if($Nivls!='')
-                            $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+                            $Nivls=$Nivls;//substr($Nivls,0,strlen($Nivls)-6);
                     else
                             $Nivls='-- Sin información --';
             }
@@ -732,7 +732,7 @@ echo $Consulta3;
             $Nivls = "";
             $Nivls .= $this->BuscaOrganizacional(array('id_organizacion' => $id_organizacion_proceso))."\n";
             if($Nivls!='')
-                    $Nivls=substr($Nivls,0,strlen($Nivls)-6);
+                    $Nivls=$Nivls;//substr($Nivls,0,strlen($Nivls)-6);
             else
                     $Nivls='-- Sin información --';
             return $Nivls;
@@ -2571,7 +2571,7 @@ echo $Consulta3;
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //print_r(array_keys($this->id_org_acceso));
                     //print_r($atr);
-                   // echo $sql;
+                    //echo $sql;
                     $this->operacion($sql, $atr);
                     
              }
@@ -3112,8 +3112,10 @@ echo $Consulta3;
         import('clases.organizacion.ArbolOrganizacional');
         $ao = new ArbolOrganizacional();
         foreach (array_column($data,'arbol_organizacional') as $value){
-            $arbol[] = str_replace('&#8594;','->',$ao->BuscaOrganizacional(array('arbol_organizacional' => $value)));
+            //echo $value;
+            $arbol[] = str_replace('&#8594;','->',$ao->BuscaOrganizacional(array('id_organizacion' => $value)));
         }
+        //print_r($arbol);
         $cod='';
         foreach (array_column($data,'Codigo_doc') as $value){
             if($cod=='') {

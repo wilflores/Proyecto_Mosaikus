@@ -1274,7 +1274,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                     ,r.contentType
                                     -- ,r.id_procesos
                                     -- ,r.id_organizacion AQUI
-                                    ,d.actualizacion_activa
+                                     ,d.actualizacion_activa
                                      $sql_col_left
                             FROM mos_registro r
                             INNER JOIN mos_documentos d ON d.IDDoc = r.IDDoc
@@ -2064,6 +2064,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
          //array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[descripcion], ENT_QUOTES, "UTF-8")),
          array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[doc_fisico], ENT_QUOTES, "UTF-8")),
          array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[contentType], ENT_QUOTES, "UTF-8")),
+         array( "width"=>"2%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[actualizacion_activa], ENT_QUOTES, "UTF-8")),
          //array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[id_procesos], ENT_QUOTES, "UTF-8")),
          //array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[id_organizacion], ENT_QUOTES, "UTF-8"))
               );
@@ -2157,6 +2158,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         case 0:
                         case 3:
                         case 4:
+                        case 5:
                             $grid->hidden[$i] = true; 
                             break;
                         default:                            
@@ -2217,6 +2219,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                 </div>';
                         $k++;
+                        $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
                                        
                                       <label >
@@ -2257,6 +2260,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                   
                             </div>';
                         $k++;
+                        $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
                                           <label >
@@ -2265,6 +2269,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                 </div>';
                         $k++;
+                        $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
                                           <label >
@@ -2273,6 +2278,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                 </div>';
                         $k++;
+                        $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
                                           <label >
@@ -2608,6 +2614,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                 </div>';
                         $k++;
+                        $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
                                        
                                       <label >
@@ -2648,6 +2655,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                   
                             </div>';
                         $k++;
+                        $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
                                           <label >
@@ -2656,6 +2664,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                 </div>';
                         $k++;
+                        $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
                                           <label >
@@ -2664,6 +2673,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                 </div>';
                         $k++;
+                        $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
                                           <label >

@@ -45,7 +45,12 @@
         <br>
         <br>
     <?php
-    echo $pagina->exportarExcel($_GET);
+    $formulario = array();
+    if($_SESSION[ParamAdic]=='formulario') {
+                    $formulario['formulario']='S';
+                    
+                }
+    echo $pagina->exportarExcel(array_merge($formulario,$_GET) );
 
     ?>
         <br/>
