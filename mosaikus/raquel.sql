@@ -83,5 +83,75 @@ UPDATE `santateresa`.`mos_link` SET `descripcion` = 'MatrizCompetencias-indexMat
 /******* actualizar categoria por familia en la vista matriz competencia***********/
 UPDATE `santateresa`.`mos_nombres_campos` SET texto = 'Familias',placeholder='Familias' WHERE id =388;
 
+/***************NUEVAS TABLLAS PARA MODULO DE MATRIZ COMPETENCIAS**/
+CREATE TABLE IF NOT EXISTS `mos_requisitos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) COLLATE utf8_spanish_ci NOT NULL,
+  `tipo` varchar(10) COLLATE utf8_spanish_ci NOT NULL,
+  `vigencia` varchar(1) COLLATE utf8_spanish_ci NOT NULL,
+  `estatus` int(11) NOT NULL,
+  `orden` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `mos_requisitos_familias` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `codigo` varchar(50) COLLATE utf8_spanish_ci NOT NULL,
+  `descripcion` varchar(255) COLLATE utf8_spanish_ci NOT NULL,
+  `orden` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `codigo` (`codigo`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci COMMENT='categorias o familia de una matriz de competencia' AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS `mos_requisitos_items_familias` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `codigo` varchar(50) COLLATE utf8_spanish_ci NOT NULL,
+  `descripcion` varchar(255) COLLATE utf8_spanish_ci NOT NULL,
+  `id_familia` int(11) NOT NULL,
+  `orden` int(11) NOT NULL,
+  `vigencia` varchar(2) COLLATE utf8_spanish_ci NOT NULL DEFAULT 'S',
+  PRIMARY KEY (`id`),
+  KEY `id_familia` (`id_familia`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci AUTO_INCREMENT=1 ;
+
+ALTER TABLE `mos_requisitos_items_familias`
+  ADD CONSTRAINT `mos_requisitos_items_familias_ibfk_2` FOREIGN KEY (`id_familia`) REFERENCES `mos_requisitos_familias` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+CREATE TABLE IF NOT EXISTS `mos_requisitos_item` (
+  `id` int(11) NOT NULL,
+  `id_item` int(11) NOT NULL,
+  `id_requisitos` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_item` (`id_item`),
+  KEY `id_requisitos` (`id_requisitos`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+--
+-- Filtros para la tabla `mos_requisitos_item`
+--
+ALTER TABLE `mos_requisitos_item`
+  ADD CONSTRAINT `mos_requisitos_item_ibfk_2` FOREIGN KEY (`id_requisitos`) REFERENCES `mos_requisitos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `mos_requisitos_item_ibfk_1` FOREIGN KEY (`id_item`) REFERENCES `mos_requisitos_items_familias` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
+CREATE TABLE IF NOT EXISTS `mos_requisitos_organizacion` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_area` int(11) NOT NULL,
+  `id_requisito` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_area` (`id_area`),
+  KEY `id_requisito` (`id_requisito`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci AUTO_INCREMENT=1 ;
+
+ALTER TABLE `mos_requisitos_organizacion`
+  ADD CONSTRAINT `mos_requisitos_organizacion_ibfk_1` FOREIGN KEY (`id_area`) REFERENCES `mos_organizacion` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `mos_requisitos_organizacion_ibfk_2` FOREIGN KEY (`id_requisito`) REFERENCES `mos_requisitos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+/*nUEVOS CAMPOS ****/
+
+
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('descripcion', 'Descripción', 29, 'Ingrese Descripción');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('codigo', 'Código', 29, 'Ingrese Código');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id_items', 'Items', 29, 'Items');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id', 'id', 29, 'id');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('orden', 'Orden', 28, 'Orden');
