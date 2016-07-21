@@ -322,9 +322,6 @@
                          WHERE 1 = 1 ";
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND ((upper(codigo) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
-                        $sql .= " OR (1 = 1";
- 
-                        $sql .= " ) ";
                         $sql .= " OR (upper(descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
                     }
                     if (strlen($atr[valor])>0)
@@ -351,23 +348,20 @@
                     WHERE 1 = 1 ";
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND ((upper(codigo) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
-                        $sql .= " OR (1 = 1";
-                
-                        $sql .= " ) ";
                         $sql .= " OR (upper(descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
                     }
                     if (strlen($atr[valor])>0)
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
-                                if (strlen($atr["b-codigo"])>0)
+                    if (strlen($atr["b-codigo"])>0)
                         $sql .= " AND upper(codigo) like '%" . strtoupper($atr["b-codigo"]) . "%'";
-            if (strlen($atr["b-descripcion"])>0)
+                    if (strlen($atr["b-descripcion"])>0)
                         $sql .= " AND upper(descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
              /*if (strlen($atr["b-orden"])>0)
                         $sql .= " AND orden = '". $atr["b-orden"] . "'";
 */
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
-                   // echo $sql;
+                    //echo $sql;
                     $this->operacion($sql, $atr);
              }
              public function eliminarFamilias($atr){

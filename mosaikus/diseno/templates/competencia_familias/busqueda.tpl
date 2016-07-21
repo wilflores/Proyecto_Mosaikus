@@ -10,9 +10,4 @@
                                     <input type="text" class="form-control" id="b-descripcion" name="b-descripcion" placeholder="{N_DESCRIPCION}" />
                                                           
                             </div>
-<div class="form-group">
-                                  <label for="orden" class="control-label">{N_ORDEN}</label>
-                                  
-                                    <input type="text" class="form-control" id="b-orden" name="b-orden" placeholder="{N_ORDEN}"/>
-                                                             
-                            </div>
+
