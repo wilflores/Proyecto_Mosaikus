@@ -322,7 +322,7 @@ echo $Consulta3;
         private $templates;
         private $bd;
         private $total_registros;
-        private $parametros;
+        public $parametros;
         public $nombres_columnas;
         private $placeholder;
         private $id_org_acceso;
@@ -519,7 +519,25 @@ echo $Consulta3;
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }
-            
+             public function ListarCamposIndexadosDoc($id){
+                $atr=array();
+                $sql = "SELECT
+                            form.Nombre,
+                            form.tipo,
+                            GROUP_CONCAT(mos_documentos_formulario_items.descripcion) valores
+                        FROM
+                        mos_documentos_datos_formulario AS form
+                        LEFT JOIN mos_documentos_formulario_items ON form.id_unico = mos_documentos_formulario_items.fk_id_unico
+                        WHERE IDDoc = $id
+                        GROUP BY
+                            form.Nombre,
+                            form.tipo
+                            ORDER BY
+                        form.orden ASC "; 
+                //echo $sql;
+                $this->operacion($sql, $atr);
+                return $this->dbl->data;
+            }           
             public function verDocumentoPDF($id){
                 $atr=array();
                 $sql = "SELECT                             
@@ -534,6 +552,18 @@ echo $Consulta3;
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }
+            public function verAnexosDoc($id){
+                $atr=array();
+                $sql = "SELECT                             
+                            id
+                            ,nomb_archivo                            
+                            ,contenttype
+                         FROM mos_documentos_anexos 
+                         WHERE id_documento = $id "; 
+                //echo $sql;
+                $this->operacion($sql, $atr);
+                return $this->dbl->data;
+            }            
              public function verVisualizaDocumentosRelacionados($id){
                 $atr=array();
                 $sql = "SELECT
@@ -570,7 +600,7 @@ echo $Consulta3;
 
              public function verDocumentos($id){
                 $atr=array();
-                $sql = "SELECT IDDoc
+                $sql = "SELECT d.IDDoc
                                 ,Codigo_doc
                                 ,nombre_doc
                                 ,version
@@ -598,10 +628,11 @@ echo $Consulta3;
                                 ,d.reviso
                                 ,d.elaboro
                                 ,d.aprobo
-                                
-                                ,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) elaboro_a
-                                ,CONCAT(CONCAT(UPPER(LEFT(re.nombres, 1)), LOWER(SUBSTRING(re.nombres, 2))),' ', CONCAT(UPPER(LEFT(re.apellido_paterno, 1)), LOWER(SUBSTRING(re.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(re.apellido_materno, 1)), LOWER(SUBSTRING(re.apellido_materno, 2)))) reviso_a
-                                ,CONCAT(CONCAT(UPPER(LEFT(ap.nombres, 1)), LOWER(SUBSTRING(ap.nombres, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_paterno, 1)), LOWER(SUBSTRING(ap.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_materno, 1)), LOWER(SUBSTRING(ap.apellido_materno, 2)))) aprobo_a
+                                ,num_rev
+                                ,DATE_FORMAT(fecha_revision, '%d/%m/%Y')fecha_rev
+                                ,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) elaboro
+                                ,CONCAT(CONCAT(UPPER(LEFT(re.nombres, 1)), LOWER(SUBSTRING(re.nombres, 2))),' ', CONCAT(UPPER(LEFT(re.apellido_paterno, 1)), LOWER(SUBSTRING(re.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(re.apellido_materno, 1)), LOWER(SUBSTRING(re.apellido_materno, 2)))) reviso
+                                ,CONCAT(CONCAT(UPPER(LEFT(ap.nombres, 1)), LOWER(SUBSTRING(ap.nombres, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_paterno, 1)), LOWER(SUBSTRING(ap.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_materno, 1)), LOWER(SUBSTRING(ap.apellido_materno, 2)))) aprobo
                                 ,d.publico
                                 ,d.id_workflow_documento
                                 ,d.estado_workflow
@@ -613,13 +644,15 @@ echo $Consulta3;
                                 ,d.actualizacion_activa
                                 ,requiere_lista_distribucion
                                 ,tipo_documento
+                                ,ifnull(DATEDIFF(DATE_ADD(fecha_revision,INTERVAL v_meses MONTH),CURRENT_DATE()),DATEDIFF(DATE_ADD(fecha,INTERVAL v_meses MONTH),CURRENT_DATE())) dias_vig
                          FROM mos_documentos  d
                                 left join mos_personal p on d.elaboro=p.cod_emp
                                 left join mos_personal re on d.reviso=re.cod_emp
                                 left join mos_personal ap on d.aprobo=ap.cod_emp
-                                left join mos_workflow_documentos wf on d.id_workflow_documento = wf.id
+                                left join mos_workflow_documentos wf on d.id_workflow_documento = wf.id 
+                                left join (select IDDoc, count(*) num_rev, max(fechaRevision) fecha_revision from mos_documento_revision GROUP BY IDDoc) as rev ON rev.IDDoc = d.IDDoc
                                 left JOIN (select IDDoc id , GROUP_CONCAT(id_organizacion_proceso) id_organizacion from mos_documentos_estrorg_arbolproc GROUP BY IDDoc) AS dao ON  d.IDDoc = dao.id
-                         WHERE IDDoc = $id "; 
+                         WHERE d.IDDoc = $id "; 
                 $this->operacion($sql, $atr);
                 //echo $sql;
                 return $this->dbl->data[0];
@@ -727,6 +760,7 @@ echo $Consulta3;
             return $Nivls;
 
         }
+        
         public function BuscaOrganizacionalTodosXLSIndividualNodo($id_organizacion_proceso)
         {
             $Nivls = "";
@@ -1955,7 +1989,7 @@ echo $Consulta3;
                     if (strlen($atr[valor])>0)
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
                     if (strlen($atr["b-IDDoc"])>0)
-                        $sql .= " AND IDDoc = '". $atr["b-IDDoc"] . "'";
+                        $sql .= " AND d.IDDoc = '". $atr["b-IDDoc"] . "'";
                     if (strlen($atr["b-Codigo_doc"])>0)
                         $sql .= " AND upper(Codigo_doc) like '%" . strtoupper($atr["b-Codigo_doc"]) . "%'";        
                     if (strlen($atr["b-nombre_doc"])>0)
@@ -2162,7 +2196,7 @@ echo $Consulta3;
                     if (strlen($atr[valor])>0)
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
                                  if (strlen($atr["b-IDDoc"])>0)
-                        $sql .= " AND IDDoc = '". $atr["b-IDDoc"] . "'";
+                        $sql .= " AND d.IDDoc = '". $atr["b-IDDoc"] . "'";
                     if (strlen($atr["b-Codigo_doc"])>0)
                                 $sql .= " AND upper(Codigo_doc) like '%" . strtoupper($atr["b-Codigo_doc"]) . "%'";
                     if (strlen($atr["b-nombre_doc"])>0)
@@ -2794,9 +2828,9 @@ echo $Consulta3;
                array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
                array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
                array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
-                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
-                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
-                    array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+            array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+            array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+            array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
                     //array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
                     //array( "width"=>"23%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
                
@@ -6107,7 +6141,7 @@ echo $Consulta3;
                         $contenido_1['MOSTRARCAMBIAR']='';
                         $contenido_1['MOSTRARRECHAZAR']=''; 
                     }
-                    $persona_pendiente = $val[reviso_a];
+                    $persona_pendiente = $val[reviso];
                 }
                 if($val[etapa_workflow]=='estado_pendiente_aprobacion'){
                     $contenido_1['ETAPANUEVA']='estado_aprobado';
@@ -6118,12 +6152,12 @@ echo $Consulta3;
                         $contenido_1['MOSTRARCAMBIAR']='';
                         $contenido_1['MOSTRARRECHAZAR']='';
                     }
-                    $persona_pendiente = $val[aprobo_a];
+                    $persona_pendiente = $val[aprobo];
                 }
                 if($val[etapa_workflow]=='estado_aprobado'){
-                    $persona_pendiente = $val[aprobo_a];
+                    $persona_pendiente = $val[aprobo];
                 }
-                $contenido_1['N_ELABORO']=$val[elaboro_a];
+                $contenido_1['N_ELABORO']=$val[elaboro];
                 $objResponse = new xajaxResponse();
                 /*DOCUMENTO DE VISUALIZACION*/
                 $archivo_aux = $this->verDocumentoPDF($parametros[id]);
