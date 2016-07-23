@@ -234,7 +234,79 @@
                 $this->parametros = $this->dbl->query($sql, array());
                 //print_r($this->parametros);
             }
-            
+
+            public function cargar_nombres_columnas_xls(){
+                session_name("$GLOBALS[SESSION]");
+                session_start(); 
+                if(!class_exists('Personas')){
+                    import("clases.personas.Personas");
+                }
+                $personal = new Personas();
+                $sql = "SELECT 
+                                id_unico
+                                ,IDDoc
+                                ,Nombre
+                                ,tipo
+                                ,valores
+                         FROM mos_documentos_datos_formulario 
+                         WHERE IDDoc = $_SESSION[IDDoc] ORDER BY orden";
+                //echo $sql;                
+                $this->parametros = $this->dbl->query($sql, array());
+                $columnas = array();
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                
+                $columnas['Codigo_doc']=$this->nombres_columnas[IDDoc];
+                $columnas['identificacion']=$this->nombres_columnas[identificacion];
+                $k=1;
+                //print_r($this->parametros);
+                foreach ($this->parametros as $value) {   
+                    switch ($value[tipo]) {
+                        case '6':
+                                if (count($personal->nombres_columnas) <= 0){
+                                    $personal->cargar_nombres_columnas();
+                                }
+                                if (count($personal->campos_activos) <= 0){
+                                        $personal->cargar_campos_activos();
+                                }
+                                /*Columnas del ID, area y cargo de la persona*/
+                                $columnas["p$k"]= $value[Nombre];
+                                $columnas[id_personal."_p$k"]= $personal->nombres_columnas[id_personal];
+                                $columnas[id_organizacion."_p$k"]= $personal->nombres_columnas[id_organizacion];
+                                $columnas[cargo."_p$k"]= $personal->nombres_columnas[cod_cargo];
+                                //$k++;$k++;$k++;
+                            break;
+                        case '11':
+                                $columnas[arbol_organizacion."_p$k"]= $value[Nombre];
+                            break;
+                        case '12':
+                                $columnas[arbol_proceso."_p$k"]= $value[Nombre];
+                            break;
+                        case '10':
+                                $columnas[estado_semaforo."_p$k"]= $value[Nombre];
+                            break;
+                        case '13':
+                                $columnas["edop$k"]= 'Vigencia';
+                                $columnas["p$k" ]= $value[Nombre];
+                                //$k++;
+                                break;
+                        case '14':                                
+                                $columnas["p$k"]= $value[Nombre];
+                                $columnas["pn$k"]= 'Personas en Cargo';
+                                //$k++;
+                                break;
+                        default:
+                            $columnas["p$k"]= $value[Nombre];
+                            break;
+                    }                        
+                   // print_r($value);
+                    $k++;
+                }                
+                return $columnas;
+                //print_r($this->parametros);
+
+            }            
             private function cargar_nombres_columnas(){
                 $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 9";
                 $nombres_campos = $this->dbl->query($sql, array());
@@ -243,7 +315,7 @@
                 }
                 
             }
-            
+           
         public function archivo_reg($tupla)
         {
             $html = "<a target=\"_blank\" title=\"Ver\" href=\"pages/registros/descargar_archivo.php?id=$tupla[idRegistro]&token=" . md5($tupla[idRegistro]) ."\">
@@ -518,7 +590,34 @@ function semaforo($tupla,$key)
    }
    return "<img class=\"SinBorde\" title=\"Vigente y le quedan $dias dias\" src=\"diseno/images/verde.png\">&nbsp;".$dias;
 }       
-
+function semaforoPHPExcel($tupla,$key)
+{ 
+  // print_r($tupla);
+   $vig =  explode(',',$tupla[$key]);
+   
+   $edo =  $vig[0];
+   $dias = $vig[1];
+ //   echo $key;
+   if ($edo=='V'){
+       return 'L';
+   }
+   if ($edo=='P'){
+       return 'K';
+   }
+   return 'J';
+}
+public function estado_columnaPHPExcel($tupla,$key){            
+    if ($tupla[$key]== '1'){
+        return "L";
+    }
+    if ($tupla[$key]== '2'){
+        return "K ";
+    }
+    if ($tupla[$key]== '3'){
+        return "J";
+    }
+    return "";
+}
 function semaforoExcel($tupla,$key)
 { 
   // print_r($tupla);
@@ -897,7 +996,176 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         return $error; 
                     }
             }            
+            public function exportarPHPExcelDocEncabezado($parametros){
+            if(!class_exists('Documentos')){
+                import("clases.documentos.Documentos");
+            }
+            $documento = new Documentos();  
+            $columnas = array('Estado','dias_vig','Codigo_doc','nombre_doc','elaboro','reviso','aprobo','v_meses','version','fecha','descripcion','num_rev','fecha_rev','arbol_organizacional','publico','tipo_documento');
+            $atr = array();
+            $data = array();
+            $dataxls =  array();
+            $atr['b-vigencia'] = 'S';
+            $atr['corder']="dias_vig";
+            $atr['email_usuario']= $_SESSION['CookEmail'];
+            $atr[terceros] = 'S';
+            $atr["b-publico"] = 'S';
+            $atr['b-IDDoc']=$parametros['id'];
+            $atr[formulario]='S';
+            $atr[cod_link]=$parametros[cod_link];
+            $atr[modo]=$parametros[modo];
+            $documento->listarDocumentos($atr,1,1);
+            $documento->cargar_parametros(15);
+            $arrayp= array();
+            $k=1;
+            foreach ($documento->parametros as $value) {                    
+                $columnas[]=  'p'.$k;
+                $k++;
+            }    
+            //print_r($columnas);
+            $data = $documento->dbl->data;
+            $arbol = array(); 
+            foreach($columnas as $value){
+               $dataxls[$value] = $data[0][$value];               
+            }
+            $dataxls[Estado] =$documento->semaforo_reporte_xls($data[0],'no');
+            $dataxls[arbol_organizacional]=$documento->BuscaOrganizacionalTodosXLS($data[0][arbol_organizacional]);;
+            $dataxls[tipo_documento] ='Formulario';
+            //$dataxls[vecesbarran]= substr_count($dataxls[arbol_organizacional], "\n");
+            //$this->listarRegistros($parametros, 1, 100000);
+           // print_r($dataxls);
+            //print_r($arbol);
+            return $dataxls;
+            }
+
+            public function exportarPHPExcelDocDatosIndexados($parametros){
+            if(!class_exists('Documentos')){
+                import("clases.documentos.Documentos");
+            }
+            $ids = array('7','8','9','1','2','3','5','6','10','11','12','13','14');
+            $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo', 'Árbol Organizacional', 'Árbol Procesos','Vigencia','Cargo');
             
+            $documento = new Documentos();  
+            $columnas = array('Estado','dias_vig','Codigo_doc','nombre_doc','elaboro','reviso','aprobo','v_meses','version','fecha','descripcion','num_rev','fecha_rev','arbol_organizacional','publico','tipo_documento');
+            $atr = array();
+            $tipo = array();
+            $data = array();
+            $dataxls =  array();
+            $data = $documento->ListarCamposIndexadosDoc($parametros['id']);
+            $i=0;
+            foreach($ids as $value){
+               $tipo[$value] = $desc[$i++];               
+            }
+            $i=0;
+            //print_r($data);
+            foreach($data as $value){
+               $data[$i][tipo] = $tipo[$value[tipo]]; 
+               $data[$i][valores] = str_replace(",", " \n" , $value[valores]); 
+               $i++;
+            }
+//            $dataxls[Estado] =$documento->semaforo_reporte_xls($data[0],'no');
+//            $dataxls[arbol_organizacional]=$documento->BuscaOrganizacionalTodosXLS($data[0][arbol_organizacional]);;
+//            $dataxls[tipo_documento] ='Formulario';
+            //$dataxls[vecesbarran]= substr_count($dataxls[arbol_organizacional], "\n");
+            //$this->listarRegistros($parametros, 1, 100000);
+           // print_r($dataxls);
+           // print_r($data);
+            return $data;
+            }
+        public function exportarPHPExcelDatosBD($parametros, $cols){
+        $this->listarRegistrosXLS($parametros, 1, 100000);
+        $data = $this->dbl->data;
+        $dataxls =  array();
+        $semaforo = array(); 
+        $arbol = array(); 
+        $vigencia = array();
+        $codigos = array();
+        $i=0;
+        $col = 0;
+        $nombre_colum = array();
+        //SE EXTRAE LOS NOMBRES DE COLUMNAS
+        foreach ($data[0] as $key => $value)
+        {
+           if(!is_integer($key)){
+               $nombre_colum[$col] = $key;
+               $col++;
+           }
+        }
+        foreach ($nombre_colum as $key => $col){
+            $dataxls[$col]= array_column($data,$col);              
+         } 
+        import('clases.organizacion.ArbolOrganizacional');
+//        print_r($cols);
+//        print_r($dataxls);
+        
+        
+        $ao = new ArbolOrganizacional();
+        foreach (array_keys($cols) as $value){
+            //$dataxls[$value]= array_column($data,$col);  
+            //print_r($dataxls[$value]);
+            //echo $value;
+            if(strstr($value,"id_organizacion_p")){
+                $arbol_key=$value;
+                foreach($dataxls[$value] as $nodo)
+                {
+                    $arbol[] = str_replace('&#8594;','->',$ao->BuscaOrganizacional(array('id_organizacion' => $nodo)));
+                }
+                $dataxls[$arbol_key]=$arbol;
+                unset($arbol);
+            }
+            if($cols[$value]=='Vigencia'){
+                foreach($dataxls[$value] as $nodo)
+                {
+                    $vigencia[] = $this->semaforoPHPExcel($nodo,$value);
+                }
+                $dataxls[$value]=$vigencia;
+                unset($vigencia);                
+            }  
+            if(strstr($value,"estado_semaforo_p")){
+                foreach($dataxls[str_replace('estado_semaforo_','',$value)] as $nodo)
+                {
+                    $semaforo[] = $this->estado_columnaPHPExcel($nodo,$value);
+                }
+                $dataxls[$value]=$semaforo;
+                unset($semaforo);                
+            }            
+            if(strstr($value,"arbol_organizacion_p")){
+                foreach($dataxls[str_replace('arbol_organizacion_','',$value)] as $nodo)
+                {
+                    $arbol[] = str_replace('&#8594;','->',$ao->BuscaOrganizacional(array('id_organizacion' => $nodo)));
+                }
+                $dataxls[$value]=$arbol;
+                unset($arbol);
+            }
+            if(strstr($value,"arbol_proceso_p")){
+                foreach($dataxls[str_replace('arbol_proceso_','',$value)] as $nodo)
+                {
+                    $arbol[] = str_replace('&#8594;','->',$this->BuscaProceso(array('id_organizacion' => $nodo)));
+                }
+                $dataxls[$value]=$arbol;
+                unset($arbol);
+            }
+            
+        }
+        //print_r($arbol);
+        $dias_caritas= array();
+        $formulario = array();
+
+//        foreach ($data as $value){
+//             $dias_caritas[] =$this->semaforo_reporte_xls($value,'no');
+//             $version[]=$this->version($value);
+//             $formulario[]=$this->BuscaRegistrosReporte($value);
+//        }
+
+        
+        
+        //unset($dataxls[semaforo]);
+       // unset($dataxls[IDDoc]);
+       
+         //print_r($dataxls);    
+        return $dataxls;
+        }
+
             
              public function listarRegistros($atr, $pag, $registros_x_pagina){
                 // print_r($atr);
@@ -1455,6 +1723,376 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     //echo $sql;
                     $this->operacion($sql, $atr);
              }
+             
+                public function listarRegistrosXLS($atr, $pag, $registros_x_pagina){
+                // print_r($atr);
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $sql_left = $sql_col_left = $sql_filtro_acceso = "" ;
+                     if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                    }                    
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);                    
+                    }
+                    $k = 1;   
+                    //id_unico,IDDoc,Nombre,tipo,valores
+                    if(!class_exists('Personas')){
+                        import("clases.personas.Personas");
+                    }
+                    $personal = new Personas();
+                    //print_r($this->parametros);
+                    foreach ($this->parametros as $value) {
+                        //,CONCAT(CONCAT(UPPER(LEFT(ap.nombres, 1)), LOWER(SUBSTRING(ap.nombres, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_paterno, 1)), LOWER(SUBSTRING(ap.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(ap.apellido_materno, 1)), LOWER(SUBSTRING(ap.apellido_materno, 2)))) aprobo
+                        if ($value[tipo]== '6'){//-- , t1.Nombre as nom_detalle   
+                            /*Filtro acceso segun el nodo*/
+                            $sql_filtro_acceso .= " AND p$k.id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
+                            $this->colummas_arbol[] = "id_organizacion_p$k";
+                            //echo $sql_filtro_acceso;
+//                            if ($registros_x_pagina == 100000){
+//                                if (count($personal->campos_activos) <= 0){
+//                                    $personal->cargar_campos_activos();
+//                                }
+
+                                $sql_left .= " LEFT JOIN(select t1.idRegistro
+                                , t1.Nombre as nom_detalle_aux
+                                ,p.id_organizacion
+                                ,p.id_personal,c.descripcion cargo                                
+                                ,CONCAT(initcap(p.nombres), ' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle
+                                from mos_registro_formulario t1
+                                inner join mos_personal p on p.cod_emp = CAST(t1.Nombre AS UNSIGNED)
+                                LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo
+                                where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
+                                $sql_col_left .= ",p$k.nom_detalle p$k"
+                                        . ",p$k.id_personal id_personal_p$k"
+                                        . ",p$k.id_organizacion id_organizacion_p$k"
+                                        . ",p$k.cargo cargo_p$k";
+                                $this->funciones["id_organizacion_p$k"] = 'BuscaOrganizacional';  
+//                            }   
+//                            else{
+//                                $sql_left .= " LEFT JOIN(select t1.idRegistro
+//                                , t1.Nombre as nom_detalle_aux
+//                                , p.id_organizacion
+//                                ,CONCAT(initcap(p.nombres), ' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle
+//                                -- ,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle 
+//                                from mos_registro_formulario t1
+//                                inner join mos_personal p on p.cod_emp = CAST(t1.Nombre AS UNSIGNED)
+//                                where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
+//                                $sql_col_left .= ",p$k.nom_detalle p$k ";
+//                            }
+                            
+                        }
+                        else if ($value[tipo]== '10'){
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, t1.Nombre as nom_detalle from mos_registro_formulario t1
+                            where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                            if ($registros_x_pagina != 100000)
+                                $this->funciones["p$k"] = 'estado_columna';  
+                            $sql_col_left .= ",p$k.nom_detalle p$k ";
+                        }
+                      // $grid->setFuncion($value[Nombre], "BuscaOrganizacionalTodosVerMas");
+                        else if ($value[tipo]== '13'){
+                            $sql_left .= " LEFT JOIN                                
+                                (select t1.idRegistro, 
+                                t1.Nombre as nom_detalle, 
+                                case when DATEDIFF(str_to_date((STR_TO_DATE(t1.Nombre,'%d/%m/%Y')),'%Y-%m-%d'),CURRENT_DATE()) < 0 THEN
+                                        CONCAT('V,',DATEDIFF(str_to_date((STR_TO_DATE(t1.Nombre,'%d/%m/%Y')),'%Y-%m-%d'),CURRENT_DATE()))
+                                else case when DATEDIFF(str_to_date((STR_TO_DATE(t1.Nombre,'%d/%m/%Y')),'%Y-%m-%d'),CURRENT_DATE()) <= f.valores THEN
+                                                CONCAT('P,',f.valores - DATEDIFF(str_to_date((STR_TO_DATE(t1.Nombre,'%d/%m/%Y')),'%Y-%m-%d'),CURRENT_DATE()))
+                                                ELSE
+                                                        CONCAT('A,',DATEDIFF(str_to_date((STR_TO_DATE(t1.Nombre,'%d/%m/%Y')),'%Y-%m-%d'),CURRENT_DATE()))
+                                                end
+                                end as edo
+                                from mos_registro_formulario t1 inner 
+                                join mos_documentos_datos_formulario f on t1.id_unico  = f.id_unico
+                            where t1.id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                            if ($registros_x_pagina != 100000)
+                                $this->funciones["edop$k"] = 'semaforoPHPExcel';  
+                            else
+                                $this->funciones["edop$k"] = 'semaforoPHPExcel';                                 
+                            $sql_col_left .= ",p$k.edo edop$k,p$k.nom_detalle p$k ";
+                           // echo $atr[corder].'-'. "p$k";
+                            if ($atr[corder] == "p$k"){
+                                $atr[corder] = "STR_TO_DATE(p$k.nom_detalle, '%d/%m/%Y')";
+                            }
+                            if ($atr[corder] == "edop$k"){
+                                $atr[corder] = " cast(SUBSTRING(p$k.edo,3)AS SIGNED) ";
+                            }                            
+                        }
+
+                        else if ($value[tipo]== '14'){
+                            if($registros_x_pagina==100000){
+                                $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','; ')";
+                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), ' ', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',',' \n ')";
+                            }
+                            else{
+                                $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','<br>')";
+                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), '&nbsp;', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),'&nbsp;', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',','<br>')";
+                            }
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, $campo_cargo as nom_detalle 
+                            from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
+                            where id_unico= $value[id_unico] group by t1.idRegistro) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                            $sql_col_left .= ",p$k.nom_detalle p$k ";
+                            //$clave= array_search(11, $this->parametros);
+                            //echo $clave;
+                            $sql_left .= "LEFT JOIN
+                            (select 
+                            t1.idRegistro, 
+                            $campo_cargo_perso cargo_perso
+                            from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
+                            inner join mos_registro_item ao on ao.idRegistro = t1.idRegistro and ao.tipo = 11
+                            inner JOIN mos_personal p on p.cod_cargo = t1.valor and p.id_organizacion = ao.valor
+                            where t1.id_unico = $value[id_unico] 
+                            group by t1.idRegistro) pn$k ON pn$k.idRegistro = r.idRegistro";
+                            $sql_col_left .= ",pn$k.cargo_perso pn$k ";
+                            
+                        }
+                        else if ($value[tipo]== '11'){
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, t1.valor as nom_detalle from mos_registro_item t1
+                            where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                            if ($registros_x_pagina != 100000)
+                                $this->funciones["p$k"] = 'BuscaOrganizacionalTodosVerMas';  
+                            else
+                                $this->funciones["p$k"] = 'BuscaOrganizacionalExcel';                                 
+                            $sql_col_left .= ",p$k.nom_detalle p$k ";
+                            /*Para la validacion de botones editar y eliminar*/
+                            $this->colummas_arbol[] = "p$k";
+                            /*Restriccion para ver solamente informacion asignada segun el arbol*/
+                            if($_SESSION[SuperUser] == 'S'){
+                                $sql_left .= " INNER JOIN(
+                                    select t1.idRegistro from mos_registro_item t1
+                                    where id_unico= $value[id_unico] AND t1.valor IN (". implode(',', array_keys($this->id_org_acceso)) . ") group by t1.idRegistro"
+                                        . " UNION all 
+                                    select idRegistro
+                                    from 
+                                    mos_registro 
+                                    where IDDoc = $_SESSION[IDDoc] AND not idRegistro in (select  idRegistro from mos_registro_item where id_unico= $value[id_unico])
+                                    group by idRegistro "
+                                        . ") AS p_temp$k ON p_temp$k.idRegistro = r.idRegistro "; 
+
+                            }else{
+                                $sql_left .= " INNER JOIN(select t1.idRegistro from mos_registro_item t1
+                                where id_unico= $value[id_unico] AND t1.valor IN (". implode(',', array_keys($this->id_org_acceso)) . ") group by t1.idRegistro) AS p_temp$k ON p_temp$k.idRegistro = r.idRegistro "; 
+                            }
+                                                    }
+                        else if ($value[tipo]== '12'){
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, (t1.valor) as nom_detalle from mos_registro_item t1
+                            where id_unico= $value[id_unico]  ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                            if ($registros_x_pagina != 100000)
+                                $this->funciones["p$k"] = 'BuscaProcesoTodosVerMas'; 
+                            else
+                                $this->funciones["p$k"] = 'BuscaProcesoExcel'; 
+                            $sql_col_left .= ",p$k.nom_detalle p$k ";
+                        }
+                        else if ($value[tipo]== '8'||$value[tipo]== '7'||$value[tipo]== '9'){
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, GROUP_CONCAT(nombre_items.descripcion) as nom_detalle from mos_registro_item t1
+                                inner join mos_documentos_formulario_items nombre_items on nombre_items.id = t1.valor
+                            where id_unico= $value[id_unico] group by t1.idRegistro ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                            $sql_col_left .= ",p$k.nom_detalle p$k ";
+                        }
+                        else{
+                            $sql_left .= " LEFT JOIN(select t1.idRegistro, t1.Nombre as nom_detalle from mos_registro_formulario t1
+                            where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+                            $sql_col_left .= ",p$k.nom_detalle p$k ";
+                            if ($value[tipo]== '3'){
+                                if ($atr[corder] == "p$k"){
+                                    $atr[corder] = "STR_TO_DATE(p$k.nom_detalle, '%d/%m/%Y')";
+                                }
+                            }
+                        }
+                        
+                        $k++;
+                    }
+            
+                    $sql = "SELECT r.idRegistro
+                                    ,d.Codigo_doc 
+                                    ,r.identificacion
+                                    ,1 doc_fisico
+                                    ,r.contentType
+                                     ,d.actualizacion_activa
+                                     $sql_col_left
+                            FROM mos_registro r
+                            INNER JOIN mos_documentos d ON d.IDDoc = r.IDDoc
+                            $sql_left
+                            WHERE 1 = 1 ";
+                            $sql  = $sql . ($atr[actualizacion_historico]=='S' ? " and r.vigencia='N' " : " and r.vigencia='S' ");                  
+                    if (strlen($_SESSION[IDDoc])>0){
+                        $sql .= " AND r.IDDoc = $_SESSION[IDDoc] ";
+                    }
+                    if (strlen($atr['b-filtro-sencillo'])>0){
+                        $k = 1; 
+                        $sql .= " AND (upper(identificacion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%' ";
+                        foreach ($this->parametros as $value) {
+                            switch ($value[tipo]) {
+                                                                
+                                case '1':
+                                case '5':
+                                case '7':
+                                case '9':
+                                    {
+                                        $sql .= " OR upper(p$k.nom_detalle) LIKE '%". strtoupper($atr["b-filtro-sencillo"]) . "%'";
+                                    }                                
+                                    break;
+                                
+                                default:
+                                    break;
+                            }
+                            
+                            $k++;
+                        }
+                        $sql .= " )";
+                    }
+                    if (strlen($atr[valor])>0)
+                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
+                                 if (strlen($atr["b-idRegistro"])>0)
+                        $sql .= " AND idRegistro = '". $atr["b-idRegistro"] . "'";
+                    if (strlen($atr["b-IDDoc"])>0)
+                        $sql .= " AND IDDoc = '". $atr["b-IDDoc"] . "'";
+                    if (strlen($atr["b-identificacion"])>0)
+                        $sql .= " AND upper(identificacion) like '%" . strtoupper($atr["b-identificacion"]) . "%'";
+                    if (strlen($atr["b-version"])>0)
+                        $sql .= " AND version = '". $atr["b-version"] . "'";
+                    if (strlen($atr["b-correlativo"])>0)
+                        $sql .= " AND correlativo = '". $atr["b-correlativo"] . "'";
+                    if (strlen($atr["b-id_usuario"])>0)
+                        $sql .= " AND id_usuario = '". $atr["b-id_usuario"] . "'";
+                    if (strlen($atr["b-descripcion"])>0)
+                        $sql .= " AND upper(descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
+                    if (strlen($atr["b-doc_fisico"])>0)
+                        $sql .= " AND doc_fisico = '". $atr["b-doc_fisico"] . "'";
+                    if (strlen($atr["b-contentType"])>0)
+                        $sql .= " AND upper(contentType) like '%" . strtoupper($atr["b-contentType"]) . "%'";
+                    if (strlen($atr["b-id_procesos"])>0)
+                        $sql .= " AND id_procesos = '". $atr["b-id_procesos"] . "'";
+                    if (strlen($atr["b-id_organizacion"])>0)
+                        $sql .= " AND id_organizacion = '". $atr["b-id_organizacion"] . "'";
+                    /*Filtro de personas y ao segun nivel de acceso de la persona*/
+                    $sql .= $sql_filtro_acceso;
+                    //id_unico,IDDoc,Nombre,tipo,valores
+                    /*
+                      $ids = array('7','8','9','1','2','3','5','6');
+                $desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona');
+                     */
+                    $k = 1;  
+                    //print_r($this->parametros);
+                    foreach ($this->parametros as $value) {
+                        switch ($value[tipo]) {
+                            //case '8':
+                            case '10':    
+                                if (is_array($atr["p$k"])){
+//                                    for($i=0;$i<count($atr["p$k"]); $i++)
+//                                        $atr["p$k"][$i] = "'".$atr["p$k"][$i]."'";
+                                    $in_values = implode(",", $atr["p$k"]);
+                                    //
+                                    {
+                                        $sql .= " AND p$k.nom_detalle IN ($in_values)";
+                                        //echo " AND p$k.nom_detalle IN ($in_values)";
+                                        //$parametros[herramienta_pre][$i] = "'" . $parametros[herramienta_pre][$i] . "'";
+                                    }
+                                }
+                                    //$sql_where .= " AND id_area IN (" . implode('<br/>', $parametros['id_area']) . ")"; 
+                                break;
+                            case '8':
+                            //case '10':                                    
+                                if (is_array($atr["p$k"])){
+                                //$in_values = implode("','", $atr["p$k"]);
+                                    //for($i=0;$i<count($atr["p$k"]); $i++)
+                                   // {
+                                   //     $sql .= " AND p$k.nom_detalle IN ($in_values)";
+                                        //$parametros[herramienta_pre][$i] = "'" . $parametros[herramienta_pre][$i] . "'";
+                                   // }
+//                                    
+                                    for($i=0;$i<count($atr["p$k"]); $i++){
+                                        $sql .= " AND p$k.nom_detalle LIKE '%". $atr["p$k"][$i] . "%'";
+                                        //$parametros[herramienta_pre][$i] = "'" . $parametros[herramienta_pre][$i] . "'";
+                                    }
+                                }
+                                    //$sql_where .= " AND id_area IN (" . implode('<br/>', $parametros['id_area']) . ")"; 
+                                break;
+                            case '7':
+                            case '9':
+                            case '2':
+                            case '3':
+                            //case '6':
+                                if (strlen($atr["p$k"])>0){
+                                    $sql .= " AND p$k.nom_detalle = '". $atr["p$k"] . "'";
+                                }                                
+                                break;
+                            case '6':
+                                if (strlen($atr["p$k"])>0){
+                                    $sql .= " AND p$k.nom_detalle = '". $atr["p$k"] . "'";
+                                }
+                                if (strlen($atr["b-id_organizacion-reg"])>0 && $atr["b-arbol-filtro"]=='persona'){
+                                    $sql .= " AND p$k.id_organizacion in (". $atr["b-id_organizacion-reg"] . ")";
+                                } 
+                                break;
+                            case '11':
+                                if (strlen($atr["b-id_organizacion-reg"])>0 && $atr["b-arbol-filtro"]=='organizacional'){
+                                    $sql .= " AND p$k.nom_detalle in (". $atr["b-id_organizacion-reg"] . ")";
+                                } 
+                                break;
+                            case '12':
+                                if (strlen($atr["b-id_proceso-reg"])>0){
+                                    $sql .= " AND p$k.nom_detalle like '%". $atr["b-id_proceso-reg"] . "%'";
+                                } 
+                                break;
+
+                            case '13':
+                                if (sizeof($atr["p$k"])>0){
+                                   // $semaforovigencia = implode(",", $atr["p$k"]);
+                                    foreach ($atr["p$k"] as $value) {
+                                        $semaforovigencia .= "'".$value."',";
+                                    }
+                                    $semaforovigencia.="'X'";
+                                    $sql .= " AND SUBSTRING(p$k.edo,1,1)  in (". $semaforovigencia . ")"; 
+       
+                                   // $semaforovigencia = implode(",", $atr["p$k"]);
+                                    //$sql .= " AND p$k.nom_detalle LIKE '%". $atr["p$k"] . "%'";
+                                } 
+                                if (strlen($atr["pdesde$k"])>0)                        
+                                {
+                                    $atr["pdesde$k"] = formatear_fecha($atr["pdesde$k"]);                        
+                                    $sql .= " AND STR_TO_DATE(p$k.nom_detalle,'%d/%m/%Y')  >= '" . ($atr["pdesde$k"]) . "'";                        
+                                }                                
+                                if (strlen($atr["phasta$k"])>0)                        
+                                {
+                                    $atr["phasta$k"] = formatear_fecha($atr["phasta$k"]);                        
+                                    $sql .= " AND STR_TO_DATE(p$k.nom_detalle,'%d/%m/%Y')  <= '" . ($atr["phasta$k"]) . "'";                        
+                                }                                
+                                break;
+                             
+                            case '5':
+                                if (strlen($atr["p$k"])>0){
+                                    $sql .= " AND p$k.nom_detalle LIKE '%". $atr["p$k"] . "%'";
+                                }                                
+                                break;
+                            case '14':
+                                //print_r($atr);
+                                //echo ("p$k:".$atr["p$k"]);
+                                if (strlen($atr["p$k"])>0){
+                                    $sql .= " AND p$k.nom_detalle LIKE '%". $atr["p$k"] . "%'";
+                                }                                
+                                break;
+                            default:
+                                break;
+                        }
+//                        $sql_left .= " LEFT JOIN(select t1.idRegistro, t1.Nombre as nom_detalle from mos_registro_formulario t1
+//                                
+//                        where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro "; 
+//                        $sql_col_left .= ",p$k.nom_detalle p$k ";
+                        $k++;
+                    }
+                    
+        
+                    $sql .= " order by 1,2 ";
+                    $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                   //print_r($atr);
+                    //echo $sql;
+                    $this->operacion($sql, $atr);
+                    return $this->dbl->data;
+             }
+             
+             
+             
+             
              public function eliminarRegistros($atr){
                     try {
                         $atr = $this->dbl->corregir_parametros($atr);
@@ -2560,8 +3198,9 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     return $template->show();
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('desc-mod-act',"innerHTML","Registros - Documento [$val[Codigo_doc] - $val[nombre_doc]]");
-                $objResponse->addAssign('contenido-aux',"innerHTML",$template->show());
-                $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);                
+                //$objResponse->addAssign('contenido-aux',"innerHTML",$template->show());
+                $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']); 
+                $objResponse->addAssign('contenido-aux',"innerHTML",str_replace('r_exportarExcel()', 'exportarExcel_registros()', $template->show()));
                 //$objResponse->addAssign('modulo_actual',"value","registros");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'registros/registros.js?'.rand());
                 $objResponse->addScript("$('#MustraCargando').hide();");
