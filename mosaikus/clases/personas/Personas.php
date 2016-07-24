@@ -1207,21 +1207,9 @@
                             $.validate({
                             lang: 'es'  
                           });");
-                $objResponse->addScript("$('#fecha_nacimiento').datepicker({
-                        changeMonth: true,
-                        yearRange: '-100:+0',
-                        changeYear: true
-                      });");
-                $objResponse->addScript("$('#fecha_ingreso').datepicker({
-                        changeMonth: true,
-                        yearRange: '-100:+0',
-                        changeYear: true
-                      });");
-                $objResponse->addScript("$('#fecha_egreso').datepicker({
-                        changeMonth: true,
-                        yearRange: '-100:+0',
-                        changeYear: true
-                      });");
+                $objResponse->addScript("$('#fecha_nacimiento').datetimepicker();");
+                $objResponse->addScript("$('#fecha_ingreso').datetimepicker();");
+                $objResponse->addScript("$('#fecha_egreso').datetimepicker();");
                 $objResponse->addScript($js);
                 $objResponse->addScript('ao_simple();');
                 $objResponse->addScript('ao_multiple_responsable();');
@@ -1519,26 +1507,10 @@
                             $.validate({
                             lang: 'es'  
                           });");
-                $objResponse->addScript("$('#fecha_nacimiento').datepicker({
-                    changeMonth: true,
-                    yearRange: '-100:+0',
-                    changeYear: true
-                  });");
-                $objResponse->addScript("$('#fecha_ingreso').datepicker({
-                        changeMonth: true,
-                        yearRange: '-100:+0',
-                        changeYear: true
-                      });");
-                $objResponse->addScript("$('#fecha_egreso').datepicker({
-                        changeMonth: true,
-                        yearRange: '-100:+0',
-                        changeYear: true
-                      });");
-                $objResponse->addScript("$('#fecha_promocion').datepicker({
-                        changeMonth: true,
-                        yearRange: '-100:+0',
-                        changeYear: true
-                      });");
+                $objResponse->addScript("$('#fecha_nacimiento').datetimepicker();");
+                $objResponse->addScript("$('#fecha_ingreso').datetimepicker();");
+                $objResponse->addScript("$('#fecha_egreso').datetimepicker();");
+                $objResponse->addScript("$('#fecha_promocion').datetimepicker();");
                 $objResponse->addScript($js);
                 $objResponse->addScript('ao_simple();');
                 $objResponse->addScript('ao_multiple_responsable();');
