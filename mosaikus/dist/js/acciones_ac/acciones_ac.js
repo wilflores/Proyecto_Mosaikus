@@ -33,6 +33,66 @@
         array.addParametro('import','clases.acciones_ac.AccionesAC');
         xajax_Loading(array.getArray());
     }
+    
+    function agregar_esp(){
+        var i = $('#num_items_esp').val();
+        i = parseInt(i) + 1;        
+        var html = '<tr id="tr-esp-' + i + '">'; 
+        html = html + '<td align="center">'+
+                           ' <i class="subir glyphicon glyphicon-arrow-up cursor-pointer"></i><i class="bajar glyphicon glyphicon-arrow-down cursor-pointer"></i>'+
+                           '<input id="orden_din_'+ i + '" type="hidden" name="orden_din_'+ i + '" value="'+ i + '">'+                           
+                           ' <a href="' + i + '"  title="Eliminar " id="eliminar_esp_' + i + '"> ' + 
+                            '<i class="icon icon-remove"></i>' +
+                            '</a>' +
+                      '  </td>';
+        html = html + '<td>' +
+                           '  <select id="tipo_'+ i + '" name="tipo_'+ i + '" class="form-control">'+                            
+                                $('#option_tipo').val() +
+                                
+                            '</select>' +
+                        '</td>';  
+        html = html + '<td>' +                                                       
+                           ' <textarea id="accion_'+ i + '"  rows="2" name="accion_'+ i + '"class="form-control" data-validation="required"></textarea>'+
+                        '</td>';
+        html = html + '<td class="td-table-data">'+
+                            '  <select id="responsable_acc_'+ i + '" name="responsable_acc_'+ i + '" class="form-control" data-validation="required" data-live-search="true">'+                            
+                            '<option value="">-- Seleccione --</option>' + 
+                                $('#option_responsables').val() +
+                                
+                            '</select>' +
+                       '</td>';
+        html = html + '<td class="td-table-data"> <div class="col-sm-24" style="padding-left: 0px;padding-right: 0px;">'+
+                            '<input id="fecha_acordada_'+ i + '" class="form-control" type="text" data-date-format="DD/MM/YYYY HH:mm" data-validation="required" name="fecha_acordada_'+ i + '" >'+
+                       ' </div></td>';
+
+        html = html + '</tr>' ;       
+        $("#table-items-esp tbody").append(html);  
+        var myDate = new Date();
+        $('#fecha_acordada_'+i).val((myDate.getDate()) + '/' + (myDate.getMonth()+1) + '/' + myDate.getFullYear() + ' ' + myDate.getHours()+':'+myDate.getMinutes());
+        $('#fecha_acordada_'+i).datetimepicker();
+        $('#responsable_acc_' + i).selectpicker({
+                                            style: 'btn-combo'
+                                          });
+        $("#eliminar_esp_" + i).click(function(e){ 
+            e.preventDefault();
+            var id = $(this).attr('href');
+            $('tr-esp-' + id).remove();
+            var parent = $(this).parents().parents().get(0);
+		$(parent).remove();
+        });             
+        $(".subir").click(function(){
+            var row = $(this).parents("tr:first");               
+            row.insertBefore(row.prev());
+            ordenar_tabla();
+        });
+        $(".bajar").click(function(){
+            var row = $(this).parents("tr:first");        
+            row.insertAfter(row.next());  
+            ordenar_tabla();
+        });
+        $('#num_items_esp').val(i);
+        
+    }
 
 
     function eliminarAccionesAC(id){

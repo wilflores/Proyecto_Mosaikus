@@ -1,24 +1,8 @@
 function init_filtrar(){        
-         $('#b-fecha-desde').datepicker({
-            changeMonth: true,
-            yearRange: '-100:+0',
-            changeYear: true
-          });
-            $('#b-fecha-hasta').datepicker({
-                changeMonth: true,
-                yearRange: '-100:+0',
-                changeYear: true
-              });
-            $('#b-fecha_termino-desde').datepicker({
-                changeMonth: true,
-                yearRange: '-100:+0',
-                changeYear: true
-              });
-            $('#b-fecha_termino-hasta').datepicker({
-                changeMonth: true,
-                yearRange: '-100:+0',
-                changeYear: true
-              });
+         $('#b-fecha-desde').datetimepicker();
+            $('#b-fecha-hasta').datetimepicker();
+            $('#b-fecha_termino-desde').datetimepicker();
+            $('#b-fecha_termino-hasta').datetimepicker();
     
         PanelOperator.initPanels("");
         ScrollBar.initScroll();

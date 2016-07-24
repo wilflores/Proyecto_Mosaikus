@@ -25,12 +25,12 @@ function init_filtrar(){
                                             placeholder: "Selecione el revisor",
                                             allowClear: true
                                           }); 
-        $("#b-fecha_generacion-desde").datepicker();
-        $("#b-fecha_acordada-desde").datepicker();;
-        $("#b-fecha_realizada-desde").datepicker();
-        $("#b-fecha_generacion-hasta").datepicker();
-        $("#b-fecha_acordada-hasta").datepicker();
-        $("#b-fecha_realizada-hasta").datepicker();
+        $("#b-fecha_generacion-desde").datetimepicker();
+        $("#b-fecha_acordada-desde").datetimepicker();;
+        $("#b-fecha_realizada-desde").datetimepicker();
+        $("#b-fecha_generacion-hasta").datetimepicker();
+        $("#b-fecha_acordada-hasta").datetimepicker();
+        $("#b-fecha_realizada-hasta").datetimepicker();
         
         PanelOperator.initPanels("");
         ScrollBar.initScroll();
@@ -64,10 +64,273 @@ function init_filtrar(){
           $( "#reportado_por" ).select2({
             placeholder: "Selecione el elaborador",
             allowClear: true
-          });    
+          }); 
           
+          $('#responsable_desvio').change(function() {                    
+               if ($('#responsable_desvio').val() == $('#reportado_por').val()){
+                   $('#responsable_analisis').parent().parent().show();
+               }else{
+                   /*OCULTAMOS CAMPOS NO REQuERIDOS ETAPA 2*/
+                   if (!($('#estatus').val() == 'sin_plan_accion'))
+                        $('#responsable_analisis').parent().parent().hide();
+                   $('#analisis_causal').removeAttr('data-validation');
+                    $('#analisis_causal').parent().parent().hide();
+                    $('#div-tabs').hide();
+                    $('#proceso').parent().parent().hide();
+                    var campos_din = $('#nombre_cam_din').val().split(',');
+
+                    for (i = 0; i < campos_din.length; i++) {
+                        if (campos_din[i].length > 0){
+                            $('#'+campos_din[i]).parent().parent().hide();
+                            $('#' + campos_din[i]).removeAttr('data-validation');
+                            //$('#' + id).attr('data-validation','required');  
+                        }                     
+                    }
+               }
+          });
+          $('#responsable_analisis').change(function() {                    
+               if ($('#responsable_desvio').val() == $('#responsable_analisis').val()){
+                   $('#analisis_causal').parent().parent().show();
+                   $('#analisis_causal').attr('data-validation','required');  
+                   $('#proceso').parent().parent().show();
+                   $('#div-tabs').show();
+                   var campos_din = $('#nombre_cam_din').val().split(',');
+              
+                    for (i = 0; i < campos_din.length; i++) {
+                        if (campos_din[i].length > 0){
+                            $('#'+campos_din[i]).parent().parent().show();
+                            //$('#' + campos_din[i]).removeAttr('data-validation');
+                            $('#' + campos_din[i]).attr('data-validation','required');  
+                        }                     
+                    }
+               }
+               else{
+                   /*OCULTAMOS CAMPOS NO REQuERIDOS ETAPA 3*/
+                    $('#analisis_causal').parent().parent().hide();
+                    $('#analisis_causal').removeAttr('data-validation');
+                    $('#proceso').parent().parent().hide();
+                    $('#div-tabs').hide();
+                    var campos_din = $('#nombre_cam_din').val().split(',');
+
+                    for (i = 0; i < campos_din.length; i++) {
+                        if (campos_din[i].length > 0){
+                            $('#'+campos_din[i]).parent().parent().hide();
+                            $('#' + campos_din[i]).removeAttr('data-validation');
+                            //$('#' + id).attr('data-validation','required');  
+                        }                     
+                    }
+               }
+          });
+          if ($('#opc').val() == 'new'){
+              /*OCULTAMOS CAMPOS NO REQuERIDOS ETAPA 2*/
+              $('#responsable_desvio').removeAttr('data-validation');
+              $('#responsable_analisis').parent().parent().hide();
+              $('#analisis_causal').removeAttr('data-validation');
+              $('#analisis_causal').parent().parent().hide();
+              $('#proceso').parent().parent().hide();
+              $('#div-tabs').hide();
+              var campos_din = $('#nombre_cam_din').val().split(',');
+              
+              for (i = 0; i < campos_din.length; i++) {
+                  if (campos_din[i].length > 0){
+                      $('#'+campos_din[i]).parent().parent().hide();
+                      $('#' + campos_din[i]).removeAttr('data-validation');
+                      //$('#' + id).attr('data-validation','required');  
+                  }                     
+              }
+          }else{
+              /*OCULTAMOS CAMPOS NO REQuERIDOS ETAPA 2*/
+              $('#responsable_desvio').removeAttr('data-validation');
+              $('#responsable_analisis').parent().parent().hide();
+              $('#analisis_causal').removeAttr('data-validation');
+              $('#analisis_causal').parent().parent().hide();
+              $('#proceso').parent().parent().hide();
+              $('#div-tabs').hide();
+              var campos_din = $('#nombre_cam_din').val().split(',');
+              
+              for (i = 0; i < campos_din.length; i++) {
+                  if (campos_din[i].length > 0){
+                      $('#'+campos_din[i]).parent().parent().hide();
+                      $('#' + campos_din[i]).removeAttr('data-validation');
+                      //$('#' + id).attr('data-validation','required');  
+                  }                     
+              }
+//              if ($('#responsable_desvio').val() != ''){
+//                  $('#responsable_analisis').parent().parent().show();
+//              }
+//              if ($('#responsable_analisis').val() != ''){
+//                  $('#analisis_causal').parent().parent().show();
+//                  $('#proceso').parent().parent().show();
+//                  $('#div-tabs').show();
+//              }
+alert($('#estatus').val());
+              switch ($('#estatus').val()){
+                  case 'en_elaboracion':
+                        if (($('#responsable_desvio').val() != '') && ($('#responsable_desvio').val() == $('#user_tok').val())){
+                            $('#responsable_analisis').parent().parent().show();
+                        }
+                        if (($('#responsable_analisis').val() != '') && ($('#user_tok').val() == $('#responsable_analisis').val())){
+                            $('#responsable_analisis').parent().parent().show();
+                            $('#analisis_causal').attr('data-validation','required');  
+                            $('#analisis_causal').parent().parent().show();
+                            $('#proceso').parent().parent().show();
+                            $('#div-tabs').show();
+                            var campos_din = $('#nombre_cam_din').val().split(',');
+
+                            for (i = 0; i < campos_din.length; i++) {
+                                if (campos_din[i].length > 0){
+                                    $('#'+campos_din[i]).parent().parent().show();
+                                    $('#' + campos_din[i]).attr('data-validation','required');   
+                                }                     
+                            }
+                      }
+                  
+                  case 'en_buzon':
+                      break;
+                  case 'sin_responsable_analisis':     
+                      if ($('#user_tok').val() == $('#responsable_desvio').val()){
+                            $('#responsable_analisis').parent().parent().show();
+                      }
+                      if (($('#responsable_analisis').val() != '') && ($('#user_tok').val() == $('#responsable_analisis').val())){
+                            $('#responsable_analisis').parent().parent().show();
+                            $('#analisis_causal').attr('data-validation','required');  
+                            $('#analisis_causal').parent().parent().show();
+                            $('#proceso').parent().parent().show();
+                            $('#div-tabs').show();
+                            var campos_din = $('#nombre_cam_din').val().split(',');
+
+                            for (i = 0; i < campos_din.length; i++) {
+                                if (campos_din[i].length > 0){
+                                    $('#'+campos_din[i]).parent().parent().show();
+                                    $('#' + campos_din[i]).attr('data-validation','required');   
+                                }                     
+                            }
+                      }
+                      
+                      break;
+                  case 'sin_plan_accion':
+                      if ($('#user_tok').val() == $('#responsable_desvio').val()){
+                            $('#responsable_analisis').parent().parent().show();
+                      }                      
+                      if ($('#user_tok').val() == $('#responsable_analisis').val()){
+                            $('#responsable_analisis').parent().parent().show();
+                            $('#analisis_causal').attr('data-validation','required');  
+                            $('#analisis_causal').parent().parent().show();
+                            $('#proceso').parent().parent().show();
+                            $('#div-tabs').show();
+                            var campos_din = $('#nombre_cam_din').val().split(',');
+
+                            for (i = 0; i < campos_din.length; i++) {
+                                if (campos_din[i].length > 0){
+                                    $('#'+campos_din[i]).parent().parent().show();
+                                    $('#' + campos_din[i]).attr('data-validation','required');   
+                                }                     
+                            }
+                      }
+                      break;
+                   case 'implementacion_acciones':
+                      if ($('#user_tok').val() == $('#responsable_desvio').val()){
+                            $('#responsable_analisis').parent().parent().show();
+                      }                      
+                      if ($('#user_tok').val() == $('#responsable_analisis').val()){
+                            $('#responsable_analisis').parent().parent().show();
+                            $('#analisis_causal').attr('data-validation','required');  
+                            $('#analisis_causal').parent().parent().show();
+                            $('#proceso').parent().parent().show();
+                            $('#div-tabs').show();
+                            var campos_din = $('#nombre_cam_din').val().split(',');
+
+                            for (i = 0; i < campos_din.length; i++) {
+                                if (campos_din[i].length > 0){
+                                    $('#'+campos_din[i]).parent().parent().show();
+                                    $('#' + campos_din[i]).attr('data-validation','required');   
+                                }                     
+                            }
+                      }
+                      break;
+              }
+              
+          }
+          
+          $(".subir").click(function(){
+            var row = $(this).parents("tr:first");               
+            row.insertBefore(row.prev());
+            ordenar_tabla();
+            
+        });
+        $(".bajar").click(function(){
+            var row = $(this).parents("tr:first");        
+            row.insertAfter(row.next());         
+            ordenar_tabla();
+        });
           
     }
+    
+    function agregar_esp(){
+        var i = $('#num_items_esp').val();
+        i = parseInt(i) + 1;        
+        var html = '<tr id="tr-esp-' + i + '">'; 
+        html = html + '<td align="center">'+
+                           ' <i class="subir glyphicon glyphicon-arrow-up cursor-pointer"></i><i class="bajar glyphicon glyphicon-arrow-down cursor-pointer"></i>'+
+                           '<input id="orden_din_'+ i + '" type="hidden" name="orden_din_'+ i + '" value="'+ i + '">'+                           
+                           ' <a href="' + i + '"  title="Eliminar " id="eliminar_esp_' + i + '"> ' + 
+                            '<i class="icon icon-remove"></i>' +
+                            '</a>' +
+                      '  </td>';
+        html = html + '<td>' +
+                           '  <select id="tipo_'+ i + '" name="tipo_'+ i + '" class="form-control">'+                            
+                                $('#option_tipo').val() +
+                                
+                            '</select>' +
+                        '</td>';  
+        html = html + '<td>' +                                                       
+                           ' <textarea id="accion_'+ i + '"  rows="2" name="accion_'+ i + '"class="form-control" data-validation="required"></textarea>'+
+                        '</td>';
+        html = html + '<td class="td-table-data">'+
+                            '  <select id="responsable_acc_'+ i + '" name="responsable_acc_'+ i + '" class="form-control" data-validation="required" data-live-search="true">'+                            
+                            '<option value="">-- Seleccione --</option>' + 
+                                $('#option_responsables').val() +
+                                
+                            '</select>' +
+                       '</td>';
+        html = html + '<td class="td-table-data">'+
+                            '<input id="fecha_acordada_'+ i + '" class="form-control" type="text" data-validation="required" name="fecha_acordada_'+ i + '" >'+
+                       '</td>';
+
+        html = html + '</tr>' ;       
+        $("#table-items-esp tbody").append(html);          
+        $('#fecha_acordada_'+i).datetimepicker();
+        $('#responsable_acc_' + i).selectpicker({
+                                            style: 'btn-combo'
+                                          });
+        $("#eliminar_esp_" + i).click(function(e){ 
+            e.preventDefault();
+            var id = $(this).attr('href');
+            $('tr-esp-' + id).remove();
+            var parent = $(this).parents().parents().get(0);
+		$(parent).remove();
+        });             
+        $(".subir").click(function(){
+            var row = $(this).parents("tr:first");               
+            row.insertBefore(row.prev());
+            ordenar_tabla();
+        });
+        $(".bajar").click(function(){
+            var row = $(this).parents("tr:first");        
+            row.insertAfter(row.next());  
+            ordenar_tabla();
+        });
+        $('#num_items_esp').val(i);
+        
+    }
+    
+    function ordenar_tabla(){
+    $("#table-items-esp tbody tr").each(function (i, row) {         
+                var row_2 = $(row);
+                family = row_2.find('input[name*="orden_din"]');
+                family.val(i + 1);                                                               
+            });
+}
     
     function filtrar_arbol(){
           array = new XArray();
@@ -155,19 +418,18 @@ function init_filtrar(){
         array.addParametro('pag',pag);
         array.setObjeto('AccionesCorrectivas','buscar');
         array.addParametro('import','clases.acciones_correctivas.AccionesCorrectivas');
+        array.addParametro('modo',document.getElementById('modo').value);
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
         $('#MustraCargando').show();
         xajax_Loading(array.getArray());
     }
 
-    function verAccionesCorrectivas(id){
-        var src = 'pages/' +  document.getElementById("modulo_actual").value + '/verAccionesCorrectivas.php?id='+id;
-        $('a#ver_ficha_trabajador').fancybox({
-                    'titleShow': false,
-                    'href' : src,
-                    'autoDimensions' :true,
-                    'type':'iframe'                    
-                });        
-        $("#ver_ficha_trabajador").trigger('click');        
+    function verAccionesCorrectivas(id){    
+        array = new XArray();
+        array.setObjeto('AccionesCorrectivas','ver');
+        array.addParametro('id',id);
+       array.addParametro('import','clases.acciones_correctivas.AccionesCorrectivas');
+        xajax_Loading(array.getArray());
     }
     
     function verAcciones(id){

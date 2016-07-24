@@ -63,10 +63,10 @@ function init_documentos(){
         placeholder: "Selecione el aprobador",
         allowClear: true
       }); 
-    $("#b-fecha-desde").datepicker();
-    $("#b-fecha-hasta").datepicker();
-    $("#b-fecha_rev-desde").datepicker();
-    $("#b-fecha_rev-hasta").datepicker();
+    $("#b-fecha-desde").datetimepicker();
+    $("#b-fecha-hasta").datetimepicker();
+    $("#b-fecha_rev-desde").datetimepicker();
+    $("#b-fecha_rev-hasta").datetimepicker();
     if(($("#b-formulario").is(":checked"))) {
         $("#b-formulario").parent().parent().hide();
     }

@@ -108,7 +108,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                     $campos_form.= "<div class=\"form-group\">
                                         <label for=\"".$fila['Field']."\" class=\"col-md-4 control-label\">{N_".strtoupper($fila['Field'])."}</label>
                                         <div class=\"col-md-10\">
-                                          <input type=\"text\" class=\"form-control\" style=\"width: 120px;\" value=\"{".strtoupper($fila['Field'])."}\" id=\"".$fila['Field']."\" name=\"".$fila['Field']."\" placeholder=\"dd/mm/yyyy\"  data-validation=\"required\"/>
+                                          <input type=\"text\" class=\"form-control\" style=\"width: 120px;\" value=\"{".strtoupper($fila['Field'])."}\" id=\"".$fila['Field']."\" name=\"".$fila['Field']."\" placeholder=\"dd/mm/yyyy\" data-date-format=\"DD/MM/YYYY\"   data-validation=\"required\"/>
                                       </div>                                
                                   </div>\n";
                      $campos_form_busq .= "<div class=\"form-group\">
@@ -116,11 +116,11 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                                   <div class=\"row\">
                                         <div class=\"col-xs-12\">
                                             <label>Desde</label>
-                                            <input type=\"text\" class=\"form-control\" id=\"b-".$fila['Field']."-desde\" name=\"b-".$fila['Field']."-desde\" placeholder=\"dd/mm/yyyy\"  />
+                                            <input type=\"text\" data-date-format=\"DD/MM/YYYY\" class=\"form-control\" id=\"b-".$fila['Field']."-desde\" name=\"b-".$fila['Field']."-desde\" placeholder=\"dd/mm/yyyy\"  />
                                         </div>   
                                         <div class=\"col-xs-12\">
                                             <label>Hasta</label>
-                                          <input type=\"text\" class=\"form-control\" id=\"b-".$fila['Field']."-hasta\" name=\"b-".$fila['Field']."-hasta\" placeholder=\"dd/mm/yyyy\"  />
+                                          <input type=\"text\" data-date-format=\"DD/MM/YYYY\" class=\"form-control\" id=\"b-".$fila['Field']."-hasta\" name=\"b-".$fila['Field']."-hasta\" placeholder=\"dd/mm/yyyy\"  />
                                         </div> 
                                   </div>
                             </div>\n";
@@ -141,7 +141,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                         \$atr['b-".$fila['Field']."-hasta'] = formatear_fecha(\$atr['b-".$fila['Field']."-hasta']);                        
                         \$sql .= \" AND ".$fila['Field']." <= '\" . (\$atr['b-".$fila['Field']."-hasta']) . \"'\";                        
                     }\n";
-                    $js_date_crear_editar .= "\$objResponse->addScript(\"$('#".$fila['Field']."').datepicker();\");\n";
+                    $js_date_crear_editar .= "\$objResponse->addScript(\"$('#".$fila['Field']."').datetimepicker();\");\n";
                     $validar_fecha .= "\$parametros[\"".$fila['Field']."\"] = formatear_fecha(\$parametros[\"".$fila['Field']."\"]);\n";
                     break;
                 default:
@@ -205,11 +205,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
         private \$parametros;
         private \$nombres_columnas;
         private \$placeholder;
-        private \$id_org_acceso;
-        private \$id_org_acceso_explicito;
-        private \$per_crear;
-        private \$per_editar;
-        private \$per_eliminar;
+        
         private \$restricciones;
         
             
@@ -218,8 +214,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 \$this->asigna_script('$nombre_fisico/$nombre_fisico.js');                                             
                 \$this->dbl = new Mysql(\$this->encryt->Decrypt_Text(\$_SESSION[BaseDato]), \$this->encryt->Decrypt_Text(\$_SESSION[LoginBD]), \$this->encryt->Decrypt_Text(\$_SESSION[PwdBD]) );
                 \$this->parametros = \$this->nombres_columnas = \$this->placeholder = array();
-                //\$this->id_org_acceso = \$this->id_org_acceso_explicito = array();
-                \$this->per_crear = \$this->per_editar = \$this->per_eliminar = 'N';
+                
                 \$this->contenido = array();
             }
 
@@ -251,68 +246,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 
             }
 
-            /**
-            * Activa los nodos donde se tiene acceso
-            
-           public function cargar_acceso_nodos(\$parametros){
-               if (strlen(\$parametros[cod_link])>0){
-                   if(!class_exists('mos_acceso')){
-                       import(\"clases.mos_acceso.mos_acceso\");
-                   }
-                   \$acceso = new mos_acceso();
-                   \$data_ids_acceso = \$acceso->obtenerArbolEstructura(\$_SESSION[CookIdUsuario],\$parametros[cod_link],\$parametros[modo]);                   
-                   foreach (\$data_ids_acceso as \$value) {
-                       \$this->id_org_acceso[\$value[id]] = \$value;
-                   }                                            
-               }
-           }
-            */
-           /**
-            * Activa los nodos donde se tiene acceso
-            
-           private function cargar_acceso_nodos_explicito(\$parametros){
-               if (strlen(\$parametros[cod_link])>0){
-                   if(!class_exists('mos_acceso')){
-                       import(\"clases.mos_acceso.mos_acceso\");
-                   }
-                   \$acceso = new mos_acceso();
-                   \$data_ids_acceso = \$acceso->obtenerNodosArbol(\$_SESSION[CookIdUsuario],\$parametros[cod_link],\$parametros[modo]);                   
-                   foreach (\$data_ids_acceso as \$value) {
-                       \$this->id_org_acceso_explicito[\$value[id]] = \$value;
-                   }                                            
-               }
-           }
-           */
-            /**
-             * Busca los permisos que tiene el usuario en el modulo
-             */
-            private function cargar_permisos(\$parametros){
-                if (strlen(\$parametros[cod_link])>0){
-                    if(!class_exists('mos_acceso')){
-                        import(\"clases.mos_acceso.mos_acceso\");
-                    }
-                    \$acceso = new mos_acceso();
-                    \$data_permisos = \$acceso->obtenerPermisosModulo(\$_SESSION[CookIdUsuario],\$parametros[cod_link],\$parametros['b-id_organizacion']);                    
-                    foreach (\$data_permisos as \$value) {
-                        if (\$value[nuevo] == 'S'){
-                            \$this->per_crear =  'S';
-                            break;
-                        }
-                    }                                               
-                    foreach (\$data_permisos as \$value) {
-                        if (\$value[modificar] == 'S'){
-                            \$this->per_editar =  'S';
-                            break;
-                        }
-                    } 
-                    foreach (\$data_permisos as \$value) {
-                        if (\$value[eliminar] == 'S'){
-                            \$this->per_eliminar =  'S';
-                            break;
-                        }
-                    } 
-                }
-            }
+           
             
             public function colum_admin(\$tupla)
             {
@@ -625,7 +559,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 \$contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;$nombre_clase';
                 \$contenido['TABLA'] = \$grid['tabla'];
                 \$contenido['PAGINADO'] = \$grid['paginado'];
-                \$contenido['PERMISO_INGRESAR'] = \$this->per_crear == 'S' ? '' : 'display:none;';
+                \$contenido['PERMISO_INGRESAR'] = \$this->restricciones->per_crear == 'S' ? '' : 'display:none;';
 
                 \$template = new Template();
                 \$template->PATH = PATH_TO_TEMPLATES.'$nombre_fisico/';

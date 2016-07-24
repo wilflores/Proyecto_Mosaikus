@@ -285,12 +285,7 @@ function init_tabla(){
 
 function init_filtrar(){
         
-        $("#b-f-desde").datepicker({
-                        changeMonth: true,                        
-                        minDate: -365,
-                        maxDate:-1,
-                        changeYear: true
-                      });
+        $("#b-f-desde").datetimepicker();
         $("input[name=b-filtro-fecha]:radio").change(function () {
             if ($("#b-filtro-fecha").val()=="1") {
                 $("#b-f-desde").removeAttr("disabled");
@@ -313,12 +308,12 @@ function init_filtrar(){
                                             placeholder: "Selecione el revisor",
                                             allowClear: true
                                           }); 
-        $("#b-fecha_generacion-desde").datepicker();
-        $("#b-fecha_acordada-desde").datepicker();;
-        $("#b-fecha_realizada-desde").datepicker();
-        $("#b-fecha_generacion-hasta").datepicker();
-        $("#b-fecha_acordada-hasta").datepicker();
-        $("#b-fecha_realizada-hasta").datepicker();
+        $("#b-fecha_generacion-desde").datetimepicker();
+        $("#b-fecha_acordada-desde").datetimepicker();;
+        $("#b-fecha_realizada-desde").datetimepicker();
+        $("#b-fecha_generacion-hasta").datetimepicker();
+        $("#b-fecha_acordada-hasta").datetimepicker();
+        $("#b-fecha_realizada-hasta").datetimepicker();
         
         $("#tabs-hv").tab();
         $("#tabs-hv a:first").tab("show"); 
