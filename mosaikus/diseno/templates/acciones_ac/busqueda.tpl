@@ -13,19 +13,19 @@
 <div class="form-group">
                                   <label for="fecha_acordada" class="col-md-2 control-label">{N_FECHA_ACORDADA}</label>
                                   <div class="col-md-2">
-                                    Desde: <input type="text" class="form-control" id="b-fecha_acordada-desde" name="b-fecha_acordada-desde" placeholder="dd/mm/yyyy"  />
+                                    Desde: <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_acordada-desde" name="b-fecha_acordada-desde" placeholder="dd/mm/yyyy"  />
                                   </div>   
                                   <div class="col-md-2">
-                                    Hasta: <input type="text" class="form-control" id="b-fecha_acordada-hasta" name="b-fecha_acordada-hasta" placeholder="dd/mm/yyyy"  />
+                                    Hasta: <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_acordada-hasta" name="b-fecha_acordada-hasta" placeholder="dd/mm/yyyy"  />
                                 </div>                                
                             </div>
 <div class="form-group">
                                   <label for="fecha_realizada" class="col-md-2 control-label">{N_FECHA_REALIZADA}</label>
                                   <div class="col-md-2">
-                                    Desde: <input type="text" class="form-control" id="b-fecha_realizada-desde" name="b-fecha_realizada-desde" placeholder="dd/mm/yyyy"  />
+                                    Desde: <input type="text" class="form-control" data-date-format="DD/MM/YYYY"  id="b-fecha_realizada-desde" name="b-fecha_realizada-desde" placeholder="dd/mm/yyyy"  />
                                   </div>   
                                   <div class="col-md-2">
-                                    Hasta: <input type="text" class="form-control" id="b-fecha_realizada-hasta" name="b-fecha_realizada-hasta" placeholder="dd/mm/yyyy"  />
+                                    Hasta: <input type="text" class="form-control" data-date-format="DD/MM/YYYY"  id="b-fecha_realizada-hasta" name="b-fecha_realizada-hasta" placeholder="dd/mm/yyyy"  />
                                 </div>                                
                             </div>
 <div class="form-group">

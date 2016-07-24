@@ -987,7 +987,7 @@
                             $html .= '<div class="col-md-'.$col_cam.'">';
                             $html .= '<input type="text" style="width: 140px;"  data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" placeholder="dd/mm/yyyy"  name="campo_' . $value[cod_parametro] . '" id="campo_' . $value[cod_parametro] . '" value="'.$desc_valores_params[$value[cod_parametro]].'"/>';
                             $html .= '</div>';
-                            $js .= "$('#campo_$value[cod_parametro]').datepicker();";
+                            $js .= "$('#campo_$value[cod_parametro]').datetimepicker();";
                             $html .= '</div>';
                             break;
                         case '4':
@@ -1120,7 +1120,7 @@
                             $html .= '<td>';
                             $html .= ' '.$desc_valores_params[$value[cod_parametro]].'';
                             $html .= '</td>';
-                            //$js .= "$('#campo_$value[cod_parametro]').datepicker();";
+                            //$js .= "$('#campo_$value[cod_parametro]').datetimepicker();";
                             $html .= '</tr>';
                             break;
                         case '4':
@@ -1240,7 +1240,7 @@
                             //$html .= '<div class="col-md-4">';
                             $html .= '<input type="text" style="width: 100px;"  data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" placeholder="dd/mm/yyyy"  name="campo_' . $value[cod_parametro] . '" id="campo_' . $value[cod_parametro] . '" value="'.$desc_valores_params[$value[cod_parametro]].'"/>';
                             //$html .= '</div>';
-                            $js .= "$('#campo_$value[cod_parametro]').datepicker();";
+                            $js .= "$('#campo_$value[cod_parametro]').datetimepicker();";
                             $html .= '</div>';
                             break;
                         case '4':

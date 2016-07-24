@@ -48,18 +48,38 @@
      
 
              public function verAccionesAC($id){
-                $atr=array();
-                $sql = "SELECT id
+                $atr=array('id' =>$id);
+                $atr = $this->dbl->corregir_parametros($atr);
+                $id = $atr[id];
+                $sql = "SELECT acco.id
                             ,tipo
+                            ,ta.descripcion tipo_desc
                             ,accion
                             ,DATE_FORMAT(fecha_acordada, '%d/%m/%Y') fecha_acordada
                             ,DATE_FORMAT(fecha_realizada, '%d/%m/%Y') fecha_realizada
                             ,id_responsable
                             ,id_ac
                             ,id_correcion
-
-                         FROM mos_acciones_ac_co 
-                         WHERE id = $id "; 
+                            ,estado
+                            ,CASE WHEN NOT acco.fecha_acordada IS NULL THEN 
+                                        CASE WHEN NOT acco.fecha_realizada IS NULL THEN
+                                                CASE WHEN acco.fecha_realizada <= acco.fecha_acordada
+                                                        THEN 0
+                                                    ElSE DATEDIFF(acco.fecha_realizada,acco.fecha_acordada )
+                                                END
+                                            WHEN CURRENT_DATE() > acco.fecha_acordada THEN 
+                                                DATEDIFF(CURRENT_DATE(),acco.fecha_acordada)
+                                            ELSE DATEDIFF(acco.fecha_acordada,CURRENT_DATE())
+                                        END 
+                                    ELSE NULL 
+                                END dias
+                            ,CONCAT(initcap(SUBSTR(per.nombres,1,IF(LOCATE(' ' ,per.nombres,1)=0,LENGTH(per.nombres),LOCATE(' ' ,per.nombres,1)-1))),' ',initcap(per.apellido_paterno)) as responsable
+                            ,(SELECT mos_nombres_campos.texto FROM mos_nombres_campos
+                                    WHERE mos_nombres_campos.nombre_campo = acco.estatus_wf AND mos_nombres_campos.modulo = 16) as estatus_wf
+                         FROM mos_acciones_ac_co acco
+                         INNER JOIN mos_tipo_ac ta ON ta.id = tipo
+                         INNER JOIN mos_personal per on per.cod_emp = acco.id_responsable
+                         WHERE acco.id = $id "; 
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }
@@ -71,20 +91,20 @@
                     if (isset($_SESSION[id_ac])){
                         $atr[id_ac] = $_SESSION[id_ac];                        
                     }
-                    else $atr[id_ac] = 'NULL';
+                    else $atr[id_ac] = strlen($atr[id_ac]) > 0 ? $atr[id_ac] : 'NULL';
                     if (isset($_SESSION[id_correccion])){
                         $atr[id_correcion] = $_SESSION[id_correccion];                        
                     }
-                    else $atr[id_correcion] = 'NULL';
+                    else $atr[id_correcion] = strlen($atr[id_correcion]) > 0 ? $atr[id_correcion] : 'NULL';
                     if (strlen($atr[fecha_realizada]) == 0){
                         $atr[fecha_realizada] = 'NULL';
                     }
                     else{
                         $atr[fecha_realizada] = "'$atr[fecha_realizada]'";
                     }
-                    $sql = "INSERT INTO mos_acciones_ac_co(tipo,accion,fecha_acordada,fecha_realizada,id_responsable,id_ac,id_correcion)
+                    $sql = "INSERT INTO mos_acciones_ac_co(tipo,accion,fecha_acordada,fecha_realizada,id_responsable,id_ac,id_correcion,orden)
                             VALUES(
-                                $atr[tipo],'$atr[accion]','$atr[fecha_acordada]',$atr[fecha_realizada],$atr[id_responsable],$atr[id_ac],$atr[id_correcion]
+                                $atr[tipo],'$atr[accion]','$atr[fecha_acordada]',$atr[fecha_realizada],$atr[id_responsable],$atr[id_ac],$atr[id_correcion],$atr[orden]
                                 )";
                     $this->dbl->insert_update($sql);
                     if ($atr[fecha_realizada] != 'NULL'){
@@ -94,7 +114,12 @@
                     $this->registraTransaccion('Insertar','Ingreso el mos_acciones_ac_co ' . $atr[descripcion_ano], 'mos_acciones_ac_co');
                       */
                     $nuevo = "Tipo: \'$atr[tipo]\', Accion: \'$atr[accion]\', Fecha Acordada: \'$atr[fecha_acordada]\', Fecha Realizada: $atr[fecha_realizada], Id Responsable: \'$atr[id_responsable]\', Id Ac: \'$atr[id_ac]\', Id Correcion: \'$atr[id_correcion]\', ";
-                    $this->registraTransaccionLog(62,$nuevo,'', '');
+                    /*Obtenemos el id del nuevo registro*/
+                    $sql = "SELECT MAX(id) ultimo FROM mos_acciones_ac_co"; 
+                    $this->operacion($sql, $atr);
+                    $id_new =  $this->dbl->data[0][0];
+                    
+                    $this->registraTransaccionLog(62,$nuevo,'', $id_new);
                     return "la acción correctiva '$atr[accion]' ha sido ingresado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
@@ -107,7 +132,7 @@
             public function registraTransaccionLog($accion,$descr, $tabla, $id = ''){
                 session_name("mosaikus");
                 session_start();
-                $sql = "INSERT INTO mos_log(codigo_accion, fecha_hora, accion, anterior, realizo, ip) VALUES ('$accion','".date('Y-m-d G:h:s')."','$descr', '$tabla','$_SESSION[CookIdUsuario]','$_SERVER[REMOTE_ADDR]')";            
+                $sql = "INSERT INTO mos_log(codigo_accion, fecha_hora, accion, anterior, realizo, ip, id_registro) VALUES ('$accion','".date('Y-m-d G:h:s')."','$descr', '$tabla','$_SESSION[CookIdUsuario]','$_SERVER[REMOTE_ADDR]', $id)";            
                 $this->dbl->insert_update($sql);
 
                 return true;
@@ -123,8 +148,9 @@
                         $atr[fecha_realizada] = "'$atr[fecha_realizada]'";
                     }
                     $sql = "UPDATE mos_acciones_ac_co SET                            
-                                    tipo = $atr[tipo],accion = '$atr[accion]',fecha_acordada = '$atr[fecha_acordada]',fecha_realizada = $atr[fecha_realizada],id_responsable = $atr[id_responsable]
-                            WHERE  id = $atr[id]";      
+                                    tipo = $atr[tipo],accion = '$atr[accion]',fecha_acordada = '$atr[fecha_acordada]',fecha_realizada = $atr[fecha_realizada],id_responsable = $atr[id_responsable], orden = $atr[orden]
+                            WHERE  id = $atr[id]";
+                    //echo $sql;
                     $val = $this->verAccionesAC($atr[id]);
                     $this->dbl->insert_update($sql);
                     if ($atr[fecha_realizada] != 'NULL'){
@@ -132,7 +158,7 @@
                     }
                     $nuevo = "Tipo: \'$atr[tipo]\', Accion: \'$atr[accion]\', Fecha Acordada: \'$atr[fecha_acordada]\', Fecha Realizada: $atr[fecha_realizada], Id Responsable: \'$atr[id_responsable]\' ";
                     $anterior = "Tipo: \'$val[tipo]\', Accion: \'$val[accion]\', Fecha Acordada: \'$val[fecha_acordada]\', Fecha Realizada: \'$val[fecha_realizada]\', Id Responsable: \'$val[id_responsable]\'";
-                    $this->registraTransaccionLog(63,$nuevo,$anterior, '');
+                    $this->registraTransaccionLog(63,$nuevo,$anterior, $atr[id]);
                     /*
                     $this->registraTransaccion('Modificar','Modifico el AccionesAC ' . $atr[descripcion_ano], 'mos_acciones_ac_co');
                     */
@@ -144,6 +170,91 @@
                         return $error; 
                     }
             }
+            
+            
+            public function listarAccionesACSinPaginacion($atr){
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $sql_left = $sql_col_left = "";
+                    /* if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                    }                    
+                    $k = 1;                    
+                    foreach ($this->parametros as $value) {
+                        $sql_left .= " LEFT JOIN(select t1.id_registro, t2.descripcion as nom_detalle from mos_parametro_modulos t1
+                                inner join mos_parametro_det t2 on t1.cod_categoria=t2.cod_categoria and t1.cod_parametro=t2.cod_parametro and t1.cod_parametro_det=t2.cod_parametro_det
+                        where t1.cod_categoria='3' and t1.cod_parametro='$value[cod_parametro]' ) AS p$k ON p$k.id_registro = p.cod_emp "; 
+                        $sql_col_left .= ",p$k.nom_detalle p$k ";
+                        $k++;
+                    }*/
+                    
+                    $sql_where = '';
+                    if (strlen($atr[valor])>0)
+                        $sql_where .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
+                    if (strlen($atr["b-tipo"])>0)
+                        $sql_where .= " AND tipo = '". $atr["b-tipo"] . "'";
+                    if (strlen($atr["b-accion"])>0)
+                        $sql_where .= " AND upper(accion) like '%" . strtoupper($atr["b-accion"]) . "%'";
+                    if (strlen($atr['b-fecha_acordada-desde'])>0)                        
+                    {
+                        $atr['b-fecha_acordada-desde'] = formatear_fecha($atr['b-fecha_acordada-desde']);                        
+                        $sql_where .= " AND fecha_acordada >= '" . ($atr['b-fecha_acordada-desde']) . "'";                        
+                    }
+                    if (strlen($atr['b-fecha_acordada-hasta'])>0)                        
+                    {
+                        $atr['b-fecha_acordada-hasta'] = formatear_fecha($atr['b-fecha_acordada-hasta']);                        
+                        $sql_where .= " AND fecha_acordada <= '" . ($atr['b-fecha_acordada-hasta']) . "'";                        
+                    }
+                    if (strlen($atr['b-fecha_realizada-desde'])>0)                        
+                    {
+                        $atr['b-fecha_realizada-desde'] = formatear_fecha($atr['b-fecha_realizada-desde']);                        
+                        $sql_where .= " AND fecha_realizada >= '" . ($atr['b-fecha_realizada-desde']) . "'";                        
+                    }
+                    if (strlen($atr['b-fecha_realizada-hasta'])>0)                        
+                    {
+                        $atr['b-fecha_realizada-hasta'] = formatear_fecha($atr['b-fecha_realizada-hasta']);                        
+                        $sql_where .= " AND fecha_realizada <= '" . ($atr['b-fecha_realizada-hasta']) . "'";                        
+                    }
+                    if (strlen($atr["b-id_responsable"])>0)
+                        $sql_where .= " AND id_responsable = '". $atr["b-id_responsable"] . "'";
+                    /*
+                     if (isset($parametros[id_ac])){
+                    $_SESSION[id_ac] = $parametros[id_ac];
+                    unset ($_SESSION['id_correccion']);
+                }
+                else if (isset($parametros[id_correccion])){
+                    $_SESSION[id_correccion] = $parametros[id_correccion];
+                    unset ($_SESSION['id_ac']);
+                }
+                     */
+                    if (strlen($atr["b-id_ac"])>0)
+                        $sql_where .= " AND id_ac = '". $atr["b-id_ac"] . "'";
+                    if (strlen($atr["b-id_correcion"])>0)
+                        $sql_where .= " AND id_correcion = ". $atr["b-id_correcion"] . "";
+                    if (strlen($_SESSION[id_ac])>0)
+                        $sql_where .= " AND id_ac = ". $_SESSION[id_ac] . "";
+                    if (strlen($_SESSION[id_correccion])>0)
+                        $sql_where .= " AND id_correcion = '". $_SESSION[id_correccion] . "'";
+
+                                                            
+                    $sql = "SELECT acco.id
+                                ,tipo
+                                ,accion
+                                ,DATE_FORMAT(fecha_acordada, '%d/%m/%Y') fecha_acordada_a
+                                ,DATE_FORMAT(fecha_realizada, '%d/%m/%Y') fecha_realizada_a
+                                ,id_responsable                                                                
+                                ,id_ac
+                                ,id_correcion
+
+                                     $sql_col_left
+                            FROM mos_acciones_ac_co acco                             
+                            $sql_left
+                            WHERE 1 = 1 $sql_where";
+                    
+                    $sql .= " order by $atr[corder] $atr[sorder] ";                    
+                    //echo $sql;
+                    $this->operacion($sql, $atr);
+             }
+             
              public function listarAccionesAC($atr, $pag, $registros_x_pagina){
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
@@ -158,63 +269,73 @@
                         $sql_col_left .= ",p$k.nom_detalle p$k ";
                         $k++;
                     }*/
-                    $sql = "SELECT COUNT(*) total_registros
-                         FROM mos_acciones_ac_co 
-                         WHERE 1 = 1 ";
+                    
+                    $sql_where = '';
                     if (strlen($atr[valor])>0)
-                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
-                                 if (strlen($atr["b-tipo"])>0)
-                        $sql .= " AND tipo = '". $atr["b-tipo"] . "'";
-            if (strlen($atr["b-accion"])>0)
-                        $sql .= " AND upper(accion) like '%" . strtoupper($atr["b-accion"]) . "%'";
-             if (strlen($atr['b-fecha_acordada-desde'])>0)                        
+                        $sql_where .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
+                    if (strlen($atr["b-tipo"])>0)
+                        $sql_where .= " AND tipo = '". $atr["b-tipo"] . "'";
+                    if (strlen($atr["b-accion"])>0)
+                        $sql_where .= " AND upper(accion) like '%" . strtoupper($atr["b-accion"]) . "%'";
+                    if (strlen($atr['b-fecha_acordada-desde'])>0)                        
                     {
                         $atr['b-fecha_acordada-desde'] = formatear_fecha($atr['b-fecha_acordada-desde']);                        
-                        $sql .= " AND fecha_acordada >= '" . ($atr['b-fecha_acordada-desde']) . "'";                        
+                        $sql_where .= " AND fecha_acordada >= '" . ($atr['b-fecha_acordada-desde']) . "'";                        
                     }
                     if (strlen($atr['b-fecha_acordada-hasta'])>0)                        
                     {
                         $atr['b-fecha_acordada-hasta'] = formatear_fecha($atr['b-fecha_acordada-hasta']);                        
-                        $sql .= " AND fecha_acordada <= '" . ($atr['b-fecha_acordada-hasta']) . "'";                        
+                        $sql_where .= " AND fecha_acordada <= '" . ($atr['b-fecha_acordada-hasta']) . "'";                        
                     }
-             if (strlen($atr['b-fecha_realizada-desde'])>0)                        
+                    if (strlen($atr['b-fecha_realizada-desde'])>0)                        
                     {
                         $atr['b-fecha_realizada-desde'] = formatear_fecha($atr['b-fecha_realizada-desde']);                        
-                        $sql .= " AND fecha_realizada >= '" . ($atr['b-fecha_realizada-desde']) . "'";                        
+                        $sql_where .= " AND fecha_realizada >= '" . ($atr['b-fecha_realizada-desde']) . "'";                        
                     }
                     if (strlen($atr['b-fecha_realizada-hasta'])>0)                        
                     {
                         $atr['b-fecha_realizada-hasta'] = formatear_fecha($atr['b-fecha_realizada-hasta']);                        
-                        $sql .= " AND fecha_realizada <= '" . ($atr['b-fecha_realizada-hasta']) . "'";                        
+                        $sql_where .= " AND fecha_realizada <= '" . ($atr['b-fecha_realizada-hasta']) . "'";                        
                     }
-             if (strlen($atr["b-id_responsable"])>0)
-                        $sql .= " AND id_responsable = '". $atr["b-id_responsable"] . "'";
-             if (strlen($atr["b-id_ac"])>0)
-                        $sql .= " AND id_ac = '". $atr["b-id_ac"] . "'";
-             if (strlen($atr["b-id_correcion"])>0)
-                        $sql .= " AND id_correcion = '". $atr["b-id_correcion"] . "'";
+                    if (strlen($atr["b-id_responsable"])>0)
+                        $sql_where .= " AND id_responsable = '". $atr["b-id_responsable"] . "'";
+                    /*
+                     if (isset($parametros[id_ac])){
+                    $_SESSION[id_ac] = $parametros[id_ac];
+                    unset ($_SESSION['id_correccion']);
+                }
+                else if (isset($parametros[id_correccion])){
+                    $_SESSION[id_correccion] = $parametros[id_correccion];
+                    unset ($_SESSION['id_ac']);
+                }
+                     */
+                    if (strlen($atr["b-id_ac"])>0)
+                        $sql_where .= " AND id_ac = '". $atr["b-id_ac"] . "'";
+                    if (strlen($atr["b-id_correcion"])>0)
+                        $sql_where .= " AND id_correcion = '". $atr["b-id_correcion"] . "'";
+                    if (strlen($_SESSION[id_ac])>0)
+                        $sql_where .= " AND id_ac = '". $_SESSION[id_ac] . "'";
+                    if (strlen($_SESSION[id_correccion])>0)
+                        $sql_where .= " AND id_correcion = '". $_SESSION[id_correccion] . "'";
+
+                    
+                    
+                    $sql = "SELECT COUNT(*) total_registros
+                         FROM mos_acciones_ac_co 
+                         WHERE 1 = 1 $sql_where";
+                    
 
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
             
                     $sql = "SELECT acco.id
+                                ,estado
                                 ,ta.descripcion tipo
                                 ,accion
                                 ,DATE_FORMAT(fecha_acordada, '%d/%m/%Y') fecha_acordada_a
                                 ,DATE_FORMAT(fecha_realizada, '%d/%m/%Y') fecha_realizada_a
-                                ,CONCAT(CONCAT(UPPER(LEFT(per.nombres, 1)), LOWER(SUBSTRING(per.nombres, 2))),' ', CONCAT(UPPER(LEFT(per.apellido_paterno, 1)), LOWER(SUBSTRING(per.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(per.apellido_materno, 1)), LOWER(SUBSTRING(per.apellido_materno, 2)))) as id_responsable
-                                ,CASE WHEN NOT acco.fecha_acordada IS NULL THEN 
-                                            CASE WHEN NOT acco.fecha_realizada IS NULL THEN
-                                                           CASE WHEN acco.fecha_realizada <= acco.fecha_acordada 
-                                                                           THEN 'Realizado'
-                                                                           ElSE 'Realizado con atraso'
-                                                           END
-                                                   WHEN CURRENT_DATE() > acco.fecha_acordada THEN 
-                                                                   'Plazo vencido'
-                                                   ELSE 'En el plazo'
-                                           END 
-                                   ELSE ''
-                                END sema
+                                ,CONCAT(initcap(SUBSTR(per.nombres,1,IF(LOCATE(' ' ,per.nombres,1)=0,LENGTH(per.nombres),LOCATE(' ' ,per.nombres,1)-1))),' ',initcap(per.apellido_paterno)) as id_responsable
+                                
                                 ,CASE WHEN NOT acco.fecha_acordada IS NULL THEN 
                                         CASE WHEN NOT acco.fecha_realizada IS NULL THEN
                                                 CASE WHEN acco.fecha_realizada <= acco.fecha_acordada
@@ -227,7 +348,7 @@
                                         END 
                                     ELSE NULL 
                                 END dias
-                                ,(select count(id) from mos_acciones_evidencia where id_accion=acco.id) as cantidad 
+                                -- ,(select count(id) from mos_acciones_evidencia where id_accion=acco.id) as cantidad 
                                 ,id_ac
                                 ,id_correcion
 
@@ -236,54 +357,8 @@
                             INNER JOIN mos_tipo_ac ta ON ta.id = tipo
                             INNER JOIN mos_personal per on per.cod_emp = acco.id_responsable
                             $sql_left
-                            WHERE 1 = 1 ";
-                    if (strlen($atr[valor])>0)
-                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
-                    if (strlen($atr["b-tipo"])>0)
-                        $sql .= " AND tipo = '". $atr["b-tipo"] . "'";
-                    if (strlen($atr["b-accion"])>0)
-                        $sql .= " AND upper(accion) like '%" . strtoupper($atr["b-accion"]) . "%'";
-                    if (strlen($atr['b-fecha_acordada-desde'])>0)                        
-                    {
-                        $atr['b-fecha_acordada-desde'] = formatear_fecha($atr['b-fecha_acordada-desde']);                        
-                        $sql .= " AND fecha_acordada >= '" . ($atr['b-fecha_acordada-desde']) . "'";                        
-                    }
-                    if (strlen($atr['b-fecha_acordada-hasta'])>0)                        
-                    {
-                        $atr['b-fecha_acordada-hasta'] = formatear_fecha($atr['b-fecha_acordada-hasta']);                        
-                        $sql .= " AND fecha_acordada <= '" . ($atr['b-fecha_acordada-hasta']) . "'";                        
-                    }
-                    if (strlen($atr['b-fecha_realizada-desde'])>0)                        
-                    {
-                        $atr['b-fecha_realizada-desde'] = formatear_fecha($atr['b-fecha_realizada-desde']);                        
-                        $sql .= " AND fecha_realizada >= '" . ($atr['b-fecha_realizada-desde']) . "'";                        
-                    }
-                    if (strlen($atr['b-fecha_realizada-hasta'])>0)                        
-                    {
-                        $atr['b-fecha_realizada-hasta'] = formatear_fecha($atr['b-fecha_realizada-hasta']);                        
-                        $sql .= " AND fecha_realizada <= '" . ($atr['b-fecha_realizada-hasta']) . "'";                        
-                    }
-                    if (strlen($atr["b-id_responsable"])>0)
-                        $sql .= " AND id_responsable = '". $atr["b-id_responsable"] . "'";
-                    /*
-                     if (isset($parametros[id_ac])){
-                    $_SESSION[id_ac] = $parametros[id_ac];
-                    unset ($_SESSION['id_correccion']);
-                }
-                else if (isset($parametros[id_correccion])){
-                    $_SESSION[id_correccion] = $parametros[id_correccion];
-                    unset ($_SESSION['id_ac']);
-                }
-                     */
-                    if (strlen($atr["b-id_ac"])>0)
-                        $sql .= " AND id_ac = '". $atr["b-id_ac"] . "'";
-                    if (strlen($atr["b-id_correcion"])>0)
-                        $sql .= " AND id_correcion = '". $atr["b-id_correcion"] . "'";
-                    if (strlen($_SESSION[id_ac])>0)
-                        $sql .= " AND id_ac = '". $_SESSION[id_ac] . "'";
-                    if (strlen($_SESSION[id_correccion])>0)
-                        $sql .= " AND id_correcion = '". $_SESSION[id_correccion] . "'";
-
+                            WHERE 1 = 1 $sql_where";
+                    
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //echo $sql;
@@ -316,6 +391,32 @@
                         return $error; 
                     }
              }
+             
+             public function colum_admin_arbol($tupla)
+            {       
+                 $html = "<a tok=\"". $tupla[id] . "\" class=\"ver-reporte\">
+                                                <i style='cursor:pointer'  class=\"icon icon-view-document\" title=\"Ver Trazabilidad Acción\"></i>
+                                            </a>";
+                //if ($this->restricciones->id_org_acceso_explicito[$tupla[id_organizacion]][modificar] == 'S')
+                {                    
+                    $html .= "<a href=\"#\" onclick=\"javascript:editarAccionesAC('". $tupla[id] . "');\"  title=\"Gestionar Trazabilidad Acción\">                            
+                                <i class=\"icon icon-edit\"></i>
+                            </a>";
+                }
+                /*
+                if ($this->restricciones->id_org_acceso_explicito[$tupla[id_organizacion]][eliminar] == 'S')
+                {
+                    $html .= "<a href=\"#\" onclick=\"javascript:eliminarAccionesCorrectivas('". $tupla[id] . "');\" title=\"Eliminar Familias\">
+                            <i class=\"icon icon-remove\"></i>
+
+                        </a>"; 
+                }*/
+                $html .= '<a href="#" onclick="javascript:verWorkFlow(\''. $tupla[IDDoc] . '\');" title="Ver Flujo de Trabajo '.$tupla[nombre_doc].'" >                        
+                            <i class="icon icon-user-document"></i>
+                    </a>'; 
+                
+                return $html;
+            }
      
  
      public function verListaAccionesAC($parametros){
@@ -334,13 +435,14 @@
 
                 $grid->SetConfiguracionMSKS("tblAccionesAC", "");
                 $config_col=array(
-                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id], "id", $parametros,"link_titulos_hv")),
+                    array( "width"=>"2%","ValorEtiqueta"=>"<div style='width:80px'>&nbsp;</div>"),
+                    array( "width"=>"5%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[estado_seguimiento], ENT_QUOTES, "UTF-8")),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[tipo], "tipo", $parametros,"link_titulos_hv")),
                array( "width"=>"20%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[accion], "accion", $parametros,"link_titulos_hv")),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[fecha_acordada], "fecha_acordada", $parametros,"link_titulos_hv")),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[fecha_realizada], "fecha_realizada", $parametros,"link_titulos_hv")),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[id_responsable], "id_responsable", $parametros,"link_titulos_hv")),
-               array( "width"=>"5%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[estado_seguimiento], ENT_QUOTES, "UTF-8")),
+               
                array( "width"=>"10%","ValorEtiqueta"=>"dias"),
                array( "width"=>"5%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[trazabilidad], ENT_QUOTES, "UTF-8")),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_ac], "id_ac", $parametros)),
@@ -357,7 +459,7 @@
 
                 $func= array();
 
-                $columna_funcion = 0;
+                $columna_funcion = -1;
                 /*if (strrpos($parametros['permiso'], '1') > 0){
                     
                     $columna_funcion = 9;
@@ -370,13 +472,13 @@
                 }
                 else{
                     
-                
+                /*
                     if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                         array_push($func,array('nombre'=> 'editarAccionesAC','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-edit\"  title='Editar AccionesAC'></i>"));
                     if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
                         array_push($func,array('nombre'=> 'eliminarAccionesAC','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\" title='Eliminar AccionesAC'></i>"));
-
-                    $config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
+*/
+                    $config=array();
                 }
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
                 $array_columns =  explode('-', $parametros['mostrar-col']);
@@ -414,7 +516,8 @@
                     $grid->setFuncion("cantidad", "cantidad_evidencia");
                 }
                 
-                $grid->setFuncion("sema", "semaforo_estado");
+                $grid->setFuncion("estado", "semaforo_estado");
+                $grid->setFuncion("id", "colum_admin_arbol");
                 $grid->setParent($this);
                 //$grid->setAligns(1,"center");
                 //$grid->hidden = array(0 => true);
@@ -445,15 +548,19 @@
                 //,cantidad_evidencia    
             switch ($tupla[$key]) {
                     case 'Realizado':
+                    case 4:
                         $html = '<img src="diseno/images/realizo.png" title="Realizado"/>';
                         break;
                     case 'Realizado con atraso':
+                    case 3:
                         $html = '<img src="diseno/images/SemPlazoAtrasado.png" title="Realizado con atraso"/>';
                         break;
                     case 'Plazo vencido':
+                    case 1:
                         $html = '<img src="diseno/images/atrasado.png" title="Plazo vencido"/>';
                         break;
                     case 'En el plazo':
+                    case 2:
                         $html = '<img src="diseno/images/SemPlazo.png" title="En el plazo"/>';
                         break;
                     default:
@@ -531,6 +638,7 @@
  
             public function indexAccionesAC($parametros)
             {
+                $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $nombre_pestana = "";
@@ -549,7 +657,7 @@
                 if ($parametros['corder'] == null) $parametros['corder']="fecha_acordada";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="1-2-3-4-5-6-8"; 
+                    $parametros['mostrar-col']="0-1-2-3-4-5-6"; 
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */               
@@ -579,7 +687,8 @@
                 $contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;AccionesAC';
                 $contenido['TABLA'] = $grid['tabla'];
                 $contenido['PAGINADO'] = $grid['paginado'];
-                $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
+                //$contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
+                $contenido['PERMISO_INGRESAR'] = 'display:none;';
                 $contenido['OPC'] = "new";
 
                 $template = new Template();
@@ -625,7 +734,7 @@
                 $template->setTemplate("mostrar_colums");
                 $template->setVars($contenido);
                 $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
-                $template->PATH = PATH_TO_TEMPLATES.'acciones_ac/';
+                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
 
                 $template->setTemplate("listar");
                 $template->setVars($contenido);
@@ -635,22 +744,22 @@
                 if (isset($parametros['html']))
                     return $template->show();
                 $objResponse = new xajaxResponse();
-                //$objResponse->addAssign('contenido',"innerHTML",$template->show());
-                $objResponse->addAssign('myModal-Ventana-Cuerpo',"innerHTML",$template->show());
+                $objResponse->addAssign('contenido',"innerHTML",$template->show());
+                /*$objResponse->addAssign('myModal-Ventana-Cuerpo',"innerHTML",$template->show());
                 $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
-                //$objResponse->addAssign('modulo_actual',"value","acciones_ac");
+                //$objResponse->addAssign('modulo_actual',"value","acciones_ac");*/
                 $objResponse->addIncludeScript(PATH_TO_JS . 'acciones_ac/acciones_ac.js');
-                $objResponse->addScript("$('#myModal-Ventana').modal('show');");
+                /*$objResponse->addScript("$('#myModal-Ventana').modal('show');");
                 $objResponse->addScript("$('#myModal-Ventana-Titulo').html('Acciones ID: " . (isset($_SESSION[id_ac]) ? $_SESSION[id_ac] : $_SESSION[id_correccion]) . "');");
                 $objResponse->addScript("$('#myModal-Ventana').on('hidden.bs.modal', function () {                                                 
                                                  $('body').css({'padding-right':'0px'});
                                             })");
                 
-                //$objResponse->addScript("$('#hv-fecha').datepicker();");
+                //$objResponse->addScript("$('#hv-fecha').datetimepicker();");
                 $objResponse->addScript("$('#tabs-hv').tab();"
-                        . "$('#tabs-hv a:first').tab('show'); ");
-                $objResponse->addScript("$('#hv-fecha_acordada').datepicker();");
-                $objResponse->addScript("$('#hv-fecha_realizada').datepicker();");
+                        . "$('#tabs-hv a:first').tab('show'); ");*/
+                $objResponse->addScript("$('#hv-fecha_acordada').datetimepicker();");
+                $objResponse->addScript("$('#hv-fecha_realizada').datetimepicker();");
                 $objResponse->addScript('$( "#hv-id_responsable" ).select2({
                                             placeholder: "Selecione el revisor",
                                             allowClear: true
@@ -703,8 +812,8 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");
-                $objResponse->addScript("$('#fecha_acordada').datepicker();");
-                $objResponse->addScript("$('#fecha_realizada').datepicker();");
+                $objResponse->addScript("$('#fecha_acordada').datetimepicker();");
+                $objResponse->addScript("$('#fecha_realizada').datetimepicker();");
                 return $objResponse;
             }
      
@@ -773,28 +882,50 @@
                     $contenido_1["P_" . strtoupper($key)] =  $value;
                 }    
                 $objResponse = new xajaxResponse();
-                $contenido_1['TIPO'] = $val["tipo"];
+                $contenido_1['TIPO'] = $val["tipo_desc"];
+                /*
                 $objResponse->addScript("$('#hv-tipo').val('$val[tipo]');");
                 $objResponse->addScript("$('#hv-accion').html('$val[accion]');");
                 $objResponse->addScript("$('#hv-fecha_acordada').val('$val[fecha_acordada]');");
                 $objResponse->addScript("$('#hv-fecha_realizada').val('$val[fecha_realizada]');");
-                $objResponse->addScript('$("#hv-id_responsable").select2("val", "'.$val["id_responsable"].'")'); 
-            $contenido_1['ACCION'] = ($val["accion"]);
-            $contenido_1['FECHA_ACORDADA'] = ($val["fecha_acordada"]);
-            $contenido_1['FECHA_REALIZADA'] = ($val["fecha_realizada"]);
-            $contenido_1['ID_RESPONSABLE'] = $val["id_responsable"];
-            $contenido_1['ID_AC'] = $val["id_ac"];
-            $contenido_1['ID_CORRECION'] = $val["id_correcion"];
+                $objResponse->addScript('$("#hv-id_responsable").select2("val", "'.$val["id_responsable"].'")'); */
+                if($_SESSION[SuperUser]=='S'){
+                    $sql = "SELECT cod_emp, 
+                            CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno))  nombres
+                                FROM mos_personal p WHERE interno = 1 AND workflow = 'S'
+                                ORDER BY nombres";
+                }
+                else
+                {
+                    $sql = "SELECT cod_emp, 
+                            CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno))  nombres
+                                FROM mos_personal p WHERE interno = 1 AND workflow = 'S' AND p.cod_emp = $_SESSION[CookCodEmp]
+                                ORDER BY nombres";
+                }
+                $ids = array('', 'Avance', 'Cierre'); 
+                $desc = array('-- Seleccione --', 'Avance', 'Cierre');
+                $contenido_1['TIPOS'] = $ut_tool->OptionsComboArrayMultiple($ids, $desc);
+                $contenido_1[RESPONSABLE_ACCIONES] .= $ut_tool->OptionsCombo($sql
+                                                                    , 'cod_emp'
+                                                                    , 'nombres', null);
+                $contenido_1['ACCION'] = ($val["accion"]);
+                $contenido_1['FECHA_ACORDADA'] = ($val["fecha_acordada"]);
+                $contenido_1['FECHA_REALIZADA'] = ($val["fecha_realizada"]);
+                $contenido_1['ID_RESPONSABLE'] = $val["responsable"];
+                $contenido_1['ID_AC'] = $val["id_ac"];
+                $contenido_1['ID_CORRECION'] = $val["id_correcion"];
+                $contenido_1['ESTATUS_WF'] = $val["estatus_wf"];
+                $contenido_1['ESTADO'] = $this->semaforo_estado($val,'estado');
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'acciones_ac/';
-                $template->setTemplate("formulario");
+                $template->setTemplate("formulario_h");
                 $template->setVars($contenido_1);
 
                 $contenido['CAMPOS'] = $template->show();
 
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
-                $template->setTemplate("formulario");
+                $template->setTemplate("formulario_h");
 
                 $contenido['TITULO_FORMULARIO'] = "Editar&nbsp;AccionesAC";
                 $contenido['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;AccionesAC";
@@ -805,23 +936,23 @@
 
                 $template->setVars($contenido);
                 
-                
+                /*
                 $objResponse->addScript("$('#id-hv').val('$parametros[id]');");
                 $objResponse->addScript("$('#opc-hv').val('upd');");
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");
-                $objResponse->addScript("$('.nav-tabs a[href=\"#hv-red\"]').tab('show');");
-//                $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
-//                $objResponse->addScriptCall("calcHeight");
-//                $objResponse->addScriptCall("MostrarContenido2");          
-//                $objResponse->addScript("$('#MustraCargando').hide();");
-//                $objResponse->addScript("$.validate({
-//                            lang: 'es'  
-//                          });");
-//                $objResponse->addScript("$('#fecha_acordada').datepicker();");
-//                $objResponse->addScript("$('#fecha_realizada').datepicker();");
+                $objResponse->addScript("$('.nav-tabs a[href=\"#hv-red\"]').tab('show');");*/
+                $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
+                $objResponse->addScriptCall("calcHeight");
+                $objResponse->addScriptCall("MostrarContenido2");          
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("$.validate({
+                            lang: 'es'  
+                          });$('#datetimepicker1').datetimepicker();$('#datetimepicker4').datetimepicker();");
+//                $objResponse->addScript("$('#fecha_acordada').datetimepicker();");
+//                $objResponse->addScript("$('#fecha_realizada').datetimepicker();");
                 return $objResponse;
             }
      

@@ -1,7 +1,7 @@
 <div class="form-group">
                                   <label for="fecha" class="control-label">{N_FECHA}</label>
                                   
-                                    <input type="text" class="form-control" id="b-fecha" name="b-fecha" placeholder="{N_FECHA}"/>
+                                    <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha" name="b-fecha" placeholder="{N_FECHA}"/>
                                                              
                             </div>
 <div class="form-group">
@@ -25,7 +25,7 @@
 <div class="form-group">
                                   <label for="fecha_leido" class="control-label">{N_FECHA_LEIDO}</label>
                                   
-                                    <input type="text" class="form-control" id="b-fecha_leido" name="b-fecha_leido" placeholder="{N_FECHA_LEIDO}"/>
+                                    <input type="text" class="form-control" data-date-format="DD/MM/YYYY"  id="b-fecha_leido" name="b-fecha_leido" placeholder="{N_FECHA_LEIDO}"/>
                                                              
                             </div>
 <div class="form-group">

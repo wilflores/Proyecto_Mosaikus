@@ -173,8 +173,10 @@ class Pagina{
 //      else
       {
         //$this->asigna_script('jquery/jquery.min.js');        
-        $this->asigna_script_vendor('jquery/dist/jquery.min.js');        
+        $this->asigna_script_vendor('jquery/dist/jquery.min.js');     
+        $this->asigna_script_vendor('moment/min/moment.min.js');    
         $this->asigna_script_vendor('bootstrap-sass/assets/javascripts/bootstrap.min.js'); 
+        $this->asigna_script_vendor('eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js');
         $this->asigna_script_vendor('jstree/dist/jstree.min.js');  
         $this->asigna_script_vendor('perfect-scrollbar/js/perfect-scrollbar.jquery.js');  
         $this->asigna_script_vendor('alertifyjs/alertify.min.js');  //para alertas
@@ -184,8 +186,8 @@ class Pagina{
         
         
       
-        $this->asigna_script('jquery/jquery-ui-1.10.3.custom.js');
-        $this->asigna_script('jquery/jquery-ui-timepicker-addon.js');
+        //$this->asigna_script('jquery/jquery-ui-1.10.3.custom.js');
+        //$this->asigna_script('jquery/jquery-ui-timepicker-addon.js');
         $this->asigna_script('jquery/jquery.form-validator.min.js'); 
         //$this->asigna_script('jquery/jquery.Rut.js'); 
         $this->asigna_script('jquery/select2.min.js');
@@ -624,14 +626,17 @@ class Pagina{
         if(!class_exists('Menu')){
           import("clases.menu.Menu");
         }
+    
         $this->asigna_css_vendor('alertifyjs/css/alertify.min.css');  //para alertas
         $this->asigna_css_vendor('alertifyjs/css/themes/bootstrap.min.css');  //para alertas
+        
         $this->asigna_css_vendor('Gallery/css/blueimp-gallery.min.css');
         $this->asigna_css_vendor('Bootstrap-Image-Gallery/css/bootstrap-image-gallery.min.css');//para gallery
         
         
         $this->asigna_css("jstree-mosaikus/style.css");
         $this->asigna_css("styles.css");
+        $this->asigna_css_vendor('eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css');
         $this->asigna_css_vendor('bootstrap-select/dist/css/bootstrap-select.min.css');//para select multiple
         $this->activar_jquery();
           

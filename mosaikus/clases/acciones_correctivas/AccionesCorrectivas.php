@@ -7,6 +7,8 @@
         private $parametros;
         public $nombres_columnas;
         private $placeholder;
+        private $cod_categoria; //Guarda el codigo para los parametros dinamicos
+        private $restricciones;
             
             public function AccionesCorrectivas(){
                 parent::__construct();
@@ -14,6 +16,7 @@
                 $this->dbl = new Mysql($this->encryt->Decrypt_Text($_SESSION[BaseDato]), $this->encryt->Decrypt_Text($_SESSION[LoginBD]), $this->encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $this->parametros = $this->nombres_columnas = $this->nombres_columnas_ac = $this->placeholder = array();
                 $this->contenido = array();
+                $this->cod_categoria = 8;
             }
 
             private function operacion($sp, $atr){
@@ -52,6 +55,53 @@
                 }
                 
             }
+            
+            /**
+         * Busca las areas relacionada al Documento de lista de distribucion
+         * @param type $tupla
+         * @return string
+         */
+        public function BuscaOrganizacional($tupla,$key='')
+        {
+            $Nivls = "";
+                                                       
+ 
+            $Resp3 = explode(',', $tupla[id_area]);//, $pieces)
+            foreach ($Resp3 as $Fila3) 
+            {                        
+                $Nivls .= $this->arbol->BuscaOrganizacional(array('id_organizacion' => $tupla[id_organizacion]));
+            }
+            if($Nivls!='')
+                    $Nivls=$Nivls;//;substr($Nivls,0,strlen($Nivls)-6);
+            else
+                    $Nivls='-- Sin información --';
+            return $Nivls;
+                        
+            
+
+        }
+            
+             public function colum_admin_arbol($tupla)
+            {       
+                 $html = "<a tok=\"". $tupla[id] . "\" class=\"ver-reporte\">
+                                                <i style='cursor:pointer'  class=\"icon icon-view-document\" title=\"Ver Reporte ". $fila['id']."\"></i>
+                                            </a>";
+                if ($this->restricciones->id_org_acceso_explicito[$tupla[id_organizacion]][modificar] == 'S')
+                {                    
+                    $html .= "<a href=\"#\" onclick=\"javascript:editarAccionesCorrectivas('". $tupla[id] . "');\"  title=\"Editar Familias\">                            
+                                <i class=\"icon icon-edit\"></i>
+                            </a>";
+                }
+                if ($this->restricciones->id_org_acceso_explicito[$tupla[id_organizacion]][eliminar] == 'S')
+                {
+                    $html .= "<a href=\"#\" onclick=\"javascript:eliminarAccionesCorrectivas('". $tupla[id] . "');\" title=\"Eliminar Familias\">
+                            <i class=\"icon icon-remove\"></i>
+
+                        </a>"; 
+                }
+                
+                return $html;
+            }
 
 
      
@@ -72,8 +122,10 @@
                             ,id_responsable_segui
                             ,alto_potencial
                             ,o.descripcion origen
-                            ,concat(initcap(p.nombres), ' ', initcap(p.apellido_paterno), ' ' , initcap(p.apellido_materno)) responsable_ana
-                            ,concat(initcap(per.nombres), ' ', initcap(per.apellido_paterno), ' ' , initcap(per.apellido_materno)) responsable_segui
+                            -- ,concat(initcap(p.nombres), ' ', initcap(p.apellido_paterno), ' ' , initcap(p.apellido_materno)) responsable_ana
+                            ,CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno)) responsable_ana
+                            -- ,concat(initcap(per.nombres), ' ', initcap(per.apellido_paterno), ' ' , initcap(per.apellido_materno)) responsable_segui
+                            ,CONCAT(initcap(SUBSTR(per.nombres,1,IF(LOCATE(' ' ,per.nombres,1)=0,LENGTH(per.nombres),LOCATE(' ' ,per.nombres,1)-1))),' ',initcap(per.apellido_paterno)) responsable_segui
                             ,CASE WHEN NOT ac.fecha_acordada IS NULL THEN 
                                             CASE WHEN NOT ac.fecha_realizada IS NULL THEN
                                                 CASE WHEN ac.fecha_realizada <= ac.fecha_acordada 
@@ -86,10 +138,20 @@
                                                 END 
                                             ELSE ''
                                         END sema_evi
+                            ,responsable_desvio
+                            ,reportado_por
+                            ,estatus
+                            ,estado
+                            ,CONCAT(initcap(SUBSTR(rp.nombres,1,IF(LOCATE(' ' ,rp.nombres,1)=0,LENGTH(rp.nombres),LOCATE(' ' ,rp.nombres,1)-1))),' ',initcap(rp.apellido_paterno))  reportado_por_aux                            
+                            ,CONCAT(initcap(SUBSTR(rd.nombres,1,IF(LOCATE(' ' ,rd.nombres,1)=0,LENGTH(rd.nombres),LOCATE(' ' ,rd.nombres,1)-1))),' ',initcap(rd.apellido_paterno))  responsable_desvio_aux
+                            ,(SELECT mos_nombres_campos.texto FROM mos_nombres_campos
+                                    WHERE mos_nombres_campos.nombre_campo = ac.estatus AND mos_nombres_campos.modulo = 15) as estatus_a
                          FROM mos_acciones_correctivas ac
                          INNER JOIN mos_origen_ac o ON o.id = origen_hallazgo
                          left JOIN mos_personal p ON p.cod_emp = responsable_analisis
                          LEFT JOIN mos_personal per ON per.cod_emp = id_responsable_segui
+                         LEFT JOIN mos_personal rp ON rp.cod_emp = ac.reportado_por
+			 LEFT JOIN mos_personal rd ON rd.cod_emp = ac.responsable_desvio
                          WHERE ac.id = $atr[id] "; 
                 //echo $sql;
                 $this->operacion($sql, $atr);
@@ -122,12 +184,29 @@
                     if (strlen($atr[responsable_analisis]) == 0){
                         $atr[responsable_analisis] = 'NULL';
                     }
-                    $sql = "INSERT INTO mos_acciones_correctivas(origen_hallazgo,fecha_generacion,descripcion,analisis_causal,responsable_analisis,id_organizacion,id_proceso,fecha_acordada,fecha_realizada,id_responsable_segui,alto_potencial,responsable_desvio)
+                    if (strlen($atr[responsable_desvio]) == 0){
+                        $atr[responsable_desvio] = 'NULL';
+                    }
+                    if (strlen($atr[estatus]) == ''){
+                        $atr[estatus] = 'NULL';
+                    }
+                    else{
+                        $atr[estatus] = "'$atr[estatus]'";
+                    }
+                    
+                    
+                    $sql = "INSERT INTO mos_acciones_correctivas(origen_hallazgo,fecha_generacion,descripcion,analisis_causal,responsable_analisis,id_organizacion,id_proceso,fecha_acordada,fecha_realizada,id_responsable_segui,alto_potencial
+                        ,responsable_desvio,estatus,reportado_por)
                             VALUES(
                                 $atr[origen_hallazgo],'$atr[fecha_generacion]','$atr[descripcion]','$atr[analisis_causal]',$atr[responsable_analisis],$atr[id_organizacion],$atr[id_proceso],$atr[fecha_acordada],$atr[fecha_realizada],$atr[id_responsable_segui], '$atr[alto_potencial]',$atr[responsable_desvio]
+                                ,$atr[estatus],$atr[reportado_por]
                                 )";
                     //echo $sql;
                     $this->dbl->insert_update($sql);
+                    /*Obtenemos el id del nuevo registro*/
+                    $sql = "SELECT MAX(id) ultimo FROM mos_acciones_correctivas"; 
+                    $this->operacion($sql, $atr);
+                    $id_new =  $this->dbl->data[0][0];
                     /*
                     $this->registraTransaccion('Insertar','Ingreso el mos_acciones_correctivas ' . $atr[descripcion_ano], 'mos_acciones_correctivas');
                       */
@@ -138,10 +217,10 @@
                         $atr[fecha_realizada] = "\\" . substr($atr[fecha_realizada], 0, strlen($atr[fecha_realizada])-1)  . "\'";
                     }
                     $nuevo = "Origen Hallazgo: \'$atr[origen_hallazgo]\', Fecha Generacion: \'$atr[fecha_generacion]\', Descripcion: \'$atr[descripcion]\', Analisis Causal: \'$atr[analisis_causal]\', Responsable Analisis: \'$atr[responsable_analisis]\', Id Organizacion: \'$atr[id_organizacion]\', Id Proceso: \'$atr[id_proceso]\', Fecha Acordada: $atr[fecha_acordada], Fecha Realizada: $atr[fecha_realizada], Id Responsable Segui: \'$atr[id_responsable_segui]\', ";
-                    $this->registraTransaccionLog(60,$nuevo,'', '');
-                    $sql = "SELECT MAX(id) ultimo FROM mos_acciones_correctivas"; 
-                    $this->operacion($sql, $atr);
-                    return $this->dbl->data[0][0];
+                    $this->registraTransaccionLog(60,$nuevo,'', $id_new);
+                    return $id_new;
+                    
+                    
                     return "El mos_acciones_correctivas '$atr[descripcion_ano]' ha sido ingresado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
@@ -154,7 +233,7 @@
             public function registraTransaccionLog($accion,$descr, $tabla, $id = ''){
                 session_name("mosaikus");
                 session_start();
-                $sql = "INSERT INTO mos_log(codigo_accion, fecha_hora, accion, anterior, realizo, ip) VALUES ('$accion','".date('Y-m-d G:h:s')."','$descr', '$tabla','$_SESSION[CookIdUsuario]','$_SERVER[REMOTE_ADDR]')";            
+                $sql = "INSERT INTO mos_log(codigo_accion, fecha_hora, accion, anterior, realizo, ip, id_registro) VALUES ('$accion','".date('Y-m-d G:h:s')."','$descr', '$tabla','$_SESSION[CookIdUsuario]','$_SERVER[REMOTE_ADDR]', $id)";            
                 $this->dbl->insert_update($sql);
 
                 return true;
@@ -163,45 +242,263 @@
             public function modificarAccionesCorrectivas($atr){
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
-                    if (strlen($atr[id_proceso]) == 0){
-                        $atr[id_proceso] = 'NULL';
-                    }
-                    if (strlen($atr[id_organizacion]) == 0){
-                        $atr[id_organizacion] = 'NULL';
-                    }
-                    if (strlen($atr[fecha_acordada]) == 0){
-                        $atr[fecha_acordada] = 'NULL';
-                    }
-                    else{
-                        $atr[fecha_acordada] = "'$atr[fecha_acordada]'";
-                    }
-                    if (strlen($atr[fecha_realizada]) == 0){
-                        $atr[fecha_realizada] = 'NULL';
-                    }
-                    else{
-                        $atr[fecha_realizada] = "'$atr[fecha_realizada]'";
-                    }
-                    if (strlen($atr[id_responsable_segui]) == 0){
-                        $atr[id_responsable_segui] = 'NULL';
-                    }
-                    if (strlen($atr[responsable_analisis]) == 0){
-                        $atr[responsable_analisis] = 'NULL';
-                    }
-                    $sql = "UPDATE mos_acciones_correctivas SET                            
-                                    origen_hallazgo = '$atr[origen_hallazgo]',fecha_generacion = '$atr[fecha_generacion]',descripcion = '$atr[descripcion]',analisis_causal = '$atr[analisis_causal]',responsable_analisis = $atr[responsable_analisis],id_organizacion = $atr[id_organizacion],id_proceso = $atr[id_proceso],fecha_acordada = $atr[fecha_acordada],fecha_realizada = $atr[fecha_realizada],id_responsable_segui = $atr[id_responsable_segui]
-                                        , alto_potencial = '$atr[alto_potencial]'
-                            WHERE  id = $atr[id]";      
-                    if ($atr[fecha_acordada] != 'NULL'){
-                        $atr[fecha_acordada] = "\\" . substr($atr[fecha_acordada], 0, strlen($atr[fecha_acordada])-1) . "\\";
-                    }
-                    if ($atr[fecha_realizada] != 'NULL'){
-                        $atr[fecha_realizada] = "\\" . substr($atr[fecha_realizada], 0, strlen($atr[fecha_realizada])-1)  . "\'";
-                    }
                     $val = $this->verAccionesCorrectivas($atr[id]);
+                    $sql_set = '';
+                    //BANDERA PARA ACTUALIZAR PARAMETROS
+                    $actualizar_parametros = 0;
+                    $actualizar_evidencias = 0;
+                    $actualizar_acciones = 0;
+                    switch ($val[estatus]) {
+                    case 'en_elaboracion':
+                    case 'en_buzon':
+                        if (($atr['notificar'] == 'si')) 
+                        {
+                            //SE VALIDA SI TIENE AL MENOS UNA ACCION DEFINIDA
+                            $bandera = 0;
+                            for($i=1;$i <= $atr[num_items_esp] * 1; $i++){                              
+                                if (isset($atr["tipo_$i"])){                                                                
+                                    $bandera = 1;
+                                    break;
+                                }
+                            }
+                            /*SI TIENE UNA ACCION DEFINIDA EL ESTATUS ES IMPLEMENTACION DE ACCIONES*/
+                            if ($bandera == 1) $atr[estatus] = "'implementacion_acciones'";
+                            else $atr[estatus] = 'NULL';
+                        }
+                        ELSE $atr[estatus] = 'estatus';
+                        /*VALIDAMOS LOS DATOS*/
+                        $atr[id_proceso] = (strlen($atr[id_proceso]) == 0) ? 'NULL' : $atr[id_proceso];
+                        $atr[id_organizacion] = (strlen($atr[id_organizacion]) == 0) ? 'NULL' : $atr[id_organizacion];
+                        $atr[fecha_acordada] = (strlen($atr[fecha_acordada]) == 0) ? 'NULL' : "'$atr[fecha_acordada]'";                                        
+                        $atr[fecha_realizada] = (strlen($atr[fecha_realizada]) == 0) ? 'NULL' : "'$atr[fecha_realizada]'";                                        
+                        $atr[id_responsable_segui] = (strlen($atr[id_responsable_segui]) == 0) ? 'NULL' : $atr[id_responsable_segui];                                        
+                        $atr[responsable_analisis] = (strlen($atr[responsable_analisis]) == 0) ? 'NULL' : $atr[responsable_analisis];                    
+                        $atr[responsable_desvio] = (strlen($atr[responsable_desvio]) == 0) ? 'NULL' : $atr[responsable_desvio];                                        
+                        $atr[estatus] = (strlen($atr[estatus]) == '') ? 'NULL' : $atr[estatus];
+                        //
+                        $sql_set = "origen_hallazgo = '$atr[origen_hallazgo]',fecha_generacion = '$atr[fecha_generacion]',descripcion = '$atr[descripcion]'"
+                                . ",analisis_causal = '$atr[analisis_causal]'"
+                                . ",responsable_desvio = $atr[responsable_desvio],responsable_analisis = $atr[responsable_analisis],id_organizacion = $atr[id_organizacion]"
+                                . ",id_proceso = $atr[id_proceso],fecha_acordada = $atr[fecha_acordada],fecha_realizada = $atr[fecha_realizada]"
+                                . ",id_responsable_segui = $atr[id_responsable_segui]
+                                        , alto_potencial = '$atr[alto_potencial]', id_usuario =  $atr[id_usuario]";
+                        $sql_set .= ",estatus = $atr[estatus]";
+                        $actualizar_parametros = 1;
+                        $actualizar_acciones = 1;
+                        $actualizar_evidencias = 1;
+                        $nuevo = "Origen Hallazgo: \'$atr[origen_hallazgo]\', Fecha Generacion: \'$atr[fecha_generacion]\', Descripcion: \'$atr[descripcion]\', Analisis Causal: \'$atr[analisis_causal]\', Responsable Analisis: \'$atr[responsable_analisis]\', Id Organizacion: \'$atr[id_organizacion]\', Id Proceso: \'$atr[id_proceso]\',Id Responsable Segui: \'$atr[id_responsable_segui]\',Alto Potencial: \'$atr[alto_potencial]\',Responsable Desvio: \'$atr[id_responsable_desvio]\' ";
+                        $anterior = "Origen Hallazgo: \'$val[origen_hallazgo]\', Fecha Generacion: \'$val[fecha_generacion]\', Descripcion: \'$val[descripcion]\', Analisis Causal: \'$val[analisis_causal]\', Responsable Analisis: \'$val[responsable_analisis]\', Id Organizacion: \'$val[id_organizacion]\', Id Proceso: \'$val[id_proceso]\', Id Responsable Segui: \'$val[id_responsable_segui]\',Alto Potencial: \'$atr[alto_potencial]\',Responsable Desvio: \'$atr[id_responsable_desvio]\' ";
+                        break;
+                                            
+                    case 'sin_responsable_analisis':                        
+                        $sql_set = "id_usuario =  $atr[id_usuario]";
+                        //SI EL USUARIO CONECTADO ES EL MISMO QUE REPORTO PUEDE EDITAR CAMPOS
+                        if (($_SESSION[CookCodEmp] == $val[reportado_por])){
+                             $atr[id_organizacion] = (strlen($atr[id_organizacion]) == 0) ? 'NULL' : $atr[id_organizacion];
+                             $atr[responsable_desvio] = (strlen($atr[responsable_desvio]) == 0) ? 'NULL' : $atr[responsable_desvio];   
+                             $sql_set .= ",origen_hallazgo = '$atr[origen_hallazgo]',fecha_generacion = '$atr[fecha_generacion]',descripcion = '$atr[descripcion]'"                                
+                                . ",responsable_desvio = $atr[responsable_desvio],id_organizacion = $atr[id_organizacion]"
+                                . ",alto_potencial = '$atr[alto_potencial]'";                           
+                             $nuevo = "Origen Hallazgo: \'$atr[origen_hallazgo]\', Fecha Generacion: \'$atr[fecha_generacion]\', Descripcion: \'$atr[descripcion]\', Analisis Causal: \'$atr[analisis_causal]\', Id Organizacion: \'$atr[id_organizacion]\' ,Alto Potencial: \'$atr[alto_potencial]\',Responsable Desvio: \'$atr[id_responsable_desvio]\' ";
+                             $anterior = "Origen Hallazgo: \'$val[origen_hallazgo]\', Fecha Generacion: \'$val[fecha_generacion]\', Descripcion: \'$val[descripcion]\', Analisis Causal: \'$val[analisis_causal]\', Id Organizacion: \'$val[id_organizacion]\', Alto Potencial: \'$atr[alto_potencial]\',Responsable Desvio: \'$atr[id_responsable_desvio]\' ";
+                             //$actualizar_parametros = 1;
+                             $actualizar_evidencias = 1;
+
+                        }
+                        //SI EL USUARIO CONECTADO ES EL MISMO RESPONSABLE DEL DESVIO PUEDE EDITAR EL RESPONSABLE DE ANALISIS
+                        if (
+                                ((strlen($atr[responsable_desvio])== 0) && ($_SESSION[CookCodEmp] == $val[responsable_desvio]) && (strlen($val[responsable_desvio])>0))
+                                || (($_SESSION[CookCodEmp] == $atr[responsable_desvio]) && strlen($atr[responsable_desvio])>0))
+                        {
+                            $atr[responsable_analisis] = (strlen($atr[responsable_analisis]) == 0) ? 'NULL' : $atr[responsable_analisis];   
+                            $sql_set .= ",responsable_analisis = $atr[responsable_analisis]";
+                            $nuevo = "Responsable Analisis: \'$atr[responsable_analisis]\'";
+                            $anterior = "Responsable Analisis: \'$val[responsable_analisis]\'";
+
+                        }
+                        //SI EL USUARIO CONECTADO ES EL MISMO RESPONSABLE DE ANALISIS PUEDE EDITAR LOS PARAMETROS, PROCESO, ANALISIS DE CAUSAS
+                        if (
+                                ((strlen($atr[responsable_analisis])== 0) && ($_SESSION[CookCodEmp] == $val[responsable_analisis]) && (strlen($val[responsable_analisis])>0))
+                                || (($_SESSION[CookCodEmp] == $atr[responsable_analisis]) && strlen($atr[responsable_analisis])>0))
+                        {
+                            $atr[id_proceso] = (strlen($atr[id_proceso]) == 0) ? 'NULL' : $atr[id_proceso];
+                            $sql_set .= ",analisis_causal = '$atr[analisis_causal]'"                                
+                                      . ",id_proceso = $atr[id_proceso]";
+                            $nuevo = "Analisis Causal: \'$atr[analisis_causal]\',  Id Proceso: \'$atr[id_proceso]\'";
+                            $anterior = "Analisis Causal: \'$val[analisis_causal]\',Id Proceso: \'$val[id_proceso]\'";
+
+                            $actualizar_parametros = 1;
+                            $actualizar_acciones = 1;
+                        }
+                        if (($atr['notificar'] == 'si')) 
+                        {
+                            //SE VALIDA SI TIENE AL MENOS UNA ACCION DEFINIDA
+                            $bandera = 0;
+                            for($i=1;$i <= $atr[num_items_esp] * 1; $i++){                              
+                                if (isset($atr["tipo_$i"])){                                                                
+                                    $bandera = 1;
+                                    break;
+                                }
+                            }
+                            /*SI TIENE UNA ACCION DEFINIDA EL ESTATUS ES IMPLEMENTACION DE ACCIONES*/
+                            if ($bandera == 1) $atr[estatus] = "'implementacion_acciones'";
+                            else $atr[estatus] = 'NULL';
+                            $sql_set .= ",estatus = $atr[estatus]";
+                        }
+                        break;
+                    case 'sin_plan_accion':
+                        $sql_set = "id_usuario =  $atr[id_usuario]";
+                        //SI EL USUARIO CONECTADO ES EL MISMO RESPONSABLE DEL DESVIO PUEDE EDITAR EL RESPONSABLE DE ANALISIS
+                        if (
+                                ((strlen($atr[responsable_desvio])== 0) && ($_SESSION[CookCodEmp] == $val[responsable_desvio]) && (strlen($val[responsable_desvio])>0))
+                                || (($_SESSION[CookCodEmp] == $atr[responsable_desvio]) && strlen($atr[responsable_desvio])>0))
+                        {
+                            $sql_set .= ",responsable_analisis = $atr[responsable_analisis]";
+                            $nuevo = "Responsable Analisis: \'$atr[responsable_analisis]\'";
+                            $anterior = "Responsable Analisis: \'$val[responsable_analisis]\'";
+                        }
+                        //SI EL USUARIO CONECTADO ES EL MISMO RESPONSABLE DE ANALISIS PUEDE EDITAR LOS PARAMETROS, PROCESO, ANALISIS DE CAUSAS
+                        if (
+                                ((strlen($atr[responsable_analisis])== 0) && ($_SESSION[CookCodEmp] == $val[responsable_analisis]) && (strlen($val[responsable_analisis])>0))
+                                || (($_SESSION[CookCodEmp] == $atr[responsable_analisis]) && strlen($atr[responsable_analisis])>0))
+                        {
+                            $atr[id_proceso] = (strlen($atr[id_proceso]) == 0) ? 'NULL' : $atr[id_proceso];
+                            $sql_set .= ",analisis_causal = '$atr[analisis_causal]'"                                
+                                      . ",id_proceso = $atr[id_proceso]";
+                            $nuevo = "Analisis Causal: \'$atr[analisis_causal]\',  Id Proceso: \'$atr[id_proceso]\'";
+                            $anterior = "Analisis Causal: \'$val[analisis_causal]\',Id Proceso: \'$val[id_proceso]\'";
+
+                            $actualizar_parametros = 1;
+                            $actualizar_acciones = 1;
+                        }
+                        if (($atr['notificar'] == 'si')) 
+                        {
+                            //SE VALIDA SI TIENE AL MENOS UNA ACCION DEFINIDA
+                            $bandera = 0;
+                            for($i=1;$i <= $atr[num_items_esp] * 1; $i++){                              
+                                if (isset($atr["tipo_$i"])){                                                                
+                                    $bandera = 1;
+                                    break;
+                                }
+                            }
+                            /*SI TIENE UNA ACCION DEFINIDA EL ESTATUS ES IMPLEMENTACION DE ACCIONES*/
+                            if ($bandera == 1) $atr[estatus] = "'implementacion_acciones'";
+                            else return  '- Debe ingresar al menos una acción.';
+                            $sql_set .= ",estatus = $atr[estatus]";
+                        }
+                        break;
+                    case 'implementacion_acciones':
+                        $sql_set = "id_usuario =  $atr[id_usuario]";
+                        //SI EL USUARIO CONECTADO ES EL MISMO RESPONSABLE DEL DESVIO PUEDE EDITAR EL RESPONSABLE DE ANALISIS
+                        if (
+                                ((strlen($atr[responsable_desvio])== 0) && ($_SESSION[CookCodEmp] == $val[responsable_desvio]) && (strlen($val[responsable_desvio])>0))
+                                || (($_SESSION[CookCodEmp] == $atr[responsable_desvio]) && strlen($atr[responsable_desvio])>0))
+                        {
+                            $sql_set .= ",responsable_analisis = $atr[responsable_analisis]";
+                            $nuevo = "Responsable Analisis: \'$atr[responsable_analisis]\'";
+                            $anterior = "Responsable Analisis: \'$val[responsable_analisis]\'";
+                        }
+                        //SI EL USUARIO CONECTADO ES EL MISMO RESPONSABLE DE ANALISIS PUEDE EDITAR LOS PARAMETROS, PROCESO, ANALISIS DE CAUSAS
+                        if (
+                                ((strlen($atr[responsable_analisis])== 0) && ($_SESSION[CookCodEmp] == $val[responsable_analisis]) && (strlen($val[responsable_analisis])>0))
+                                || (($_SESSION[CookCodEmp] == $atr[responsable_analisis]) && strlen($atr[responsable_analisis])>0))
+                        {
+                            $atr[id_proceso] = (strlen($atr[id_proceso]) == 0) ? 'NULL' : $atr[id_proceso];
+                            $sql_set .= ",analisis_causal = '$atr[analisis_causal]'"                                
+                                      . ",id_proceso = $atr[id_proceso]";
+                            $nuevo = "Analisis Causal: \'$atr[analisis_causal]\',  Id Proceso: \'$atr[id_proceso]\'";
+                            $anterior = "Analisis Causal: \'$val[analisis_causal]\',Id Proceso: \'$val[id_proceso]\'";
+
+                            $actualizar_parametros = 1;
+                            $actualizar_acciones = 1;
+                        }
+                        if (($atr['notificar'] == 'si')) 
+                        {
+                            //SE VALIDA SI TIENE AL MENOS UNA ACCION DEFINIDA
+                            $bandera = 0;
+                            for($i=1;$i <= $atr[num_items_esp] * 1; $i++){                              
+                                if (isset($atr["tipo_$i"])){                                                                
+                                    $bandera = 1;
+                                    break;
+                                }
+                            }
+                            /*SI TIENE UNA ACCION DEFINIDA EL ESTATUS ES IMPLEMENTACION DE ACCIONES*/
+                            if ($bandera == 1) $atr[estatus] = "'implementacion_acciones'";
+                            else return  '- Debe ingresar al menos una acción.';
+                            //$sql_set .= ",estatus = $atr[estatus]";
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                    
+                    $sql = "UPDATE mos_acciones_correctivas SET                            
+                                    $sql_set
+                            WHERE  id = $atr[id]"; 
+                    //echo $sql;
+                    if ($actualizar_parametros == 1){
+                        /*PARAMETROS DINAMICOS*/
+                        if(!class_exists('Parametros')){
+                            import("clases.parametros.Parametros");
+                        }
+                        $campos_dinamicos = new Parametros();
+                        $campos_dinamicos->guardar_parametros_dinamicos($atr, 8);
+                    }
+                    if ($actualizar_evidencias == 1){
+                        /* EVIDENCIAS ADJUNTADAS*/
+                        if(!class_exists('ArchivosAdjuntos')){
+                            import("clases.utilidades.ArchivosAdjuntos");
+                        }
+                        $adjuntos = new ArchivosAdjuntos();
+                        $atr[tabla] = 'mos_acciones_evidencia';
+                        $atr[clave_foranea] = 'fk_id_accion_c';
+                        $atr[valor_clave_foranea] = $atr[id];
+                        $adjuntos->guardar($atr);
+                        /*FIN EVIDENNCIAS*/
+                    }
+                    
+                    if ($actualizar_acciones == 1){    
+                        $params = array();
+                        $params[id_ac] = $respuesta;
+                        //IMPORTAMOS CLASE de ACCIONES
+                        import('clases.acciones_ac.AccionesAC');
+                        $acciones_ac = new AccionesAC();
+                        if (strlen($atr[id_unico_del])>0){
+                            $atr[id_unico_del] = substr($atr[id_unico_del], 0, strlen($atr[id_unico_del]) - 1);
+                            $sql = "DELETE FROM mos_acciones_ac_co WHERE id IN ($atr[id_unico_del]) and id_ac = $atr[id]"
+                                . " AND NOT id IN (SELECT id_accion FROM mos_acciones_trazabilidad id_accion IN ($atr[id_unico_del])) ";                               
+                            $this->dbl->insert_update($sql);
+                        }
+                        for($i=1;$i <= $atr[num_items_esp] * 1; $i++){                              
+                            //GUARDAMOS LAS ACCIONES VALIDAS
+                            if (!isset($atr["id_unico_din_$i"])){ 
+                                if (isset($atr["tipo_$i"])){
+                                    $params[tipo] = $atr["tipo_$i"];
+                                    $params[accion] = $atr["accion_$i"];                                        
+                                    $params[id_responsable] = $atr["responsable_acc_$i"];                                
+                                    $params[fecha_acordada] = formatear_fecha($atr["fecha_acordada_$i"]);
+                                    $params[orden] = $atr["orden_din_$i"];     
+                                    $params[id_ac] = $atr[id];
+                                    $acciones_ac->ingresarAccionesAC($params);                                                               
+                                }
+                            }else{
+                                if (isset($atr["tipo_$i"])){
+                                    $params[tipo] = $atr["tipo_$i"];
+                                    $params[accion] = $atr["accion_$i"];                                        
+                                    $params[id_responsable] = $atr["responsable_acc_$i"];                                
+                                    $params[fecha_acordada] = formatear_fecha($atr["fecha_acordada_$i"]);
+                                    $params[orden] = $atr["orden_din_$i"];    
+                                    $params[id] = $atr["id_unico_din_$i"]; 
+                                    $acciones_ac->modificarAccionesAC($params);
+                                }
+                            }
+                        }
+                    }
+                    
                     $this->dbl->insert_update($sql);
-                    $nuevo = "Origen Hallazgo: \'$atr[origen_hallazgo]\', Fecha Generacion: \'$atr[fecha_generacion]\', Descripcion: \'$atr[descripcion]\', Analisis Causal: \'$atr[analisis_causal]\', Responsable Analisis: \'$atr[responsable_analisis]\', Id Organizacion: \'$atr[id_organizacion]\', Id Proceso: \'$atr[id_proceso]\', Fecha Acordada: $atr[fecha_acordada], Fecha Realizada: $atr[fecha_realizada], Id Responsable Segui: \'$atr[id_responsable_segui]\', ";
-                    $anterior = "Origen Hallazgo: \'$val[origen_hallazgo]\', Fecha Generacion: \'$val[fecha_generacion]\', Descripcion: \'$val[descripcion]\', Analisis Causal: \'$val[analisis_causal]\', Responsable Analisis: \'$val[responsable_analisis]\', Id Organizacion: \'$val[id_organizacion]\', Id Proceso: \'$val[id_proceso]\', Fecha Acordada: \'$val[fecha_acordada]\', Fecha Realizada: \'$val[fecha_realizada]\', Id Responsable Segui: \'$val[id_responsable_segui]\', ";
-                    $this->registraTransaccionLog(19,$nuevo,$anterior, '');
+                    $nuevo = "Origen Hallazgo: \'$atr[origen_hallazgo]\', Fecha Generacion: \'$atr[fecha_generacion]\', Descripcion: \'$atr[descripcion]\', Analisis Causal: \'$atr[analisis_causal]\', Responsable Analisis: \'$atr[responsable_analisis]\', Id Organizacion: \'$atr[id_organizacion]\', Id Proceso: \'$atr[id_proceso]\'Id Responsable Segui: \'$atr[id_responsable_segui]\', ";
+                    $anterior = "Origen Hallazgo: \'$val[origen_hallazgo]\', Fecha Generacion: \'$val[fecha_generacion]\', Descripcion: \'$val[descripcion]\', Analisis Causal: \'$val[analisis_causal]\', Responsable Analisis: \'$val[responsable_analisis]\', Id Organizacion: \'$val[id_organizacion]\', Id Proceso: \'$val[id_proceso]\', Id Responsable Segui: \'$val[id_responsable_segui]\', ";
+                    $this->registraTransaccionLog(19,$nuevo,$anterior, $atr[id]);
                     /*
                     $this->registraTransaccion('Modificar','Modifico el AccionesCorrectivas ' . $atr[descripcion_ano], 'mos_acciones_correctivas');
                     */
@@ -273,17 +570,32 @@
 
                         $k++;
                     }
+                    
+                    /*PARAMETROS DINAMICOS*/
+                    if(!class_exists('Parametros')){
+                        import("clases.parametros.Parametros");
+                    } 
+                    if (count($this->parametros) <= 0){
+                        $this->cargar_parametros($this->cod_categoria);
+                    }                                       
+
+                    $k = 1;
+                    $campos_dinamicos = new Parametros();
+                    $valores = $campos_dinamicos->ArmaSqlParamsDinamicos($this->cod_categoria,$k,$this->parametros,'ac.id');
+                    $sql_left = $valores[sql_left];
+                    $sql_col_left = $valores[sql_col_left];
+                    $k = $valores[k];
                     $id_org ='';
                     if ((strlen($atr["b-id_organizacion"])>0) && ($atr["b-id_organizacion"] != "2")){                             
                         $id_org = $this->BuscaOrgNivelHijos($atr["b-id_organizacion"]);                        
                     }
-                    $sql = "SELECT COUNT(*) total_registros
-                         FROM mos_acciones_correctivas 
-                         WHERE 1 = 1 ";
+                    
+                    /*FILTRO SQL*/
+                    $sql_where = '';
                     if (strlen($atr[valor])>0)
-                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
+                        $sql_where .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
                     if (strlen($atr["b-origen_hallazgo"])>0)
-                        $sql .= " AND upper(origen_hallazgo) like '%" . strtoupper($atr["b-origen_hallazgo"]) . "%'";
+                        $sql_where .= " AND upper(origen_hallazgo) like '%" . strtoupper($atr["b-origen_hallazgo"]) . "%'";
                     /*PARAMETROS DEL REPORTE DE AC*/
                     $sql_where_pac = '';
                     if (isset($atr["b-filtro-fecha"])){
@@ -314,74 +626,117 @@
                     if (strlen($atr['b-fecha_generacion-desde'])>0)                        
                     {
                         $atr['b-fecha_generacion-desde'] = formatear_fecha($atr['b-fecha_generacion-desde']);                        
-                        $sql .= " AND (fecha_generacion >= '" . ($atr['b-fecha_generacion-desde']) . "' $sql_where_pac)";    
+                        $sql_where .= " AND (fecha_generacion >= '" . ($atr['b-fecha_generacion-desde']) . "' $sql_where_pac)";    
                         
                     }
                     if (strlen($atr['b-fecha_generacion-hasta'])>0)                        
                     {
                         $atr['b-fecha_generacion-hasta'] = formatear_fecha($atr['b-fecha_generacion-hasta']);                        
-                        $sql .= " AND fecha_generacion <= '" . ($atr['b-fecha_generacion-hasta']) . "'";                        
+                        $sql_where .= " AND fecha_generacion <= '" . ($atr['b-fecha_generacion-hasta']) . "'";                        
                     }
                     if (strlen($atr["b-descripcion"])>0)
-                        $sql .= " AND upper(descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
+                        $sql_where .= " AND upper(descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
                     if (strlen($atr["b-analisis_causal"])>0)
-                        $sql .= " AND upper(analisis_causal) like '%" . strtoupper($atr["b-analisis_causal"]) . "%'";
+                        $sql_where .= " AND upper(analisis_causal) like '%" . strtoupper($atr["b-analisis_causal"]) . "%'";
                     if (strlen($atr["b-responsable_analisis"])>0)
-                        $sql .= " AND responsable_analisis = '". $atr["b-responsable_analisis"] . "'";
+                        $sql_where .= " AND responsable_analisis = '". $atr["b-responsable_analisis"] . "'";
                     if ((strlen($atr["b-id_organizacion"])>0) && ($atr["b-id_organizacion"] != "2"))
-                        $sql .= " AND ac.id_organizacion IN (". $id_org . ")";
+                        $sql_where .= " AND ac.id_organizacion IN (". $id_org . ")";
                     if (strlen($atr["b-id_proceso"])>0)
-                        $sql .= " AND id_proceso = '". $atr["b-id_proceso"] . "'";
+                        $sql_where .= " AND id_proceso = '". $atr["b-id_proceso"] . "'";
                     if (strlen($atr["b-alto_potencial"])>0)
-                        $sql .= " AND alto_potencial = '". $atr["b-alto_potencial"] . "'";
+                        $sql_where .= " AND alto_potencial = '". $atr["b-alto_potencial"] . "'";
                     if (strlen($atr['b-fecha_acordada-desde'])>0)                        
                     {
                         $atr['b-fecha_acordada-desde'] = formatear_fecha($atr['b-fecha_acordada-desde']);                        
-                        $sql .= " AND fecha_acordada >= '" . ($atr['b-fecha_acordada-desde']) . "'";                        
+                        $sql_where .= " AND fecha_acordada >= '" . ($atr['b-fecha_acordada-desde']) . "'";                        
                     }
                     if (strlen($atr['b-fecha_acordada-hasta'])>0)                        
                     {
                         $atr['b-fecha_acordada-hasta'] = formatear_fecha($atr['b-fecha_acordada-hasta']);                        
-                        $sql .= " AND fecha_acordada <= '" . ($atr['b-fecha_acordada-hasta']) . "'";                        
+                        $sql_where .= " AND fecha_acordada <= '" . ($atr['b-fecha_acordada-hasta']) . "'";                        
                     }
                     if (strlen($atr['b-fecha_realizada-desde'])>0)                        
                     {
                         $atr['b-fecha_realizada-desde'] = formatear_fecha($atr['b-fecha_realizada-desde']);                        
-                        $sql .= " AND fecha_realizada >= '" . ($atr['b-fecha_realizada-desde']) . "'";                        
+                        $sql_where .= " AND fecha_realizada >= '" . ($atr['b-fecha_realizada-desde']) . "'";                        
                     }
                     if (strlen($atr['b-fecha_realizada-hasta'])>0)                        
                     {
                         $atr['b-fecha_realizada-hasta'] = formatear_fecha($atr['b-fecha_realizada-hasta']);                        
-                        $sql .= " AND fecha_realizada <= '" . ($atr['b-fecha_realizada-hasta']) . "'";                        
+                        $sql_where .= " AND fecha_realizada <= '" . ($atr['b-fecha_realizada-hasta']) . "'";                        
                     }
                     if (strlen($atr["b-id_responsable_segui"])>0)
-                        $sql .= " AND id_responsable_segui = '". $atr["b-id_responsable_segui"] . "'";
+                        $sql_where .= " AND id_responsable_segui = '". $atr["b-id_responsable_segui"] . "'";
+                    /*FIN FILTRO SQL*/
+                    
+                    $sql = "SELECT COUNT(*) total_registros
+                         FROM mos_acciones_correctivas 
+                         WHERE 1 = 1 $sql_where ";
+                    
 
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
             
                     $sql = "SELECT ac.id
                                     ,estado
+                                    ,(SELECT mos_nombres_campos.texto FROM mos_nombres_campos
+                                    WHERE mos_nombres_campos.nombre_campo = ac.estatus AND mos_nombres_campos.modulo = 15) as estatus_a
                                     ,ac.id as id_2
                                     ,alto_potencial
                                     ,oac.descripcion origen_hallazgo
                                     ,DATE_FORMAT(fecha_generacion, '%d/%m/%Y') fecha_generacion_a
                                     ,ac.descripcion
+                                    ,ac.reportado_por
+				    ,CONCAT(initcap(SUBSTR(rp.nombres,1,IF(LOCATE(' ' ,rp.nombres,1)=0,LENGTH(rp.nombres),LOCATE(' ' ,rp.nombres,1)-1))),' ',initcap(rp.apellido_paterno))  reportado_por_aux
+                                    ,ac.responsable_desvio
+                                    ,CONCAT(initcap(SUBSTR(rd.nombres,1,IF(LOCATE(' ' ,rd.nombres,1)=0,LENGTH(rd.nombres),LOCATE(' ' ,rd.nombres,1)-1))),' ',initcap(rd.apellido_paterno))  responsable_desvio_aux
+                                    ,ac.responsable_analisis
+				    ,CONCAT(initcap(SUBSTR(per.nombres,1,IF(LOCATE(' ' ,per.nombres,1)=0,LENGTH(per.nombres),LOCATE(' ' ,per.nombres,1)-1))),' ',initcap(per.apellido_paterno))  responsable_analisis_aux
                                     ,analisis_causal
-                                    ,concat(initcap(per.nombres), ' ', initcap(per.apellido_paterno), ' ' , initcap(per.apellido_materno)) as responsable_analisis
+                                    
                                     $sql_col_left
                                     ,ac.id_organizacion
                                     ,ac.id_proceso
-                                    -- ,DATE_FORMAT(fecha_acordada, '%d/%m/%Y') fecha_acordada
-                                    -- ,DATE_FORMAT(fecha_realizada, '%d/%m/%Y') fecha_realizada
-                                    -- ,id_responsable_segui
-
-                                     
+                                    ,DATE_FORMAT(fecha_acordada, '%d/%m/%Y') fecha_acordada_a
+                                    ,DATE_FORMAT(fecha_realizada, '%d/%m/%Y') fecha_realizada_a
+                                    ,id_responsable_segui
+                                    ,CONCAT(initcap(SUBSTR(rs.nombres,1,IF(LOCATE(' ' ,rs.nombres,1)=0,LENGTH(rs.nombres),LOCATE(' ' ,rs.nombres,1)-1))),' ',initcap(rs.apellido_paterno))  id_responsable_segui_aux
+                                    ,CASE WHEN NOT ac.fecha_acordada IS NULL THEN 
+                                            CASE WHEN NOT ac.fecha_realizada IS NULL THEN
+                                                CASE WHEN ac.fecha_realizada <= ac.fecha_acordada 
+                                                    THEN 'Realizado'
+                                                    ElSE 'Realizado con atraso'
+                                                END
+                                                WHEN CURRENT_DATE() > ac.fecha_acordada THEN 
+                                                    'Plazo vencido'
+                                                    ELSE 'En el plazo'
+                                                END 
+                                            ELSE ''
+                                        END sema_evi
+                                        ,CASE WHEN NOT ac.fecha_acordada IS NULL THEN 
+                                            CASE WHEN NOT ac.fecha_realizada IS NULL THEN
+                                                CASE WHEN ac.fecha_realizada <= ac.fecha_acordada
+                                                    THEN 0
+                                                    ElSE DATEDIFF(ac.fecha_realizada,ac.fecha_acordada )
+                                                END
+                                                WHEN CURRENT_DATE() > ac.fecha_acordada THEN 
+                                                    DATEDIFF(CURRENT_DATE(),ac.fecha_acordada)
+                                                ELSE DATEDIFF(ac.fecha_acordada,CURRENT_DATE())
+                                            END 
+                                            ELSE NULL 
+                                        END dias_evi 
+                                        ,estatus
                             FROM mos_acciones_correctivas ac
                             INNER JOIN mos_origen_ac oac ON oac.id = ac.origen_hallazgo 
+                            
+                            LEFT JOIN mos_personal rp ON rp.cod_emp = ac.reportado_por
+			    LEFT JOIN mos_personal rd ON rd.cod_emp = ac.responsable_desvio
                             LEFT JOIN mos_personal per ON per.cod_emp = ac.responsable_analisis
+                            LEFT JOIN mos_personal rs ON rs.cod_emp = ac.id_responsable_segui
                             $sql_left
-                            WHERE 1 = 1 ";
+                            WHERE 1 = 1 $sql_where ";
+                    /*
                     if (strlen($atr[valor])>0)
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
                                 if (strlen($atr["b-origen_hallazgo"])>0)
@@ -431,7 +786,7 @@
                     }
              if (strlen($atr["b-id_responsable_segui"])>0)
                         $sql .= " AND id_responsable_segui = '". $atr["b-id_responsable_segui"] . "'";
-
+                        */
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                    //echo $sql;
@@ -481,19 +836,27 @@
             return $OrgNom;
         }
              
-     private function semaforo_estado($tupla, $key){
+     public function semaforo_estado($tupla, $key){
                 //,cantidad_evidencia    
+         /*,IFNULL(sum(case when estado=1 then 1 else 0 end),0) as atrasada
+                                        ,IFNULL(sum(case when estado=2 then 1 else 0 end),0) as en_plazo
+                                        ,IFNULL(sum(case when estado=3 then 1 else 0 end),0) as realizada_atraso
+                                        ,IFNULL(sum(case when estado=4 then 1 else 0 end),0) as realizada*/
             switch ($tupla[$key]) {
                     case 'Realizado':
+                    case 4:
                         $html = '<img src="diseno/images/realizo.png" title="Realizado"/>';
                         break;
                     case 'Realizado con atraso':
+                    case 3:
                         $html = '<img src="diseno/images/SemPlazoAtrasado.png" title="Realizado con atraso"/>';
                         break;
                     case 'Plazo vencido':
+                    case 1:
                         $html = '<img src="diseno/images/atrasado.png" title="Plazo vencido"/>';
                         break;
                     case 'En el plazo':
+                    case 2:
                         $html = '<img src="diseno/images/SemPlazo.png" title="En el plazo"/>';
                         break;
                     default:
@@ -502,14 +865,17 @@
                 }
             if (strpos($tupla[$key],"vencido") === false){
                 if (strpos($tupla[$key],"atraso") === false){
-                    $html .= '<font color="#006600">'." ".str_pad(abs($tupla["dias"]) ,4,0,STR_PAD_LEFT).'</font>';                       
+                    //$html .= '<font color="#006600">'." ".str_pad(abs($tupla["dias"]) ,4,0,STR_PAD_LEFT).'</font>';  
+                    $html .= '<font color="#006600">'." ".($tupla["estatus_a"]).'</font>';
                 }
                 else{
-                    $html .=  '<font color="#FF0000">'." ".str_pad(abs($tupla["dias"]) ,4,0,STR_PAD_LEFT).'</font>';
+                    //$html .=  '<font color="#FF0000">'." ".str_pad(abs($tupla["dias"]) ,4,0,STR_PAD_LEFT).'</font>';
+                    $html .=  '<font color="#FF0000">'." ".($tupla["estatus_a"]).'</font>';
                 }
             }
             else{
-                $html .=  '<font color="#FF0000">'." ".str_pad(abs($tupla["dias"]) ,4,0,STR_PAD_LEFT).'</font>';
+                //$html .=  '<font color="#FF0000">'." ".str_pad(abs($tupla["dias"]) ,4,0,STR_PAD_LEFT).'</font>';
+                $html .=  '<font color="#FF0000">'." ".($tupla["estatus_a"]).'</font>';
             }
             return $html;
         }
@@ -553,7 +919,7 @@
             return $html;
         }
         
-        private function semaforo_estado_ver($tupla, $key){
+        public function semaforo_estado_ver($tupla, $key){
                 //,cantidad_evidencia               
                 switch ($tupla[$key]) {
                     case 'Realizado':
@@ -654,7 +1020,7 @@
             return $html;
         }
         
-        private function formatear_descripcion($tupla,$key){
+        public function formatear_descripcion($tupla,$key){
             if (strlen($tupla[descripcion])>200)
                 return substr($tupla[descripcion], 0, 200) . '.. <br/>
                     <a href="#" tok="' .$tupla[id]. '-des" class="ver-mas">
@@ -664,7 +1030,7 @@
             return $tupla[descripcion];
         }
         
-        private function formatear_analisis_causal($tupla,$key){
+        public function formatear_analisis_causal($tupla,$key){
             if (strlen($tupla[analisis_causal])>200)
                 return substr($tupla[analisis_causal], 0, 200) . '.. <br/>
                     <a href="#" tok="' .$tupla[id]. '-ac" class="ver-mas">
@@ -672,6 +1038,9 @@
                         <input type="hidden" id="ver-mas-' .$tupla[id]. '-ac" value="'.$tupla[analisis_causal].'"/>
                     </a>';
             return $tupla[analisis_causal];
+
+            
+            
         }
         
         private function formatear_accion($tupla,$key){
@@ -694,6 +1063,7 @@
                 if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
                 $this->listarAccionesCorrectivas($parametros, $parametros['pag'], $reg_por_pagina);
                 $data=$this->dbl->data;
+                //print_r($data);
                 
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
@@ -701,20 +1071,31 @@
 
                 $grid->SetConfiguracionMSKS("tblAccionesCorrectivas", "");
                 $config_col=array(
-                    array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id], "id", $parametros)),  
+                    array( "width"=>"5%","ValorEtiqueta"=>"<div style='width:100px'>&nbsp;</div>"),  
+                    
                     array( "width"=>"5%","ValorEtiqueta"=>"Estado"), 
+                    array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[estatus], "estatus", $parametros)),  
                     array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id], "id_2", $parametros)),     
                     array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[alto_potencial], "alto_potencial", $parametros)),     
                     array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[origen_hallazgo], "origen_hallazgo", $parametros)),
                     array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_generacion], "fecha_generacion", $parametros)),
                     array( "width"=>"25%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[descripcion], "descripcion", $parametros,250)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[reportado_por], "reportado_por", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[reportado_por], "reportado_por", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[responsable_desvio], "responsable_desvio", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[responsable_desvio], "responsable_desvio", $parametros)),
+                    
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[responsable_analisis], "responsable_analisis", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[responsable_analisis], "responsable_analisis", $parametros)),
                     array( "width"=>"25%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[analisis_causal], "analisis_causal", $parametros,250)),
-                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[responsable_analisis], "responsable_analisis", $parametros)));;
+                    
+                    
+                    );;
                     
               if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 }
-              $k = 9;
+              $k = 1;
                 foreach ($this->parametros as $value) {                    
                     array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>link_titulos(($value[espanol]), "p$k", $parametros)));
                     $k++;
@@ -722,12 +1103,13 @@
                 
                 
                
-               array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_organizacion], "id_organizacion", $parametros)));
+               array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_organizacion], "id_organizacion", $parametros,250)));
                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_proceso], "id_proceso", $parametros)));
                
-               if (count($this->nombres_columnas_ac) <= 0){
+               /*if (count($this->nombres_columnas_ac) <= 0){
                         $this->cargar_nombres_columnas_acciones();
                 }
+                 ANTERIOR COMENTADO 
                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>"Id Accion"));
                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas_ac[trazabilidad], ENT_QUOTES, "UTF-8")));
                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas_ac[tipo], ENT_QUOTES, "UTF-8")));
@@ -737,40 +1119,46 @@
                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas_ac[id_responsable], ENT_QUOTES, "UTF-8")));
                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas_ac[estado_seguimiento], ENT_QUOTES, "UTF-8")));
                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>"Dias"));
+               /*FIN */
                 
-               array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>($this->nombres_columnas[trazabilidad])));
+               //array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>($this->nombres_columnas[trazabilidad])));
                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_acordada], "fecha_acordada", $parametros)));
                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_realizada], "fecha_realizada", $parametros)));
                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_responsable_segui], "id_responsable_segui", $parametros)));
+               array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_responsable_segui], "id_responsable_segui", $parametros)));
                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[estado_seguimiento], ENT_QUOTES, "UTF-8")));
                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>"Dias"));
-               array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>"Dias"));
+               array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>"Estatus"));
+               
+               //array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>"Dias"));
                 
                 
 
                 $func= array();
 
-                $columna_funcion = 0;
+                $columna_funcion = -1;
                 /*if (strrpos($parametros['permiso'], '1') > 0){
                     
                     $columna_funcion = 12;
                 }
                 if ($parametros['permiso'][1] == "1")
                     array_push($func,array('nombre'=> 'verAccionesCorrectivas','imagen'=> "<img style='cursor:pointer' src='diseno/images/find.png' title='Ver AccionesCorrectivas'>"));
-                */
+                
                 
                     if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                         array_push($func,array('nombre'=> 'editarAccionesCorrectivas','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_modificar.png' title='Editar AccionesCorrectivas'>"));
                     if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
                         array_push($func,array('nombre'=> 'eliminarAccionesCorrectivas','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_eliminar.png' title='Eliminar AccionesCorrectivas'>"));
-                
+                */
                 /*VALIDAMOS QUE NO SEA REPORTE SALIDA DE ACCION CORRECTIVA*/
                 if (!isset($parametros['reporte_ac'])){
                     $config=array(array("width"=>"5%", "ValorEtiqueta"=>"<div style='width:80px'>&nbsp;</div>"));
                 }
                 ELSE
                     $config=array(array("width"=>"5%", "ValorEtiqueta"=>"<div style='width:60px'>&nbsp;</div>"));
+                $config=array();
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
+                //echo $parametros['mostrar-col'];
                 $array_columns =  explode('-', $parametros['mostrar-col']);
                 for($i=0;$i<count($config_col);$i++){
                     switch ($i) {                                             
@@ -792,15 +1180,33 @@
                             break;
                     }
                 }
-                $this->hidden = $grid->hidden;                
-                //$grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
+                //print_r($array_columns);
+                //print_r($grid->hidden);
+                //$this->hidden = $grid->hidden;   
+                $grid->setParent($this);
+                $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
+                $grid->setFuncion("id", "colum_admin_arbol");
+                $grid->setFuncion("descripcion", "formatear_descripcion");
+                $grid->setFuncion("analisis_causal", "formatear_analisis_causal");
+                $grid->setFuncion("estado", "semaforo_estado");
+                $grid->setFuncion("id_organizacion", "BuscaOrganizacional");
+                $grid->setFuncion("sema_evi", "semaforo_estado_ver");
+                //$this->funciones["sema_evi"] = "semaforo_estado_ver";
+                //$this->funciones["descripcion"] = "formatear_descripcion";
+                //$this->funciones["analisis_causal"] = "formatear_analisis_causal";
                 //$grid->setFuncion("en_proceso_inscripcion", "enProcesoInscripcion");
                 //$grid->setAligns(1,"center");
                 //$grid->hidden = array(0 => true);
     
-                //$grid->setDataMSKS("td-table-data", $data, $func,$columna_funcion, $parametros['pag'] );
-                //$out['tabla']= $grid->armarTabla();
+                $grid->setDataMSKS("td-table-data", $data, $func,$columna_funcion, $parametros['pag'] );
+                $out['tabla']= $grid->armarTabla();
+                //if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina))
+                {
+                    $out['paginado']=$grid->setPaginadohtmlMSKS("verPagina", "document");
+                }
+                return $out;
                 
+                /* INICIO DE COMO ESTABA ANTERIORMENTE */
                 $titulosColumna="<thead><tr height=\"30px\">";
                 foreach($config as $detalle){
                     $titulosColumna.="<th ";
@@ -1115,8 +1521,8 @@
                                                                             END
                                                                         WHEN CURRENT_DATE() > STR_TO_DATE(p_1$k.descripcion, '%d/%m/%Y') THEN 
                                                                             '<img src=\"diseno/images/atrasado.png\" title=\"Plazo vencido\"/>'
-                                                                        ELSE '<img src=\"diseno/images/SemPlazo.png\" title=\"En el plazo\"/>'*/
-                                
+                                                                        ELSE '<img src=\"diseno/images/SemPlazo.png\" title=\"En el plazo\"/>'
+                                */
                                 
                                 
                             }                            
@@ -1135,8 +1541,8 @@
                     $datos.=" </td></tr>\n";
                 }
                 
-                $grid->setPagina($parametros['pag']);
-                $out['tabla'] = '<table id="tblAccionesCorrectivas" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">' . $titulosColumna . $datos.'</table>';
+                //$grid->setPagina($parametros['pag']);
+                //$out['tabla'] = '<table id="tblAccionesCorrectivas" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">' . $titulosColumna . $datos.'</table>';
                 //if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina))
                 {
                     $out['paginado']=$grid->setPaginadohtmlMSKS("verPagina", "document");
@@ -1634,14 +2040,27 @@
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
+                /*PERMISOS*/
+                import('clases.utilidades.NivelAcceso');
+                $this->restricciones = new NivelAcceso();
+                $this->restricciones->cargar_acceso_nodos_explicito($parametros);
+                $this->restricciones->cargar_permisos($parametros);
+                /*ARBOL ORGANIZACIONAL*/
+                import('clases.organizacion.ArbolOrganizacional');
+                $this->arbol = new ArbolOrganizacional();
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $this->arbol->jstree_ao(0,$parametros);
+                /*FIN ARBOL ORGANIZACIONAL*/
+                
                 if ($parametros['corder'] == null) $parametros['corder']="id_2";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="1-2-3-4-5-6-7-8"; 
+                    $parametros['mostrar-col']="0-1-3-4-5-6-7-14"; 
                 if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 }
-                $k = 9;
+                $k = 15;
                 $contenido[PARAMETROS_OTROS] = "";
                 foreach ($this->parametros as $value) {                    
                     $parametros['mostrar-col'] .= "-$k"; //checked="checked"
@@ -1707,9 +2126,12 @@
                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[estado_seguimiento], ENT_QUOTES, "UTF-8")));
 
                  */
+                /*
                 if (count($this->nombres_columnas_ac) <= 0){
                         $this->cargar_nombres_columnas_acciones();
                 }
+                 
+                 
                 $k++;                
                 $parametros['mostrar-col'] .= "-". ($k); //Columna Trazabilidad checked="checked"
                 $contenido[PARAMETROS_OTROS_AE_AO] .= '
@@ -1764,6 +2186,8 @@
                                       ' . $this->nombres_columnas_ac[id_responsable] . '</label>
                                   </div>
                             ';
+                 * 
+                 
                 $k++;
                 $parametros['mostrar-col'] .= "-". ($k); //Columna Semaforo checked="checked"
                 $contenido[PARAMETROS_OTROS_AE_AO] .= '
@@ -1782,7 +2206,7 @@
                                       ' . $this->nombres_columnas[trazabilidad] . '</label>
                                   </div>
                             ';
-                $k++;                
+                $k++;         */       
                 $parametros['mostrar-col'] .= "-". ($k); //Columna Fecha Acordada EVI checked="checked"
                 $contenido[PARAMETROS_OTROS_AE_AO] .= '
                                   <div class="checkbox">      
@@ -1800,7 +2224,7 @@
                                       ' . $this->nombres_columnas[fecha_realizada] . '</label>
                                   </div>
                             ';
-                $k++;
+                $k++;$k++;
                 $parametros['mostrar-col'] .= "-". ($k); //Columna Responsable EVI checked="checked"
                 $contenido[PARAMETROS_OTROS_AE_AO] .= '
                                   <div class="checkbox">      
@@ -1833,6 +2257,8 @@
                                                                     , 'descripcion', $value[valor]);
                 
                 $grid = $this->verListaAccionesCorrectivas($parametros);
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];     
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
@@ -1845,11 +2271,7 @@
                 $contenido['PAGINADO'] = $grid['paginado'];
                 $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
 
-                import('clases.organizacion.ArbolOrganizacional');
-
-
-                $ao = new ArbolOrganizacional();
-                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao();
+                
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'acciones_correctivas/';
                 
@@ -1900,12 +2322,12 @@
                                                                                 placeholder: "Selecione el revisor",
                                                                                 allowClear: true
                                                                               }); 
-                                            $("#b-fecha_generacion-desde").datepicker();
-                                            $("#b-fecha_acordada-desde").datepicker();;
-                                            $("#b-fecha_realizada-desde").datepicker();
-                                            $("#b-fecha_generacion-hasta").datepicker();
-                                            $("#b-fecha_acordada-hasta").datepicker();
-                                            $("#b-fecha_realizada-hasta").datepicker();
+                                            $("#b-fecha_generacion-desde").datetimepicker();
+                                            $("#b-fecha_acordada-desde").datetimepicker();;
+                                            $("#b-fecha_realizada-desde").datetimepicker();
+                                            $("#b-fecha_generacion-hasta").datetimepicker();
+                                            $("#b-fecha_acordada-hasta").datetimepicker();
+                                            $("#b-fecha_realizada-hasta").datetimepicker();
 
                                             PanelOperator.initPanels("");
                                             ScrollBar.initScroll();
@@ -1923,7 +2345,8 @@
                                     $('.ver-reporte').on('click', function (event) {
                                         event.preventDefault();
                                         var id = $(this).attr('tok');
-                                        window.open('pages/acciones_correctivas/reporte_ac_pdf.php?id='+id,'_blank');
+                                        verAccionesCorrectivas(id);
+                                        /*window.open('pages/acciones_correctivas/reporte_ac_pdf.php?id='+id,'_blank');*/
                                     });");
                 
                 return $objResponse;
@@ -4003,12 +4426,7 @@
                 $objResponse->addScript('setTimeout(function(){ PanelOperator.resize() }, 550);');
                 
                 /*JS init_filtrar*/
-                $objResponse->addScript('$("#b-f-desde").datepicker({
-                        changeMonth: true,                        
-                        minDate: -365,
-                        maxDate:-1,
-                        changeYear: true
-                      });
+                $objResponse->addScript('$("#b-f-desde").datetimepicker();
                     $("input[name=b-filtro-fecha]:radio").change(function () {
                         if ($("#b-filtro-fecha").val()=="1") {
                             $("#b-f-desde").removeAttr("disabled");
@@ -4031,12 +4449,12 @@
                                                         placeholder: "Selecione el revisor",
                                                         allowClear: true
                                                       }); 
-                    $("#b-fecha_generacion-desde").datepicker();
-                    $("#b-fecha_acordada-desde").datepicker();;
-                    $("#b-fecha_realizada-desde").datepicker();
-                    $("#b-fecha_generacion-hasta").datepicker();
-                    $("#b-fecha_acordada-hasta").datepicker();
-                    $("#b-fecha_realizada-hasta").datepicker();
+                    $("#b-fecha_generacion-desde").datetimepicker();
+                    $("#b-fecha_acordada-desde").datetimepicker();;
+                    $("#b-fecha_realizada-desde").datetimepicker();
+                    $("#b-fecha_generacion-hasta").datetimepicker();
+                    $("#b-fecha_acordada-hasta").datetimepicker();
+                    $("#b-fecha_realizada-hasta").datetimepicker();
 
                     $("#tabs-hv").tab();
                     $("#tabs-hv a:first").tab("show"); 
@@ -4088,7 +4506,28 @@
                 }
                 foreach ( $this->nombres_columnas as $key => $value) {
                     $contenido_1["N_" . strtoupper($key)] =  $value;
-                }                
+                }   
+                
+                /*NOMBRE CAMPOS ACCIONES*/
+                if (count($this->nombres_columnas_ac) <= 0){
+                        $this->cargar_nombres_columnas_acciones();
+                }
+                $contenido_1["N_ACCION"] = $this->nombres_columnas_ac[accion];
+                $contenido_1["N_FECHA_ACORDADA"] = $this->nombres_columnas_ac[fecha_acordada];
+                $contenido_1["N_TIPO"] = $this->nombres_columnas_ac[tipo];
+                $contenido_1["N_ID_RESPONSABLE"] = $this->nombres_columnas_ac[id_responsable];
+                $contenido_1[TIPOS] .= $ut_tool->OptionsCombo("SELECT id, 
+                                                                        descripcion
+                                                                            FROM mos_tipo_ac ORDER BY descripcion"
+                                                                    , 'id'
+                                                                    , 'descripcion', null);
+                $contenido_1[RESPONSABLE_ACCIONES] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
+                                                                        CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  nombres_a
+                                                                            FROM mos_personal p WHERE interno = 1 AND workflow = 'S' ORDER BY nombres, apellido_paterno"
+                                                                    , 'cod_emp'
+                                                                    , 'nombres_a', null);
+                $contenido_1[NUM_ITEMS_ESP] = 0;
+                
                 if (count($this->placeholder) <= 0){
                         $this->cargar_placeholder();
                 }
@@ -4100,18 +4539,18 @@
                                                                             FROM mos_personal p WHERE interno = 1 AND workflow = 'S'
                                                                             ORDER BY apellido_paterno, apellido_materno, nombres"
                                                                     , 'cod_emp'
-                                                                    , 'nombres', $value[valor]);
+                                                                    , 'nombres', null);
                 $contenido_1[ORIGENES] .= $ut_tool->OptionsCombo("SELECT id, 
                                                                         descripcion
                                                                             FROM mos_origen_ac ORDER BY descripcion"
                                                                     , 'id'
-                                                                    , 'descripcion', $value[valor]);
+                                                                    , 'descripcion', null);
                 $contenido_1[RESPONSABLE_ANALISIS] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno))  nombres
                                                                             FROM mos_personal p WHERE interno = 1 AND workflow = 'S'
                                                                             ORDER BY apellido_paterno, apellido_materno, nombres"
                                                                     , 'cod_emp'
-                                                                    , 'nombres', $value[valor]);
+                                                                    , 'nombres', null);
                 if($_SESSION[SuperUser]=='S'){
                     $sql = "SELECT cod_emp, 
                             CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno))  nombres
@@ -4166,6 +4605,7 @@
                 $campos_dinamicos = new Parametros();
                 $array = $campos_dinamicos->crear_campos_dinamicos(8);
                 $contenido_1[CAMPOS_DINAMICOS] = $array[html];
+                $contenido_1[NOMBRE_CAMPOS_DIN] = $array[nombre_campos];
                 $js = $array[js];
                 
                 /* EVIDENCIAS ADJUNTADAS*/
@@ -4193,7 +4633,9 @@
                 $contenido['TITULO_FORMULARIO'] = "Crear&nbsp;";
                 $contenido['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;AccionesCorrectivas";
                 $contenido['PAGINA_VOLVER'] = "listarAccionesCorrectivas.php";
-                $contenido['DESC_OPERACION'] = "Guardar";
+                $contenido['DESC_OPERACION'] = "Solo Guardar";
+                $contenido[JS_PREVIO_GUARDAR] = "$('#notificar').val('');";
+                $contenido['OTRO_BOTON_PRINCIPAL'] = '<button type="button" class="btn btn-primary" onClick="$(\'#notificar\').val(\'si\');validar(document);" id="btn-guardar-not">Guardar y Enviar</button>';
                 $contenido['OPC'] = "new";
                 $contenido['ID'] = "-1";
 
@@ -4208,9 +4650,9 @@
                             lang: 'es'  
                           });");
                 $objResponse->addScript($array[js]);
-                $objResponse->addScript("$('#fecha_generacion').datepicker();");
-                $objResponse->addScript("$('#fecha_acordada').datepicker();");
-                $objResponse->addScript("$('#fecha_realizada').datepicker();");
+                $objResponse->addScript("$('#fecha_generacion').datetimepicker();");
+                $objResponse->addScript("$('#fecha_acordada').datetimepicker();");
+                $objResponse->addScript("$('#fecha_realizada').datetimepicker();");
                 $objResponse->addScript($js);
                 return $objResponse;
             }
@@ -4243,6 +4685,21 @@
                     $parametros[id_proceso] = $parametros['b-id_proceso_aux'];
                     $parametros[id_organizacion] = $parametros['b-id_organizacion_aux'];
                     if (!isset($parametros[alto_potencial])) $parametros[alto_potencial] = 'N';
+                    /*SE VERIFICA SI ESTA EN ELABORACION*/
+                    if (!($parametros['notificar'] == 'si')) 
+                        $parametros[estatus] = 'en_elaboracion';
+                    else{
+                        //SE VALIDA SI TIENE AL MENOS UNA ACCION DEFINIDA
+                        $bandera = 0;
+                        for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
+                            if (isset($parametros["tipo_$i"])){                                                                
+                                $bandera = 1;
+                                break;
+                            }
+                        }
+                        /*SI TIENE UNA ACCION DEFINIDA EL ESTATUS ES IMPLEMENTACION DE ACCIONES*/
+                        if ($bandera == 1) $parametros[estatus] = 'implementacion_acciones';
+                    }
                     $respuesta = $this->ingresarAccionesCorrectivas($parametros);
 
                     //if (preg_match("/ha sido ingresado con exito/",$respuesta ) == true) {
@@ -4264,6 +4721,25 @@
                         $adjuntos->guardar($parametros);
                         /*FIN EVIDENNCIAS*/
                         
+                        $params = array();
+                        $params[id_ac] = $respuesta;
+                        //IMPORTAMOS CLASE de ACCIONES
+                        import('clases.acciones_ac.AccionesAC');
+                        $acciones_ac = new AccionesAC();
+                        
+                        for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
+                            //GUARDAMOS LAS ACCIONES VALIDAS
+                            if (isset($parametros["tipo_$i"])){                                                                
+                                $params[tipo] = $parametros["tipo_$i"];
+                                $params[accion] = $parametros["accion_$i"];                                        
+                                $params[id_responsable] = $parametros["responsable_acc_$i"];                                
+                                $params[fecha_acordada] = formatear_fecha($parametros["fecha_acordada_$i"]);
+                                $params[orden] = $parametros["orden_din_$i"];                                  
+                                $acciones_ac->ingresarAccionesAC($params);                                                               
+                            }
+                        }
+                        
+                        
                         $objResponse->addScriptCall("MostrarContenido");
                         $objResponse->addScriptCall('VerMensaje','exito',"La Acción Correctiva '$parametros[descripcion]' ha sido ingresado con exito");
                     }
@@ -4276,34 +4752,7 @@
                                         $( '#btn-guardar' ).prop( 'disabled', false );");
                 return $objResponse;
             }
-     
-        public function BuscaOrganizacional($tupla)
-        {
-            //$encryt = new EnDecryptText();
-            //$dbl = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
-            $OrgNom = "";            
-                if (strlen($tupla[id_organizacion]) > 0) {                                           
-                        $Consulta3="select id as id_organizacion,parent_id as organizacion_padre, title as identificacion from mos_organizacion where id in ($tupla[id_organizacion])";
-                        $Resp3 = $this->dbl->query($Consulta3,array());
-
-                        foreach ($Resp3 as $Fila3) 
-                        {
-                                if($Fila3[organizacion_padre]==1)
-                                {
-                                        $OrgNom.=($Fila3[identificacion]);
-                                        return($OrgNom);                                        
-                                }
-                                else
-                                {
-                                        $OrgNom .= $this->BuscaOrganizacional(array('id_organizacion' => $Fila3[organizacion_padre])) . ' -> ' . ($Fila3[identificacion]);
-                                }
-                        }
-                }
-                else
-                    $OrgNom .= '-------';//$_SESSION[CookNomEmpresa];
-                return $OrgNom;
-
-        }
+             
         
         public function BuscaProceso($tupla)
         {
@@ -4353,6 +4802,7 @@
                 foreach ( $this->placeholder as $key => $value) {
                     $contenido_1["P_" . strtoupper($key)] =  $value;
                 }    
+                $contenido_1['ESTATUS'] = ($val["estatus"]);
                 $contenido_1['ORIGEN_HALLAZGO'] = ($val["origen_hallazgo"]);
                 $contenido_1['FECHA_GENERACION'] = ($val["fecha_generacion"]);
                 $contenido_1['DESCRIPCION'] = ($val["descripcion"]);
@@ -4364,18 +4814,101 @@
                 $contenido_1['FECHA_REALIZADA'] = ($val["fecha_realizada"]);
                 $contenido_1['ID_RESPONSABLE_SEGUI'] = $val["id_responsable_segui"];
                 $contenido_1[CHECKED_ALTO_POTENCIAL] = $val["alto_potencial"] == 'S' ? 'checked="checked"' : '';
+                $js = '';
+                $bloqueo_evidencia = 0;
+                switch ($val[estatus]) {
+                    case 'en_elaboracion':
+                        //$js = 'formulario';
+
+                        break;
+                    case 'en_buzon':
+                        //$js = 'formulario';
+                        break;
+                    case 'sin_responsable_analisis':
+                        //$js = 'formulario';
+                        //echo $_SESSION[CookCodEmp] . '=' .$val[reportado_por];
+                        if (($_SESSION[CookCodEmp] != $val[reportado_por])){//&&($_SESSION[SuperUser]!='S')){
+                            $js .= "$('#origen_hallazgo').attr('disabled','true');";
+                            $js .= "$('#fecha_generacion').attr('readonly','true');";
+                            $js .= "$('#descripcion').attr('readonly','true');";
+                            $js .= "$('#responsable_desvio').attr('disabled','true');";
+                            $js .= "$('#reportado_por').attr('disabled','true');";
+                            $bloqueo_evidencia = 1;
+                        }
+                        break;
+                    case 'sin_plan_accion':
+                        if (($_SESSION[CookCodEmp] == $val[responsable_analisis])){
+                            //SI NO ES ES RESPONSABLE DEL DESVIO BLOQUEAMOS QUE NO PUEDA CAMBAIR EL RESPONSABLE DE ANALISIS
+                            if (($_SESSION[CookCodEmp] != $val[responsable_desvio])){
+                                $js .= "$('#responsable_analisis').attr('disabled','true');";
+                            }                                                       
+                        }else if (($_SESSION[CookCodEmp] != $val[responsable_desvio])){
+                            $js .= "$('#responsable_analisis').attr('disabled','true');";
+                        }
+                        if (($_SESSION[CookCodEmp] != $val[reportado_por])){//&&($_SESSION[SuperUser]!='S')){
+                                $js .= "$('#origen_hallazgo').attr('disabled','true');";
+                                $js .= "$('#fecha_generacion').attr('readonly','true');";
+                                $js .= "$('#descripcion').attr('readonly','true');";
+                                $js .= "$('#responsable_desvio').attr('disabled','true');";
+                                $js .= "$('#reportado_por').attr('disabled','true');";
+                                $bloqueo_evidencia = 1;
+                        }
+                        break;
+                    case 'implementacion_acciones':
+//                        if (($_SESSION[CookCodEmp] == $val[responsable_analisis])){
+//                            //SI NO ES ES RESPONSABLE DEL DESVIO BLOQUEAMOS QUE NO PUEDA CAMBAIR EL RESPONSABLE DE ANALISIS
+//                            if (($_SESSION[CookCodEmp] != $val[responsable_desvio])){
+//                                $js .= "$('#responsable_analisis').attr('disabled','true');";
+//                            }                                                       
+//                        }else 
+                        if (($_SESSION[CookCodEmp] != $val[responsable_desvio])){
+                            $js .= "$('#responsable_analisis').attr('disabled','true');";
+                        }
+                        //if (($_SESSION[CookCodEmp] != $val[responsable_analisis]))
+                        {//&&($_SESSION[SuperUser]!='S')){
+                                $js .= "$('#origen_hallazgo').attr('disabled','true');";
+                                $js .= "$('#fecha_generacion').attr('readonly','true');";
+                                $js .= "$('#descripcion').attr('readonly','true');";
+                                $js .= "$('#responsable_desvio').attr('disabled','true');";
+                                $js .= "$('#reportado_por').attr('disabled','true');";
+                                $bloqueo_evidencia = 1;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                
+                
+                if($_SESSION[SuperUser]=='S'){
+                    $sql = "SELECT cod_emp, 
+                            CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno))  nombres
+                                FROM mos_personal p WHERE interno = 1 AND workflow = 'S' and vigencia = 'S'
+                                ORDER BY nombres";
+                }
+                else
+                {
+                    $sql = "SELECT cod_emp, 
+                            CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno))  nombres
+                                FROM mos_personal p WHERE interno = 1 AND workflow = 'S' AND p.cod_emp = $val[reportado_por]  and vigencia = 'S'
+                                ORDER BY nombres";
+                }
+                $contenido_1[USER_TOK] = $_SESSION[CookCodEmp];
+                //echo $sql;
+                $contenido_1[REPORTADO_POR] .= $ut_tool->OptionsCombo($sql
+                                                                    , 'cod_emp'
+                                                                    , 'nombres', $val["reportado_por"]);
                 
                 $contenido_1[RESPONSABLE_SEGUI] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE interno = 1"
+                                                                            FROM mos_personal p WHERE interno = 1  AND workflow = 'S'  and vigencia = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val["id_responsable_segui"]);
                 $contenido_1[RESPONSABLE_DESVIO] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(initcap(p.apellido_paterno), ' ',initcap(p.apellido_materno), ' ', initcap(p.nombres))  nombres
-                                                                            FROM mos_personal p WHERE interno = 1 AND workflow = 'S'
+                                                                            FROM mos_personal p WHERE interno = 1 AND workflow = 'S'  and vigencia = 'S'
                                                                             ORDER BY apellido_paterno, apellido_materno, nombres"
                                                                     , 'cod_emp'
-                                                                    , 'nombres', $value[responsable_desvio]);
+                                                                    , 'nombres', $val[responsable_desvio]);
                 $contenido_1[ORIGENES] .= $ut_tool->OptionsCombo("SELECT id, 
                                                                         descripcion
                                                                             FROM mos_origen_ac ORDER BY descripcion"
@@ -4383,23 +4916,34 @@
                                                                     , 'descripcion', $val["origen_hallazgo"]);
                 $contenido_1[RESPONSABLE_ANALISIS] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
-                                                                            FROM mos_personal p WHERE interno = 1"
+                                                                            FROM mos_personal p WHERE interno = 1  AND workflow = 'S'  and vigencia = 'S'"
                                                                     , 'cod_emp'
                                                                     , 'nombres', $val["responsable_analisis"]);
                 
                 if (count($this->campos_activos) <= 0){
                         $this->cargar_campos_activos();
                 } 
+                //IMPORTAMOS LA CLASE DEL ARBOL ORGANIZACIONAL
+                import("clases.organizacion.ArbolOrganizacional");
+                $arbol = new ArbolOrganizacional();
                 foreach ($this->campos_activos as $key => $value) {
                     if ($value[0] == '1'){                        
                         if ($key == 'id_organizacion'){
                             $contenido_1[ID_ORGANIZACIONES] = '<div class="form-group">
                                         <label for="idRegistro" class="col-md-4 control-label">' . $this->nombres_columnas[id_organizacion] . '</label>';
-                            $contenido_1[ID_ORGANIZACIONES] .= '<div class="col-md-10" style="">  
-                                        <a href="#" data-toggle="modal" style="" data-target="#myModal-Filtrar-Arbol">[Seleccionar]</a> 
-                                        <span id="desc-arbol">' . $this->BuscaOrganizacional($val) . '</span>                                        
+                            if ($bloqueo_evidencia == 1){
+                            $contenido_1[ID_ORGANIZACIONES] .= '<div class="col-md-10" style="">                                          
+                                        <span id="desc-arbol">' . $arbol->BuscaOrganizacional($val) . '</span>                                        
                                         <input type="hidden" value="'.$val["id_organizacion"].'"  id="nivel" name="nivel" data-validation="required"/>                                    
                                     </div>';
+                            }
+                            else{
+                                $contenido_1[ID_ORGANIZACIONES] .= '<div class="col-md-10" style="">  
+                                        <a href="#" data-toggle="modal" style="" data-target="#myModal-Filtrar-Arbol">[Seleccionar]</a> 
+                                        <span id="desc-arbol">' . $arbol->BuscaOrganizacional($val) . '</span>                                        
+                                        <input type="hidden" value="'.$val["id_organizacion"].'"  id="nivel" name="nivel" data-validation="required"/>                                    
+                                    </div>';
+                            }
                             $contenido_1[ID_ORGANIZACIONES] .= '</div>';
                         }
                     
@@ -4424,18 +4968,132 @@
                 $campos_dinamicos = new Parametros();
                 $array = $campos_dinamicos->crear_campos_dinamicos(8,$val["id"]);
                 $contenido_1[CAMPOS_DINAMICOS] = $array[html];
-                $js = $array[js];
+                $contenido_1[NOMBRE_CAMPOS_DIN] = $array[nombre_campos];
+                $js .= $array[js];
                 
                 /* EVIDENCIAS ADJUNTADAS*/
                 if(!class_exists('ArchivosAdjuntos')){
                     import("clases.utilidades.ArchivosAdjuntos");
                 }
-                $adjuntos = new ArchivosAdjuntos();                
-                $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_acciones_evidencia', 'fk_id_accion_c',$val["id"]);
+                $adjuntos = new ArchivosAdjuntos();       
+                if ($bloqueo_evidencia == 1){
+                    $array_nuevo = $adjuntos->visualizar_archivos_adjuntos('mos_acciones_evidencia', 'fk_id_accion_c',$val["id"]);
+                }
+                else{
+                    $array_nuevo = $adjuntos->crear_archivos_adjuntos('mos_acciones_evidencia', 'fk_id_accion_c',$val["id"]);
+                }
                 $contenido_1[ARCHIVOS_ADJUNTOS] = $array_nuevo[html];
                 $js .= $array_nuevo[js];
                 
                 /*FIN EVIDENNCIAS*/
+                
+                
+                /* Acciones */ 
+                /*NOMBRE CAMPOS ACCIONES*/
+                if (count($this->nombres_columnas_ac) <= 0){
+                        $this->cargar_nombres_columnas_acciones();
+                }
+                $contenido_1["N_ACCION"] = $this->nombres_columnas_ac[accion];
+                $contenido_1["N_FECHA_ACORDADA"] = $this->nombres_columnas_ac[fecha_acordada];
+                $contenido_1["N_TIPO"] = $this->nombres_columnas_ac[tipo];
+                $contenido_1["N_ID_RESPONSABLE"] = $this->nombres_columnas_ac[id_responsable];
+                $contenido_1[TIPOS] .= $ut_tool->OptionsCombo("SELECT id, 
+                                                                        descripcion
+                                                                            FROM mos_tipo_ac ORDER BY descripcion"
+                                                                    , 'id'
+                                                                    , 'descripcion', null);
+                $contenido_1[RESPONSABLE_ACCIONES] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
+                                                                        CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  nombres_a
+                                                                            FROM mos_personal p WHERE interno = 1 AND workflow = 'S' ORDER BY nombres, apellido_paterno"
+                                                                    , 'cod_emp'
+                                                                    , 'nombres_a', null);
+                import('clases.acciones_ac.AccionesAC');
+                $ac = new AccionesAC();
+                $parametros['b-id_ac'] = $val[id];
+                $parametros[corder] = 'orden';
+                //$parametros[corder] = 'orden';
+                $ac->listarAccionesACSinPaginacion($parametros);
+                $data=$ac->dbl->data;
+                //print_r($data);
+                $item = "";
+                //$js = "";
+                $i = 0;
+                $contenido_1['TOK_NEW'] = time();                                
+                //$ids = array('7','8','9','1','2','3','5','6','10');
+                //$desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo');
+                foreach ($data as $value) {                          
+                    $i++;                    
+                    $item = $item. '<tr id="tr-esp-' . $i . '">';                      
+                    
+
+                    {
+                        
+                                                                    
+                        $item = $item. '<td align="center">'.
+                                            ' <a href="' . $i . '"  title="Eliminar " id="eliminar_esp_' . $i . '"> ' . 
+                                            //' <imgsrc="diseno/images/ico_eliminar.png" style="cursor:pointer">' . 
+                                             '<i class="icon icon-remove" style="width: 18px;"></i>'.
+                                             '</a>' .
+                                             '<i class="subir glyphicon glyphicon-arrow-up cursor-pointer"></i>
+                                              <i class="bajar glyphicon glyphicon-arrow-down cursor-pointer"></i>'.
+                                              
+                                              '<input id="id_unico_din_'. $i . '" name="id_unico_din_'. $i . '" value="'.$value[id].'" type="hidden" >'.                                              
+                                              '<input id="orden_din_'. $i . '" name="orden_din_'. $i . '" value="'.($value[orden] == '' ? $i : $value[orden]).'" type="hidden" >'.
+                                       '  </td>';
+                         $item = $item. '<td class="td-table-data">'.
+                                             '  <select id="tipo_' .$i. '" name="tipo_'.$i. '" class="form-control">' .
+                                                    $ut_tool->OptionsCombo("SELECT id, 
+                                                                        descripcion
+                                                                            FROM mos_tipo_ac ORDER BY descripcion"
+                                                                    , 'id'
+                                                                    , 'descripcion', $value[tipo]).
+
+                                                '</select>' .
+                                        '</td>';
+//                         $item = $item. '<td>' .
+//                                            $ut_tool->combo_array("tipo_din_$i", $desc, $ids, false, $value["tipo"],"actualizar_atributo_dinamico($i);")  .
+//                                         '</td>';
+                         $item = $item.  '<td>' .
+                                            ' <textarea id="accion_'. $i . '" name="accion_'. $i . '" class="form-control" data-validation="required">'. $value[accion] .'</textarea>'.
+                                         '</td>';
+                         $item = $item . '<td class="td-table-data">'.
+                                            '  <select id="responsable_acc_'. $i .  '" name="responsable_acc_'. $i .  '" class="form-control" data-validation="required" data-live-search="true">'.
+                                            '<option value="">-- Seleccione --</option>' . 
+                                                //$('#option_responsables').val() .
+                                                $ut_tool->OptionsCombo("SELECT cod_emp, 
+                                                                        CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  nombres_a
+                                                                            FROM mos_personal p WHERE interno = 1 AND workflow = 'S' ORDER BY nombres, apellido_paterno"
+                                                                    , 'cod_emp'
+                                                                    , 'nombres_a', $value[id_responsable]) . 
+                                            '</select>' .
+                                       '</td>';
+                         $item = $item . '<td class="td-table-data">'.
+                                            '<input id="fecha_acordada_'. $i .  '" class="form-control" type="text" data-validation="required" value="'.$value[fecha_acordada_a].'" name="fecha_acordada_'. $i .  '" >'.
+                                       '</td>';
+                        
+                        
+                        $item = $item. '</tr>' ;                    
+                        $js .= '$("#eliminar_esp_'. $i .'").click(function(e){ 
+                                    e.preventDefault();
+                                    var id = $(this).attr("href");  
+                                    $("#id_unico_del").val($("#id_unico_del").val() + $("#id_unico_din_"+id).val() + ",");
+                                    $("tr-esp-'. $i .'").remove();
+                                    var parent = $(this).parents().parents().get(0);
+                                        $(parent).remove();
+                            });';
+                        $js .= "$('#fecha_acordada_$i').datetimepicker();
+                                $('#responsable_acc_$i').selectpicker({
+                                                                    style: 'btn-combo'
+                                });";
+                        
+                        
+                        
+                    }
+                }               
+                //echo $item;
+                $contenido_1['ITEMS_ESP'] = $item;
+                $contenido_1['NUM_ITEMS_ESP'] = $i;
+                
                 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'acciones_correctivas/';
@@ -4451,6 +5109,10 @@
                 $contenido['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;AccionesCorrectivas";
                 $contenido['PAGINA_VOLVER'] = "listarAccionesCorrectivas.php";
                 $contenido['DESC_OPERACION'] = "Guardar";
+                $contenido['DESC_OPERACION'] = "Solo Guardar";
+                $contenido[JS_PREVIO_GUARDAR] = "$('#notificar').val('');";
+                $contenido['OTRO_BOTON_PRINCIPAL'] = '<button type="button" class="btn btn-primary" onClick="$(\'#notificar\').val(\'si\');validar(document);" id="btn-guardar-not">Guardar y Enviar</button>';
+
                 $contenido['OPC'] = "upd";
                 $contenido['ID'] = $val["id"];
 
@@ -4465,9 +5127,9 @@
                             lang: 'es'  
                           });");
                 $objResponse->addScript($js);
-                $objResponse->addScript("$('#fecha_generacion').datepicker();");
-                $objResponse->addScript("$('#fecha_acordada').datepicker();");
-                $objResponse->addScript("$('#fecha_realizada').datepicker();");
+                $objResponse->addScript("$('#fecha_generacion').datetimepicker();");
+                $objResponse->addScript("$('#fecha_acordada').datetimepicker();");
+                $objResponse->addScript("$('#fecha_realizada').datetimepicker();");
                 return $objResponse;
             }
      
@@ -4478,7 +5140,7 @@
                 session_start();
                 $objResponse = new xajaxResponse();
                 unset ($parametros['opc']);
-                $parametros['id_usuario']= $_SESSION['USERID'];
+                $parametros['id_usuario']= $_SESSION['CookIdUsuario'];
 
                 $validator = new FormValidator();
                 
@@ -4498,25 +5160,28 @@
                     $parametros[id_proceso] = $parametros['b-id_proceso_aux'];
                     $parametros[id_organizacion] = $parametros['b-id_organizacion_aux'];
                     if (!isset($parametros[alto_potencial])) $parametros[alto_potencial] = 'N';
-
+                    /*SE VERIFICA SI SE TIENE QUE NOTIFICAR*/
+                    if (!($parametros['notificar'] == 'si')) 
+                        $parametros[estatus] = 'en_elaboracion';
+                    else{
+                        //SE VALIDA SI TIENE AL MENOS UNA ACCION DEFINIDA
+                        $bandera = 0;
+                        for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
+                            if (isset($parametros["tipo_$i"])){                                                                
+                                $bandera = 1;
+                                break;
+                            }
+                        }
+                        /*SI TIENE UNA ACCION DEFINIDA EL ESTATUS ES IMPLEMENTACION DE ACCIONES*/
+                        if ($bandera == 1) $parametros[estatus] = 'implementacion_acciones';
+                    }
                     $respuesta = $this->modificarAccionesCorrectivas($parametros);
 
                     if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
-                        if(!class_exists('Parametros')){
-                            import("clases.parametros.Parametros");
-                        }
-                        $campos_dinamicos = new Parametros();
-                        $campos_dinamicos->guardar_parametros_dinamicos($parametros, 8);
-                        /* EVIDENCIAS ADJUNTADAS*/
-                        if(!class_exists('ArchivosAdjuntos')){
-                            import("clases.utilidades.ArchivosAdjuntos");
-                        }
-                        $adjuntos = new ArchivosAdjuntos();
-                        $parametros[tabla] = 'mos_acciones_evidencia';
-                        $parametros[clave_foranea] = 'fk_id_accion_c';
-                        $parametros[valor_clave_foranea] = $parametros[id];
-                        $adjuntos->guardar($parametros);
-                        /*FIN EVIDENNCIAS*/
+
+                        $parametros = $this->dbl->corregir_parametros($parametros);
+                        
+                        
                         $objResponse->addScriptCall("MostrarContenido");
                         $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
                     }
@@ -4550,6 +5215,14 @@
  
             public function buscar($parametros)
             {
+                /*PERMISOS*/
+                import('clases.utilidades.NivelAcceso');                
+                $this->restricciones = new NivelAcceso();
+                $this->restricciones->cargar_acceso_nodos_explicito($parametros);
+                $this->restricciones->cargar_permisos($parametros);
+                /*ARBOL*/
+                import('clases.organizacion.ArbolOrganizacional');
+                $this->arbol = new ArbolOrganizacional();
                 $grid = $this->verListaAccionesCorrectivas($parametros);                
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
@@ -4636,28 +5309,100 @@
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido_1["N_" . strtoupper($key)] =  $value;
+                }  
 
                 $val = $this->verAccionesCorrectivas($parametros[id]);
+                
 
-                $contenido_1['ORIGEN_HALLAZGO'] = ($val["origen_hallazgo"]);
+                $contenido_1['ORIGEN_HALLAZGO'] = ($val["origen"]);
                 $contenido_1['FECHA_GENERACION'] = ($val["fecha_generacion"]);
                 $contenido_1['DESCRIPCION'] = ($val["descripcion"]);
                 $contenido_1['ANALISIS_CAUSAL'] = ($val["analisis_causal"]);
-                $contenido_1['RESPONSABLE_ANALISIS'] = $val["responsable_analisis"];
-                $contenido_1['ID_ORGANIZACION'] = $val["id_organizacion"];
+                /*ARBOL ORgaNIZACIONAL*/
+                import('clases.organizacion.ArbolOrganizacional');
+                $arbol = new ArbolOrganizacional();                    
+                $contenido_1['ID_ORGANIZACION'] = $arbol->BuscaOrganizacional($val);
+                
+                $contenido_1['RESPONSABLE_ANALISIS'] = $val["responsable_ana"];
+                
                 $contenido_1['ID_PROCESO'] = $val["id_proceso"];
                 $contenido_1['FECHA_ACORDADA'] = ($val["fecha_acordada"]);
                 $contenido_1['FECHA_REALIZADA'] = ($val["fecha_realizada"]);
-                $contenido_1['ID_RESPONSABLE_SEGUI'] = $val["id_responsable_segui"];
-;
+                $contenido_1['ID_RESPONSABLE_SEGUI'] = $val["responsable_segui"];
+                $contenido_1['RESPONSABLE_DESVIO'] = $val["responsable_desvio_aux"];
+                $contenido_1['REPORTADO_POR'] = $val["reportado_por_aux"];
+                $contenido_1['ID'] = $val["id"];
+                $contenido_1[ALTO_POTENCIAL] = $val["alto_potencial"] == 'S' ? 'Si' : 'No';
+                
+                $contenido_1['ESTADO'] = $this->semaforo_estado($val, "estado") ;
+;   
+                /*PARAMETROS*/
+                
 
+                /*ACCIONES*/
+                if (count($this->nombres_columnas_ac) <= 0){
+                    $this->cargar_nombres_columnas_acciones();
+                }
+        
+                foreach ( $this->nombres_columnas_ac as $key => $value) {
+                    $contenido_1["NA_" . strtoupper($key)] =  $value;
+                }
+                import('clases.acciones_ac.AccionesAC');
+                $acciones_ac = new AccionesAC();
 
+                import('clases.acciones_evidencia.AccionesEvidencia');
+
+                $evidencia = new AccionesEvidencia();        
+
+                $acciones_ac->listarAccionesAC(array('b-id_ac'=>$val[id],'corder'=>'dias','sorder'=>'asc'), 1, 100);
+                $data=$acciones_ac->dbl->data;
+                $contenido_1[TABLA_ACCIONES] = '';
+                foreach ($data as $value) {
+                    $contenido_1[TABLA_ACCIONES] .= '<tr>';
+                    $contenido_1[TABLA_ACCIONES] .= '<td>'.$value[tipo].'&nbsp;</td>';
+                    $contenido_1[TABLA_ACCIONES] .= '<td>'.$value[accion].'&nbsp;</td>';
+                    $contenido_1[TABLA_ACCIONES] .= '<td>'.$value[fecha_acordada_a].'&nbsp;</td>';
+                    $contenido_1[TABLA_ACCIONES] .= '<td>'.$value[fecha_realizada_a].'&nbsp;</td>';
+                    $contenido_1[TABLA_ACCIONES] .= '<td>'.$value[id_responsable].'&nbsp;</td>';
+                    $contenido_1[TABLA_ACCIONES] .= '<td style="vertical-align: middle;" align="center">'.$acciones_ac->semaforo_estado($value, 'sema') .'&nbsp;</td>';
+                    $contenido_1[TABLA_ACCIONES] .= '</tr>';
+                    $contenido_1[TABLA_ACCIONES] .= '';
+                }
+                /*TRAZAVILIDAD DE ACCIONES*/
+                $contenido_1[TABLA_TRAZA] = '';
+                foreach ($data as $value) {
+                    $contenido_1[TABLA_TRAZA] .= '<tr>';
+                    $contenido_1[TABLA_TRAZA] .= '<td>'.$value[tipo].'&nbsp;</td>';
+                    $contenido_1[TABLA_TRAZA] .= '<td>'.$value[accion].'&nbsp;</td>';
+                    $evidencia->listarAccionesEvidencia(array('b-id_accion'=>$value[id],'corder'=>'fecha_evi', 'sorder'=>'desc'), 1, 1000);
+                    $data_evidencias = $evidencia->dbl->data;
+                    $html = "";
+                    foreach ($data_evidencias as $value_Evi) {
+                        $html .= "$value_Evi[observacion].<br/>"    ;
+                        $html .= $evidencia->archivo_descarga_pdf($value_Evi, 'nomb_archivo');
+                        $html .= "$value_Evi[id_persona], $value_Evi[fecha_evi_a]<br/><br/>"    ;
+                    }                                               
+                    $contenido_1[TABLA_TRAZA] .= '<td>'.$html.'&nbsp;</td>';
+                    $contenido_1[TABLA_TRAZA] .= '</tr>';
+                    $contenido_1[TABLA_TRAZA] .= '';
+                }
+                
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'acciones_correctivas/';
                 $template->setTemplate("verAccionesCorrectivas");
                 $template->setVars($contenido_1);
                 $contenido['DATOS'] = $template->show();
-                $contenido['TITULO'] = "Datos de la AccionesCorrectivas";
+                $contenido['TITULO'] = "Acción Correctiva - Reporte Individual";
+                /*OPCION GENERAR PDF*/
+                $contenido[OPCIONES] = " <li> <a id=\"a-imprimir-reporte\" title=\"Generar PDF\" tok=\"$val[id]\"  href=\"#\">
+                            
+                            <i class=\"icon icon-alert-print\"></i>
+                        </a>  </li>";
 
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
                 $template->setTemplate("ver");
@@ -4666,7 +5411,33 @@
                 $this->contenido['CONTENIDO']  = $template->show();
                 $this->asigna_contenido($this->contenido);
 
-                return $template->show();
+                $html =  $template->show();
+                
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('detail-content',"innerHTML",$html);                
+                $objResponse->addScript("$('.close-detail').click(function (event) {
+                        event.preventDefault();
+                        PanelOperator.hideDetail('');
+                    })
+
+                    $('.detail-show').click(function (event) {
+                        event.preventDefault();
+                        PanelOperator.showDetail('');
+                        PanelOperator.hideSearch('');
+                    });");
+                $objResponse->addScript("PanelOperator.showDetail('');");  
+                $objResponse->addScript("PanelOperator.resize();");
+                //$objResponse->addScript("init_ver_registros();");
+                $objResponse->addScript("
+
+                                    $('#a-imprimir-reporte').on('click', function (event) {
+                                        event.preventDefault();
+                                        var id = $(this).attr('tok');
+                                        
+                                        window.open('pages/acciones_correctivas/reporte_ac_pdf.php?id='+id,'_blank');
+                                    });");                
+                return $objResponse;
+                //return $template->show();
             }
      
  }?>

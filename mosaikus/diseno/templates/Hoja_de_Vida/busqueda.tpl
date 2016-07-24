@@ -13,10 +13,10 @@
 <div class="form-group">
                                   <label for="fecha" class="col-md-2 control-label">Fecha</label>
                                   <div class="col-md-2">
-                                    Desde: <input type="text" class="form-control" id="b-fecha-desde" name="b-fecha-desde" placeholder="Fecha"  />
+                                    Desde: <input type="text" class="form-control" id="b-fecha-desde" data-date-format="DD/MM/YYYY" name="b-fecha-desde" placeholder="dd/mm/yyyy"  />
                                   </div>   
                                   <div class="col-md-2">
-                                    Hasta: <input type="text" class="form-control" id="b-fecha-hasta" name="b-fecha-hasta" placeholder="Fecha"  />
+                                    Hasta: <input type="text" class="form-control" id="b-fecha-hasta" data-date-format="DD/MM/YYYY"  name="b-fecha-hasta" placeholder="dd/mm/yyyy"  />
                                 </div>                                
                             </div>
 <div class="form-group">

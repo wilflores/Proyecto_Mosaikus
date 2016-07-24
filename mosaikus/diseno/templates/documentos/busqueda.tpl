@@ -45,11 +45,11 @@
     <div class="row">
         <div class="col-xs-12">
             <label for="exampleInputPassword1">Desde</label>
-            <input type="text" class="form-control" id="b-fecha-desde" name="b-fecha-desde" placeholder="{N_FECHA}"  />
+            <input type="text" class="form-control" data-date-format="DD/MM/YYYY"  id="b-fecha-desde" name="b-fecha-desde" placeholder="{N_FECHA}"  />
         </div>   
         <div class="col-xs-12">
             <label for="exampleInputPassword1">Hasta</label> 
-            <input type="text" class="form-control" id="b-fecha-hasta" name="b-fecha-hasta" placeholder="{N_FECHA}"  />
+            <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha-hasta" name="b-fecha-hasta" placeholder="{N_FECHA}"  />
         </div>                                
     </div>
 </div>
@@ -58,11 +58,11 @@
     <div class="row">
         <div class="col-xs-12">
             <label for="exampleInputPassword1">Desde</label>
-            <input type="text" class="form-control" id="b-fecha_rev-desde" name="b-fecha_rev-desde" placeholder="{N_FECHA}"  />
+            <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_rev-desde" name="b-fecha_rev-desde" placeholder="{N_FECHA}"  />
         </div>   
         <div class="col-xs-12">
             <label for="exampleInputPassword1">Hasta</label>
-            <input type="text" class="form-control" id="b-fecha_rev-hasta" name="b-fecha_rev-hasta" placeholder="{N_FECHA}"  />
+            <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_rev-hasta" name="b-fecha_rev-hasta" placeholder="{N_FECHA}"  />
         </div>                                
     </div>
 </div>

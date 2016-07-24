@@ -49,7 +49,7 @@
                                   <div class="form-group" {DISPLAY_FECHA_GENERO}>
                                     <label for="fecha_nacimiento" {DISPLAY_FECHA_NACIMIENTO} class="col-md-4 control-label">{N_FECHA_NACIMIENTO}</label>
                                         <div class="col-md-6" {DISPLAY_FECHA_NACIMIENTO}>
-                                            <input style="width: 120px;" type="text" class="form-control" value="{FECHA_NACIMIENTO}" id="fecha_nacimiento" name="fecha_nacimiento" placeholder="{P_FECHA_NACIMIENTO}" {VALIDACION_FECHA_NACIMIENTO}/>
+                                            <input style="width: 120px;" type="text" data-date-format="DD/MM/YYYY"  class="form-control" value="{FECHA_NACIMIENTO}" id="fecha_nacimiento" name="fecha_nacimiento" placeholder="{P_FECHA_NACIMIENTO}" {VALIDACION_FECHA_NACIMIENTO}/>
                                       </div> 
                                             <label for="genero" class="col-md-2 control-label" {DISPLAY_FECHA_NACIMIENTO_ENTRE}>&nbsp;</label>
                                         <label for="genero" class="col-md-2 control-label" {DISPLAY_GENERO}>{N_GENERO}</label>
@@ -109,11 +109,11 @@
                                          <div class="form-group">
                                               <label for="fecha_ingreso" {DISPLAY_FECHA_INGRESO} class="col-md-4 control-label">{N_FECHA_INGRESO}</label>
                                                 <div class="col-md-10" {DISPLAY_FECHA_INGRESO}>
-                                                    <input type="text" class="form-control" value="{FECHA_INGRESO}" id="fecha_ingreso" name="fecha_ingreso" placeholder="{P_FECHA_INGRESO}" {VALIDACION_FECHA_NACIMIENTO}/>
+                                                    <input type="text" data-date-format="DD/MM/YYYY" class="form-control" value="{FECHA_INGRESO}" id="fecha_ingreso" name="fecha_ingreso" placeholder="{P_FECHA_INGRESO}" {VALIDACION_FECHA_NACIMIENTO}/>
                                               </div> 
                                               <label for="fecha_ingreso" {DISPLAY_FECHA_EGRESO} class="col-md-4 control-label">{N_FECHA_EGRESO}</label>
                                                 <div class="col-md-10" {DISPLAY_FECHA_EGRESO}>
-                                                    <input type="text" {DISPLAY_FECHA_EGRESO} class="form-control" value="{FECHA_EGRESO}" id="fecha_egreso" name="fecha_egreso" placeholder="{P_FECHA_EGRESO}"/>
+                                                    <input type="text" data-date-format="DD/MM/YYYY"  {DISPLAY_FECHA_EGRESO} class="form-control" value="{FECHA_EGRESO}" id="fecha_egreso" name="fecha_egreso" placeholder="{P_FECHA_EGRESO}"/>
                                               </div> 
                                          </div>
                                                 

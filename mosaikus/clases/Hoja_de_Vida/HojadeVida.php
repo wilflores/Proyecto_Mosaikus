@@ -652,7 +652,7 @@
                 $objResponse->addScript("$('#myModal-Ventana').modal('show');");
                 $objResponse->addScript("$('#myModal-Ventana-Titulo').html('Hoja de Vida');");
                 
-                $objResponse->addScript("$('#hv-fecha').datepicker();");
+                $objResponse->addScript("$('#hv-fecha').datetimepicker();");
                 $objResponse->addScript("$('#tabs-hv').tab();"
                         . "$('#tabs-hv a:first').tab('show');"
                         . "ScrollBar.initScroll();");
@@ -695,7 +695,7 @@
                 $objResponse->addScript("$('#MustraCargando').hide();"); 
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
-                          });");$objResponse->addScript("$('#fecha').datepicker();");
+                          });");$objResponse->addScript("$('#fecha').datetimepicker();");
    return $objResponse;
             }
      
@@ -819,7 +819,7 @@
                 //$objResponse->addScript("$('#tabs-hv a:first').tab('show');");
                 $objResponse->addScript("$('.nav-tabs a[href=\"#hv-red\"]').tab('show');");
                 $objResponse->addScript ("$('.nav-tabs a[href=\"#hv-red\"]').show();");
-                //$objResponse->addScript("$('#fecha').datepicker();");
+                //$objResponse->addScript("$('#fecha').datetimepicker();");
                 return $objResponse;
             }
      

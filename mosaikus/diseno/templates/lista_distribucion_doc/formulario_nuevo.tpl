@@ -13,7 +13,7 @@
                                       <div class="form-group">
                                         <label for="fecha_ejecutada" class="col-md-4 control-label">{N_FECHA_EJECUTADA}</label>
                                         <div class="col-md-10">
-                                          <input type="text" class="form-control" style="width: 120px;" value="{FECHA_EJECUTADA}" id="fecha_ejecutada" name="fecha_ejecutada" placeholder="dd/mm/yyyy"  data-validation="required"/>
+                                          <input type="text" class="form-control" style="width: 120px;" data-date-format="DD/MM/YYYY"  value="{FECHA_EJECUTADA}" id="fecha_ejecutada" name="fecha_ejecutada" placeholder="dd/mm/yyyy"  data-validation="required"/>
                                       </div>                                
                                   </div>
 <div class="form-group">

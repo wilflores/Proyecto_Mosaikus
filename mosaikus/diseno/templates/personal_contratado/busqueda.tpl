@@ -25,11 +25,11 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <label for="exampleInputPassword1">Desde</label>
-                                        <input type="text" class="form-control clsDatePicker" id="b-fecha_nacimiento-desde" name="b-fecha_nacimiento-desde" placeholder="dd/mm/yyyy"  />
+                                        <input type="text" class="form-control " data-date-format="DD/MM/YYYY" id="b-fecha_nacimiento-desde" name="b-fecha_nacimiento-desde" placeholder="dd/mm/yyyy"  />
                                     </div>   
                                     <div class="col-xs-12">
                                         <label for="exampleInputPassword1">Hasta</label> 
-                                        <input type="text" class="form-control clsDatePicker" id="b-fecha_nacimiento-hasta" name="b-fecha_nacimiento-hasta" placeholder="dd/mm/yyyy"  />
+                                        <input type="text" class="form-control " data-date-format="DD/MM/YYYY" id="b-fecha_nacimiento-hasta" name="b-fecha_nacimiento-hasta" placeholder="dd/mm/yyyy"  />
                                     </div>                                
                                 </div>
                             </div>

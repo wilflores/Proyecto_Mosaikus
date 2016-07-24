@@ -1035,16 +1035,8 @@
 //                        });
 //
 //                        \$confModal.modal({ backdrop : false });");
-                $objResponse->addScript("$('#b-fecha_nacimiento-desde').datepicker({
-                                            changeMonth: true,
-                                            yearRange: '-100:+0',
-                                            changeYear: true
-                                          });");
-                $objResponse->addScript("$('#b-fecha_nacimiento-hasta').datepicker({
-                                            changeMonth: true,
-                                            yearRange: '-100:+0',
-                                            changeYear: true
-                                          });");
+                $objResponse->addScript("$('#b-fecha_nacimiento-desde').datetimepicker();");
+                $objResponse->addScript("$('#b-fecha_nacimiento-hasta').datetimepicker();");
 //                $objResponse->addScript("$('#tabs').tab();"
 //                        . "$('#tabs a:first').tab('show');"
 //                        . "$('a[data-toggle=\"tab\"]').on('shown.bs.tab', function (e) {

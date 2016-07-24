@@ -19,11 +19,11 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <label for="exampleInputPassword1">Desde</label>
-                                        <input type="text" class="form-control" id="b-fecha-desde" name="b-fecha-desde" placeholder="dd/mm/yyyy"  />
+                                        <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha-desde" name="b-fecha-desde" placeholder="dd/mm/yyyy"  />
                                     </div>   
                                     <div class="col-xs-12">
                                         <label for="exampleInputPassword1">Hasta</label> 
-                                        <input type="text" class="form-control" id="b-fecha-hasta" name="b-fecha-hasta" placeholder="dd/mm/yyyy"  />
+                                        <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha-hasta" name="b-fecha-hasta" placeholder="dd/mm/yyyy"  />
                                     </div>                                
                                 </div>
                             </div>
@@ -33,11 +33,11 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <label for="exampleInputPassword1">Desde</label>
-                                        <input type="text" class="form-control" id="b-fecha_termino-desde" name="b-fecha_termino-desde"  placeholder="dd/mm/yyyy"  />
+                                        <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_termino-desde" name="b-fecha_termino-desde"  placeholder="dd/mm/yyyy"  />
                                     </div>   
                                     <div class="col-xs-12">
                                         <label for="exampleInputPassword1">Hasta</label> 
-                                        <input type="text" class="form-control" id="b-fecha_termino-hasta" name="b-fecha_termino-hasta" placeholder="dd/mm/yyyy"  />
+                                        <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_termino-hasta" name="b-fecha_termino-hasta" placeholder="dd/mm/yyyy"  />
                                     </div>                                
                                 </div>
                             </div>

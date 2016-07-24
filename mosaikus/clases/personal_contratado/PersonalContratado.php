@@ -731,16 +731,8 @@
 //                        });
 //
 //                        \$confModal.modal({ backdrop : false });");
-                $objResponse->addScript("$('#b-fecha_nacimiento-desde').datepicker({
-                                            changeMonth: true,
-                                            yearRange: '-100:+0',
-                                            changeYear: true
-                                          });");
-                $objResponse->addScript("$('#b-fecha_nacimiento-hasta').datepicker({
-                                            changeMonth: true,
-                                            yearRange: '-100:+0',
-                                            changeYear: true
-                                          });");
+                $objResponse->addScript("$('#b-fecha_nacimiento-desde').datetimepicker();");
+                $objResponse->addScript("$('#b-fecha_nacimiento-hasta').datetimepicker();");
                  $objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
 //                $objResponse->addScript('PanelOperator.initPanels("");ScrollBar.initScroll();');
                 return $objResponse;
@@ -863,21 +855,9 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");
-                $objResponse->addScript("$('#fecha_nacimiento').datepicker({
-                        changeMonth: true,
-                        yearRange: '-100:+0',
-                        changeYear: true
-                      });");
-                $objResponse->addScript("$('#fecha_ingreso').datepicker({
-                        changeMonth: true,
-                        yearRange: '-100:+0',
-                        changeYear: true
-                      });");
-                $objResponse->addScript("$('#fecha_egreso').datepicker({
-                        changeMonth: true,
-                        yearRange: '-100:+0',
-                        changeYear: true
-                      });");
+                $objResponse->addScript("$('#fecha_nacimiento').datetimepicker();");
+                $objResponse->addScript("$('#fecha_ingreso').datetimepicker();");
+                $objResponse->addScript("$('#fecha_egreso').datetimepicker();");
                 $objResponse->addScript($js);
                 return $objResponse;
             }
@@ -1120,21 +1100,9 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");
-                $objResponse->addScript("$('#fecha_nacimiento').datepicker({
-                    changeMonth: true,
-                    yearRange: '-100:+0',
-                    changeYear: true
-                  });");
-                $objResponse->addScript("$('#fecha_ingreso').datepicker({
-                        changeMonth: true,
-                        yearRange: '-100:+0',
-                        changeYear: true
-                      });");
-                $objResponse->addScript("$('#fecha_egreso').datepicker({
-                        changeMonth: true,
-                        yearRange: '-100:+0',
-                        changeYear: true
-                      });");
+                $objResponse->addScript("$('#fecha_nacimiento').datetimepicker();");
+                $objResponse->addScript("$('#fecha_ingreso').datetimepicker();");
+                $objResponse->addScript("$('#fecha_egreso').datetimepicker();");
                 $objResponse->addScript($js);
                 return $objResponse;
             }

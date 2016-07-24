@@ -118,7 +118,7 @@
                                 <div class="form-group">
                                         <label for="fecha" class="col-md-4 control-label">{N_FECHA}</label>
                                         <div class="col-md-10">
-                                            <input type="text" class="form-control" style="width: 120px;" value="{FECHA}" id="fecha" name="fecha" placeholder="{N_FECHA}" readonly="readonly" data-validation="required"/>
+                                            <input type="text" class="form-control" style="width: 120px;" data-date-format="DD/MM/YYYY"  value="{FECHA}" id="fecha" name="fecha" placeholder="{N_FECHA}" readonly="readonly" data-validation="required"/>
                                           <input type="hidden" class="form-control" value="{CODIGO_DOC}" id="Codigo_doc" name="Codigo_doc" placeholder="{N_CODIGO_DOC}" data-validation="required"/>
                                           <input type="hidden" class="form-control" value="{NOMBRE_DOC}" id="nombre_doc" name="nombre_doc" placeholder="{N_NOMBRE_DOC}" data-validation="required"/>
                                           <input type="hidden" class="form-control" value="{NOMBRE_DOC_VIS}" id="nombre_doc_vis" name="nombre_doc_vis" readonly="readonly"/>

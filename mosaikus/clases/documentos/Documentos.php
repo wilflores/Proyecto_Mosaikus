@@ -3517,10 +3517,10 @@ echo $Consulta3;
                                             placeholder: "Selecione el aprobador",
                                             allowClear: true
                                         }); 
-                                        $("#b-fecha-desde").datepicker();        
-                                        $("#b-fecha-hasta").datepicker();
-                                        $("#b-fecha_rev-desde").datepicker();
-                                        $("#b-fecha_rev-hasta").datepicker();
+                                        $("#b-fecha-desde").datetimepicker();        
+                                        $("#b-fecha-hasta").datetimepicker();
+                                        $("#b-fecha_rev-desde").datetimepicker();
+                                        $("#b-fecha_rev-hasta").datetimepicker();
                                         PanelOperator.initPanels("");
                                         ScrollBar.initScroll();
                                         init_filtro_rapido();
@@ -3736,10 +3736,10 @@ echo $Consulta3;
                                             placeholder: "Selecione el aprobador",
                                             allowClear: true
                                           }); 
-                                        $("#b-fecha-desde").datepicker();
-                                        $("#b-fecha-hasta").datepicker();
-                                        $("#b-fecha_rev-desde").datepicker();
-                                        $("#b-fecha_rev-hasta").datepicker();
+                                        $("#b-fecha-desde").datetimepicker();
+                                        $("#b-fecha-hasta").datetimepicker();
+                                        $("#b-fecha_rev-desde").datetimepicker();
+                                        $("#b-fecha_rev-hasta").datetimepicker();
 //                                        if(($("#b-formulario").is(":checked"))) {
 //                                            $("#b-formulario").parent().parent().hide();
 //                                        }
@@ -4005,10 +4005,10 @@ echo $Consulta3;
                                                 placeholder: "Selecione el aprobador",
                                                 allowClear: true
                                               }); 
-                                            $("#b-fecha-desde").datepicker();
-                                            $("#b-fecha-hasta").datepicker();
-                                            $("#b-fecha_rev-desde").datepicker();
-                                            $("#b-fecha_rev-hasta").datepicker();
+                                            $("#b-fecha-desde").datetimepicker();
+                                            $("#b-fecha-hasta").datetimepicker();
+                                            $("#b-fecha_rev-desde").datetimepicker();
+                                            $("#b-fecha_rev-hasta").datetimepicker();
 //                                            if(($("#b-formulario").is(":checked"))) {
 //                                                $("#b-formulario").parent().parent().hide();
 //                                            }
@@ -4228,7 +4228,7 @@ echo $Consulta3;
                           });");
                 $objResponse->addScript('ao_multiple();');
 
-                $objResponse->addScript("$('#fecha').datepicker();");
+                $objResponse->addScript("$('#fecha').datetimepicker();");
                 $objResponse->addScript("$('#tabs-hv-2').tab();"
                         . "$('#tabs-hv-2 a:first').tab('show');");
                 if($_SESSION[ParamAdic]!='formulario')
@@ -4438,7 +4438,7 @@ echo $Consulta3;
                     $objResponse->addScript("$('#tabs-hv').tab();$('#tabs-hv a:last').tab('show');");
                     $objResponse->addScript ("$('.nav-tabs a[href=\"#hv-red\"]').hide();");
                 }
-                $objResponse->addScript("$('#fecha').datepicker();");
+                $objResponse->addScript("$('#fecha').datetimepicker();");
                 return $objResponse;
             }
             
@@ -4656,7 +4656,7 @@ echo $Consulta3;
                     $objResponse->addScript("$('#tabs-hv').tab();$('#tabs-hv a:last').tab('show');");
                     $objResponse->addScript ("$('.nav-tabs a[href=\"#hv-red\"]').hide();");
                 }
-                $objResponse->addScript("$('#fecha').datepicker();");
+                $objResponse->addScript("$('#fecha').datetimepicker();");
                 return $objResponse;
             }
      
@@ -5537,7 +5537,7 @@ echo $Consulta3;
                 $objResponse->addScript("$jswf");
                 $objResponse->addScript("$js_din");
                 $objResponse->addScript($js_cambiar_archivos);
-                //$objResponse->addScript("$('#fecha').datepicker();");
+                //$objResponse->addScript("$('#fecha').datetimepicker();");
                 return $objResponse;
             }
      

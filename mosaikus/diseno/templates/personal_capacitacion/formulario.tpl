@@ -51,13 +51,13 @@
                                 <div class="form-group">
                                         <label for="fecha" class="col-md-4 control-label">{N_FECHA}</label>
                                         <div class="col-md-10">
-                                            <input type="text" class="form-control" style="width: 140px;" value="{FECHA}" id="fecha" name="fecha" placeholder="Fecha Inicio"  data-validation="required fechaMenor"/>
+                                            <input type="text" class="form-control" style="width: 140px;" data-date-format="DD/MM/YYYY" value="{FECHA}" id="fecha" name="fecha" placeholder="Fecha Inicio"  data-validation="required fechaMenor"/>
                                       </div>                                
                                   </div>
                                   <div class="form-group">
                                         <label for="fecha_termino" class="col-md-4 control-label">{N_FECHA_TERMINO}</label>
                                         <div class="col-md-10">
-                                          <input type="text" class="form-control" style="width: 140px;" value="{FECHA_TERMINO}" id="fecha_termino" name="fecha_termino" placeholder="Fecha Termino"  data-validation="required"/>
+                                          <input type="text" class="form-control" style="width: 140px;" data-date-format="DD/MM/YYYY" value="{FECHA_TERMINO}" id="fecha_termino" name="fecha_termino" placeholder="Fecha Termino"  data-validation="required"/>
                                       </div>                                
                                   </div>
                                       <div class="form-group">

@@ -453,7 +453,7 @@
                 $objResponse->addScript("$('#myModal-Ventana').modal('show');");
                 $objResponse->addScript("$('#myModal-Ventana-Titulo').html('Items: $val[espanol]');");
                 
-                //$objResponse->addScript("$('#hv-fecha').datepicker();");
+                //$objResponse->addScript("$('#hv-fecha').datetimepicker();");
                 $objResponse->addScript("$('#tabs-hv').tab();"
                         . "$('#tabs-hv a:first').tab('show'); ");
                 return $objResponse;

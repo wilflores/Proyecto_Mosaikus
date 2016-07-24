@@ -49,11 +49,11 @@
                                   <div class="row">
                                         <div class="col-xs-12">
                                             <label>Desde</label>
-                                            <input type="text" class="form-control" id="b-fecha_expi-desde" name="b-fecha_expi-desde" placeholder="dd/mm/yyyy"  />
+                                            <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_expi-desde" name="b-fecha_expi-desde" placeholder="dd/mm/yyyy"  />
                                         </div>   
                                         <div class="col-xs-12">
                                             <label>Hasta</label>
-                                          <input type="text" class="form-control" id="b-fecha_expi-hasta" name="b-fecha_expi-hasta" placeholder="dd/mm/yyyy"  />
+                                          <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_expi-hasta" name="b-fecha_expi-hasta" placeholder="dd/mm/yyyy"  />
                                         </div> 
                                   </div>
                             </div>

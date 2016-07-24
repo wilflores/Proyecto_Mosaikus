@@ -926,8 +926,8 @@
                         ScrollBar.initScroll();
                         init_filtro_rapido();
                         init_filtro_ao_multiple();');
-                $objResponse->addScript("$('#b-fecha_ejecutada-desde').datepicker();");
-                $objResponse->addScript("$('#b-fecha_ejecutada-hasta').datepicker();");
+                $objResponse->addScript("$('#b-fecha_ejecutada-desde').datetimepicker();");
+                $objResponse->addScript("$('#b-fecha_ejecutada-hasta').datetimepicker();");
                 
                 return $objResponse;
             }
@@ -1001,7 +1001,7 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");
-                $objResponse->addScript("$('#fecha_ejecutada').datepicker();");
+                $objResponse->addScript("$('#fecha_ejecutada').datetimepicker();");
                 $objResponse->addScript("$('#id_area').selectpicker({
                                             style: 'btn-combo'
                                           });
@@ -1342,7 +1342,7 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");
-                $objResponse->addScript("$('#fecha_ejecutada').datepicker();");
+                $objResponse->addScript("$('#fecha_ejecutada').datetimepicker();");
                 $objResponse->addScript("$('#id_area').selectpicker({
                                             style: 'btn-combo'
                                           });

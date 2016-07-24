@@ -13,7 +13,7 @@
 <div class="form-group">
                                   <label for="fecha_operacion" class="control-label">{N_FECHA_OPERACION}</label>
                                   
-                                    <input type="text" class="form-control" id="b-fecha_operacion" name="b-fecha_operacion" placeholder="{N_FECHA_OPERACION}"/>
+                                    <input type="text" class="form-control" data-date-format="DD/MM/YYYY"  id="b-fecha_operacion" name="b-fecha_operacion" placeholder="{N_FECHA_OPERACION}"/>
                                                              
                             </div>
 <div class="form-group">

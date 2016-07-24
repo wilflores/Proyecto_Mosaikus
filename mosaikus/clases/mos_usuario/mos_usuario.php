@@ -1094,8 +1094,8 @@
                                             placeholder: "Selecione el perfil portal",
                                             allowClear: true
                                         }); 
-                                        $("#b-fecha_expi-desde").datepicker();        
-                                        $("#b-fecha_expi-hasta").datepicker();');                
+                                        $("#b-fecha_expi-desde").datetimepicker();        
+                                        $("#b-fecha_expi-hasta").datetimepicker();');                
                 return $objResponse;
             }
          
@@ -1149,8 +1149,8 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");
-                $objResponse->addScript("$('#fecha_creacion').datepicker();");
-            $objResponse->addScript("$('#fecha_expi').datepicker({changeMonth: true,yearRange: '-100:+0',changeYear: true});");
+                $objResponse->addScript("$('#fecha_creacion').datetimepicker();");
+            $objResponse->addScript("$('#fecha_expi').datetimepicker();");
    return $objResponse;
             }
      
@@ -1267,8 +1267,8 @@
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
-                          });");$objResponse->addScript("$('#fecha_creacion').datepicker();");
-$objResponse->addScript("$('#fecha_expi').datepicker();");
+                          });");$objResponse->addScript("$('#fecha_creacion').datetimepicker();");
+$objResponse->addScript("$('#fecha_expi').datetimepicker();");
   return $objResponse;
             }
      
@@ -1399,8 +1399,8 @@ $objResponse->addScript("$('#fecha_expi').datepicker();");
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
-                          });");$objResponse->addScript("$('#fecha_creacion').datepicker();");
-                $objResponse->addScript("$('#fecha_expi').datepicker();");
+                          });");$objResponse->addScript("$('#fecha_creacion').datetimepicker();");
+                $objResponse->addScript("$('#fecha_expi').datetimepicker();");
                 return $objResponse;               
     }
             

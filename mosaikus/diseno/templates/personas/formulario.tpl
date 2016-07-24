@@ -22,7 +22,7 @@
                                     <div class="form-group col-xs-8" {DISPLAY_FECHA_NACIMIENTO}>
                                         <label for="fecha_nacimiento" {DISPLAY_FECHA_NACIMIENTO} class="">{N_FECHA_NACIMIENTO}</label>
 
-                                        <input style="" type="text" class="form-control" value="{FECHA_NACIMIENTO}" id="fecha_nacimiento" name="fecha_nacimiento" placeholder="{P_FECHA_NACIMIENTO}" {VALIDACION_FECHA_NACIMIENTO}/>
+                                        <input style="" type="text" class="form-control" data-date-format="DD/MM/YYYY" value="{FECHA_NACIMIENTO}" id="fecha_nacimiento" name="fecha_nacimiento" placeholder="{P_FECHA_NACIMIENTO}" {VALIDACION_FECHA_NACIMIENTO}/>
                                     </div>                                                                                                                
                                 </div>
                                 
@@ -50,11 +50,11 @@
                                         
                                         <div class="form-group col-xs-8" {DISPLAY_FECHA_INGRESO}>
                                             <label for="fecha_ingreso" {DISPLAY_FECHA_INGRESO} class="">{N_FECHA_INGRESO}</label>                                                
-                                            <input type="text" class="form-control" value="{FECHA_INGRESO}" id="fecha_ingreso" name="fecha_ingreso" placeholder="{P_FECHA_INGRESO}" {VALIDACION_FECHA_NACIMIENTO}/>
+                                            <input type="text" data-date-format="DD/MM/YYYY" class="form-control" value="{FECHA_INGRESO}" id="fecha_ingreso" name="fecha_ingreso" placeholder="{P_FECHA_INGRESO}" {VALIDACION_FECHA_NACIMIENTO}/>
                                         </div> 
                                         <div class="form-group col-xs-8" {DISPLAY_FECHA_EGRESO}>
                                               <label for="fecha_ingreso" {DISPLAY_FECHA_EGRESO} class="">{N_FECHA_EGRESO}</label>                                                
-                                              <input type="text" {DISPLAY_FECHA_EGRESO} class="form-control" value="{FECHA_EGRESO}" id="fecha_egreso" name="fecha_egreso" placeholder="{P_FECHA_EGRESO}"/>
+                                              <input type="text" {DISPLAY_FECHA_EGRESO} data-date-format="DD/MM/YYYY" class="form-control" value="{FECHA_EGRESO}" id="fecha_egreso" name="fecha_egreso" placeholder="{P_FECHA_EGRESO}"/>
                                         </div> 
                                         <div class="form-group col-xs-{COL_EMA}">
                                             <label for="email" class="">{N_EMAIL}</label>                                        
@@ -156,7 +156,7 @@
                                     </div> 
                                 <div class="form-group col-xs-8" id="div_fecha_promocion" style="display:{MOSTRAR_FECHA_PROMOCION}" >
                                         <label for="fecha_promocion"  class="">{N_FECHA_PROMOCION}</label>
-                                        <input style="" type="text" class="form-control" value="" id="fecha_promocion" name="fecha_promocion" placeholder="{P_FECHA_PROMOCION}" />
+                                        <input style="" type="text" data-date-format="DD/MM/YYYY" class="form-control" value="" id="fecha_promocion" name="fecha_promocion" placeholder="{P_FECHA_PROMOCION}" />
                                     </div> 
                                 <div class="col-xs-12">
                                     {OTROS_CAMPOS}

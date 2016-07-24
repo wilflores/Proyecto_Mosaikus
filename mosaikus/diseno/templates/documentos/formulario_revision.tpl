@@ -64,7 +64,7 @@
                                         <div class="form-group">
                                                 <label for="fecha" class="col-md-4 control-label">{N_FECHA}</label>
                                                 <div class="col-md-10">
-                                                    <input type="text" class="form-control" style="width: 120px;" value="{FECHA}" id="fecha" name="fecha" placeholder="{N_FECHA}"  data-validation="required"/>
+                                                    <input type="text" class="form-control" style="width: 120px;" data-date-format="DD/MM/YYYY"  value="{FECHA}" id="fecha" name="fecha" placeholder="{N_FECHA}"  data-validation="required"/>
                                                     <input type="hidden" class="form-control" value="{VERSION}" id="version" name="version"/>
                                               </div>                                
                                         </div>

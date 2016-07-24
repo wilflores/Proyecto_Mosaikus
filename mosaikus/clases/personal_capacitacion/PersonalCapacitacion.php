@@ -950,8 +950,8 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");
-                $objResponse->addScript("$('#fecha').datepicker();");
-                $objResponse->addScript("$('#fecha_termino').datepicker();");
+                $objResponse->addScript("$('#fecha').datetimepicker();");
+                $objResponse->addScript("$('#fecha_termino').datetimepicker();");
                 $objResponse->addScriptCall('cargar_autocompletado');
                 $objResponse->addScript("$('#tabs-hv').tab();"
                         . "$('#tabs-hv a:first').tab('show');");
@@ -1233,8 +1233,8 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");
-                $objResponse->addScript("$('#fecha').datepicker();");
-                $objResponse->addScript("$('#fecha_termino').datepicker();");
+                $objResponse->addScript("$('#fecha').datetimepicker();");
+                $objResponse->addScript("$('#fecha_termino').datetimepicker();");
                 $objResponse->addScriptCall('cargar_autocompletado');
                 $objResponse->addScript("$('#tabs-hv').tab();"
                         . "$('#tabs-hv a:first').tab('show');");

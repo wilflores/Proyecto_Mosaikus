@@ -33,10 +33,10 @@ function init_filtrar(){
             placeholder: "Selecione el aprobador",
             allowClear: true
         }); 
-        $("#b-fecha-desde").datepicker();        
-        $("#b-fecha-hasta").datepicker();
-        $("#b-fecha_rev-desde").datepicker();
-        $("#b-fecha_rev-hasta").datepicker();
+        $("#b-fecha-desde").datetimepicker();        
+        $("#b-fecha-hasta").datetimepicker();
+        $("#b-fecha_rev-desde").datetimepicker();
+        $("#b-fecha_rev-hasta").datetimepicker();
         PanelOperator.initPanels("");
         ScrollBar.initScroll();
         init_filtro_rapido();
@@ -780,6 +780,7 @@ function ao_multiple(){
                 "plugins": ["search", "types","checkbox"]
             }
         );
+
     $("#div-ao-form").on("select_node.jstree", function (e, data) {
         if(data.event) { 
             data.instance.select_node(data.node.children_d);

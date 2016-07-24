@@ -28,13 +28,13 @@
             <div class="form-group">
                     <label for="fecha_acordada" class="col-md-4 control-label" style="color: black;">{N_FECHA_ACORDADA}</label>
                     <div class="col-md-10">
-                      <input type="text" class="form-control"  style="width: 110px;" value="{FECHA_ACORDADA}" id="hv-fecha_acordada" name="fecha_acordada" placeholder="dd/mm/yyyy"  data-validation="required"/>
+                      <input type="text" class="form-control"  style="width: 110px;" data-date-format="DD/MM/YYYY"  value="{FECHA_ACORDADA}" id="hv-fecha_acordada" name="fecha_acordada" placeholder="dd/mm/yyyy"  data-validation="required"/>
                   </div>                                
               </div>
             <div class="form-group">
                     <label for="fecha_realizada" class="col-md-4 control-label" style="color: black;">{N_FECHA_REALIZADA}</label>
                     <div class="col-md-10">
-                      <input type="text" class="form-control"  style="width: 110px;" value="{FECHA_REALIZADA}" id="hv-fecha_realizada" name="fecha_realizada" placeholder="dd/mm/yyyy" />
+                      <input type="text" class="form-control"  style="width: 110px;" data-date-format="DD/MM/YYYY"  value="{FECHA_REALIZADA}" id="hv-fecha_realizada" name="fecha_realizada" placeholder="dd/mm/yyyy" />
                   </div>                                
               </div>
             <div class="form-group">

@@ -407,7 +407,7 @@
             $objResponse->addScript("$('#myModal-Ventana').modal('show');");
             $objResponse->addScript("$('#myModal-Ventana-Titulo').html('Cambiar Contraseña');");
 
-            //$objResponse->addScript("$('#hv-fecha').datepicker();");
+            //$objResponse->addScript("$('#hv-fecha').datetimepicker();");
             $objResponse->addScript("$.formUtils.addValidator({
             name : 'igual_pw',
             validatorFunction : function(value, \$el, config, language, \$form) { 

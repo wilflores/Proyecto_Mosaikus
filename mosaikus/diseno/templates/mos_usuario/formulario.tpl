@@ -41,7 +41,7 @@
 <div class="form-group">
                                         <label for="fecha_expi" class="col-md-4 control-label">{N_FECHA_EXPI}</label>
                                         <div class="col-md-10">
-                                          <input type="text" class="form-control" style="width: 120px;" value="{FECHA_EXPI}" id="fecha_expi" name="fecha_expi" placeholder="dd/mm/yyyy"  data-validation="required"/>
+                                          <input type="text" class="form-control" style="width: 120px;" data-date-format="DD/MM/YYYY" value="{FECHA_EXPI}" id="fecha_expi" name="fecha_expi" placeholder="dd/mm/yyyy"  data-validation="required"/>
                                       </div>                                
                                   </div>
 

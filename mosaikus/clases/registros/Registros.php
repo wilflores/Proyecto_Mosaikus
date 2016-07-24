@@ -3037,9 +3037,9 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         case '3':
                         case 'Fecha':
                                 $html .= '';
-                                $html .= '<input type="text" style=""  data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="p' . $i . '" id="p' . $i . '">';
+                                $html .= '<input type="text" style="" data-date-format="DD/MM/YYYY" data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="p' . $i . '" id="p' . $i . '">';
                                 $html .= '';
-                                $js .= "$('#p$i').datepicker();";
+                                $js .= "$('#p$i').datetimepicker();";
                             break;
                         case '13':
                         case 'Vigencia':
@@ -3058,11 +3058,11 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                                 <input type="checkbox" value="V" name="p' . $i . '[]" id="p' . $i . '"> <img style="margin-top: -6px;" src="diseno/images/atrasado.png" /> 
                                               </label>';
                             
-                                $html .= '<br>Desde:<input type="text" style=""  data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="pdesde' . $i . '" id="pdesde' . $i . '">';
-                                $html .= 'Hasta:<input type="text" style=""  data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="phasta' . $i . '" id="phasta' . $i . '">';
+                                $html .= '<br>Desde:<input type="text" style="" data-date-format="DD/MM/YYYY" data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="pdesde' . $i . '" id="pdesde' . $i . '">';
+                                $html .= 'Hasta:<input type="text" style="" data-date-format="DD/MM/YYYY" data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="phasta' . $i . '" id="phasta' . $i . '">';
                                 $html .= '';
-                                $js .= "$('#pdesde$i').datepicker();";
-                                $js .= "$('#phasta$i').datepicker();";
+                                $js .= "$('#pdesde$i').datetimepicker();";
+                                $js .= "$('#phasta$i').datetimepicker();";
                             break;
                         case '5':
                         case 'Rut':
@@ -3437,9 +3437,9 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         case '3':
                         case 'Fecha':
                                 $html .= '';
-                                $html .= '<input type="text" style=""  data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="p' . $i . '" id="p' . $i . '">';
+                                $html .= '<input type="text" style="" data-date-format="DD/MM/YYYY" data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="p' . $i . '" id="p' . $i . '">';
                                 $html .= '';
-                                $js .= "$('#p$i').datepicker();";
+                                $js .= "$('#p$i').datetimepicker();";
                             break;
                         case '13':
                         case 'Vigencia':
@@ -3458,11 +3458,11 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                                 <input type="checkbox" value="V" name="p' . $i . '[]" id="p' . $i . '"> <img style="margin-top: -6px;" src="diseno/images/atrasado.png" /> 
                                               </label>';
                             
-                                $html .= '<br>Desde:<input type="text" style=""  data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="pdesde' . $i . '" id="pdesde' . $i . '">';
-                                $html .= 'Hasta:<input type="text" style=""  data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="phasta' . $i . '" id="phasta' . $i . '">';
+                                $html .= '<br>Desde:<input type="text" style="" data-date-format="DD/MM/YYYY"  data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="pdesde' . $i . '" id="pdesde' . $i . '">';
+                                $html .= 'Hasta:<input type="text" style="" data-date-format="DD/MM/YYYY" data-validation="date" placeholder="dd/mm/yyyy" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="phasta' . $i . '" id="phasta' . $i . '">';
                                 $html .= '';
-                                $js .= "$('#pdesde$i').datepicker();";
-                                $js .= "$('#phasta$i').datepicker();";
+                                $js .= "$('#pdesde$i').datetimepicker();";
+                                $js .= "$('#phasta$i').datetimepicker();";
                             break;
                         case '5':
                         case 'Rut':
@@ -3710,13 +3710,9 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         case '3':
                         case 'Fecha':
                                 $html .= '<div class="col-md-6">';
-                                $html .= '<input type="text" style="width: 120px;" placeholder="dd/mm/yyyy" data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
+                                $html .= '<input type="text" style="width: 120px;" data-date-format="DD/MM/YYYY" placeholder="dd/mm/yyyy" data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
                                 $html .= '</div>';
-                                $js .= "$('#campo_$i').datepicker({
-                        changeMonth: true,
-                        yearRange: '-50:+20',
-                        changeYear: true
-                      });";
+                                $js .= "$('#campo_$i').datetimepicker();";
                             break;
                         case '5':
                         case 'Rut':
@@ -3815,13 +3811,9 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             break;
                         case '13':
                                 $html .= '<div class="col-md-11">';
-                                $html .= '<input type="text" style="width: 120px;" placeholder="dd/mm/yyyy" data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
+                                $html .= '<input type="text" style="width: 120px;" data-date-format="DD/MM/YYYY" placeholder="dd/mm/yyyy" data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
                                 $html .= '</div>';
-                                $js .= "$('#campo_$i').datepicker({
-                        changeMonth: true,
-                        yearRange: '-50:+20',
-                        changeYear: true
-                      });";
+                                $js .= "$('#campo_$i').datetimepicker();";
                             break;  
                         case '14':
                             $cadenas = split("<br />", $value[valores]) ;
@@ -4150,13 +4142,9 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         case '3':
                         case 'Fecha':
                                 $html .= '<div class="col-md-6">';
-                                $html .= '<input type="text" style="width: 120px;" placeholder="dd/mm/yyyy"  data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
+                                $html .= '<input type="text" style="width: 120px;" data-date-format="DD/MM/YYYY" placeholder="dd/mm/yyyy"  data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
                                 $html .= '</div>';
-                                $js .= "$('#campo_$i').datepicker({
-                        changeMonth: true,
-                        yearRange: '-50:+20',
-                        changeYear: true
-                      }); ";
+                                $js .= "$('#campo_$i').datetimepicker(); ";
                             break;
                         case '5':
                         case 'Rut':
@@ -4319,13 +4307,9 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             break;
                         case '13':
                                 $html .= '<div class="col-md-11">';
-                                $html .= '<input type="text" style="width: 120px;" placeholder="dd/mm/yyyy"  data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
+                                $html .= '<input type="text" style="width: 120px;" placeholder="dd/mm/yyyy" data-date-format="DD/MM/YYYY" data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
                                 $html .= '</div>';
-                                $js .= "$('#campo_$i').datepicker({
-                        changeMonth: true,
-                        yearRange: '-50:+20',
-                        changeYear: true
-                      });";
+                                $js .= "$('#campo_$i').datetimepicker();";
                             break;                        
                         
                         case '14':
@@ -4636,13 +4620,9 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         case '3':
                         case 'Fecha':
                                 $html .= '<div class="col-md-6">';
-                                $html .= '<input type="text" style="width: 120px;" placeholder="dd/mm/yyyy"  data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
+                                $html .= '<input type="text" style="width: 120px;" data-date-format="DD/MM/YYYY" placeholder="dd/mm/yyyy"  data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
                                 $html .= '</div>';
-                                $js .= "$('#campo_$i').datepicker({
-                        changeMonth: true,
-                        yearRange: '-50:+20',
-                        changeYear: true
-                      }); ";
+                                $js .= "$('#campo_$i').datetimepicker(); ";
                             break;
                         case '5':
                         case 'Rut':
@@ -4805,13 +4785,9 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             break;
                         case '13':
                                 $html .= '<div class="col-md-11">';
-                                $html .= '<input type="text" style="width: 120px;" placeholder="dd/mm/yyyy"  data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
+                                $html .= '<input type="text" style="width: 120px;" data-date-format="DD/MM/YYYY" placeholder="dd/mm/yyyy"  data-validation="date" data-validation-format="dd/mm/yyyy" class="form-control" value="'. $value[valor] .'"  name="campo_' . $i . '" id="campo_' . $i . '">';
                                 $html .= '</div>';
-                                $js .= "$('#campo_$i').datepicker({
-                        changeMonth: true,
-                        yearRange: '-50:+20',
-                        changeYear: true
-                      });";
+                                $js .= "$('#campo_$i').datetimepicker();";
                             break;                        
                         
                         case '14':
