@@ -304,164 +304,164 @@ $objDrawing2->setWorksheet($objPHPExcel->getActiveSheet());
 /////////////////////////////////////////////////////////////////////////////////////////////
 ///////// REGISTROS BD
 
-//$objPHPExcel->createSheet(); 
-//$objPHPExcel->setActiveSheetIndex(1);
+$objPHPExcel->createSheet(); 
+$objPHPExcel->setActiveSheetIndex(1);
+$objActSheet = $objPHPExcel->getActiveSheet();
+$objActSheet->setTitle($hoja2);
+$objActSheet->setCellValue('A1', $titulo2); 
+$objActSheet->setCellValue('A2', 'Fecha: '.date('d/m/Y')); 
+//$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(2);
+$objActSheet->mergeCells('A1:E1'); 
+$objPHPExcel->getActiveSheet()->getStyle('A1:E1')->applyFromArray( $style_titulo ); //
+$columnas = $reg->cargar_nombres_columnas_xls();
+$datos = $reg->exportarPHPExcelDatosBD($_GET,$columnas);
+
+//print_r($columnas);
+//print_r($datos);
+///////////////////////////////////////////////////////////////////////////
+///////////////TABLA SIN ESTILOS PARA LA DINAMICA//////////////////////////////////////
+/////PARA HACER EL ENCABEZADO DE LA TABLA
+$col = 0;
+$fila=5;
 //$objActSheet = $objPHPExcel->getActiveSheet();
-//$objActSheet->setTitle($hoja2);
-//$objActSheet->setCellValue('A1', $titulo2); 
-//$objActSheet->setCellValue('A2', 'Fecha: '.date('d/m/Y')); 
-////$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(2);
-//$objActSheet->mergeCells('A1:E1'); 
-//$objPHPExcel->getActiveSheet()->getStyle('A1:E1')->applyFromArray( $style_titulo ); //
-//$columnas = $reg->cargar_nombres_columnas_xls();
-//$datos = $reg->exportarPHPExcelDatosBD($_GET,$columnas);
-//
-////print_r($columnas);
-////print_r($datos);
-/////////////////////////////////////////////////////////////////////////////
-/////////////////TABLA SIN ESTILOS PARA LA DINAMICA//////////////////////////////////////
-///////PARA HACER EL ENCABEZADO DE LA TABLA
-//$col = 0;
-//$fila=5;
-////$objActSheet = $objPHPExcel->getActiveSheet();
-//$style_header_resumen_head = array(
-//    'borders' => array(
-//        'allborders' => array(
-//            'style' => PHPExcel_Style_Border::BORDER_THIN
-//        )
-//    ),
-//    'fill' => array(
-//        'type' => PHPExcel_Style_Fill::FILL_SOLID,
-//        'color' => array('rgb'=>'E1E0F7'),
-//    ),
-//    'font' => array(
-//        'bold' => true,
-//        'size' => 10,
-//    )
-//);
-//$style_header_sencillo = array(
-//    'borders' => array(
-//        'allborders' => array(
-//            'style' => PHPExcel_Style_Border::BORDER_THIN
-//        )
-//    ),
-//    'fill' => array(
-//        'type' => PHPExcel_Style_Fill::FILL_SOLID
-//    ),
-//    'font' => array(
-//        'size' => 10,
-//    )
-//);
-//$style_header_semaforo_rojo = array(
-//    'borders' => array(
-//        'allborders' => array(
-//            'style' => PHPExcel_Style_Border::BORDER_THIN
-//        )
-//    ),
-//    'fill' => array(
-//        'type' => PHPExcel_Style_Fill::FILL_SOLID
-//    ),
-//    'font' => array(
-//        'bold' => true,
-//        'size' => 18,
-//        'name' =>'Wingdings',
-//        'color' => array('rgb'=>'DF013A')
-//    )
-//);
-//$style_header_semaforo_verde = array(
-//    'borders' => array(
-//        'allborders' => array(
-//            'style' => PHPExcel_Style_Border::BORDER_THIN
-//        )
-//    ),
-//    'fill' => array(
-//        'type' => PHPExcel_Style_Fill::FILL_SOLID
-//    ),
-//    'font' => array(
-//        'bold' => true,
-//        'size' => 18,
-//        'name' =>'Wingdings',
-//        'color' => array('rgb'=>'349B41')
-//    )
-//);
-//$objActSheet = $objPHPExcel->getActiveSheet(); 
-//foreach (array_keys($columnas) as $value){
-//    //$nombre = $doc->cargar_nombres_columnas_xls($value);
-//    //echo strpos($value,"edo").'-'.strtolower($columnas[$value]);
-//    if(strstr($value,"edo") && strtolower($columnas[$value])=='vigencia' ) {
-//            $col_vigencia=$col;
-//            //echo 'col:'.$value.'-valor:'.$columnas[$value].'-colnum:'. $col_vigencia;
-//    }
-//
-//    $objActSheet->setCellValueByColumnAndRow($col,$fila, $columnas[$value]); 
-//    $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$fila)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-//    $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$fila)->applyFromArray( $style_header_resumen_head ); // give style to header
-//    $col++;
-//}
-///////PARA HACER EL detalle DE LA TABLA
-//$col=0;
-//foreach (array_keys($columnas) as $columna){
-//   //echo 'columna:'.$columna.'--';
-//    $row = 6;
-//   // print_r($datos[$columna]);
-//    foreach ($datos[$columna] as $value){
-//      // echo ($value).'-';
-//        if(($col_vigencia && $col==$col_vigencia)||(strstr($columna,"estado_semaforo"))){
-//           $objActSheet->setCellValueByColumnAndRow($col,$row, $value); 
-//           switch ($value) {                                             
-//                case 'L': 
-//                    $estilo=$style_header_semaforo_rojo;
-//                    break;
-//                case 'K': 
-//                    $estilo=$style_header_semaforo_verde;
-//                    break;
-//                case 'J': 
-//                    $estilo=$style_header_semaforo_verde;
-//                    break;
-//           }
-//           $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->applyFromArray( $estilo ); // give style to header
-//           $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-//        } 
-//        else {
-//            $objActSheet->setCellValueByColumnAndRow($col,$row, $value);
-//            $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-//            $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
-//            $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->getAlignment()->setWrapText(true);
-//            $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->applyFromArray( $style_header_sencillo ); // give style to header        
-//        }
-//       $row++;
-//    }
-//    //echo $col.'<br>'." \n" ;
-//    $col++;
-//}
-//
-//////PARA LAS IMAGENES 
-//$objPHPExcel->setActiveSheetIndex(1); 
-//$objDrawing = new PHPExcel_Worksheet_Drawing();
-//$objDrawing->setPath('dist/images/logo_report.png');
-//$objDrawing->setName('Sample image');
-//$objDrawing->setDescription('Sample image');
-//$objDrawing->setWidthAndHeight(68,68);
-//$objDrawing->setResizeProportional(true);
-//$objDrawing->setCoordinates('A'.($row+1));
-//
-//$objDrawing2 = new PHPExcel_Worksheet_Drawing();
-//$objDrawing2->setPath('diseno/images/logo_empresa/'.$_SESSION[CookIdEmpresa].'_logo_empresa_report.png');
-//$objDrawing2->setName('Sample image');
-//$objDrawing2->setDescription('Sample image');
-//$objDrawing2->setWidthAndHeight(125,125);
-////$objDrawing2->setHeight(28);
-//$objDrawing2->setResizeProportional(true);
-//$objDrawing2->setCoordinates('F1');
-//
-//$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
-//$objDrawing2->setWorksheet($objPHPExcel->getActiveSheet());
+$style_header_resumen_head = array(
+    'borders' => array(
+        'allborders' => array(
+            'style' => PHPExcel_Style_Border::BORDER_THIN
+        )
+    ),
+    'fill' => array(
+        'type' => PHPExcel_Style_Fill::FILL_SOLID,
+        'color' => array('rgb'=>'E1E0F7'),
+    ),
+    'font' => array(
+        'bold' => true,
+        'size' => 10,
+    )
+);
+$style_header_sencillo = array(
+    'borders' => array(
+        'allborders' => array(
+            'style' => PHPExcel_Style_Border::BORDER_THIN
+        )
+    ),
+    'fill' => array(
+        'type' => PHPExcel_Style_Fill::FILL_SOLID
+    ),
+    'font' => array(
+        'size' => 10,
+    )
+);
+$style_header_semaforo_rojo = array(
+    'borders' => array(
+        'allborders' => array(
+            'style' => PHPExcel_Style_Border::BORDER_THIN
+        )
+    ),
+    'fill' => array(
+        'type' => PHPExcel_Style_Fill::FILL_SOLID
+    ),
+    'font' => array(
+        'bold' => true,
+        'size' => 18,
+        'name' =>'Wingdings',
+        'color' => array('rgb'=>'DF013A')
+    )
+);
+$style_header_semaforo_verde = array(
+    'borders' => array(
+        'allborders' => array(
+            'style' => PHPExcel_Style_Border::BORDER_THIN
+        )
+    ),
+    'fill' => array(
+        'type' => PHPExcel_Style_Fill::FILL_SOLID
+    ),
+    'font' => array(
+        'bold' => true,
+        'size' => 18,
+        'name' =>'Wingdings',
+        'color' => array('rgb'=>'349B41')
+    )
+);
+$objActSheet = $objPHPExcel->getActiveSheet(); 
+foreach (array_keys($columnas) as $value){
+    //$nombre = $doc->cargar_nombres_columnas_xls($value);
+    //echo strpos($value,"edo").'-'.strtolower($columnas[$value]);
+    if(strstr($value,"edo") && strtolower($columnas[$value])=='vigencia' ) {
+            $col_vigencia=$col;
+            //echo 'col:'.$value.'-valor:'.$columnas[$value].'-colnum:'. $col_vigencia;
+    }
+
+    $objActSheet->setCellValueByColumnAndRow($col,$fila, $columnas[$value]); 
+    $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$fila)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+    $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$fila)->applyFromArray( $style_header_resumen_head ); // give style to header
+    $col++;
+}
+/////PARA HACER EL detalle DE LA TABLA
+$col=0;
+foreach (array_keys($columnas) as $columna){
+   //echo 'columna:'.$columna.'--';
+    $row = 6;
+   // print_r($datos[$columna]);
+    foreach ($datos[$columna] as $value){
+      // echo ($value).'-';
+        if(($col_vigencia && $col==$col_vigencia)||(strstr($columna,"estado_semaforo"))){
+           $objActSheet->setCellValueByColumnAndRow($col,$row, $value); 
+           switch ($value) {                                             
+                case 'L': 
+                    $estilo=$style_header_semaforo_rojo;
+                    break;
+                case 'K': 
+                    $estilo=$style_header_semaforo_verde;
+                    break;
+                case 'J': 
+                    $estilo=$style_header_semaforo_verde;
+                    break;
+           }
+           $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->applyFromArray( $estilo ); // give style to header
+           $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        } 
+        else {
+            $objActSheet->setCellValueByColumnAndRow($col,$row, $value);
+            $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
+            $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->getAlignment()->setWrapText(true);
+            $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->applyFromArray( $style_header_sencillo ); // give style to header        
+        }
+       $row++;
+    }
+    //echo $col.'<br>'." \n" ;
+    $col++;
+}
+
+////PARA LAS IMAGENES 
+$objPHPExcel->setActiveSheetIndex(1); 
+$objDrawing = new PHPExcel_Worksheet_Drawing();
+$objDrawing->setPath('dist/images/logo_report.png');
+$objDrawing->setName('Sample image');
+$objDrawing->setDescription('Sample image');
+$objDrawing->setWidthAndHeight(68,68);
+$objDrawing->setResizeProportional(true);
+$objDrawing->setCoordinates('A'.($row+1));
+
+$objDrawing2 = new PHPExcel_Worksheet_Drawing();
+$objDrawing2->setPath('diseno/images/logo_empresa/'.$_SESSION[CookIdEmpresa].'_logo_empresa_report.png');
+$objDrawing2->setName('Sample image');
+$objDrawing2->setDescription('Sample image');
+$objDrawing2->setWidthAndHeight(125,125);
+//$objDrawing2->setHeight(28);
+$objDrawing2->setResizeProportional(true);
+$objDrawing2->setCoordinates('F1');
+
+$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+$objDrawing2->setWorksheet($objPHPExcel->getActiveSheet());
 //print_r($datos);
 
 //$objPHPExcel->getActiveSheet()->getStyle('B1:B100')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
 
-//$objPHPExcel->setActiveSheetIndex(0); 
-//$objActSheet = $objPHPExcel->getActiveSheet(); 
+$objPHPExcel->setActiveSheetIndex(0); 
+$objActSheet = $objPHPExcel->getActiveSheet(); 
 $objActSheet->setTitle($hoja1);
 ////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
