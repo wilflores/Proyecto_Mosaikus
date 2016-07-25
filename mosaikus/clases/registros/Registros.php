@@ -3596,7 +3596,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $objResponse = new xajaxResponse();
                 $objResponse->addIncludeScript(PATH_TO_JS . 'registros/registros_reporte.js?'.rand());
                 $objResponse->addAssign('desc-mod-act',"innerHTML","Registros - Documento [$val[Codigo_doc] - $val[nombre_doc]]");
-                $objResponse->addAssign('contenido-aux',"innerHTML",$template->show());
+                $objResponse->addAssign('contenido-aux',"innerHTML",str_replace('r_exportarExcel()', 'exportarExcel_registros()', $template->show()));
+                //$objResponse->addAssign('contenido-aux',"innerHTML",$template->show());
                 $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
                 
                 //$objResponse->addAssign('modulo_actual',"value","registros");
