@@ -111,3 +111,9 @@ function verPagina_aux(pag,doc){
         $('#MustraCargando').show();
         xajax_Loading(array.getArray());
     }
+    function exportarExcel_registros(){
+    var params =  getForm('r-busquedaFrm');
+    params = params + '&modo='+$('#modo').val()+ '&cod_link='+$('#cod_link').val();
+    //window.open('pages/' +  document.getElementById("modulo_actual").value + '/exportarExcel.php?campo='+document.getElementById("campo").value + '&valor=' + document.getElementById("valor").value + '&corder=' + document.getElementById("corder").value + '&sorder=' + document.getElementById("sorder").value,null,'toolbar=no, location=no, menubar=no, width=600,height=400');    
+    window.open('pages/registros/exportarphpexcel.php?'+params,null,'toolbar=no, location=no, menubar=no, width=600,height=400');
+    }
