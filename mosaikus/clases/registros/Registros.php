@@ -1029,7 +1029,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                $dataxls[$value] = $data[0][$value];               
             }
             $dataxls[Estado] =$documento->semaforo_reporte_xls($data[0],'no');
-            $dataxls[arbol_organizacional]=$documento->BuscaOrganizacionalTodosXLS($data[0][arbol_organizacional]);;
+            $dataxls[arbol_organizacional]=$documento->BuscaOrganizacionalTodosXLS($data[0]);
             $dataxls[tipo_documento] ='Formulario';
             //$dataxls[vecesbarran]= substr_count($dataxls[arbol_organizacional], "\n");
             //$this->listarRegistros($parametros, 1, 100000);
