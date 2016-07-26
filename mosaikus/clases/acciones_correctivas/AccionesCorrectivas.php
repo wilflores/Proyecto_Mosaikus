@@ -4518,7 +4518,7 @@
                 $contenido_1["N_ID_RESPONSABLE"] = $this->nombres_columnas_ac[id_responsable];
                 $contenido_1[TIPOS] .= $ut_tool->OptionsCombo("SELECT id, 
                                                                         descripcion
-                                                                            FROM mos_tipo_ac ORDER BY descripcion"
+                                                                            FROM mos_tipo_ac where id = 1 ORDER BY descripcion"
                                                                     , 'id'
                                                                     , 'descripcion', null);
                 $contenido_1[RESPONSABLE_ACCIONES] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
@@ -5000,8 +5000,7 @@
                 $contenido_1["N_VALIDADOR_ACCION"] = $this->nombres_columnas_ac[validador_accion];
                 $contenido_1[TIPOS] .= $ut_tool->OptionsCombo("SELECT id, 
                                                                         descripcion
-                                                                            FROM mos_tipo_ac ORDER BY descripcion 
-                                                                            where id = 1"
+                                                                            FROM mos_tipo_ac where id = 1 ORDER BY descripcion"
                                                                     , 'id'
                                                                     , 'descripcion', null);
                 $contenido_1[RESPONSABLE_ACCIONES] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
