@@ -322,10 +322,10 @@
                         $sql_where .= " AND id_ac = '". $atr["b-id_ac"] . "'";
                     if (strlen($atr["b-id_correcion"])>0)
                         $sql_where .= " AND id_correcion = '". $atr["b-id_correcion"] . "'";
-                    if (strlen($_SESSION[id_ac])>0)
-                        $sql_where .= " AND id_ac = '". $_SESSION[id_ac] . "'";
-                    if (strlen($_SESSION[id_correccion])>0)
-                        $sql_where .= " AND id_correcion = '". $_SESSION[id_correccion] . "'";
+//                    if (strlen($_SESSION[id_ac])>0)
+//                        $sql_where .= " AND id_ac = '". $_SESSION[id_ac] . "'";
+//                    if (strlen($_SESSION[id_correccion])>0)
+//                        $sql_where .= " AND id_correcion = '". $_SESSION[id_correccion] . "'";
 
                     
                     
