@@ -301,7 +301,7 @@ function init_filtrar(){
                             '</select>' +
                        '</td>';
         html = html + '<td class="td-table-data"><div class="col-sm-24" style="padding-left: 0px;padding-right: 0px;">'+
-                            '<input id="fecha_acordada_'+ i + '" class="form-control" type="text" data-validation="required" name="fecha_acordada_'+ i + '" >'+
+                            '<input id="fecha_acordada_'+ i + '" class="form-control"  data-date-format="DD/MM/YYYY"  type="text" data-validation="required" name="fecha_acordada_'+ i + '" >'+
                        '</div></td>';
 
         html = html + '</tr>' ;       
