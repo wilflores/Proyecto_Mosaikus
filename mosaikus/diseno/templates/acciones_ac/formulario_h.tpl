@@ -29,7 +29,7 @@
                                       </div> <div class="form-group col-md-6">
                                         <label for="fecha_realizada" class="">{N_FECHA_REALIZADA}</label>
                                         
-                                          <input type="text" class="form-control" value="{FECHA_REALIZADA}" id="fecha_realizada" readonly="readonly" name="fecha_realizada" placeholder="dd/mm/yyyy"  data-validation="required"/>
+                                          <input type="text" class="form-control" value="{FECHA_REALIZADA}" id="fecha_realizada" readonly="readonly" name="fecha_realizada" placeholder="dd/mm/yyyy"  />
                                       </div>  <div class="form-group col-md-9">
                                         <label for="id_responsable" class="">{N_ID_RESPONSABLE}</label>
                                         
@@ -66,14 +66,15 @@
                 <input type="hidden" id="num_items_esp" name="num_items_esp" value="{NUM_ITEMS_ESP}"/> 
                 <textarea id="option_tipo" style="display: none;">{TIPOS}</textarea>
                 <textarea id="option_responsables" style="display: none;">{RESPONSABLE_ACCIONES}</textarea>
+                <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="{TOK_NEW}"/>
                 <input type="hidden" id="id_unico_del" name="id_unico_del" value=""/>
-               <button type="button" style="margin-bottom: 10px;" onClick="agregar_esp();" class="btn btn-primary "><i class="glyphicon glyphicon-asterisk"></i>Agregar Acción</button>
+               <button type="button" style="margin-bottom: 10px;" onClick="agregar_esp();" class="btn btn-primary "><i class="glyphicon glyphicon-asterisk"></i>Agregar Trazabilidad</button>
 
                 <table id="table-items-esp" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">
                     <thead>
                         <tr bgcolor="#FFFFFF" height="30px">
                             <th width="5%">
-                                <div align="left" style="width: 60px;">&nbsp; </div>
+                                <div align="left" style="width: 50px;">&nbsp; </div>
                             </th>
                             <th width="13%">
                                 <div align="left" >{N_TIPO}</div>

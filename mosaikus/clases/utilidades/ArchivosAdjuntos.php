@@ -362,8 +362,66 @@
             return $grid->armarTabla();
         }
  
- 
+ /*crear_archivos_adjuntos_solo_html*/
             public function indexItemsFormulario($parametros)
+            {
+                session_name("$GLOBALS[SESSION]");
+                session_start();
+                
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                switch ($parametros[tipo]) {
+                    case '1':
+                        $tabla = 'mos_acciones_evidencia';
+                        $fk = 'fk_id_trazabilidad';
+                        $extensiones = 'jpg,png,pdf';
+                        break;
+
+                    default:
+                        break;
+                }
+                /*SI EXISTE LA VARIABLE FK_ID, ESTA EDITANDO, POR LO TANTO SE CARGA EL VALOR*/
+                if (isset($parametros[fk_id])){
+                    $token = $parametros[token]*1 - $parametros[i];
+                    $fk_valor = $parametros[fk_id];
+                    //echo 1;
+                }
+                else{
+                    /*NO EXISTE EL REGISTRO PADRE Y SE AGREGAN DE FORMA TEMPORAL LAS EVIDENCIAS*/
+                    $fk_valor = null;
+                    $token = $parametros[token]*1 + $parametros[i];
+                }
+                $array_nuevo = $this->crear_archivos_adjuntos_solo_html($tabla, $fk,$fk_valor,24,$extensiones,$token);
+                //}
+                //echo $array_nuevo[html];
+                $html = '<div class="row">'.$array_nuevo[html].'</div>';
+                $js .= $array_nuevo[js];
+                
+               
+                //$this->contenido['CONTENIDO']  = $template->show();
+                //$this->asigna_contenido($this->contenido);
+                //return $template->show();
+                if (isset($parametros['html']))
+                    return $template->show();
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('myModal-Ventana-Cuerpo',"innerHTML",$html);
+                //$objResponse->addAssign('contenido',"innerHTML",$template->show());
+                //$objResponse->addAssign('myModal-Ventana-Cuerpo',"innerHTML",$template->show());
+                //$objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
+                //$objResponse->addAssign('modulo_actual',"value","items_formulario");
+                $objResponse->addIncludeScript(PATH_TO_JS . 'items_formulario/items_formulario.js');
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                //$objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
+                $objResponse->addScript("$('#myModal-Ventana').modal('show');");
+                $objResponse->addScript("$('#myModal-Ventana-Titulo').html('Trazabilidad');");
+                $objResponse->addScript("$('#tabs-hv').tab();"
+                        . "$('#tabs-hv a:first').tab('show'); ");
+                $objResponse->addScript($js);
+                return $objResponse;
+            }
+         
+            public function indexItemsFormulario_old($parametros)
             {
                 session_name("$GLOBALS[SESSION]");
                 session_start();
@@ -460,7 +518,6 @@
                         . "$('#tabs-hv a:first').tab('show'); ");
                 return $objResponse;
             }
-         
  
             public function crear_archivos_adjuntos($tabla,$clave_foranea=null, $valor_clave_foranea=null,$valor_col=19, $extensiones='')
             {
@@ -570,6 +627,145 @@
                 $return[js] = 'init_archivos_adjuntos();'; 
                 
                 }
+                return $return;
+            }
+            
+            public function crear_archivos_adjuntos_solo_html($tabla,$clave_foranea=null, $valor_clave_foranea=null,$valor_col=19, $extensiones='',$token)
+            {
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                $return = array();
+                //$token = time();
+                $data_items = array();
+                //echo $valor_clave_foranea;
+                if (strlen($valor_clave_foranea)>0){
+//                    $sql = "INSERT INTO mos_evidencias_temp(nomb_archivo, contenttype, clave_foranea, id_usuario, tok, estado, id_md5)"
+//                                    . " SELECT nomb_archivo, contenttype, id, $_SESSION[CookIdUsuario],$token,0, '$tabla-$clave_foranea'"
+//                                    . " FROM $tabla"
+//                                    . " WHERE $clave_foranea = $valor_clave_foranea";
+                    //echo $sql;
+                            //$this->dbl->insert_update($sql);, (length(archivo))/(1024) tamano
+                            $sql = "SELECT 
+                                    id,nomb_archivo, contenttype, 1 tamano
+                            FROM mos_evidencias_temp 
+                            WHERE id_usuario = $_SESSION[CookIdUsuario] and tok = $token ";
+                            //echo $sql;
+                            $data_items = $this->dbl->query($sql);
+
+                }
+                if (count($data_items)>0){
+                    $i = 1;
+                    $html = '';
+                    $js = '';
+                    foreach ($data_items as $value) {
+                        //$target = $value[contenttype] == 'application/pdf' ? 'target="_blank"' : 'data-gallery';
+                        switch ($value[contenttype]) {
+                            case 'image/jpeg':
+                            case 'image/pjpeg':                
+                            case 'image/png':
+                            case 'image/x-png':                
+                                $target = 'data-gallery';
+                                break;
+
+                            default:
+                                $target = 'target="_blank"';
+                                break;
+                        }
+                        $html .= '<tr id="tr-adj-' .$i. '">'; 
+                        $html.= '<td align="center">'.
+                                           ' ' .
+                                      '  </td>';
+                        $html.= '<td >'.
+                                            '<a id="a-img-adj-'.$i.'" '. $target .' href="pages/evidencias/ver_evidencia.php?id='.$value[id].'&token='.$token.'" title="'.$value[nomb_archivo]. '" >'.
+                                                $value[nomb_archivo].
+                                            '</a>'.                                            
+                                       '</td>';
+                        $html.= '<td>' .
+                                            number_format($value[tamano]). ' KB ' .
+                                            
+                                        '</td>';
+
+                        $html.= '<td>' .
+                                           '<i class="glyphicon glyphicon-trash cursor-pointer" href="'.$i. '" id="ico_trash_img_'.$i. '" tok="'.$value[id]. '"></i>'.
+                                        '</td>';
+                        $html.= '</tr>' ;  
+                        
+                        $js .= "$('#ico_trash_img_$i').click(function(e){ 
+                                        e.preventDefault();
+                                        var id = $(this).attr('href');
+                                        $('tr-adj-$i').remove();
+                                        var parent = $(this).parents().parents().get(0);
+                                            $(parent).remove();
+                                        var id = $(this).attr('tok');            
+                                        array = new XArray();
+                                        array.setObjeto('ArchivosAdjuntos','actualizar_creada');
+                                        array.addParametro('tok',id);                        
+                                        array.addParametro('token', $('#tok_new_edit').val());
+                                        array.addParametro('import','clases.utilidades.ArchivosAdjuntos');
+                                        xajax_Loading(array.getArray());
+                                    }); ";
+                        $i++;
+                    }
+                    $return[html] = '<div class="col-md-'.$valor_col.'">
+                                            <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload_adjuntos" name="fileUpload_adjuntos"/>
+                                            <input type="hidden" id="num_items_adj" name="num_items" value="'.$i.'"/> 
+                                            <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>
+                                            <input type="hidden" id="extensiones" name="extensiones" value="'.$extensiones.'"/>    
+                                            <br>    
+                                            <table id="table-items-adj" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
+                                                <tbody>
+                                                    ' . $html . '
+                                                </tbody>
+                                            </table>    
+                                 </div>';
+                    $return[js] = $js.'init_archivos_adjuntos();'; 
+                }
+                else
+                {
+                $return[html] = '<div class="col-md-'.$valor_col.'">
+                                            <input type="file" accept="image/jpeg image/png image/x-png" multiple id="fileUpload_adjuntos" name="fileUpload_adjuntos"/>
+                                            <input type="hidden" id="num_items_adj" name="num_items" value="0"/> 
+                                            <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="'.$token.'"/>
+                                            <input type="hidden" id="extensiones" name="extensiones" value="'.$extensiones.'"/>    
+                                            <br>    
+                                            <table id="table-items-adj" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
+                                                <tbody>
+                                                    
+                                                </tbody>
+                                            </table>    
+                                 </div>';
+                $return[js] = 'init_archivos_adjuntos();'; 
+                
+                }
+                return $return;
+            }
+            
+            public function ingresar_archivos_adjuntos_temp($tabla,$clave_foranea=null, $valor_clave_foranea=null,$token)
+            {
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                //$return = array();
+                //$token = time();
+                $data_items = array();
+                //echo $valor_clave_foranea;
+                if (strlen($valor_clave_foranea)>0){
+                    $sql = "INSERT INTO mos_evidencias_temp(nomb_archivo, contenttype, clave_foranea, id_usuario, tok, estado, id_md5)"
+                                    . " SELECT nomb_archivo, contenttype, id, $_SESSION[CookIdUsuario],$token,0, '$tabla-$clave_foranea'"
+                                    . " FROM $tabla"
+                                    . " WHERE $clave_foranea = $valor_clave_foranea";
+                    //echo $sql;
+                            $this->dbl->insert_update($sql);
+//                            $sql = "SELECT 
+//                                    id,nomb_archivo, contenttype, (length(archivo))/(1024) tamano
+//                            FROM $tabla 
+//                            WHERE $clave_foranea = $valor_clave_foranea ";
+//                            //echo $sql;
+//                            $data_items = $this->dbl->query($sql);
+
+                }
+                                                
                 return $return;
             }
             

@@ -1142,7 +1142,7 @@
                             lang: 'es'  
                           });");
                 $objResponse->addScript($array[js]);
-                $objResponse->addScript("$('#fecha_generacion').datepicker();");
+                $objResponse->addScript("$('#fecha_generacion').datetimepicker();");
                 return $objResponse;
             }
      
@@ -1293,7 +1293,7 @@
                             lang: 'es'  
                           });");
                 $objResponse->addScript($array[js]);
-                $objResponse->addScript("$('#fecha_generacion').datepicker();");
+                $objResponse->addScript("$('#fecha_generacion').datetimepicker();");
                 return $objResponse;
             }
      

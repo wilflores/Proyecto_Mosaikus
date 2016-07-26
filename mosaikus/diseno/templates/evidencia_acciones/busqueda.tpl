@@ -31,10 +31,10 @@
 <div class="form-group">
                                   <label for="fecha_evi" class="col-md-2 control-label">{N_FECHA_EVI}</label>
                                   <div class="col-md-2">
-                                    Desde: <input type="text" class="form-control" id="b-fecha_evi-desde" name="b-fecha_evi-desde" placeholder="{N_FECHA_EVI}"  />
+                                    Desde: <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_evi-desde" name="b-fecha_evi-desde" placeholder="{N_FECHA_EVI}"  />
                                   </div>   
                                   <div class="col-md-2">
-                                    Hasta: <input type="text" class="form-control" id="b-fecha_evi-hasta" name="b-fecha_evi-hasta" placeholder="{N_FECHA_EVI}"  />
+                                    Hasta: <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_evi-hasta" name="b-fecha_evi-hasta" placeholder="{N_FECHA_EVI}"  />
                                 </div>                                
                             </div>
 <div class="form-group">

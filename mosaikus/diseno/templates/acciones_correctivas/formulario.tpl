@@ -6,27 +6,12 @@
                                                         {REPORTADO_POR}
                                                     </select>
                                           </div>
-                                  </div> 
-{ID_ORGANIZACIONES}
-<div class="form-group">                                                               
-                                      <label for="vigencia" class="col-md-4 control-label"> {N_ALTO_POTENCIAL} </label>  
-                                      <div class="col-md-10">      
-                                        <label class="checkbox-inline" style="padding-top: 0px;">
-                                            <input type="checkbox" name="alto_potencial" id="alto_potencial" value="S" {CHECKED_ALTO_POTENCIAL}>   &nbsp;
-                                        </label>
-                                        </div>
-                                  
-                                </div>
-<div class="form-group">
-                                        <label for="origen_hallazgo" class="col-md-4 control-label"> {N_ORIGEN_HALLAZGO}</label>
-                                        <div class="col-md-10">                                            
-                                            <select id="origen_hallazgo" name="origen_hallazgo" data-validation="required" class="form-control" >
-                                                <option selected="" value="">-- Seleccione --</option>
-                                                {ORIGENES}
-                                            </select>                                          
-                                      </div>                                
                                   </div>
-<div class="form-group">
+                                  <div class="form-group" id="tabla_fileUpload">
+                                        <label for="archivo" class="col-md-4 control-label">{N_ANEXOS}</label>
+                                        {ARCHIVOS_ADJUNTOS}                                          
+                                 </div> 
+                                        <div class="form-group">
                                         <label for="fecha_generacion" class="col-md-4 control-label">{N_FECHA_GENERACION}</label>
                                         <div class="col-md-10">
                                             <input type="text" class="form-control" data-date-format="DD/MM/YYYY"  value="{FECHA_GENERACION}" id="fecha_generacion" name="fecha_generacion" placeholder="{P_FECHA_GENERACION}" style="width: 110px;" data-validation="required"/>
@@ -38,6 +23,28 @@
                                           <textarea class="form-control" rows="3" id="descripcion" name="descripcion" data-validation="required" placeholder="{N_DESCRIPCION}">{DESCRIPCION}</textarea>
                                       </div>                                
                                   </div>
+
+
+<div class="form-group">
+                                        <label for="origen_hallazgo" class="col-md-4 control-label"> {N_ORIGEN_HALLAZGO}</label>
+                                        <div class="col-md-10">                                            
+                                            <select id="origen_hallazgo" name="origen_hallazgo" data-validation="required" class="form-control" >
+                                                <option selected="" value="">-- Seleccione --</option>
+                                                {ORIGENES}
+                                            </select>                                          
+                                      </div>                                
+                                  </div>
+                                   
+                                            <div class="form-group">                                                               
+                                      <label for="vigencia" class="col-md-4 control-label"> {N_ALTO_POTENCIAL} </label>  
+                                      <div class="col-md-10">      
+                                        <label class="checkbox-inline" style="padding-top: 0px;">
+                                            <input type="checkbox" name="alto_potencial" id="alto_potencial" value="S" {CHECKED_ALTO_POTENCIAL}>   &nbsp;
+                                        </label>
+                                        </div>
+                                  
+                                </div>
+                                        {ID_ORGANIZACIONES}
                                   <div class="form-group">
                                         <label for="responsable_analisis" class="col-md-4 control-label">{N_RESPONSABLE_DESVIO}</label>                                           
                                       <div class="col-md-10">                                              
@@ -71,14 +78,11 @@
                                     {ID_PROCESOS}
                                    
                                   
-                                  <div class="form-group" id="tabla_fileUpload">
-                                        <label for="archivo" class="col-md-4 control-label">{N_DOC_FISICO}</label>
-                                        {ARCHIVOS_ADJUNTOS}                                          
-                                 </div>                                    
+                                                                     
                                  <div class="form-group" id="div-tabs">
                                     <div class="tabs">
                                         <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">
-                                            <li><a href="#hv-red-2" data-toggle="tab">Agregar/Modificar Acciones Correctivas</a></li>
+                                            <li><a href="#hv-red-2" data-toggle="tab">Agregar/Modificar Plan de Acción</a></li>
                                             
                                         </ul>
                                         <div id="my-tab-content" class="tab-content" style="padding: 45px 15px;">
@@ -98,22 +102,28 @@
                                                                 <th width="5%">
                                                                     <div align="left" style="width: 60px;">&nbsp; </div>
                                                                 </th>
+                                                                <!--
                                                                 <th width="13%">
                                                                     <div align="left" >{N_TIPO}</div>
                                                                 </th>
+                                                                -->
                                                                 
-                                                                
-                                                                <th width="43%">
+                                                                <th width="40%">
                                                                     <div align="left">
                                                                         <div style="cursor:pointer;display:inline;">{N_ACCION}</div>                                                
                                                                     </div>
                                                                 </th>
-                                                                <th width="25%">
+                                                                <th width="20%">
                                                                     <div align="left">
                                                                         <div style="cursor:pointer;display:inline;">{N_ID_RESPONSABLE}</div>
                                                                     </div>
                                                                 </th>
-                                                                <th width="10%">
+                                                                <th width="20%">
+                                                                    <div align="left">
+                                                                        <div style="cursor:pointer;display:inline;">{N_VALIDADOR_ACCION}</div>
+                                                                    </div>
+                                                                </th>
+                                                                <th width="13%">
                                                                     <div align="left">
                                                                         <div style="cursor:pointer;display:inline;">{N_FECHA_ACORDADA}</div>                                                
                                                                     </div>

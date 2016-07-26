@@ -163,7 +163,7 @@ function init_filtrar(){
 //                  $('#proceso').parent().parent().show();
 //                  $('#div-tabs').show();
 //              }
-alert($('#estatus').val());
+//alert($('#estatus').val());
               switch ($('#estatus').val()){
                   case 'en_elaboracion':
                         if (($('#responsable_desvio').val() != '') && ($('#responsable_desvio').val() == $('#user_tok').val())){
@@ -277,7 +277,7 @@ alert($('#estatus').val());
                             '<i class="icon icon-remove"></i>' +
                             '</a>' +
                       '  </td>';
-        html = html + '<td>' +
+        html = html + '<td style="display:none;">' +
                            '  <select id="tipo_'+ i + '" name="tipo_'+ i + '" class="form-control">'+                            
                                 $('#option_tipo').val() +
                                 
@@ -288,6 +288,13 @@ alert($('#estatus').val());
                         '</td>';
         html = html + '<td class="td-table-data">'+
                             '  <select id="responsable_acc_'+ i + '" name="responsable_acc_'+ i + '" class="form-control" data-validation="required" data-live-search="true">'+                            
+                            '<option value="">-- Seleccione --</option>' + 
+                                $('#option_responsables').val() +
+                                
+                            '</select>' +
+                       '</td>';
+               html = html + '<td>'+
+                            '  <select id="validador_acc_'+ i + '" name="validador_acc_'+ i + '" class="form-control" data-validation="required" data-live-search="true">'+                            
                             '<option value="">-- Seleccione --</option>' + 
                                 $('#option_responsables').val() +
                                 

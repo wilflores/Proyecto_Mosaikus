@@ -12,7 +12,7 @@
             <div class="form-group">
                 <label for="fecha_evi" class="col-md-4 control-label" style="color: black;">{N_FECHA_EVI}</label>
                         <div class="col-md-10">
-                            <input type="text" class="form-control" value="{FECHA_EVI}" style="width: 100px;" id="fecha_evi-hv-2" name="fecha_evi" placeholder="{N_FECHA_EVI}"  data-validation="required"/>
+                            <input type="text" class="form-control" data-date-format="DD/MM/YYYY" value="{FECHA_EVI}" style="width: 100px;" id="fecha_evi-hv-2" name="fecha_evi" placeholder="{N_FECHA_EVI}"  data-validation="required"/>
                       </div>                                
                   </div>
                 <div class="form-group">

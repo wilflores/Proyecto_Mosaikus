@@ -4997,9 +4997,11 @@
                 $contenido_1["N_FECHA_ACORDADA"] = $this->nombres_columnas_ac[fecha_acordada];
                 $contenido_1["N_TIPO"] = $this->nombres_columnas_ac[tipo];
                 $contenido_1["N_ID_RESPONSABLE"] = $this->nombres_columnas_ac[id_responsable];
+                $contenido_1["N_VALIDADOR_ACCION"] = $this->nombres_columnas_ac[validador_accion];
                 $contenido_1[TIPOS] .= $ut_tool->OptionsCombo("SELECT id, 
                                                                         descripcion
-                                                                            FROM mos_tipo_ac ORDER BY descripcion"
+                                                                            FROM mos_tipo_ac ORDER BY descripcion 
+                                                                            where id = 1"
                                                                     , 'id'
                                                                     , 'descripcion', null);
                 $contenido_1[RESPONSABLE_ACCIONES] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
@@ -5040,11 +5042,11 @@
                                               '<input id="id_unico_din_'. $i . '" name="id_unico_din_'. $i . '" value="'.$value[id].'" type="hidden" >'.                                              
                                               '<input id="orden_din_'. $i . '" name="orden_din_'. $i . '" value="'.($value[orden] == '' ? $i : $value[orden]).'" type="hidden" >'.
                                        '  </td>';
-                         $item = $item. '<td class="td-table-data">'.
+                         $item = $item. '<td class="td-table-data" style="display:none;">'.
                                              '  <select id="tipo_' .$i. '" name="tipo_'.$i. '" class="form-control">' .
                                                     $ut_tool->OptionsCombo("SELECT id, 
                                                                         descripcion
-                                                                            FROM mos_tipo_ac ORDER BY descripcion"
+                                                                            FROM mos_tipo_ac where id = 1 ORDER BY descripcion "
                                                                     , 'id'
                                                                     , 'descripcion', $value[tipo]).
 
@@ -5068,8 +5070,19 @@
                                             '</select>' .
                                        '</td>';
                          $item = $item . '<td class="td-table-data">'.
-                                            '<input id="fecha_acordada_'. $i .  '" class="form-control" type="text" data-validation="required" value="'.$value[fecha_acordada_a].'" name="fecha_acordada_'. $i .  '" >'.
+                                            '  <select id="responsable_acc_'. $i .  '" name="responsable_acc_'. $i .  '" class="form-control" data-validation="required" data-live-search="true">'.
+                                            '<option value="">-- Seleccione --</option>' . 
+                                                //$('#option_responsables').val() .
+                                                $ut_tool->OptionsCombo("SELECT cod_emp, 
+                                                                        CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  nombres_a
+                                                                            FROM mos_personal p WHERE interno = 1 AND workflow = 'S' ORDER BY nombres, apellido_paterno"
+                                                                    , 'cod_emp'
+                                                                    , 'nombres_a', $value[id_responsable]) . 
+                                            '</select>' .
                                        '</td>';
+                         $item = $item . '<td class="td-table-data"><div class="col-sm-24" style="padding-left: 0px;padding-right: 0px;">'.
+                                            '<input id="fecha_acordada_'. $i .  '"  data-date-format="DD/MM/YYYY" class="form-control" type="text" data-validation="required" value="'.$value[fecha_acordada_a].'" name="fecha_acordada_'. $i .  '" >'.
+                                       '</div></td>';
                         
                         
                         $item = $item. '</tr>' ;                    

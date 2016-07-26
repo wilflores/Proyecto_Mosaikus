@@ -53,10 +53,12 @@
         }
         foreach ($pagina->campos_activos as $key => $value) {
             if ($value[0] == '1'){                        
-                if ($key == 'id_organizacion'){                    
+                if ($key == 'id_organizacion'){                
+                    import('clases.organizacion.ArbolOrganizacional');
+                    $arbol = new ArbolOrganizacional();
                     $contenido_1[ID_ORGANIZACIONES] = '<tr class="'. $class_ao .'">
                                 <td>' . $pagina->nombres_columnas[id_organizacion] . '</td>';
-                    $contenido_1[ID_ORGANIZACIONES] .= '<td>' . $pagina->BuscaOrganizacional($val) . '</td></tr>';
+                    $contenido_1[ID_ORGANIZACIONES] .= '<td>' . $arbol->BuscaOrganizacional($val) . '</td></tr>';
                    
                 }
 

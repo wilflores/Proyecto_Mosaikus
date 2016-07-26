@@ -35,6 +35,15 @@
                 
             }
             
+            public function cargar_nombres_columnas_acciones(){
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 15";
+                $nombres_campos = $this->dbl->query($sql, array());
+                foreach ($nombres_campos as $value) {
+                    $this->nombres_columnas_ac[$value[nombre_campo]] = $value[texto];
+                }
+                
+            }
+            
             private function cargar_placeholder(){
                 $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE modulo = 16";
                 $nombres_campos = $this->dbl->query($sql, array());
@@ -329,11 +338,14 @@
                     $this->total_registros = $total_registros[0][total_registros];   
             
                     $sql = "SELECT acco.id
-                                ,estado
-                                ,ta.descripcion tipo
+                                ,acco.estado
+                                ,ac.id id_ac
+                                ,DATE_FORMAT(fecha_generacion, '%d/%m/%Y') fecha_generacion_a
+                                ,ac.descripcion descripcion
+                                ,ta.descripcion tipo                                
                                 ,accion
-                                ,DATE_FORMAT(fecha_acordada, '%d/%m/%Y') fecha_acordada_a
-                                ,DATE_FORMAT(fecha_realizada, '%d/%m/%Y') fecha_realizada_a
+                                ,DATE_FORMAT(acco.fecha_acordada, '%d/%m/%Y') fecha_acordada_a
+                                ,DATE_FORMAT(acco.fecha_realizada, '%d/%m/%Y') fecha_realizada_a
                                 ,CONCAT(initcap(SUBSTR(per.nombres,1,IF(LOCATE(' ' ,per.nombres,1)=0,LENGTH(per.nombres),LOCATE(' ' ,per.nombres,1)-1))),' ',initcap(per.apellido_paterno)) as id_responsable
                                 
                                 ,CASE WHEN NOT acco.fecha_acordada IS NULL THEN 
@@ -354,6 +366,7 @@
 
                                      $sql_col_left
                             FROM mos_acciones_ac_co acco 
+                            INNER JOIN mos_acciones_correctivas ac ON ac.id = acco.id_ac
                             INNER JOIN mos_tipo_ac ta ON ta.id = tipo
                             INNER JOIN mos_personal per on per.cod_emp = acco.id_responsable
                             $sql_left
@@ -432,11 +445,15 @@
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
                 }
+                $this->cargar_nombres_columnas_acciones();
 
                 $grid->SetConfiguracionMSKS("tblAccionesAC", "");
                 $config_col=array(
                     array( "width"=>"2%","ValorEtiqueta"=>"<div style='width:80px'>&nbsp;</div>"),
                     array( "width"=>"5%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[estado_seguimiento], ENT_QUOTES, "UTF-8")),
+                    array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas_ac[id], "id_ac", $parametros,30)), 
+                    array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas_ac[fecha_generacion], "ac.fecha_generacion", $parametros,80,40)), 
+                    array( "width"=>"20%","ValorEtiqueta"=>link_titulos($this->nombres_columnas_ac[descripcion], "ac.descripcion", $parametros)), 
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[tipo], "tipo", $parametros,"link_titulos_hv")),
                array( "width"=>"20%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[accion], "accion", $parametros,"link_titulos_hv")),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[fecha_acordada], "fecha_acordada", $parametros,"link_titulos_hv")),
@@ -489,9 +506,9 @@
                 for($i=0;$i<count($config_col);$i++){
                     switch ($i) {                                             
 //                        case 1:
-                        case 7:
-                        case 9:
                         case 10:
+                        case 11:
+                        case 12:
                             $grid->hidden[$i] = true;
 //                            array_push($config,$config_col[$i]);
                             break;
@@ -518,6 +535,7 @@
                 
                 $grid->setFuncion("estado", "semaforo_estado");
                 $grid->setFuncion("id", "colum_admin_arbol");
+                $grid->setFuncion("descripcion", "formatear_descripcion");
                 $grid->setParent($this);
                 //$grid->setAligns(1,"center");
                 //$grid->hidden = array(0 => true);
@@ -530,6 +548,16 @@
                 return $out;
             }
      
+       public function formatear_descripcion($tupla,$key){
+            if (strlen($tupla[descripcion])>200)
+                return substr($tupla[descripcion], 0, 200) . '.. <br/>
+                    <a href="#" tok="' .$tupla[id]. '-des" class="ver-mas">
+                        <i class="glyphicon glyphicon-search" href="#search"></i> Ver Mas
+                        <input type="hidden" id="ver-mas-' .$tupla[id]. '-des" value="'.$tupla[descripcion].'"/>
+                    </a>';
+            return $tupla[descripcion];
+        }
+        
         public function cantidad_evidencia($tupla, $key){
                 //,cantidad_evidencia    
             //return $tupla[$key];
@@ -654,14 +682,14 @@
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
-                if ($parametros['corder'] == null) $parametros['corder']="fecha_acordada";
+                if ($parametros['corder'] == null) $parametros['corder']="acco.fecha_acordada";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="0-1-2-3-4-5-6"; 
+                    $parametros['mostrar-col']="0-1-2-3-4-6-7-8-9"; 
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */               
-                $k = 9;
+                $k = 10;
                 $contenido[PARAMETROS_OTROS] = "";
                 foreach ($this->parametros as $value) {                    
                     $parametros['mostrar-col'] .= "-$k";
@@ -764,6 +792,21 @@
                                             placeholder: "Selecione el revisor",
                                             allowClear: true
                                           }); ');
+                /*JS init_tabla*/
+                $objResponse->addScript("$('.ver-mas').on('click', function (event) {
+                                        event.preventDefault();
+                                        var id = $(this).attr('tok');
+                                        $('#myModal-Ventana-Cuerpo').html($('#ver-mas-'+id).val());
+                                        $('#myModal-Ventana-Titulo').html('');
+                                        $('#myModal-Ventana').modal('show');
+                                    });
+/*
+                                    $('.ver-reporte').on('click', function (event) {
+                                        event.preventDefault();
+                                        var id = $(this).attr('tok');
+                                        verAccionesCorrectivas(id);*/
+                                        /*window.open('pages/acciones_correctivas/reporte_ac_pdf.php?id='+id,'_blank');*/
+                                    /*});*/");
                 return $objResponse;
             }
          
@@ -917,6 +960,111 @@
                 $contenido_1['ESTATUS_WF'] = $val["estatus_wf"];
                 $contenido_1['ESTADO'] = $this->semaforo_estado($val,'estado');
 
+                /*LISTADO DE TRAZABILIDAD*/
+                import('clases.acciones_trazabildiad.AccionesTrazavilidad');
+                $ac = new AccionesTrazavilidad();
+                $parametros['b-id_accion'] = $val[id];
+                $parametros[corder] = 'fecha_evi';
+                $parametros[sorder] = '';
+                //$parametros[corder] = 'orden';
+                $ac->listarAccionesTrazavilidad($parametros,1,10000);
+                $data=$ac->dbl->data;
+                //print_r($data);
+                $item = "";
+                //$js = "";
+                $i = 0;
+                $contenido_1['TOK_NEW'] = time();       
+                /* EVIDENCIAS ADJUNTADAS*/
+                if(!class_exists('ArchivosAdjuntos')){
+                    import("clases.utilidades.ArchivosAdjuntos");
+                }
+                $adjuntos = new ArchivosAdjuntos();       
+                
+                //$ids = array('7','8','9','1','2','3','5','6','10');
+                //$desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo');
+                foreach ($data as $value) {                          
+                    $i++;                    
+                    $item = $item. '<tr id="tr-esp-' . $i . '">';                      
+                    
+
+                    {
+                        $adjuntos->ingresar_archivos_adjuntos_temp('mos_acciones_evidencia', 'fk_id_trazabilidad',$value["id"],$contenido_1['TOK_NEW']*1-$i);
+                        
+                                                          //paperclip          
+                        $item = $item. '<td align="center">'.
+                                            ' <a href="' . $i . '"  title="Eliminar " id="eliminar_esp_' . $i . '"> ' . 
+                                            //' <imgsrc="diseno/images/ico_eliminar.png" style="cursor:pointer">' . 
+                                             '<i class="icon icon-remove" style="width: 18px;"></i>'.
+                                             '</a>' .
+//                                             '<i class="subir glyphicon glyphicon-arrow-up cursor-pointer"></i>
+//                                              <i class="bajar glyphicon glyphicon-arrow-down cursor-pointer"></i>'.
+                        '<i class="bajar glyphicon glyphicon-paperclip cursor-pointer" id="ico_cmb_din_'. $i . '" tok="'. $i .'" title="Administrar Anexos"></i>'.
+                                              
+                                              '<input id="id_unico_din_'. $i . '" name="id_unico_din_'. $i . '" value="'.$value[id].'" type="hidden" >'.                                              
+                                              '<input id="orden_din_'. $i . '" name="orden_din_'. $i . '" value="'.($value[orden] == '' ? $i : $value[orden]).'" type="hidden" >'.
+                                       '  </td>';
+                         $item = $item. '<td class="td-table-data">'.
+                                             '  <select id="tipo_' .$i. '" name="tipo_'.$i. '" class="form-control">' .
+                                                    $ut_tool->OptionsComboArrayMultiple($ids, $desc, array($value[tipo])).
+
+                                                '</select>' .
+                                        '</td>';
+//                         $item = $item. '<td>' .
+//                                            $ut_tool->combo_array("tipo_din_$i", $desc, $ids, false, $value["tipo"],"actualizar_atributo_dinamico($i);")  .
+//                                         '</td>';
+                         $item = $item.  '<td>' .
+                                            ' <textarea id="accion_'. $i . '" name="accion_'. $i . '" class="form-control" data-validation="required">'. $value[observacion] .'</textarea>'.
+                                         '</td>';
+                         $item = $item . '<td class="td-table-data">'.
+                                            '  <select id="responsable_acc_'. $i .  '" name="responsable_acc_'. $i .  '" class="form-control" data-validation="required" data-live-search="true">'.
+                                            '<option value="">-- Seleccione --</option>' . 
+                                                //$('#option_responsables').val() .
+                                                $ut_tool->OptionsCombo("SELECT cod_emp, 
+                                                                        CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  nombres_a
+                                                                            FROM mos_personal p WHERE interno = 1 AND workflow = 'S' ORDER BY nombres, apellido_paterno"
+                                                                    , 'cod_emp'
+                                                                    , 'nombres_a', $value[id_persona]) . 
+                                            '</select>' .
+                                       '</td>';
+                         $item = $item . '<td class="td-table-data"><div class="col-sm-24" style="padding-left: 0px;padding-right: 0px;">'.
+                                            '<input id="fecha_acordada_'. $i .  '" data-date-format="DD/MM/YYYY HH:mm"   class="form-control" type="text" data-validation="required" value="'.$value[fecha_evi_a].'" name="fecha_acordada_'. $i .  '" >'.
+                                       '</div></td>';
+                        
+                        
+                        $item = $item. '</tr>' ;                    
+                        $js .= '$("#eliminar_esp_'. $i .'").click(function(e){ 
+                                    e.preventDefault();
+                                    var id = $(this).attr("href");  
+                                    $("#id_unico_del").val($("#id_unico_del").val() + $("#id_unico_din_"+id).val() + ",");
+                                    $("tr-esp-'. $i .'").remove();
+                                    var parent = $(this).parents().parents().get(0);
+                                        $(parent).remove();
+                            });';
+                        $js .= "$('#fecha_acordada_$i').datetimepicker();
+                                $('#responsable_acc_$i').selectpicker({
+                                                                    style: 'btn-combo'
+                                });";
+                        
+                        $js .= '$("#ico_cmb_din_'. $i .'").click(function(e){ 
+                                    e.preventDefault();
+                                    var id = $(this).attr("tok");            
+                                    array = new XArray();
+                                    array.setObjeto("ArchivosAdjuntos","indexItemsFormulario");
+                                    array.addParametro("i",id);
+                                    array.addParametro("fk_id",$("#id_unico_din_"+id).val());
+                                    array.addParametro("titulo",$("#nombre_din_"+id).val());
+                                    array.addParametro("token", $("#tok_new_edit").val());
+                                    array.addParametro("import","clases.utilidades.ArchivosAdjuntos");
+                                    array.addParametro("tipo",1);
+                                    xajax_Loading(array.getArray());
+                                }); ';
+                        
+                    }
+                }               
+                //echo $item;
+                $contenido_1['ITEMS_ESP'] = $item;
+                $contenido_1['NUM_ITEMS_ESP'] = $i;
+                
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'acciones_ac/';
                 $template->setTemplate("formulario_h");
@@ -950,7 +1098,8 @@
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
-                          });$('#datetimepicker1').datetimepicker();$('#datetimepicker4').datetimepicker();");
+                          });");
+                $objResponse->addScript($js);
 //                $objResponse->addScript("$('#fecha_acordada').datetimepicker();");
 //                $objResponse->addScript("$('#fecha_realizada').datetimepicker();");
                 return $objResponse;
@@ -979,16 +1128,56 @@
                     if (strlen($parametros["fecha_realizada"])>0)
                         $parametros["fecha_realizada"] = formatear_fecha($parametros["fecha_realizada"]);
 
-                    $respuesta = $this->modificarAccionesAC($parametros);
+                    /*GUARDAMOS LA TRAZABILIDAD DE UNA ACCION*/
+                    $params = array();
+                    $params[id_ac] = $respuesta;
+                    //IMPORTAMOS CLASE de ACCIONES
+                    import('clases.acciones_trazabildiad.AccionesTrazavilidad');
+                    $trazabilidad = new AccionesTrazavilidad();                    
+                    if (strlen($parametros[id_unico_del])>0){
+                        $parametros[id_unico_del] = substr($parametros[id_unico_del], 0, strlen($parametros[id_unico_del]) - 1);
+                        $sql = "DELETE FROM mos_acciones_trazabilidad WHERE id IN ($parametros[id_unico_del]) and id_accion = $parametros[id]"
+                            . " -- AND NOT id IN (SELECT id_accion FROM mos_acciones_trazabilidad id_accion IN ($parametros[id_unico_del])) ";                               
+                        $this->dbl->insert_update($sql);
+                    }     
+                    //print_r($parametros);
+                    //echo $parametros[num_items_esp];
+                    for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
+                        //GUARDAMOS LAS ACCIONES VALIDAS
+                        if (!isset($parametros["id_unico_din_$i"])){ 
+                            if (isset($parametros["tipo_$i"])){
+                                $params[tipo] = $parametros["tipo_$i"];
+                                $params[observacion] = $parametros["accion_$i"];                                        
+                                $params[id_persona] = $parametros["responsable_acc_$i"];                                
+                                $params[fecha_evi] = formatear_fecha_hora($parametros["fecha_acordada_$i"]);
+                                //$params[orden] = $parametros["orden_din_$i"];     
+                                $params[id_accion] = $parametros[id];
+                                //$trazabilidad->ingresarAccionesTrazavilidad($params);                                                               
+                            }
+                        }else{
+                            if (isset($parametros["tipo_$i"])){
+                                $params[tipo] = $parametros["tipo_$i"];
+                                $params[observacion] = $parametros["accion_$i"];                                        
+                                $params[id_persona] = $parametros["responsable_acc_$i"];                                
+                                $params[fecha_evi] = formatear_fecha_hora($parametros["fecha_acordada_$i"]);
+                                //$params[orden] = $parametros["orden_din_$i"];     
+                                $params[id_accion] = $parametros[id];   
+                                $params[id] = $parametros["id_unico_din_$i"]; 
+                                $trazabilidad->modificarAccionesTrazavilidad($params);
+                            }
+                        }
+                    }
+                    //$respuesta = $this->modificarAccionesAC($parametros);
 
-                    if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
+                    //if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) 
+                    {
                         $objResponse->addScriptCall("MostrarContenido");
                         $objResponse->addScript("reset_formulario();");
                         $objResponse->addScript("verPagina_hv(1,1);");
                         $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
                     }
-                    else
-                        $objResponse->addScriptCall('VerMensaje','error',$respuesta);
+                    //else
+                    //    $objResponse->addScriptCall('VerMensaje','error',$respuesta);
                 }
                           
                 $objResponse->addScript("$('#MustraCargando').hide();"); 

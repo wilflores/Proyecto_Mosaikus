@@ -8,17 +8,17 @@
             xajax_Loading(array.getArray());
     }
 
-    function validar_hv(doc){        
-        if($('#idFormulario-hv').isValid()) {
-            $( "#btn-guardar-hv" ).html('Procesando..');
-            $( "#btn-guardar-hv" ).prop( "disabled", true );
+    function validar(doc){        
+        if($('#idFormulario').isValid()) {
+            $( "#btn-guardar" ).html('Procesando..');
+            $( "#btn-guardar" ).prop( "disabled", true );
             array = new XArray();
-            if (doc.getElementById("opc-hv").value == "new")
+            if (doc.getElementById("opc").value == "new")
                 array.setObjeto('AccionesAC','guardar');
             else
                 array.setObjeto('AccionesAC','actualizar');
             array.addParametro('permiso',document.getElementById('permiso_modulo').value);
-            array.getForm('idFormulario-hv');
+            array.getForm('idFormulario');
             array.addParametro('import','clases.acciones_ac.AccionesAC');
             xajax_Loading(array.getArray());
         }else{
@@ -39,8 +39,9 @@
         i = parseInt(i) + 1;        
         var html = '<tr id="tr-esp-' + i + '">'; 
         html = html + '<td align="center">'+
-                           ' <i class="subir glyphicon glyphicon-arrow-up cursor-pointer"></i><i class="bajar glyphicon glyphicon-arrow-down cursor-pointer"></i>'+
-                           '<input id="orden_din_'+ i + '" type="hidden" name="orden_din_'+ i + '" value="'+ i + '">'+                           
+                           //' <i class="subir glyphicon glyphicon-arrow-up cursor-pointer"></i><i class="bajar glyphicon glyphicon-arrow-down cursor-pointer"></i>'+
+                           '<input id="orden_din_'+ i + '" type="hidden" name="orden_din_'+ i + '" value="'+ i + '">'+   
+                           '<i class="bajar glyphicon glyphicon-paperclip cursor-pointer" id="ico_cmb_din_'+ i +  '" tok="'+ i + '" title="Administrar Anexos"></i>'+
                            ' <a href="' + i + '"  title="Eliminar " id="eliminar_esp_' + i + '"> ' + 
                             '<i class="icon icon-remove"></i>' +
                             '</a>' +
@@ -68,7 +69,7 @@
         html = html + '</tr>' ;       
         $("#table-items-esp tbody").append(html);  
         var myDate = new Date();
-        $('#fecha_acordada_'+i).val((myDate.getDate()) + '/' + (myDate.getMonth()+1) + '/' + myDate.getFullYear() + ' ' + myDate.getHours()+':'+myDate.getMinutes());
+        $('#fecha_acordada_'+i).val((myDate.getDate()) + '/' + (((myDate.getMonth()+1)<10)?'0'+ (myDate.getMonth()+1):(myDate.getMonth()+1))+ '/' + myDate.getFullYear() + ' ' + myDate.getHours()+':'+myDate.getMinutes());
         $('#fecha_acordada_'+i).datetimepicker();
         $('#responsable_acc_' + i).selectpicker({
                                             style: 'btn-combo'
