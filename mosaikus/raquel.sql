@@ -154,4 +154,12 @@ INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES(
 INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('codigo', 'Código', 29, 'Ingrese Código');
 INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id_items', 'Items', 29, 'Items');
 INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id', 'id', 29, 'id');
-INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('orden', 'Orden', 28, 'Orden');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('orden', 'Orden', 29, 'Orden');
+/*********** Campos usados en el modulo de requisitos************/
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id', 'Id', 30, 'Id');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('nombre', 'Nombre', 30, 'Nombre');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('tipo', 'Tipo', 30, 'Tipo');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('vigencia', 'Aplica Vigencia', 30, 'Aplica Vigencia');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('estatus', 'Estatus', 30, 'Estatus');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('orden', 'Orden', 30, 'Orden');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id_area', 'Arbol Organizacional', 30, 'Arbol Organizacional');
