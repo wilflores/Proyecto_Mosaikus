@@ -206,18 +206,18 @@
                                                                           
                                         </div>
                                         
-                                        <div class="form-group">
-                                            <label for="aprobo" class="control-label">{N_APROBO}</label>
-                                                                                       
-                                              <select id="b-aprobo" name="b-aprobo" >
-                                                <option selected="" value="">-- Seleccione --</option>
-                                                {APROBO}
-                                             </select>
-                                             <input type="hidden" id="b-id_organizacion" name="b-id_organizacion"/>                                                                        
-                                             <input type="hidden" name="b-ocultar-publico" id="b-ocultar-publico">
-                                             <input type="hidden" id="b-area_espejo" name="b-area_espejo"/> 
-                                        </div>
-                                             <div class="form-group">
+                                    <div class="form-group">
+                                        <label for="aprobo" class="control-label">{N_APROBO}</label>
+
+                                          <select id="b-aprobo" name="b-aprobo" >
+                                            <option selected="" value="">-- Seleccione --</option>
+                                            {APROBO}
+                                         </select>
+                                         <input type="hidden" id="b-id_organizacion" name="b-id_organizacion"/>                                                                        
+                                         <input type="hidden" name="b-ocultar-publico" id="b-ocultar-publico">
+                                         <input type="hidden" id="b-area_espejo" name="b-area_espejo"/> 
+                                    </div>
+                                    <div class="form-group">
                                         <label for="vigencia" class="col-md-24 control-label">{N_VIGENCIA}</label>                                                                                                           
                                         
                                     </div>                                    
@@ -227,6 +227,27 @@
                                             <input type="radio" value="N" id="b-vigencia" name="b-vigencia"> No &nbsp; 
                                         </label>
                                      </div>
+                                    <div class="form-group">
+                                        <label for="tipo-documento" class="control-label">{N_TIPO_DOCUMENTO}</label>
+
+                                          <select id="b-tipo-documento" name="b-tipo-documento[]" multiple>
+                                            <option selected="" value="0">-- Seleccione --</option>
+                                            {TIPOS_DOCUMENTOS}
+                                         </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="requiere_lista" class="col-md-24 control-label">{N_REQUIERE_LISTA_DISTRIBUCION}</label>                                                                                                           
+                                        
+                                    </div>                                    
+                                    <div class="form-group"> 
+                                        <label class="checkbox-inline" style="padding-top: 0px;"> 
+                                            <input type="radio" checked="checked" value="S" id="b-requiere-lista" name="b-requiere-lista"> Si &nbsp; 
+                                            <input type="radio" value="N" id="b-requiere-lista" name="b-requiere-lista"> No &nbsp; 
+                                            <input type="radio" checked="checked" value="T" id="b-requiere-lista" name="b-requiere-lista"> Todos &nbsp; 
+                                        </label>
+                                     </div>
+
+
                             <!--<div class="form-group">
                                   <label for="vigencia" class="col-md-2 control-label">{N_VIGENCIA}</label>
                                   <div class="col-md-2">
