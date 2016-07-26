@@ -4516,6 +4516,7 @@
                 $contenido_1["N_FECHA_ACORDADA"] = $this->nombres_columnas_ac[fecha_acordada];
                 $contenido_1["N_TIPO"] = $this->nombres_columnas_ac[tipo];
                 $contenido_1["N_ID_RESPONSABLE"] = $this->nombres_columnas_ac[id_responsable];
+                $contenido_1["N_VALIDADOR_ACCION"] = $this->nombres_columnas_ac[validador_accion];
                 $contenido_1[TIPOS] .= $ut_tool->OptionsCombo("SELECT id, 
                                                                         descripcion
                                                                             FROM mos_tipo_ac where id = 1 ORDER BY descripcion"
