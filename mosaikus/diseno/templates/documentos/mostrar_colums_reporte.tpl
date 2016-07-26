@@ -73,10 +73,26 @@
                                       {N_APROBO}</label>
                                   
                             </div>   
+                            <div class="checkbox">
+                                  
+                                  
+                                      <label>
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="12" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                      {N_TIPO_DOCUMENTO}</label>
+                                  
+                            </div>
+                            <div class="checkbox">
+                                  
+                                  
+                                      <label>
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="13" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                      {N_REQUIERE_LISTA_DISTRIBUCION}</label>
+                                  
+                            </div>
                                   <div {MOSTRARREGISTRO} class="checkbox">
                                   
                                     <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="12" class="checkbox-mos-col" {FORMULARIOCHECKED}>   &nbsp;
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="14" class="checkbox-mos-col" {FORMULARIOCHECKED}>   &nbsp;
                                       {N_FORMULARIO}</label>
                                   
                             </div>
@@ -84,7 +100,7 @@
                                   
     
                                       <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="13" class="checkbox-mos-col" >   &nbsp;
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="15" class="checkbox-mos-col" >   &nbsp;
                                       {N_V_MESES}</label>
                                   
                             </div>
@@ -93,21 +109,21 @@
                                   
     
                                       <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="14" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="16" class="checkbox-mos-col" checked="checked">   &nbsp;
                                       {N_VERSION}</label>
                                   
                             </div><div class="checkbox">
                                   
                                   
                                       <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="15" class="checkbox-mos-col" >   &nbsp;
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="17" class="checkbox-mos-col" >   &nbsp;
                                       {N_FECHA}</label>
                                   
                             </div><div class="checkbox">
                                   
                                   
                                       <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="16" class="checkbox-mos-col" >   &nbsp;
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="18" class="checkbox-mos-col" >   &nbsp;
                                       {N_DESCRIPCION}</label>
                                   
                             </div>
@@ -115,7 +131,7 @@
                                   
                                   
                                       <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="17" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="19" class="checkbox-mos-col" checked="checked">   &nbsp;
                                       Revisión</label>
                                   
                             </div>      
@@ -123,7 +139,7 @@
                                   
                                   
                                       <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="18" class="checkbox-mos-col" >   &nbsp;
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="20" class="checkbox-mos-col" >   &nbsp;
                                       Fecha de Revisión</label>
                                   
                             </div>  
@@ -146,7 +162,7 @@
                                   
                                   
                                       <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="20" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="22" class="checkbox-mos-col" checked="checked">   &nbsp;
                                       {N_ARBPROC}</label>
                                   
                             </div><!--<div class="checkbox">
@@ -195,14 +211,14 @@
                                   
                                  
                                       <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="22" class="checkbox-mos-col" >   &nbsp;
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="24" class="checkbox-mos-col" >   &nbsp;
                                       {N_PUBLICO}</label>
                                   </div>
                                   <div class="checkbox">
                                   
                                   
                                       <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="23" class="checkbox-mos-col" >   &nbsp;
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="25" class="checkbox-mos-col" >   &nbsp;
                                       {N_OBSERVACION}</label>
                                   
                             </div><!--<div class="checkbox">
