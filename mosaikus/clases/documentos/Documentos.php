@@ -1808,7 +1808,11 @@ echo $Consulta3;
                     return ($combosemp);
               }
              public function listarDocumentos($atr, $pag, $registros_x_pagina){
-                 //print_r($atr);
+                //print_r($atr);
+                    if (sizeof($atr["b-tipo-documento"])>0)
+                        unset($atr["b-tipo-documento"][array_search('0', $atr["b-tipo-documento"])]);
+
+                 //echo implode(',', $atr["b-tipo-documento"]);die;
                  // HABILIYAR LA COLUMNA ESYAD0
                     //print_r($atr);
                     if(!class_exists('Parametros')){
@@ -2024,20 +2028,14 @@ echo $Consulta3;
 //                                $sql .= " AND upper(formulario) like '%" . strtoupper($atr["b-formulario"]) . "%'";
                     if (strlen($atr["b-vigencia"])>0)
                         $sql .= " AND (d.vigencia) = '" . ($atr["b-vigencia"]) . "'";
-//                    if (strlen($atr["b-publico"])>0){
-//                        if (strlen($atr["b-privado"])>0){
-//                            
-//                        }
-//                        else
-//                            
-//                            $sql .= " AND publico = 'S'";
-//                    }
-//                    else
-//                    if (strlen($atr["b-privado"])>0)
-//                        $sql .= " AND publico = 'N'";
-//                    if (strlen($atr["b-ocultar-publico"])>0)
-//                        $sql .= " AND d.publico <> 'S' ";
-                    if (strlen($atr["b-doc_fisico"])>0)
+                     
+                     if (sizeof($atr["b-tipo-documento"])>0)
+                        $sql .= " and d.tipo_documento IN (0". implode(',', $atr["b-tipo-documento"]) . ")";                   
+                    if ($atr["b-requiere-lista"]!='T' && $atr["b-requiere-lista"]!='')
+                        $sql .= " AND (d.requiere_lista_distribucion) = '" . ($atr["b-requiere-lista"]) . "'";
+                     
+
+                     if (strlen($atr["b-doc_fisico"])>0)
                         $sql .= " AND doc_fisico = '". $atr["b-doc_fisico"] . "'";
                     if (strlen($atr["b-contentType"])>0)
                         $sql .= " AND upper(contentType) like '%" . strtoupper($atr["b-contentType"]) . "%'";
@@ -2103,6 +2101,8 @@ echo $Consulta3;
                                     ,CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  elaboro
                                     ,CONCAT(initcap(SUBSTR(re.nombres,1,IF(LOCATE(' ' ,re.nombres,1)=0,LENGTH(re.nombres),LOCATE(' ' ,re.nombres,1)-1))),' ',initcap(re.apellido_paterno)) reviso                                    
                                     ,CONCAT(initcap(SUBSTR(ap.nombres,1,IF(LOCATE(' ' ,ap.nombres,1)=0,LENGTH(ap.nombres),LOCATE(' ' ,ap.nombres,1)-1))),' ',initcap(ap.apellido_paterno)) aprobo
+                                    ,tipo.descripcion tipo_documento
+                                     ,CASE d.requiere_lista_distribucion WHEN 'S' Then 'Si' ELSE 'No' END requiere_lista_distribucion 
                                     $campo_formulario
                                     ,v_meses                                    
                                     ,version
@@ -2139,6 +2139,7 @@ echo $Consulta3;
                                 left join mos_workflow_documentos wf on d.id_workflow_documento = wf.id
                                 left join (select IDDoc, count(*) num_rev, max(fechaRevision) fecha_revision from mos_documento_revision GROUP BY IDDoc) as rev ON rev.IDDoc = d.IDDoc
                                 INNER JOIN (select IDDoc id , GROUP_CONCAT(id_organizacion_proceso) arbol_organizacional from mos_documentos_estrorg_arbolproc GROUP BY IDDoc) AS dao ON dao.id = d.IDDoc
+                                left join mos_documentos_tipos tipo on d.tipo_documento = tipo.id
                             $sql_left
                                 $filtro_ao
                             WHERE muestra_doc='S' ";
@@ -2231,19 +2232,10 @@ echo $Consulta3;
 //                                $sql .= " AND upper(formulario) like '%" . strtoupper($atr["b-formulario"]) . "%'";
                     if (strlen($atr["b-vigencia"])>0)
                         $sql .= " AND (d.vigencia) = '" . ($atr["b-vigencia"]) . "'";
-//                    if (strlen($atr["b-publico"])>0){
-//                        if (strlen($atr["b-privado"])>0){
-//                            
-//                        }
-//                        else
-//                            
-//                            $sql .= " AND publico = 'S'";
-//                    }
-//                    else
-//                    if (strlen($atr["b-privado"])>0)
-//                        $sql .= " AND publico = 'N'";
-//                    if (strlen($atr["b-ocultar-publico"])>0)
-//                        $sql .= " AND d.publico <> 'S' ";
+                     if (sizeof($atr["b-tipo-documento"])>0)
+                        $sql .= " and d.tipo_documento IN (0". implode(',', $atr["b-tipo-documento"]) . ")";                   
+                    if ($atr["b-requiere-lista"]!='T' && $atr["b-requiere-lista"]!='')
+                        $sql .= " AND (d.requiere_lista_distribucion) = '" . ($atr["b-requiere-lista"]) . "'";
                     
                     if (strlen($atr["b-doc_fisico"])>0)
                         $sql .= " AND doc_fisico = '". $atr["b-doc_fisico"] . "'";
@@ -2308,7 +2300,7 @@ echo $Consulta3;
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //print_r(array_keys($this->id_org_acceso));
                     //print_r($atr);
-                    // echo $sql;
+                   // echo $sql;
                     $this->operacion($sql, $atr);
                     
              }
@@ -2446,6 +2438,9 @@ echo $Consulta3;
                                     ,dao.arbol_organizacional 
                                     ,CASE d.publico WHEN 'S' Then 'Si' ELSE 'No' END publico    
                                     ,tipo.descripcion tipo_documento
+                                    ,CASE d.requiere_lista_distribucion WHEN 'S' Then 'Si' ELSE 'No' END requiere_lista_distribucion
+                                    ,doccargos.cod_cargo cargos
+                                    ,doc_relacionados 
                                     ,semaforo
                                     ,d.IDDoc
                                     $sql_col_left    
@@ -2457,6 +2452,26 @@ echo $Consulta3;
                                 left join mos_workflow_documentos wf on d.id_workflow_documento = wf.id
                                 left join (select IDDoc, count(*) num_rev, max(fechaRevision) fecha_revision from mos_documento_revision GROUP BY IDDoc) as rev ON rev.IDDoc = d.IDDoc
                                 INNER JOIN (select IDDoc id , id_organizacion_proceso arbol_organizacional from mos_documentos_estrorg_arbolproc ) AS dao ON dao.id = d.IDDoc
+                                left join (SELECT
+                                            replace(GROUP_CONCAT(cargo.descripcion),',',';') cod_cargo,
+                                            d.IDDoc
+                                            FROM
+                                            mos_documentos AS d
+                                            INNER JOIN mos_documentos_cargos AS doccargo ON d.IDDoc = doccargo.IDDoc
+                                            INNER JOIN mos_cargo AS cargo ON doccargo.cod_cargo = cargo.cod_cargo
+                                            GROUP BY
+                                            d.IDDoc) doccargos
+                                            on d.IDDoc = doccargos.IDDoc
+                                left join (SELECT
+                                            replace((GROUP_CONCAT(CONCAT(d2.Codigo_doc,'-',d2.nombre_doc))),',',';') doc_relacionados,
+                                            d.IDDoc
+                                            FROM
+                                            mos_documentos AS d
+                                            INNER JOIN mos_documentos_relacionados AS rel ON d.IDDoc = rel.IDDoc
+                                            INNER JOIN mos_documentos  AS d2 ON rel.IDDoc_relacionado = d2.IDDoc
+                                            GROUP BY
+                                            d.IDDoc) docrel
+                                            on d.IDDoc = docrel.IDDoc                                            
                             $sql_left
                                 $filtro_ao
                             WHERE muestra_doc='S' ";
@@ -2539,6 +2554,14 @@ echo $Consulta3;
                                 $sql .= " AND upper(palabras_claves) like '%" . strtoupper($atr["b-palabras_claves"]) . "%'";
 //                    if (strlen($atr["b-formulario"])>0)
 //                                $sql .= " AND upper(formulario) like '%" . strtoupper($atr["b-formulario"]) . "%'";
+                    if (sizeof($atr["b-tipo-documento"])>0)
+                        unset($atr["b-tipo-documento"][array_search('0', $atr["b-tipo-documento"])]);
+                     
+                     if (sizeof($atr["b-tipo-documento"])>0)
+                        $sql .= " and d.tipo_documento IN (0". implode(',', $atr["b-tipo-documento"]) . ")";                   
+                    if ($atr["b-requiere-lista"]!='T' && $atr["b-requiere-lista"]!='')
+                        $sql .= " AND (d.requiere_lista_distribucion) = '" . ($atr["b-requiere-lista"]) . "'";
+                    
                     if (strlen($atr["b-vigencia"])>0)
                         $sql .= " AND (d.vigencia) = '" . ($atr["b-vigencia"]) . "'";
                     if (strlen($atr["b-doc_fisico"])>0)
@@ -2784,7 +2807,7 @@ echo $Consulta3;
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
                 }
-
+                //"2-3-4-5-7-8-9-14-17-20-21"
                 $grid->SetConfiguracionMSKS("tblDocumentos", "");
                 $config_col=array(
                array( "width"=>"1%","ValorEtiqueta"=>"ID"),     
@@ -2801,6 +2824,8 @@ echo $Consulta3;
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[elaboro], "elaboro", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[reviso], "reviso", $parametros)),               
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[aprobo], "aprobo", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[tipo_documento], "tipo_documento", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[requiere_lista_distribucion], "requiere_lista_distribucion", $parametros)),     
                array( "width"=>"4%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[formulario], "formulario", $parametros,65)),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[v_meses], "v_meses", $parametros)),                    
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
@@ -2953,6 +2978,9 @@ echo $Consulta3;
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[elaboro], "elaboro", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[reviso], "reviso", $parametros)),               
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[aprobo], "aprobo", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[tipo_documento], "tipo_documento", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[requiere_lista_distribucion], "requiere_lista_distribucion", $parametros)),     
+                    
                array( "width"=>"4%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[formulario], "formulario", $parametros)),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[v_meses], "v_meses", $parametros)),                    
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
@@ -3222,6 +3250,9 @@ echo $Consulta3;
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[elaboro], "elaboro", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[reviso], "reviso", $parametros)),               
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[aprobo], "aprobo", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[tipo_documento], "tipo_documento", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[requiere_lista_distribucion], "requiere_lista_distribucion", $parametros)),     
+              
                array( "width"=>"4%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[formulario], "formulario", $parametros)),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[v_meses], "v_meses", $parametros)),                    
                array( "width"=>"2%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
@@ -3345,9 +3376,10 @@ echo $Consulta3;
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
                 if ($parametros['mostrar-col'] == null) 
                     if($cod_categoria == 15)
-                        $parametros['mostrar-col']="2-3-4-5-7-8-9-12-14-17-20-21";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
+                        $parametros['mostrar-col']="2-3-4-5-7-8-9-12-13-14-16-19-22-23";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
                     else
-                        $parametros['mostrar-col']="2-3-4-5-7-8-9-14-17-20-21";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
+                        $parametros['mostrar-col']="2-3-4-5-7-8-9-12-13-16-19-22-23";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
+                        //$parametros['mostrar-col']="2-3-4-5-7-8-9-14-17-20-21";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
                 if (count($this->parametros) <= 0){
                         $this->cargar_parametros($cod_categoria);
                 }
@@ -3389,6 +3421,10 @@ echo $Consulta3;
                 $contenido['PAGINADO'] = $grid['paginado'];
                 $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
                 $ut_tool = new ut_Tool();
+                
+                $contenido['TIPOS_DOCUMENTOS'] = $ut_tool->OptionsComboMultiple("SELECT id, descripcion FROM mos_documentos_tipos $sql_where_tipo_documentos "
+                                                                    , 'id'
+                                                                    , 'descripcion');
                 
                 $contenido['REVISORES'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  nombres
@@ -3501,7 +3537,11 @@ echo $Consulta3;
                 $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
                 $objResponse->addAssign('modulo_actual',"value","documentos");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'documentos/documentos.js?'.  rand());
-                $objResponse->addScript("$('#MustraCargando').hide();");                                
+                $objResponse->addScript("$('#MustraCargando').hide();");        
+                $objResponse->addScript("$('#b-tipo-documento').selectpicker({
+                                                style: 'btn-combo'
+                                              });$js");
+                
                 //$objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
                 //$objResponse->addScript('setTimeout(function(){ init_tabla(); }, 500);');
                 /*JS init_filtrar*/
@@ -3577,7 +3617,7 @@ echo $Consulta3;
                 if ($parametros['corder'] == null) $parametros['corder']="dias_vig";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="2-4-5-6-12-14-17-20";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
+                    $parametros['mostrar-col']="2-4-5-6-12-13-14-16-19-22";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
                 if (count($this->parametros) <= 0){
                         $this->cargar_parametros(15);
                 }
@@ -3613,6 +3653,11 @@ echo $Consulta3;
                 $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
                 $contenido['PERMISO_INGRESAR'] = 'display:none;';
                 $ut_tool = new ut_Tool();
+                
+                $contenido['TIPOS_DOCUMENTOS'] = $ut_tool->OptionsComboMultiple("SELECT id, descripcion FROM mos_documentos_tipos $sql_where_tipo_documentos "
+                                                                    , 'id'
+                                                                    , 'descripcion');
+                
                 $contenido['REVISORES'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
                                                                             FROM mos_personal p WHERE reviso = 'S'"
@@ -3794,6 +3839,9 @@ echo $Consulta3;
                                     });");
                 $objResponse->addScript("$('#tabs-visualiza').tab();"
                         . "$('#tabs-visualiza a:first').tab('show');"); 
+                $objResponse->addScript("$('#b-tipo-documento').selectpicker({
+                                                style: 'btn-combo'
+                                              });$js");
                 
                 $objResponse->addScript($js_flujo);
                 return $objResponse;
@@ -3844,7 +3892,7 @@ echo $Consulta3;
                 if ($parametros['corder'] == null) $parametros['corder']="dias_vig";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="2-4-5-14-17-20";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
+                    $parametros['mostrar-col']="2-4-5-12-13-16-19-22";//"2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-"; 
                 if (count($this->parametros) <= 0){
                         $this->cargar_parametros(1);
                 }
@@ -3880,6 +3928,10 @@ echo $Consulta3;
                 $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
                 $contenido['PERMISO_INGRESAR'] = 'display:none;';
                 $ut_tool = new ut_Tool();
+                $contenido['TIPOS_DOCUMENTOS'] = $ut_tool->OptionsComboMultiple("SELECT id, descripcion FROM mos_documentos_tipos $sql_where_tipo_documentos "
+                                                                    , 'id'
+                                                                    , 'descripcion');
+                
                 $contenido['REVISORES'] = $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
                                                                             FROM mos_personal p WHERE reviso = 'S'"
@@ -4046,7 +4098,11 @@ echo $Consulta3;
                                                 $('#myModal-Ventana').modal('show');
                                             });");
                 $objResponse->addScript("$('#tabs-visualiza').tab();"
-                        . "$('#tabs-visualiza a:first').tab('show');");                
+                        . "$('#tabs-visualiza a:first').tab('show');");     
+                $objResponse->addScript("$('#b-tipo-documento').selectpicker({
+                                                style: 'btn-combo'
+                                              });$js");
+                
                 $objResponse->addScript($js_flujo);
                 
                 //$objResponse->addScript('setTimeout(function(){ init_documentos(); }, 500);');
