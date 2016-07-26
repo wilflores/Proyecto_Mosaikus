@@ -11,7 +11,8 @@ function init_tabla(){
         $('.ver-reporte').on('click', function (event) {
             event.preventDefault();
             var id = $(this).attr('tok');
-            window.open('pages/acciones_correctivas/reporte_ac_pdf.php?id='+id,'_blank');
+            verAccionesCorrectivas(id);
+            /*window.open('pages/acciones_correctivas/reporte_ac_pdf.php?id='+id,'_blank');*/
         });
 }
 
