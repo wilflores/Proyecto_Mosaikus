@@ -96,7 +96,7 @@
             }
             
             private function cargar_nombres_columnas(){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 21";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo = 21";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
@@ -104,7 +104,7 @@
             }
             
             private function cargar_nombres_columnas_perfil(){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 19";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo = 19";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
@@ -112,7 +112,7 @@
             }            
             
             private function cargar_placeholder(){
-                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE modulo = 21";
+                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo = 21";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->placeholder[$value[nombre_campo]] = $value[placeholder];
@@ -148,6 +148,7 @@
                         ,password_1
                         ,cedula
                         ,recibe_notificaciones
+                        ,id_idioma
                          FROM mos_usuario 
                          WHERE id_usuario = $id "; 
                 $this->operacion($sql, $atr);
@@ -233,7 +234,67 @@
                         return $error; 
                     }
             }
-             public function listarmos_usuario($atr, $pag, $registros_x_pagina){
+            public function modificar_general($atr){
+                try {
+                    //print_r($atr);
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $val = $this->vermos_usuario($atr[id_usuario]);
+                    $atr[recibe_notificaciones] = $atr["recibe_notificaciones"] == 'S' ? "'S'" : 'NULL';
+                    $sql = "UPDATE mos_usuario SET                            
+                                    recibe_notificaciones = $atr[recibe_notificaciones], id_idioma = $atr[id_idioma]
+                            WHERE  id_usuario = $atr[id_usuario]"; 
+                    
+                    $this->dbl->insert_update($sql);
+                    return "Los datos generales ha sido actualizado con exito";
+                } catch(Exception $e) {
+                        $error = $e->getMessage();                     
+                        if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
+                            return "Ya existe una sección con el mismo nombre.";                        
+                        return $error; 
+                    }
+            }
+            public function modificarmos_contrasena($atr){
+                try {
+                    import('clases.bd.MysqlBDP');
+                    import('clases.bd.Mysql');
+                    $pagina = new MysqlBDP();
+                    /*SELECCIONAMOS LAS BDS Y OBTENEMOS CREDENCIALES*/
+                    $Consulta = 'SELECT
+                                id_empresa,
+                                businessName,
+                                address,
+                                scheme,
+                                db,
+                                loginDB,
+                                passwordDB
+                                FROM
+                                mos_adm_empresas 
+                                where id_empresa=11';
+                    //QUITAR LA VALIDACION DE ID_EMPRESA=11
+                    $data = $pagina->query($Consulta, array()); 
+                    //print_r($data);
+                    $pass = md5($atr[password_2]);
+                    foreach( $data as $bds)
+                    {
+                        if($bds[db]!='' && $bds[loginDB]!='' && $bds[passwordDB]!=''){
+                            $pagina2 = new Mysql($bds["db"],$bds["loginDB"],$bds["passwordDB"]);
+                                $sql = "UPDATE mos_usuario SET                            
+                                                password_1 = '$pass'
+                                        WHERE  email = '$atr[email]'"; 
+                                $pagina2->insert_update($sql, array());
+                                //echo $sql;
+                        }
+                    }
+                    return "El password ha sido actualizado con exito";
+                } catch(Exception $e) {
+                        $error = $e->getMessage();                     
+                        if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
+                            return "Ya existe una sección con el mismo nombre.";                        
+                        return $error; 
+                    }
+            }
+
+            public function listarmos_usuario($atr, $pag, $registros_x_pagina){
                 //print_r($atr);
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
@@ -1199,7 +1260,8 @@
                        // );
                 return $objResponse;
             }
-     
+  
+            
  
             public function editar($parametros)
             {
@@ -1275,7 +1337,7 @@ $objResponse->addScript("$('#fecha_expi').datetimepicker();");
  
             public function actualizar($parametros)
             {
-             
+               
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $objResponse = new xajaxResponse();
@@ -1311,7 +1373,101 @@ $objResponse->addScript("$('#fecha_expi').datetimepicker();");
                 return $objResponse;
             }
      
- 
+            public function cambiarcontrasena($parametros)
+            {
+             //print_r($parametros);
+                session_name("$GLOBALS[SESSION]");
+                session_start();
+                $objResponse = new xajaxResponse();
+                unset ($parametros['opc']);         
+                $val = $this->vermos_usuario($_SESSION['CookIdUsuario']);
+
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                
+                if ($val[password_1]!=md5($parametros[password_1])){
+                    $mensaje = "El ".$this->nombres_columnas[password_1]." actual no coincide";
+                    $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
+                    $objResponse->addScript("$('#MustraCargando').hide();"); 
+                    $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                                            $( '#btn-guardar' ).prop( 'disabled', false );");                    
+                    return $objResponse;
+                }
+                if ($parametros[password_2]!=$parametros[password_3]){
+                    $mensaje = "El ".$this->nombres_columnas[password_2]." debe ser igual a ".$this->nombres_columnas[password_3];
+                    $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
+                    $objResponse->addScript("$('#MustraCargando').hide();"); 
+                    $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                                            $( '#btn-guardar' ).prop( 'disabled', false );");                    
+                    return $objResponse;
+                }
+                $validator = new FormValidator();
+                $parametros[id_usuario]=$_SESSION['CookIdUsuario'];
+                if(!$validator->ValidateForm($parametros)){
+                        $error_hash = $validator->GetErrors();
+                        $mensaje="";
+                        foreach($error_hash as $inpname => $inp_err){
+                                $mensaje.="- $inp_err <br/>";
+                        }
+                         $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
+                }else{                    
+                    $respuesta = $this->modificarmos_contrasena($parametros);
+
+                    if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
+                        $objResponse->addScriptCall("MostrarContenido");
+                        $objResponse->addScript("verPagina(1,1);");
+                        $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+                    }
+                    else
+                        $objResponse->addScriptCall('VerMensaje','error',$respuesta);
+                }
+                          
+                $objResponse->addScript("$('#MustraCargando').hide();"); 
+                $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                                        $( '#btn-guardar' ).prop( 'disabled', false );");
+                return $objResponse;
+            }
+             public function cambiargeneral($parametros)
+            {
+             //print_r($parametros);
+                session_name("$GLOBALS[SESSION]");
+                session_start();
+                $objResponse = new xajaxResponse();
+                unset ($parametros['opc']);         
+                $val = $this->vermos_usuario($_SESSION['CookIdUsuario']);
+
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                
+                $validator = new FormValidator();
+                $parametros[id_usuario]=$_SESSION['CookIdUsuario'];
+                if(!$validator->ValidateForm($parametros)){
+                        $error_hash = $validator->GetErrors();
+                        $mensaje="";
+                        foreach($error_hash as $inpname => $inp_err){
+                                $mensaje.="- $inp_err <br/>";
+                        }
+                         $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
+                }else{                    
+                    $respuesta = $this->modificar_general($parametros);
+
+                    if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
+                        $objResponse->addScriptCall("MostrarContenido");
+                        $objResponse->addScript("verPagina(1,1);");
+                        $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+                    }
+                    else
+                        $objResponse->addScriptCall('VerMensaje','error',$respuesta);
+                }
+                          
+                $objResponse->addScript("$('#MustraCargando').hide();"); 
+                $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                                        $( '#btn-guardar' ).prop( 'disabled', false );");
+                return $objResponse;
+            }
+
             public function eliminar($parametros)
             { 
                 $val = $this->vermos_usuario($parametros[id]);                 
@@ -1798,5 +1954,155 @@ $objResponse->addScript("$('#fecha_expi').datetimepicker();");
                                $( '#btn-guardar' ).prop( 'disabled', false );");
        return $objResponse;
    }    
+        public function configuraciones()
+        {
+            
+            if(!class_exists('Template')){
+                import("clases.interfaz.Template");
+            }
+            session_name($GLOBALS[SESSION]);
+            session_start();
+            //echo 1;
+            $val = $this->vermos_usuario($_SESSION['CookIdUsuario']);
+            $template = new Template();
+            //echo 2;
+            
+            $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
+            $template->setTemplate("configuraciones");
+            $contenido['CAMBIOCONTRASENA'] = $this->editar_contrasena();
+            $contenido['GENERAL'] = $this->editar_general();
+            $template->setVars($contenido);
+            $objResponse = new xajaxResponse();
+            //$objResponse->addAssign('contenido',"innerHTML",$template->show());
+            //$objResponse->addAssign('cambio_contrasena',"innerHTML",$this->editar_contrasena());
+            $objResponse->addAssign('myModal-Ventana-Cuerpo',"innerHTML",$template->show());
+            $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
+            //$objResponse->addAssign('modulo_actual',"value","parametros_det");
+            $objResponse->addIncludeScript(PATH_TO_JS . 'mos_usuario/mos_usuario.js');
+            $objResponse->addScript("$('#tabs-config').tab();"
+                        . "$('#tabs-config a:first').tab('show');");
+            $objResponse->addScriptCall('cargar_autocompletado');
+            $objResponse->addScript("$('#MustraCargando').hide();");
+            $objResponse->addScript("$('#myModal-Ventana').modal('show');");
+            $objResponse->addScript("$('#myModal-Ventana-Titulo').html('Configuraciones');");
+            $objResponse->addScript("$.formUtils.addValidator({
+            name : 'igual_pw',
+            validatorFunction : function(value, \$el, config, language, \$form) { 
+                if ((value != $('#password').val())){                    
+                    
+                    return false;
+                }                  
+              return true;
+            },
+            errorMessage : 'La contraseña nueva no coincide con la confirmacion de contraseña.',
+            errorMessageKey: 'badEvenNumber'
+          });");
+            
+
+            return $objResponse;
+//            $this->asigna_contenido($this->contenido);
+//            return $template->show();
+        }
+            public function editar_contrasena()
+            {
+             
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                $ut_tool = new ut_Tool();
+                $val = $this->vermos_usuario($_SESSION['CookIdUsuario']); 
+             
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido_1["N_" . strtoupper($key)] =  $value;
+                }                
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido_1["P_" . strtoupper($key)] =  $value;
+                }    
+             
+            $contenido_1['ID_USUARIO'] = $val["id_usuario"];
+            $contenido_1['NOMBRES'] = ($val["apellido_paterno"].' '.$val["nombres"]);
+            $contenido_1['FECHA_CREACION'] = ($val["fecha_creacion"]);
+            $contenido_1['FECHA_EXPI'] = ($val["fecha_expi"]);
+            $contenido_1['VIGENCIA'] = ($val["vigencia"]);
+            $contenido_1['SUPER_USUARIO'] = ($val["super_usuario"]);
+            $contenido_1['EMAIL'] = ($val["email"]);
+            $contenido_1['PASSWORD_1'] = ($val["password_1"]);
+
+            $contenido_1['RECIBE_NOTIFICACIONES'] = $val["recibe_notificaciones"] == 'S' ? 'checked="checked"' : '';
+            $val_aux = $this->vermos_usuario($_SESSION[CookIdUsuario]);
+            $contenido_1['READ_SUPER_USUARIO'] = $val_aux["super_usuario"] == 'S' ? '' : 'disabled="disabled"';
+            //print_r($contenido_1);
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
+                $template->setTemplate("formulario_contrasena");
+                $template->setVars($contenido_1);
+
+                //return $template->show();
+                $contenido['CAMPOS'] = $template->show();
+
+                $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
+                $template->setTemplate("formulario_sup_contrasena");
+
+                $contenido['DESC_OPERACION'] = "Guardar";
+                $contenido['OPC'] = "upd";
+                $contenido['ID'] = $val["id"];
+
+                $template->setVars($contenido);
+                return $template->show();
+
+            }
+        public function editar_general()
+            {
+             
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                $ut_tool = new ut_Tool();
+                $val = $this->vermos_usuario($_SESSION['CookIdUsuario']); 
+             
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido_1["N_" . strtoupper($key)] =  $value;
+                }                
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido_1["P_" . strtoupper($key)] =  $value;
+                } 
+            $contenido_1['email'] =$val["email"];
+            $contenido_1['ID_IDIOMA'] = $ut_tool->OptionsCombo("SELECT id,idioma FROM mos_idiomas ORDER BY 1"
+                                                                    , 'id'
+                                                                    , 'idioma', $val['id_idioma']);
+
+            $contenido_1['RECIBE_NOTIFICACIONES'] = $val["recibe_notificaciones"] == 'S' ? 'checked="checked"' : '';
+            //print_r($contenido_1);
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
+                $template->setTemplate("formulario_general");
+                $template->setVars($contenido_1);
+
+                //return $template->show();
+                $contenido['CAMPOS'] = $template->show();
+
+                $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
+                $template->setTemplate("formulario_sup_general");
+
+                $contenido['DESC_OPERACION'] = "Guardar";
+                $contenido['OPC'] = "upd";
+                $contenido['ID'] = $val["id"];
+
+                $template->setVars($contenido);
+                return $template->show();
+
+            } 
     
  }?>
