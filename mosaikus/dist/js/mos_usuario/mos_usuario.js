@@ -18,7 +18,12 @@
          $('#myModal-Mostrar-Colums').modal('hide');
          
     }
-
+function cargar_autocompletado(){
+        $( "#id_idioma" ).select2({
+            placeholder: "idioma",
+            allowClear: true
+          }); 
+      }
     function nuevo_mos_usuario(){
             array = new XArray();
             array.setObjeto('mos_usuario','crear');
@@ -146,7 +151,38 @@ function r_init_filtrar(){
         
         }
     }
-
+    function validar_cambio_contrasena(doc){        
+        if($('#idFormulario').isValid()) {
+            $( "#btn-guardar" ).html('Procesando..');
+            $( "#btn-guardar" ).prop( "disabled", true );
+            array = new XArray();
+            array.setObjeto('mos_usuario','cambiarcontrasena');
+            array.getForm('idFormulario');
+//            array.addParametro('password_1',document.getElementById("password_1").value);
+//            array.addParametro('password_2',document.getElementById("password_2").value);
+//            array.addParametro('password_3',document.getElementById("password_3").value);
+            array.addParametro('import','clases.mos_usuario.mos_usuario');
+            xajax_Loading(array.getArray());
+        }else{
+        
+        }
+    }
+    function validar_general(doc){        
+        if($('#idFormulariogeneral').isValid()) {
+            $( "#btn-guardar" ).html('Procesando..');
+            $( "#btn-guardar" ).prop( "disabled", true );
+            array = new XArray();
+            array.setObjeto('mos_usuario','cambiargeneral');
+            array.getForm('idFormulariogeneral');
+//            array.addParametro('password_1',document.getElementById("password_1").value);
+//            array.addParametro('password_2',document.getElementById("password_2").value);
+//            array.addParametro('password_3',document.getElementById("password_3").value);
+            array.addParametro('import','clases.mos_usuario.mos_usuario');
+            xajax_Loading(array.getArray());
+        }else{
+        
+        }
+    }
     function editarmos_usuario(id){
         array = new XArray();
         array.setObjeto('mos_usuario','editar');
