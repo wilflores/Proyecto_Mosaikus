@@ -1429,7 +1429,13 @@ function contrasena()
 //    $("#ver_ficha_trabajador").trigger('click');
 
 }
-
+function VerConfiguraciones()
+{
+    array = new XArray();    
+    array.setObjeto('mos_usuario','configuraciones');    
+    array.addParametro('import','clases.mos_usuario.mos_usuario');
+    xajax_Loading(array.getArray());
+}
 //----------------------------------------------------------------------------------------
 
 function getForm (frm){
