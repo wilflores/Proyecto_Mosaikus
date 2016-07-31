@@ -130,8 +130,11 @@
                                 . ",CONCAT(UPPER(LEFT(usuario.apellido_materno, 1)), LOWER(SUBSTRING(usuario.apellido_materno, 2))) apellido_materno "
                                 . ",cod_emp"
                                 . ",c.descripcion cargo "
+                                . ",usuario.id_idioma "
+                                . ",i.idioma "
                                 . " from mos_usuario usuario LEFT JOIN mos_personal persona "
                                 . " on usuario.email = persona.email "
+                                . " INNER JOIN mos_idiomas i ON usuario.id_idioma = i.id "
                                 . " LEFT JOIN mos_cargo c ON c.cod_cargo = persona.cod_cargo "
                                 . " where usuario.email='".$TxtUsuario."' and (password_1='".md5($TxtPwd)."')";
                        // echo $Consulta;
@@ -146,6 +149,8 @@
 			//$_SESSION[CookNomEmpresaGeneralIni]=$Fila["businessName"];
 			$_SESSION[CookIdEmpresa]=$id_empresa;//$Fila["id_empresa"];
 			$_SESSION[CookIdUsuario]=$Fila2["id_usuario"];
+                        $_SESSION[CookIdIdioma]=$Fila2["id_idioma"];
+                        $_SESSION[CookIdioma]=$Fila2["idioma"];
 			//$_SESSION[CookWeb]='S';
                         //cambio del 29/03/2016
                         //GUARDAMOS EL CORREO DEL USUARIO Y COD EMP SI LO POSEE
