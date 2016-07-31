@@ -139,7 +139,8 @@
             }
 
             public function indexMenuTab($parametros)
-            {
+            {   // print_r($parametros);
+                echo 'sdasdasd';
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
@@ -181,13 +182,14 @@
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
-                $Consulta="select t3.* from mos_usuario_filial t1 inner join mos_link_por_perfil t2 on t1.cod_perfil=t2.cod_perfil  inner join mos_link t3 ";
-                $Consulta.=" on t2.cod_link=t3.cod_link   ";
+                $Consulta="select t3.cod_link,t3.descripcion,t3.dependencia,t3.tipo,t3.link,t3.orden,t3.imagen, t4.nombre_link from mos_usuario_filial t1 inner join mos_link_por_perfil t2 on t1.cod_perfil=t2.cod_perfil  inner join mos_link t3 "
+                        . " inner join mos_nombres_link_idiomas t4 on t3.cod_link = t4.cod_link ";
+                $Consulta.=" on t2.cod_link=t3.cod_link  ";
                 //if($SuperUser!='S')
-                $Consulta.=" where t1.id_usuario='".$_SESSION[CookIdUsuario]."' and  t1.id_filial='".$_SESSION[CookFilial]."' AND t3.dependencia = 0";
+                $Consulta.=" where t1.id_usuario='".$_SESSION[CookIdUsuario]."'  and t4.id_idioma=$_SESSION[CookIdIdioma] and  t1.id_filial='".$_SESSION[CookFilial]."' AND t3.dependencia = 0";
                 $Consulta.=" group by t3.cod_link order by t3.dependencia,t3.orden asc";
                 //$this->operacion_2($Consulta, $parametros);                
-
+                //echo $Consulta;
                 import('clases.mos_acceso.mos_acceso');                
                 $acceso = new mos_acceso();
                 $nodos = $acceso->obtenerNodosMenu($_SESSION[CookIdUsuario], $_SESSION[CookFilial],'Especialista');
@@ -235,13 +237,15 @@
             
             private function buscar_hijo($value,$nivel){
                 $html = '';
-                $Consulta="select t3.* from mos_usuario_filial t1 inner join mos_link_por_perfil t2 on t1.cod_perfil=t2.cod_perfil  inner join mos_link t3 ";
-                $Consulta.=" on t2.cod_link=t3.cod_link   ";
+                $Consulta="select t3.cod_link,t3.descripcion,t3.dependencia,t3.tipo,t3.link,t3.orden,t3.imagen, t4.nombre_link from mos_usuario_filial t1 inner join mos_link_por_perfil t2 on t1.cod_perfil=t2.cod_perfil  inner join mos_link t3 "
+                        .  " on t2.cod_link=t3.cod_link   "
+                        . " inner join mos_nombres_link_idiomas t4 on t3.cod_link = t4.cod_link ";
+                
                 //if($SuperUser!='S')
-                $Consulta.=" where t1.id_usuario='".$_SESSION[CookIdUsuario]."' and  t1.id_filial='".$_SESSION[CookFilial]."' AND t3.dependencia = $value[cod_link]";
+                $Consulta.=" where t1.id_usuario='".$_SESSION[CookIdUsuario]."' and t4.id_idioma=$_SESSION[CookIdIdioma] and  t1.id_filial='".$_SESSION[CookFilial]."' AND t3.dependencia = $value[cod_link]";
                 $Consulta.=" group by t3.cod_link order by t3.dependencia,t3.orden asc";
                 //print_r($_SESSION);
-                //echo $Consulta;
+               // echo $Consulta."\n";
                 $data_aux = $this->dbl->query($Consulta, $param);
                 if (count($data_aux)>0){
                     /*
