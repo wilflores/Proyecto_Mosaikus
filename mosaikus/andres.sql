@@ -482,8 +482,8 @@ INSERT INTO `mos_nombres_link_idiomas` VALUES ('6', '1', 'Accidentes Ley');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('6', '2', 'acidentes');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('7', '1', 'Incidentes');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('7', '2', 'incidentes');
-INSERT INTO `mos_nombres_link_idiomas` VALUES ('8', '1', 'Acciones Correctivas');
-INSERT INTO `mos_nombres_link_idiomas` VALUES ('8', '2', 'ocorrências');
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('8', '1', 'Ocurrencias');
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('8', '2', 'Ocorrências');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('9', '1', 'Competencias');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('9', '2', 'competências');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('10', '1', 'Configuración');
@@ -566,15 +566,15 @@ INSERT INTO `mos_nombres_link_idiomas` VALUES ('48', '1', 'Informes Individuales
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('48', '2', 'relatórios individuais');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('49', '1', 'Árbol Organizacional');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('49', '2', 'árvore organizacional');
-INSERT INTO `mos_nombres_link_idiomas` VALUES ('50', '1', 'Administrador de  AC');
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('50', '1', 'Administrador de  Ocurrencias con Plan de Acción');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('50', '2', 'gestor de ocorrências com plano de acção');
-INSERT INTO `mos_nombres_link_idiomas` VALUES ('51', '1', 'Configuración de AC');
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('51', '1', 'Configuración');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('51', '2', 'configuração');
-INSERT INTO `mos_nombres_link_idiomas` VALUES ('52', '1', 'Reportes de AC');
-INSERT INTO `mos_nombres_link_idiomas` VALUES ('52', '2', 'resumos ocorrências com plano de acção');
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('52', '1', 'Reporte de Ocurrencias con Plan de Acción');
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('52', '2', 'Resumos Ocorrências com Plano de Acção');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('55', '1', 'Incidentes');
-INSERT INTO `mos_nombres_link_idiomas` VALUES ('55', '2', 'incidentes');
-INSERT INTO `mos_nombres_link_idiomas` VALUES ('56', '1', 'reportes');
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('55', '2', 'Incidentes');
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('56', '1', 'Reportes');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('56', '2', 'resumos');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('57', '1', 'Incidentes');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('57', '2', 'incidentes');
@@ -616,7 +616,7 @@ INSERT INTO `mos_nombres_link_idiomas` VALUES ('75', '1', 'Parámetros de Docume
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('75', '2', 'configurações de documentos');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('76', '1', 'Parámetros de Personas');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('76', '2', 'parâmetros de pessoas');
-INSERT INTO `mos_nombres_link_idiomas` VALUES ('77', '1', 'Administrar Correcciones');
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('77', '1', 'Administrador de  Ocurrencias con Correcciones');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('77', '2', 'gestor de ocorrências com correções');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('78', '1', 'Parámetros de Correcciones');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('78', '2', 'parâmetros correções');
@@ -648,5 +648,6 @@ INSERT INTO `mos_nombres_link_idiomas` VALUES ('91', '1', 'Lista de Distribució
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('91', '2', 'Lista de distribuição');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('92', '1', 'Migración de Responsabilidades');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('92', '2', 'migração de Responsabilidades');
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('93', '1', 'Seguimiento de Acciones Correctivas');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('93', '2', 'Seguimento de Ação Corretiva');
 
