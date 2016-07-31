@@ -118,7 +118,7 @@ function notifyBrowser(title,desc,url)
                 {USUARIO}<span class="caret"></span>
               </a>
               <ul class="dropdown-menu">
-                <li><a href="javascript:contrasena()">Cambiar contraseña</a></li>
+                <li><a href="javascript:VerConfiguraciones();">Configuraciones</a></li>
                 <li><a href="login.php?cerrar=true">Salir</a></li>
               </ul>
             </div>
@@ -145,7 +145,10 @@ function notifyBrowser(title,desc,url)
 
 
             </div>
-            
+             <!--div class="configuraciones">
+              <a id="configuraciones" onclick="VerConfiguraciones();" class="config-icon" data-toggle="collapse" href="#">
+              </a>
+            </div-->           
 
           </div>
         <!-- Fin  .status-bar -->
