@@ -371,7 +371,7 @@ echo $Consulta3;
             }
             
             public function cargar_nombres_columnas($modulo=6){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = $modulo";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo = $modulo";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
@@ -379,7 +379,7 @@ echo $Consulta3;
                 
             }
             public function cargar_nombres_columnas_xls($campo,$formulario,$modulo=6){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE nombre_campo='$campo' and modulo = $modulo";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and nombre_campo='$campo' and modulo = $modulo";
                 $nombres_campos = $this->dbl->query($sql, array());
                 if($formulario=='S') {
                     $cod_categoria = 15;
@@ -445,7 +445,7 @@ echo $Consulta3;
            }
        }            
             private function cargar_placeholder(){
-                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE modulo = 6";
+                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo = 6";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->placeholder[$value[nombre_campo]] = $value[placeholder];
@@ -2114,9 +2114,9 @@ echo $Consulta3;
                                     ,CASE d.vigencia WHEN 'S' Then 'Si' ELSE 'No' END vigencia
                                     ,dao.arbol_organizacional arbol_organizacional
                                     ,IFNULL((SELECT mos_nombres_campos.texto FROM mos_nombres_campos
-                                    WHERE mos_nombres_campos.nombre_campo = d.etapa_workflow AND mos_nombres_campos.modulo = 6
+                                    WHERE  mos_nombres_campos.id_idioma=$_SESSION[CookIdIdioma] and mos_nombres_campos.nombre_campo = d.etapa_workflow AND mos_nombres_campos.modulo = 6
                                     ),(SELECT mos_nombres_campos.texto FROM mos_nombres_campos
-                                    WHERE mos_nombres_campos.nombre_campo = 'estado_sin_asignar' AND mos_nombres_campos.modulo = 6)) etapa_workflow
+                                    WHERE mos_nombres_campos.id_idioma=$_SESSION[CookIdIdioma] and mos_nombres_campos.nombre_campo = 'estado_sin_asignar' AND mos_nombres_campos.modulo = 6)) etapa_workflow
                                      ,CASE d.publico WHEN 'S' Then 'Si' ELSE 'No' END publico                                    
                                     -- ,id_usuario
                                     ,d.observacion
@@ -2802,7 +2802,7 @@ echo $Consulta3;
                 $reg_por_pagina = getenv("PAGINACION");
                 if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
                 $this->listarDocumentos($parametros, $parametros['pag'], $reg_por_pagina);
-                
+                //print_r($this->dbl->data);
                 $data=$this->dbl->data;
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
@@ -3359,7 +3359,7 @@ echo $Consulta3;
  
             public function indexDocumentos($parametros)
             { //print_r($parametros);
-            
+
                 //echo  $_SESSION[ParamAdic];
                 if($_SESSION[ParamAdic]=='formulario') {
                     $parametros['formulario']='S';
