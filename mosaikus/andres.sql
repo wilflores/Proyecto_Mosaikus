@@ -447,11 +447,14 @@ INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder) VALUES (
 INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder) VALUES ( 'password_3', 'Confirme Password ', '21', 'Confirme Password');
 INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder) VALUES ( 'id_idioma', 'Idioma', '21', 'Idioma');
 
+ALTER TABLE `mos_nombres_campos`
+ADD COLUMN `id_idioma`  int NULL DEFAULT 1 AFTER `placeholder`;
+
 -- CON ESTO DUPLICAMOS LOS REGISTROS DE DOCUMENTOS, MOS_USUARIO Y REGISTROS 
 insert into mos_nombres_campos (nombre_campo, texto, modulo, placeholder,id_idioma)
 SELECT nombre_campo, texto, modulo, placeholder, 2 idioma
 FROM `mos_nombres_campos`
-WHERE modulo in (21,6,9) ORDER BY modulo
+WHERE modulo in (21,6,9) ORDER BY modulo;
 
 
 DROP TABLE IF EXISTS `mos_nombres_link_idiomas`;
