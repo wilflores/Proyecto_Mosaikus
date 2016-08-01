@@ -32,7 +32,7 @@
                             <div class="checkbox">
                                       
                                       <label >
-                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="3" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="6" class="checkbox-mos-col" checked="checked">   &nbsp;
                                       {N_ID_AREA}</label>
                                   
                             </div>

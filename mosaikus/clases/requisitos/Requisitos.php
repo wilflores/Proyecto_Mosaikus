@@ -495,7 +495,7 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                 $grid->SetConfiguracionMSKS("tblRequisitos", "");
                 $config_col=array(
                     
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id], "id", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>"&nbsp;"),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[nombre], "nombre", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[tipo], "tipo", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),

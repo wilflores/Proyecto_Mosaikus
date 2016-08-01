@@ -163,3 +163,79 @@ INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES(
 INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('estatus', 'Estatus', 30, 'Estatus');
 INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('orden', 'Orden', 30, 'Orden');
 INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id_area', 'Arbol Organizacional', 30, 'Arbol Organizacional');
+
+/************ modulo competencias cargos 3-07-16****/
+CREATE TABLE IF NOT EXISTS `mos_requisitos_cargos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_cargo` int(11) NOT NULL,
+  `id_area` int(11) NOT NULL,
+  `id_requisito_items` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_cargo` (`id_cargo`),
+  KEY `id_requisito_items` (`id_requisito_items`),
+  KEY `id_area` (`id_area`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `mos_requisitos_parametros_index` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_requisitos_formularios` int(11) NOT NULL,
+  `id_parametro_formulario` int(11) NOT NULL,
+  `id_parametro_items` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_requisitos_formulario` (`id_requisitos_formularios`),
+  KEY `id_parametro_formulario` (`id_parametro_formulario`),
+  KEY `id_parametro_items` (`id_parametro_items`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci AUTO_INCREMENT=1 ;
+
+
+CREATE TABLE IF NOT EXISTS `mos_requisitos_formularios` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_requisito_cargo` int(11) NOT NULL,
+  `id_documento_form` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_requisito_cargo` (`id_requisito_cargo`),
+  KEY `id_documento_form` (`id_documento_form`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci AUTO_INCREMENT=1 ;
+
+/*** ELIMINAR RELACION CON MOS_ORGANIZACION***/
+ALTER TABLE `mos_requisitos_organizacion` DROP FOREIGN KEY `mos_requisitos_organizacion_ibfk_3` ;
+
+
+
+/******** FORANEAS ****/
+--
+-- Filtros para la tabla `mos_requisitos_cargos`
+--
+ALTER TABLE `mos_requisitos_cargos`
+  ADD CONSTRAINT `mos_requisitos_cargos_ibfk_1` FOREIGN KEY (`id_cargo`) REFERENCES `mos_cargo` (`cod_cargo`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `mos_requisitos_cargos_ibfk_2` FOREIGN KEY (`id_requisito_items`) REFERENCES `mos_requisitos_item` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+  --
+-- Filtros para la tabla `mos_requisitos_formularios`
+--
+ALTER TABLE `mos_requisitos_formularios`
+  ADD CONSTRAINT `mos_requisitos_formularios_ibfk_1` FOREIGN KEY (`id_requisito_cargo`) REFERENCES `mos_requisitos_cargos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `mos_requisitos_formularios_ibfk_2` FOREIGN KEY (`id_documento_form`) REFERENCES `mos_documentos` (`IDDoc`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+
+--
+-- Filtros para la tabla `mos_requisitos_parametros_index`
+--
+ALTER TABLE `mos_requisitos_parametros_index`
+  ADD CONSTRAINT `mos_requisitos_parametros_index_ibfk_1` FOREIGN KEY (`id_requisitos_formularios`) REFERENCES `mos_requisitos_formularios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `mos_requisitos_parametros_index_ibfk_2` FOREIGN KEY (`id_parametro_formulario`) REFERENCES `mos_documentos_datos_formulario` (`id_unico`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `mos_requisitos_parametros_index_ibfk_3` FOREIGN KEY (`id_parametro_items`) REFERENCES `mos_documentos_formulario_items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+/********* FALTAN INSERT NOMBRE_CAMPOS****/
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id', 'Id', 31, 'Id');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id_cargo', 'Cargo', 31, 'Cargo');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id_requisito_items', 'id_requisito_items', 31, 'id_requisito_items');
+INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES('id_area', 'Areas', 31, 'Areas');
+/*****  MOS_LINK PARA EL MENU del modulo competencia***********/
+UPDATE `santateresa`.`mos_link` SET `descripcion` = 'Familias-indexFamilias-clases.competencia_familias.Familias',
+`nombre_link` = 'Competencias Familias' WHERE `mos_link`.`cod_link` =58;
+
+UPDATE `santateresa`.`mos_link` SET `descripcion` = 'Requisitos-indexRequisitos-clases.requisitos.Requisitos' WHERE `mos_link`.`cod_link` =59;
+
+UPDATE `santateresa`.`mos_link` SET `descripcion` = 'RequisitosCargos-indexRequisitosCargos-clases.requisitos_cargos.RequisitosCargos' WHERE `mos_link`.`cod_link` =60;
