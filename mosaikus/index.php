@@ -41,7 +41,10 @@
                     
                     $encryt = new EnDecryptText();                                
                     $pagina = new Mysql($encryt->Decrypt_Text($_SESSION[BaseDato]), $encryt->Decrypt_Text($_SESSION[LoginBD]), $encryt->Decrypt_Text($_SESSION[PwdBD]) );
-                    $sql = 'Select descripcion,nombre_link,cod_link FROM mos_link WHERE cod_link = ' . $parametros['id_menu_opcion'];
+                    $sql = 'Select descripcion,t4.nombre_link,mos_link.cod_link FROM mos_link ';
+                    $sql .= ' inner join mos_nombres_link_idiomas t4 on mos_link.cod_link = t4.cod_link ';
+                    $sql .= ' WHERE id_idioma='.$_SESSION[CookIdIdioma].' and mos_link.cod_link = ' . $parametros['id_menu_opcion'];
+                    //echo $sql;
                     //$pagina->conectar();
                     //$params['p_id']= $parametros['id_menu_opcion'];
                     //$val = $pagina->exe("util_sp_menu_con_id", $params);                    
