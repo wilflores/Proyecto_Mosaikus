@@ -245,6 +245,7 @@
                             WHERE  id_usuario = $atr[id_usuario]"; 
                     
                     $this->dbl->insert_update($sql);
+                    $_SESSION[CookIdIdioma] = $atr[id_idioma];
                     return "Los datos generales ha sido actualizado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
@@ -1454,9 +1455,8 @@ $objResponse->addScript("$('#fecha_expi').datetimepicker();");
                     $respuesta = $this->modificar_general($parametros);
 
                     if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
-                        $objResponse->addScriptCall("MostrarContenido");
-                        $objResponse->addScript("verPagina(1,1);");
                         $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+                        $objResponse->addScript("location.reload();");
                     }
                     else
                         $objResponse->addScriptCall('VerMensaje','error',$respuesta);
@@ -1981,7 +1981,10 @@ $objResponse->addScript("$('#fecha_expi').datetimepicker();");
             $objResponse->addIncludeScript(PATH_TO_JS . 'mos_usuario/mos_usuario.js');
             $objResponse->addScript("$('#tabs-config').tab();"
                         . "$('#tabs-config a:first').tab('show');");
-            $objResponse->addScriptCall('cargar_autocompletado');
+            $objResponse->addScript('$("#id_idioma").select2({
+                                    placeholder: "idioma",
+                                    allowClear: true
+                                  }); ');
             $objResponse->addScript("$('#MustraCargando').hide();");
             $objResponse->addScript("$('#myModal-Ventana').modal('show');");
             $objResponse->addScript("$('#myModal-Ventana-Titulo').html('Configuraciones');");
