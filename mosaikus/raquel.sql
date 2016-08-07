@@ -198,7 +198,16 @@ CREATE TABLE IF NOT EXISTS `mos_requisitos_formularios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci AUTO_INCREMENT=1 ;
 
 /*** ELIMINAR RELACION CON MOS_ORGANIZACION***/
-ALTER TABLE `mos_requisitos_organizacion` DROP FOREIGN KEY `mos_requisitos_organizacion_ibfk_3` ;
+DROP TABLE IF EXISTS `mos_requisitos_organizacion`;
+CREATE TABLE `mos_requisitos_organizacion` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_area` int(11) NOT NULL,
+  `id_requisito` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_area` (`id_area`),
+  KEY `id_requisito` (`id_requisito`),
+  CONSTRAINT `mos_requisitos_organizacion_ibfk_2` FOREIGN KEY (`id_requisito`) REFERENCES `mos_requisitos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
 
 
@@ -239,3 +248,7 @@ UPDATE `santateresa`.`mos_link` SET `descripcion` = 'Familias-indexFamilias-clas
 UPDATE `santateresa`.`mos_link` SET `descripcion` = 'Requisitos-indexRequisitos-clases.requisitos.Requisitos' WHERE `mos_link`.`cod_link` =59;
 
 UPDATE `santateresa`.`mos_link` SET `descripcion` = 'RequisitosCargos-indexRequisitosCargos-clases.requisitos_cargos.RequisitosCargos' WHERE `mos_link`.`cod_link` =60;
+
+ALTER TABLE `mos_requisitos_item`
+MODIFY COLUMN `id`  int(11) NOT NULL AUTO_INCREMENT FIRST ;
+

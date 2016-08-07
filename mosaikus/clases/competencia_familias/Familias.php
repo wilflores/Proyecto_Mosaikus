@@ -21,7 +21,7 @@
                 $this->dbl = new Mysql($this->encryt->Decrypt_Text($_SESSION[BaseDato]), $this->encryt->Decrypt_Text($_SESSION[LoginBD]), $this->encryt->Decrypt_Text($_SESSION[PwdBD]) );
                 $this->parametros = $this->nombres_columnas = $this->placeholder = array();
                 //$this->id_org_acceso = $this->id_org_acceso_explicito = array();
-                $this->restricciones->per_crear = $this->restricciones->per_editar = $this->restricciones->per_eliminar = 'N';
+                //$this->restricciones->per_crear = $this->restricciones->per_editar = $this->restricciones->per_eliminar = 'N';
                 $this->contenido = array();
             }
 
