@@ -495,10 +495,10 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                 $grid->SetConfiguracionMSKS("tblRequisitos", "");
                 $config_col=array(
                     
-               array( "width"=>"5%","ValorEtiqueta"=>"&nbsp;"),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[nombre], "nombre", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[tipo], "tipo", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>"<div style='width:50px'>&nbsp;</div>"),
+               array( "width"=>"30%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[nombre], "nombre", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[tipo], "tipo", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[vigencia], "vigencia", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[estatus], "estatus", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[orden], "orden", $parametros)),
                 array( "width"=>"20%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[id_area], ENT_QUOTES, "UTF-8"))
@@ -702,7 +702,7 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                 if ($parametros['corder'] == null) $parametros['corder']="orden";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc";//ordenar ascendente por orden 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="0-1-2-3-4-5-6-"; 
+                    $parametros['mostrar-col']="0-1-2-3-6"; 
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */  
