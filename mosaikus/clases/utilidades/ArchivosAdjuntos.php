@@ -769,7 +769,7 @@
                 return $return;
             }
             
-            public function visualizar_archivos_adjuntos($tabla,$clave_foranea=null, $valor_clave_foranea=null,$valor_col=19)
+            public function visualizar_archivos_adjuntos($tabla,$clave_foranea=null, $valor_clave_foranea=null,$valor_col=19,$formato='tabla',$ini_i=1)
             {
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
@@ -789,12 +789,13 @@
                                     id,nomb_archivo, contenttype, (length(archivo))/(1024) tamano
                             FROM $tabla 
                             WHERE $clave_foranea = $valor_clave_foranea ";
-                            //echo $sql;
+                    //        echo $sql;
                             $data_items = $this->dbl->query($sql);
 
                 }
+                //print_r($data_items);
                 if (count($data_items)>0){
-                    $i = 1;
+                    $i = $ini_i;
                     $html = '';
                     $js = '';
                     foreach ($data_items as $value) {
@@ -811,58 +812,77 @@
                                 $target = 'target="_blank"';
                                 break;
                         }
-                        $html .= '<tr id="tr-esp-' .$i. '">'; 
-                        $html.= '<td align="center">'.
-                                           ' ' .
-                                      '  </td>';
-                        $html.= '<td >'.
-                                            '<a id="a-img-'.$i.'" '. $target .' href="pages/evidencias/ver_evidencia.php?id='.$value[id].'&token='.$token.'" title="'.$value[nomb_archivo]. '" >'.
-                                                $value[nomb_archivo].
-                                            '</a>'.                                            
-                                       '</td>';
-                        $html.= '<td>' .
-                                            number_format($value[tamano]). ' KB ' .
-                                            
-                                        '</td>';
+                        if ($formato == 'tabla'){
+                            $html .= '<tr id="tr-esp-' .$i. '">'; 
+                            $html.= '<td align="center">'.
+                                               ' ' .
+                                          '  </td>';
+                            $html.= '<td >'.
+                                                '<a id="a-img-'.$i.'" '. $target .' href="pages/evidencias/ver_evidencia.php?id='.$value[id].'&token='.$token.'" title="'.$value[nomb_archivo]. '" >'.
+                                                    $value[nomb_archivo].
+                                                '</a>'.                                            
+                                           '</td>';
+                            $html.= '<td>' .
+                                                number_format($value[tamano]). ' KB ' .
 
-                        $html.= '<td>' .'<a id="a-img-'.$i.'" target="_blank" href="pages/evidencias/ver_evidencia.php?id='.$value[id].'&token='.$token.'&des=1" title="'.$value[nomb_archivo]. '" >'.
-                                           '<i class="icon icon-download cursor-pointer" href="'.$i. '" id="ico_trash_img_'.$i. '" tok="'.$value[id]. '"></i>'.
-                                '</a>'.    
-                                        '</td>';
-                        $html.= '</tr>' ;  
+                                            '</td>';
+
+                            $html.= '<td>' .'<a id="a-img-'.$i.'" target="_blank" href="pages/evidencias/ver_evidencia.php?id='.$value[id].'&token='.$token.'&des=1" title="'.$value[nomb_archivo]. '" >'.
+                                               '<i class="icon icon-download cursor-pointer" href="'.$i. '" id="ico_trash_img_'.$i. '" tok="'.$value[id]. '"></i>'.
+                                    '</a>'.    
+                                            '</td>';
+                            $html.= '</tr>' ; 
+                        }else{
+                            $html .= '<div class="row">'
+                                        . '<div class="col-md-12">' .
+                                            '<a id="a-img-'.$i.'" '. $target .' href="pages/evidencias/ver_evidencia.php?id='.$value[id].'&token='.$token.'" title="'.$value[nomb_archivo]. '" >'.
+                                                    $value[nomb_archivo].
+                                                '</a>' 
+                                        . '</div>' 
+                                    . '<div class="col-md-4">' .
+                                                number_format($value[tamano]). ' KB ' .
+
+                                     '</div>' 
+
+                                    . '<div class="col-md-4">' .
+                                    '<a id="a-img-'.$i.'" target="_blank" href="pages/evidencias/ver_evidencia.php?id='.$value[id].'&token='.$token.'&des=1" title="'.$value[nomb_archivo]. '" >'.
+                                               '<i class="icon icon-download cursor-pointer" href="'.$i. '" id="ico_trash_img_'.$i. '" tok="'.$value[id]. '"></i>'.
+                                    '</a>'.     '</div>'  .
+                                       
+                                     '</div>';
+                        }
+                        
+
+                        $i++;
+                    }
+                    if ($formato == 'tabla'){
                         $return[html] = '
                                             <table id="table-items-esp-vis" class="table table-striped table-condensed" width="100%" style="margin-bottom: 0px;">                                                        
                                                 <tbody>
                                                     ' . $html . '
                                                 </tbody>
                                             </table>    
-                                 </div>';
-//                        $js .= "$('#ico_trash_img_$i').click(function(e){ 
-//                                        e.preventDefault();
-//                                        var id = $(this).attr('href');
-//                                        $('tr-esp-$i').remove();
-//                                        var parent = $(this).parents().parents().get(0);
-//                                            $(parent).remove();
-//                                        var id = $(this).attr('tok');            
-//                                        array = new XArray();
-//                                        array.setObjeto('ArchivosAdjuntos','actualizar_creada');
-//                                        array.addParametro('tok',id);                        
-//                                        array.addParametro('token', $('#tok_new_edit').val());
-//                                        array.addParametro('import','clases.utilidades.ArchivosAdjuntos');
-//                                        xajax_Loading(array.getArray());
-//                                    }); ";
-                        $i++;
+                                 ';
+                    }
+                    else{
+                        $return[html] = '
+                                            <div id="links">
+                                                    ' . $html . '
+                                                <div>    
+                                 ';
                     }
                     //$return[js] = $js.'init_archivos_adjuntos();'; 
                 }
                 else
                 {
                 $return[html] = '';
+                $return[js] = '';
                 //$return[js] = 'init_archivos_adjuntos();'; 
                 
                 }
                 return $return;
             }
+            
      
  
             public function guardar($parametros)
@@ -883,6 +903,7 @@
                         
                         $sql = "INSERT INTO $parametros[tabla](nomb_archivo,archivo, contenttype,$parametros[clave_foranea])"
                                 . " VALUES('$value_evi[nomb_archivo]','$archivo','$value_evi[contenttype]',$parametros[valor_clave_foranea])";
+                        //echo $sql;
                         $this->dbl->insert_update($sql);
                         unlink(APPLICATION_DOWNLOADS. 'temp/' . $value_evi[id_md5]);
                     }

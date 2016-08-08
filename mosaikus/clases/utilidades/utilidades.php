@@ -126,7 +126,7 @@ function BuscaOrganizacionalRegistros($tupla)
 
                         foreach ($Resp3 as $Fila3) 
                         {
-                                if($Fila3[organizacion_padre]==1)
+                                if($Fila3[organizacion_padre]==2)
                                 {
                                         $OrgNom.=($Fila3[identificacion]);
                                         return($OrgNom);                                        

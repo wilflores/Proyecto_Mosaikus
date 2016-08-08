@@ -34,6 +34,45 @@
         xajax_Loading(array.getArray());
     }
     
+    function WFAccionesAC(id){
+        array = new XArray();
+        array.setObjeto('AccionesAC','WFAccionesAC');
+        array.addParametro('id',id);
+        array.addParametro('import','clases.acciones_ac.AccionesAC');
+        xajax_Loading(array.getArray());
+    }
+    
+function CambiarEstadoWF(estado,id){
+    array = new XArray();
+    array.setObjeto('AccionesAC','cambiar_estado');
+    array.addParametro('id',id);
+    array.addParametro('estado',estado);
+    var myDate = new Date();
+    array.addParametro('fecha_estado_wf',(myDate.getDate()) + '/' + (((myDate.getMonth()+1)<10)?'0'+ (myDate.getMonth()+1):(myDate.getMonth()+1))+ '/' + myDate.getFullYear() + ' ' + myDate.getHours()+':'+myDate.getMinutes());
+    array.addParametro('import','clases.acciones_ac.AccionesAC');
+    xajax_Loading(array.getArray());
+}
+function RechazarWF(estado,id){
+    if(document.getElementById("observacion_rechazo").value!=''){
+        array = new XArray();
+        array.setObjeto('AccionesAC','cambiar_estado');
+        array.addParametro('id',id);
+        array.addParametro('estado',estado);
+        var myDate = new Date();
+        array.addParametro('fecha_estado_wf',(myDate.getDate()) + '/' + (((myDate.getMonth()+1)<10)?'0'+ (myDate.getMonth()+1):(myDate.getMonth()+1))+ '/' + myDate.getFullYear() + ' ' + myDate.getHours()+':'+myDate.getMinutes());
+        array.addParametro('observacion_rechazo',document.getElementById("observacion_rechazo").value);
+        array.addParametro('import','clases.acciones_ac.AccionesAC');
+        xajax_Loading(array.getArray());
+        $('#myModal-observacion-rechazo').modal('hide');
+        
+        }
+    else{
+        document.getElementById("observacion_rechazo").style.display='';
+        alertify.error("Cargue una observacion de rechazo y vuelva a presionar Rechazar",5); 
+    }
+        
+}
+    
     function agregar_esp(){
         var i = $('#num_items_esp').val();
         i = parseInt(i) + 1;        
@@ -106,20 +145,20 @@
             xajax_Loading(array.getArray());
         }
     }
-    function verPagina_hv(pag,doc){
+    function verPagina(pag,doc){
         array = new XArray();
         if (doc== null)
         {
              $('form')[0].reset();             
         }
-        array.getForm('busquedaFrm-hv'); 
-        if ((isNaN(document.getElementById("reg_por_pag-hv").value) == true) || (parseInt(document.getElementById("reg_por_pag-hv").value) <= 0)){
+        array.getForm('busquedaFrm'); 
+        if ((isNaN(document.getElementById("reg_por_pag").value) == true) || (parseInt(document.getElementById("reg_por_pag").value) <= 0)){
             array.addParametro('reg_por_pagina', 10);
-            document.getElementById("reg_por_pag-hv").value = 10
+            document.getElementById("reg_por_pag").value = 10
         }
         else
         {
-            array.addParametro('reg_por_pagina', document.getElementById("reg_por_pag-hv").value);
+            array.addParametro('reg_por_pagina', document.getElementById("reg_por_pag").value);
         }
         array.addParametro('permiso',document.getElementById('permiso_modulo').value);
         array.addParametro('pag',pag);
@@ -173,17 +212,16 @@
         array.addParametro('import','clases.acciones_evidencia.AccionesEvidencia');
         xajax_Loading(array.getArray());
     }
-    
-    function link_titulos_hv(valor){
-        if (valor == $('#corder-hv').val()){
-            if ($('#sorder-hv').val()== 'asc')
-                $('#sorder-hv').val('desc');
-            else 
-                $('#sorder-hv').val('asc');
-        }
-        else
-            $('#sorder-hv').val('desc');
-        $('#corder-hv').val(valor);
-        verPagina_hv(1,1);
+   function filtrar_mostrar_colums(){
+        var colums = '0-1-2-3-4-';
+         $('.checkbox-mos-col').each(function() {
+                if (this.checked){
+                    colums = colums + this.value + '-';
+                }
+         });
+         colums = colums.substring(0, colums.length - 1);
+         $('#mostrar-col').val(colums);
+         verPagina($('#pag_actual').val(),1);
+         $('#myModal-Mostrar-Colums').modal('hide');
+         
     }
-    

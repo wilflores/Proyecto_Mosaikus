@@ -96,12 +96,12 @@
         $contenido_1[TABLA_ACCIONES] = '';
         foreach ($data as $value) {
             $contenido_1[TABLA_ACCIONES] .= '<tr>';
-            $contenido_1[TABLA_ACCIONES] .= '<td>'.$value[tipo].'&nbsp;</td>';
+            //$contenido_1[TABLA_ACCIONES] .= '<td>'.$value[tipo].'&nbsp;</td>';
             $contenido_1[TABLA_ACCIONES] .= '<td>'.$value[accion].'&nbsp;</td>';
             $contenido_1[TABLA_ACCIONES] .= '<td>'.$value[fecha_acordada_a].'&nbsp;</td>';
             $contenido_1[TABLA_ACCIONES] .= '<td>'.$value[fecha_realizada_a].'&nbsp;</td>';
-            $contenido_1[TABLA_ACCIONES] .= '<td>'.$value[id_responsable].'&nbsp;</td>';
-            $contenido_1[TABLA_ACCIONES] .= '<td style="vertical-align: middle;" align="center">'.$acciones_ac->semaforo_estado($value, 'sema') .'&nbsp;</td>';
+            $contenido_1[TABLA_ACCIONES] .= '<td>'.$value[responsable].'&nbsp;</td>';
+            $contenido_1[TABLA_ACCIONES] .= '<td style="vertical-align: middle;" align="center">'.$acciones_ac->semaforo_estado($value, 'estado') .'&nbsp;</td>';
             $contenido_1[TABLA_ACCIONES] .= '</tr>';
             $contenido_1[TABLA_ACCIONES] .= '';
         }
@@ -183,7 +183,7 @@
         $contenido_1[TABLA_TRAZA] = '';
         foreach ($data as $value) {
             $contenido_1[TABLA_TRAZA] .= '<tr>';
-            $contenido_1[TABLA_TRAZA] .= '<td>'.$value[tipo].'&nbsp;</td>';
+            //$contenido_1[TABLA_TRAZA] .= '<td>'.$value[tipo].'&nbsp;</td>';
             $contenido_1[TABLA_TRAZA] .= '<td>'.$value[accion].'&nbsp;</td>';
             $evidencia->listarAccionesEvidencia(array('b-id_accion'=>$value[id],'corder'=>'fecha_evi', 'sorder'=>'desc'), 1, 1000);
             $data_evidencias = $evidencia->dbl->data;

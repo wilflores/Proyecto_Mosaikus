@@ -132,7 +132,7 @@
                       </thead>
                       <thead>
                       <tr>
-                          <th style="width: 12%;">{NA_TIPO}</th>
+                         <!--<th style="width: 12%;">{NA_TIPO}</th>-->
                         <th style="width: 47%">{NA_ACCION}</th>
                         <th style="width: 10%">{NA_FECHA_ACORDADA}</th>
                         <th style="width: 10%">{NA_FECHA_REALIZADA}</th>
@@ -157,9 +157,9 @@
                       </thead>
                       <thead>
                       <tr>
-                            <th style="width: 12%;">{NA_TIPO}</th>
-                            <th style="width: 44%">{NA_ACCION}</th>
-                            <th style="width: 44%">{NA_TRAZABILIDAD}</th>                        
+                            <!--<th style="width: 12%;">{NA_TIPO}</th>-->
+                            <th style="width: 40%">{NA_ACCION}</th>
+                            <th style="width: 60%">{NA_TRAZABILIDAD}</th>                        
 
                       </tr>
                       </thead>

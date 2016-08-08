@@ -38,9 +38,10 @@
                                             <div class="form-group">                                                               
                                       <label for="vigencia" class="col-md-4 control-label"> {N_ALTO_POTENCIAL} </label>  
                                       <div class="col-md-10">      
-                                        <label class="checkbox-inline" style="padding-top: 0px;">
+                                          {ALTO_POTENCIAL}
+                                        <!--<label class="checkbox-inline" style="padding-top: 0px;">
                                             <input type="checkbox" name="alto_potencial" id="alto_potencial" value="S" {CHECKED_ALTO_POTENCIAL}>   &nbsp;
-                                        </label>
+                                        </label>-->
                                         </div>
                                   
                                 </div>
@@ -64,6 +65,31 @@
                                                     </select>
                                           </div>
                                   </div>
+                                <div class="form-group">  
+                                      
+                                        <label for="id_responsable_segui" class="col-md-4 control-label">{N_ID_RESPONSABLE_SEGUI}</label>                                                                               
+                                         <div class=" col-md-10">                                               
+                                                    <select class="form-control "  name="id_responsable_segui" id="id_responsable_segui">
+                                                        <option selected="" value="">-- Seleccione --</option>
+                                                        {RESPONSABLE_SEGUI}
+                                                    </select>
+                                          </div>                                                                     
+                                </div>
+                                
+                                <div class="form-group">                                                               
+                                      <label for="vigencia" class="col-md-4 control-label"> {N_ALTO_POTENCIAL_VAL} </label>  
+                                      <div class="col-md-10">      
+                                          {ALTO_POTENCIAL_VAL}                                       
+                                        </div>
+                                  
+                                </div>
+                                <div class="form-group">
+                                        <label for="descripcion" class="col-md-4 control-label">{N_DESCRIPCION_VAL}</label>
+                                        <div class="col-md-10">                                          
+                                          <textarea class="form-control" rows="3" id="descripcion_val" name="descripcion_val" data-validation="required" placeholder="{N_DESCRIPCION_VAL}">{DESCRIPCION_VAL}</textarea>
+                                      </div>                                
+                                </div>
+                                      
                                   <div class="form-group">
                                         <label for="analisis_causal" class="col-md-4 control-label">{N_ANALISIS_CAUSAL}</label>
                                         <div class="col-md-10">                                          
@@ -174,7 +200,7 @@
                                   <h4 class="modal-title" id="myModalLabel">Árbol Organizacional</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <iframe width="100%" height="350px" id="b-iframe" frameborder="0" scrolling="no" src="pages/personas/emb_jstree_single_aux.php"></iframe>
+                                    {DIV_ARBOL_ORGANIZACIONAL}
                                     <input type="hidden" id="b-id_organizacion_aux" name="b-id_organizacion_aux" value="{ID_ORGANIZACION}"/>
                                 </div>
                                 <div class="modal-footer">
@@ -193,7 +219,9 @@
                                   <h4 class="modal-title" id="myModalLabel">Árbol de Procesos</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <iframe width="100%" height="350px" id="b-iframe" frameborder="0" scrolling="no" src="pages/arbol_procesos/emb_jstree_procesos_aux.php"></iframe>
+                                    <div id="id-tree-ap">
+                                        <div id="tree">Seleccione un Área para administrar el Arbol de Procesos</div>
+                                    </div>
                                     <input type="hidden" id="b-id_proceso_aux" name="b-id_proceso_aux" value="{ID_PROCESO}"/>
                                 </div>
                                 <div class="modal-footer">

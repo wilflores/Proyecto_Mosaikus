@@ -107,20 +107,21 @@
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
                     /*Carga Acceso segun el arbol*/
-                    if (count($this->restricciones->id_org_acceso_explicito) <= 0){
+                    /*if (count($this->restricciones->id_org_acceso_explicito) <= 0){
                         $this->restricciones->cargar_acceso_nodos_explicito($atr);
                     }                    
                     /*Valida Restriccion*/
-                    if (!isset($this->restricciones->id_org_acceso_explicito[$atr[id_organizacion]]))
+                    /*if (!isset($this->restricciones->id_org_acceso_explicito[$atr[id_organizacion]]))
                         return '- Acceso denegado para registrar persona en el &aacute;rea seleccionada.';
                     if (!(($this->restricciones->id_org_acceso_explicito[$atr[id_organizacion]][nuevo]== 'S') || ($this->restricciones->id_org_acceso_explicito[$atr[id_organizacion]][modificar] == S)))
                         return '- Acceso denegado para registrar persona en el &aacute;rea ' . $this->restricciones->id_org_acceso_explicito[$atr[id_organizacion]][title] . '.';
-
-                    $sql = "INSERT INTO mos_acciones_trazabilidad(id,id_accion_correctiva,id_accion,tipo,fecha_evi,id_persona,observacion)
+                    *///id_accion_correctiva,
+                    $sql = "INSERT INTO mos_acciones_trazabilidad(id_accion,tipo,fecha_evi,id_persona,observacion)
                             VALUES(
-                                $atr[id],$atr[id_accion_correctiva],$atr[id_accion],'$atr[tipo]',$atr[fecha_evi],$atr[id_persona],'$atr[observacion]'
+                                $atr[id_accion],'$atr[tipo]','$atr[fecha_evi]',$atr[id_persona],'$atr[observacion]'
                                 )";
-                    $this->dbl->insert_update($sql);
+                    //echo $sql;
+                    $this->dbl->insert_update($sql);//$atr[id_accion_correctiva],
                     /*
                     $this->registraTransaccion('Insertar','Ingreso el mos_acciones_trazabilidad ' . $atr[descripcion_ano], 'mos_acciones_trazabilidad');
                       */
@@ -128,7 +129,8 @@
                     $this->operacion($sql, $atr);
                     $id_new = $this->dbl->data[0][0];
                     $nuevo = "Id Accion Correctiva: \'$atr[id_accion_correctiva]\', Id Accion: \'$atr[id_accion]\', Tipo: \'$atr[tipo]\', Fecha Evi: \'$atr[fecha_evi]\', Id Persona: \'$atr[id_persona]\', Observacion: \'$atr[observacion]\', ";
-                    $this->registraTransaccionLog(18,$nuevo,'', $id_new);
+                    $this->registraTransaccionLog(20,$nuevo,'', $id_new);
+                    return $id_new;
                     return "El mos_acciones_trazabilidad '$atr[descripcion_ano]' ha sido ingresado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
@@ -240,9 +242,11 @@
                                 ,DATE_FORMAT(fecha_evi, '%d/%m/%Y %H:%i') fecha_evi_a
                                 ,id_persona
                                 ,observacion
-
+                                ,CONCAT(initcap(SUBSTR(per.nombres,1,IF(LOCATE(' ' ,per.nombres,1)=0,LENGTH(per.nombres),LOCATE(' ' ,per.nombres,1)-1))),' ',initcap(per.apellido_paterno)) as persona
                                 $sql_col_left
-                            FROM mos_acciones_trazabilidad $sql_left
+                            FROM mos_acciones_trazabilidad 
+                            INNER JOIN mos_personal per ON per.cod_emp = id_persona
+                            $sql_left
                             WHERE 1 = 1 ";
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND ((upper(id_personal) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";

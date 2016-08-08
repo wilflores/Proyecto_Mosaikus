@@ -312,11 +312,74 @@ class GenerarPDFReportes{
 
 
         if($baja){
-            $mpdf->Output($filename.".pdf",'D');
+            $mpdf->Output($filename.".pdf",'I');
         }else{
             $mpdf->Output($path_to_pdf,'F');
             $mpdf->debug = true;
             Header("Location: " .APPLICATION_ROOT . $path_to_pdf);
+        }
+    }
+    
+    function pdf_create_reporte_portada($html, $filename, $baja=false, $sizepage=1, $piepagina=true, $orientacion=0,$ruta) {
+        //usando MFPDF
+                
+        
+        if (!file_exists("downloads/tmp_doc/".$ruta."/")) {
+	    	mkdir("downloads/tmp_doc/".$ruta."/", 0777);
+			chmod("downloads/tmp_doc/".$ruta."/", 0777);
+		}
+        $path_to_pdf="downloads/tmp_doc/".$ruta."/".$filename.".pdf";
+        $formato = "";
+
+        switch ($sizepage) {
+            case 1:
+                if($orientacion==1){
+                    $formato = "Letter-L";
+                }else{
+                    $formato = "Letter";
+                }
+                break;
+            case 3:
+                if($orientacion==1){
+                    $formato = "Legal-L";
+                }else{
+                    $formato = "Legal";
+                }
+                break;
+            case 2:
+                $formato = array(216,139.5);
+                break;
+            }
+
+        $mpdf=new mPDF('',$formato,'','',0,0,30,0, 0, 0);  
+        $stylesheet = file_get_contents('dist/css/styles_pdf_formato_1.css'); // external css
+        $mpdf->WriteHTML($stylesheet,1);
+        if ($piepagina) {
+             
+        }
+        $mpdf->SetHTMLHeaderByName('MyHeader1');
+
+        
+        $tam = count($html);
+        $i = 0;
+        
+        foreach ($html as $cont) {        
+            $mpdf->WriteHTML($cont,2+$i);
+            if ($i!=(count($html) - 1)) 
+            {
+                $mpdf->AddPage();
+            }
+            $i++;
+        }
+
+
+        if($baja){
+            $mpdf->Output($filename.".pdf",'I');
+        }else{
+            $mpdf->Output($path_to_pdf,'F');
+            $mpdf->debug = true;
+            return $path_to_pdf;
+            //Header("Location: " .APPLICATION_ROOT . $path_to_pdf);
         }
     }
 }

@@ -992,14 +992,26 @@
             
             public function buscar_hijos($parametros)
             {
+                $parametros = $this->dbl->corregir_parametros($parametros);
                 $hijos = $this->BuscaOrgNivelHijos($parametros['b-id_organizacion']);                
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('nivel',"value",$hijos);
                 //$objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
                 $nombre = BuscaOrganizacional(array('id_organizacion' => $parametros['b-id_organizacion']));
                 $objResponse->addAssign('desc-arbol',"innerHTML",$nombre);
-                $objResponse->addScript("procesar_filtrar_arbol();");
+                //$objResponse->addScript("procesar_filtrar_arbol();");
                 $objResponse->addScript("$('#myModal-Filtrar-Arbol').modal('hide');");
+                if (isset($parametros[respon]) && $parametros[respon] == '1'){
+                    $sql = "select cod_emp from mos_responsable_area where id_organizacion = " . $parametros['b-id_organizacion'];
+                    $data = $this->dbl->query($sql);
+                    if (count($data)> 0){
+                        $objResponse->addScript("$('#responsable_desvio').val('".$data[0][cod_emp]."');");
+                        $objResponse->addScript('$( "#responsable_desvio" ).select2({
+                                                    placeholder: "Selecione el elaborador",
+                                                    allowClear: true
+                                                  });actualizar_cambio_respon_desvio();');
+                    }
+                }
                 return $objResponse;
             }
             

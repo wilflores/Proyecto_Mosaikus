@@ -100,7 +100,7 @@
                   </thead>
                   <thead>
                       <tr height="30px">
-                            <th style="width: 12%;">{NA_TIPO}</th>
+                        <!--    <th style="width: 12%;">{NA_TIPO}</th>-->
                         <th style="width: 47%">{NA_ACCION}</th>
                         <th style="width: 10%">{NA_FECHA_ACORDADA}</th>
                         <th style="width: 10%">{NA_FECHA_REALIZADA}</th>
@@ -123,9 +123,9 @@
                   </thead>
                   <thead>
                       <tr>
-                            <th style="width: 12%;">{NA_TIPO}</th>
-                            <th style="width: 44%">{NA_ACCION}</th>
-                            <th style="width: 44%">{NA_TRAZABILIDAD}</th>                        
+                            <!--<th style="width: 12%;">{NA_TIPO}</th>-->
+                            <th style="width: 40%">{NA_ACCION}</th>
+                            <th style="width: 60%">{NA_TRAZABILIDAD}</th>                        
 
                       </tr>
                   </thead>
@@ -157,7 +157,13 @@
 
             </dl>
         </div>
-       
+        <div class="row">
+            <dl class="col-xs-24">
+              <dt>{N_DESC_VERIFICACION} </dt>
+              <dd> {DESC_VERIFICACION}</dd>
+
+            </dl>            
+        </div>
         <div class="row">
             <dl class="col-xs-24">
               <dt>{N_ID_RESPONSABLE_SEGUI} </dt>

@@ -27,7 +27,7 @@
             }
             
             private function cargar_nombres_columnas(){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 16";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 16  AND id_idioma = $_SESSION[CookIdIdioma]";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
@@ -36,7 +36,7 @@
             }
             
             public function cargar_nombres_columnas_acciones(){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 15";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 15  AND id_idioma = $_SESSION[CookIdIdioma]";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas_ac[$value[nombre_campo]] = $value[texto];
@@ -45,7 +45,7 @@
             }
             
             private function cargar_placeholder(){
-                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE modulo = 16";
+                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE modulo = 16  AND id_idioma = $_SESSION[CookIdIdioma]";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->placeholder[$value[nombre_campo]] = $value[placeholder];
@@ -84,7 +84,7 @@
                                 END dias
                             ,CONCAT(initcap(SUBSTR(per.nombres,1,IF(LOCATE(' ' ,per.nombres,1)=0,LENGTH(per.nombres),LOCATE(' ' ,per.nombres,1)-1))),' ',initcap(per.apellido_paterno)) as responsable
                             ,(SELECT mos_nombres_campos.texto FROM mos_nombres_campos
-                                    WHERE mos_nombres_campos.nombre_campo = acco.estatus_wf AND mos_nombres_campos.modulo = 16) as estatus_wf
+                                    WHERE mos_nombres_campos.nombre_campo = acco.estatus_wf AND mos_nombres_campos.modulo = 16  AND id_idioma = $_SESSION[CookIdIdioma]) as estatus_wf
                          FROM mos_acciones_ac_co acco
                          INNER JOIN mos_tipo_ac ta ON ta.id = tipo
                          INNER JOIN mos_personal per on per.cod_emp = acco.id_responsable
@@ -111,10 +111,12 @@
                     else{
                         $atr[fecha_realizada] = "'$atr[fecha_realizada]'";
                     }
-                    $sql = "INSERT INTO mos_acciones_ac_co(tipo,accion,fecha_acordada,fecha_realizada,id_responsable,id_ac,id_correcion,orden)
+                    $sql = "INSERT INTO mos_acciones_ac_co(tipo,accion,fecha_acordada,fecha_realizada,id_responsable,id_ac,id_correcion,orden
+                        ,id_validador)
                             VALUES(
                                 $atr[tipo],'$atr[accion]','$atr[fecha_acordada]',$atr[fecha_realizada],$atr[id_responsable],$atr[id_ac],$atr[id_correcion],$atr[orden]
-                                )";
+                                ,$atr[id_validador])";
+                    //echo $sql;
                     $this->dbl->insert_update($sql);
                     if ($atr[fecha_realizada] != 'NULL'){
                         $atr[fecha_realizada] = "\\" . substr($atr[fecha_realizada], 0, strlen($atr[fecha_realizada])-1)  . "\'";
@@ -158,6 +160,7 @@
                     }
                     $sql = "UPDATE mos_acciones_ac_co SET                            
                                     tipo = $atr[tipo],accion = '$atr[accion]',fecha_acordada = '$atr[fecha_acordada]',fecha_realizada = $atr[fecha_realizada],id_responsable = $atr[id_responsable], orden = $atr[orden]
+                                    ,id_validador = $atr[id_validador]
                             WHERE  id = $atr[id]";
                     //echo $sql;
                     $val = $this->verAccionesAC($atr[id]);
@@ -180,6 +183,34 @@
                     }
             }
             
+            public function cambiarestadowf($atr){
+                    try {
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $sql = "UPDATE mos_acciones_ac_co 
+                        SET                            
+                        estatus_wf = '$atr[estado]',                            
+                            observacion_rechazo = '$atr[observacion_rechazo]',    
+                            fecha_estado_wf = '$atr[fecha_estado_wf]',id_usuario_wf = $atr[id_usuario]
+                            WHERE  id = $atr[id]";     
+                    //echo $sql;
+                    //$val = $this->verDocumentos($atr[id]);
+                    $this->dbl->insert_update($sql);
+                    
+                    $nuevo = "$atr[estado]";
+                    $anterior = "$atr[observacion_rechazo]";
+                    $this->registraTransaccionLog(22,$nuevo,$anterior, $atr[id]);
+                    /*
+                    $this->registraTransaccion('Modificar','Modifico el WorkflowDocumentos ' . $atr[descripcion_ano], 'mos_workflow_documentos');
+                    */
+                    return "El flujo de trabajo de documentos ha sido actualizado con exito";
+                } catch(Exception $e) {
+                        $error = $e->getMessage();                     
+                        if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
+                            return "Ya existe una sección con el mismo nombre.";                        
+                        return $error; 
+                    }
+
+             }
             
             public function listarAccionesACSinPaginacion($atr){
                     $atr = $this->dbl->corregir_parametros($atr);
@@ -253,9 +284,24 @@
                                 ,id_responsable                                                                
                                 ,id_ac
                                 ,id_correcion
-
-                                     $sql_col_left
-                            FROM mos_acciones_ac_co acco                             
+                                ,CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno)) responsable
+                                ,CASE WHEN NOT acco.fecha_acordada IS NULL THEN 
+                                        CASE WHEN NOT acco.fecha_realizada IS NULL THEN
+                                                CASE WHEN acco.fecha_realizada <= acco.fecha_acordada
+                                                        THEN 0
+                                                    ElSE DATEDIFF(acco.fecha_realizada,acco.fecha_acordada )
+                                                END
+                                            WHEN CURRENT_DATE() > acco.fecha_acordada THEN 
+                                                DATEDIFF(CURRENT_DATE(),acco.fecha_acordada)
+                                            ELSE DATEDIFF(acco.fecha_acordada,CURRENT_DATE())
+                                        END 
+                                    ELSE NULL 
+                                END dias
+                                ,estado
+                                ,id_validador
+                                $sql_col_left
+                            FROM mos_acciones_ac_co acco   
+                            INNER JOIN mos_personal p ON p.cod_emp = id_responsable
                             $sql_left
                             WHERE 1 = 1 $sql_where";
                     
@@ -346,7 +392,7 @@
                                 ,accion
                                 ,DATE_FORMAT(acco.fecha_acordada, '%d/%m/%Y') fecha_acordada_a
                                 ,DATE_FORMAT(acco.fecha_realizada, '%d/%m/%Y') fecha_realizada_a
-                                ,CONCAT(initcap(SUBSTR(per.nombres,1,IF(LOCATE(' ' ,per.nombres,1)=0,LENGTH(per.nombres),LOCATE(' ' ,per.nombres,1)-1))),' ',initcap(per.apellido_paterno)) as id_responsable
+                                ,CONCAT(initcap(SUBSTR(per.nombres,1,IF(LOCATE(' ' ,per.nombres,1)=0,LENGTH(per.nombres),LOCATE(' ' ,per.nombres,1)-1))),' ',initcap(per.apellido_paterno)) as responsable
                                 
                                 ,CASE WHEN NOT acco.fecha_acordada IS NULL THEN 
                                         CASE WHEN NOT acco.fecha_realizada IS NULL THEN
@@ -361,9 +407,13 @@
                                     ELSE NULL 
                                 END dias
                                 -- ,(select count(id) from mos_acciones_evidencia where id_accion=acco.id) as cantidad 
-                                ,id_ac
+                                -- ,id_ac
                                 ,id_correcion
-
+                                ,(SELECT mos_nombres_campos.texto FROM mos_nombres_campos
+                                    WHERE mos_nombres_campos.nombre_campo = acco.estatus_wf AND mos_nombres_campos.modulo = 16 AND id_idioma = $_SESSION[CookIdIdioma]) as estatus_wf_a
+                                ,id_responsable
+                                ,id_validador
+                                ,estatus_wf
                                      $sql_col_left
                             FROM mos_acciones_ac_co acco 
                             INNER JOIN mos_acciones_correctivas ac ON ac.id = acco.id_ac
@@ -411,7 +461,10 @@
                                                 <i style='cursor:pointer'  class=\"icon icon-view-document\" title=\"Ver Trazabilidad Acción\"></i>
                                             </a>";
                 //if ($this->restricciones->id_org_acceso_explicito[$tupla[id_organizacion]][modificar] == 'S')
+                 //
+                if ((($tupla[estatus_wf] == 'en_ejecucion')  || ($tupla[estatus_wf] == 'rechazado')) && ($tupla[id_responsable] == $_SESSION['CookCodEmp']))
                 {                    
+                    //print_r($tupla);
                     $html .= "<a href=\"#\" onclick=\"javascript:editarAccionesAC('". $tupla[id] . "');\"  title=\"Gestionar Trazabilidad Acción\">                            
                                 <i class=\"icon icon-edit\"></i>
                             </a>";
@@ -424,7 +477,8 @@
 
                         </a>"; 
                 }*/
-                $html .= '<a href="#" onclick="javascript:verWorkFlow(\''. $tupla[IDDoc] . '\');" title="Ver Flujo de Trabajo '.$tupla[nombre_doc].'" >                        
+                if (($tupla[id_validador] == $_SESSION['CookCodEmp']) && ($tupla[estatus_wf] == 'cerrada_verificar'))
+                    $html .= '<a href="#" onclick="javascript:WFAccionesAC(\''. $tupla[id] . '\');" title="Ver Flujo de Trabajo '.$tupla[nombre_doc].'" >                        
                             <i class="icon icon-user-document"></i>
                     </a>'; 
                 
@@ -449,21 +503,25 @@
 
                 $grid->SetConfiguracionMSKS("tblAccionesAC", "");
                 $config_col=array(
-                    array( "width"=>"2%","ValorEtiqueta"=>"<div style='width:80px'>&nbsp;</div>"),
+                    array( "width"=>"2%","ValorEtiqueta"=>"<div style='width:60px'>&nbsp;</div>"),
                     array( "width"=>"5%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[estado_seguimiento], ENT_QUOTES, "UTF-8")),
                     array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas_ac[id], "id_ac", $parametros,30)), 
                     array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas_ac[fecha_generacion], "ac.fecha_generacion", $parametros,80,40)), 
                     array( "width"=>"20%","ValorEtiqueta"=>link_titulos($this->nombres_columnas_ac[descripcion], "ac.descripcion", $parametros)), 
-               array( "width"=>"5%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[tipo], "tipo", $parametros,"link_titulos_hv")),
-               array( "width"=>"20%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[accion], "accion", $parametros,"link_titulos_hv")),
-               array( "width"=>"5%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[fecha_acordada], "fecha_acordada", $parametros,"link_titulos_hv")),
-               array( "width"=>"5%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[fecha_realizada], "fecha_realizada", $parametros,"link_titulos_hv")),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[id_responsable], "id_responsable", $parametros,"link_titulos_hv")),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[tipo], "tipo", $parametros,"link_titulos")),
+               array( "width"=>"20%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[accion], "accion", $parametros,"link_titulos")),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[fecha_acordada], "acco.fecha_acordada", $parametros,"link_titulos")),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[fecha_realizada], "acco.fecha_realizada", $parametros,"link_titulos")),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[id_responsable], "id_responsable", $parametros,"link_titulos")),
                
                array( "width"=>"10%","ValorEtiqueta"=>"dias"),
                array( "width"=>"5%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[trazabilidad], ENT_QUOTES, "UTF-8")),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_ac], "id_ac", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_correcion], "id_correcion", $parametros))
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_ac], "id_ac", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[estatus_wf], "estatus_wf", $parametros)),
+                    //
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[estatus_wf], "estatus_wf", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[estatus_wf], "estatus_wf", $parametros)),
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[estatus_wf], "estatus_wf", $parametros)),
                 );
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
@@ -508,7 +566,7 @@
 //                        case 1:
                         case 10:
                         case 11:
-                        case 12:
+                        //case 12:
                             $grid->hidden[$i] = true;
 //                            array_push($config,$config_col[$i]);
                             break;
@@ -542,7 +600,8 @@
     
                 $grid->setDataMSKS("td-table-data", $data, $func,$columna_funcion, $parametros['pag'] );
                 $out['tabla']= $grid->armarTabla();
-                if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina)){
+                //if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina))
+                {
                     $out['paginado']=$grid->setPaginadohtmlMSKS("verPagina", "document");
                 }
                 return $out;
@@ -685,11 +744,11 @@
                 if ($parametros['corder'] == null) $parametros['corder']="acco.fecha_acordada";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="0-1-2-3-4-6-7-8-9"; 
+                    $parametros['mostrar-col']="0-1-2-3-4-6-7-8-9-12"; 
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */               
-                $k = 10;
+                $k = 14;
                 $contenido[PARAMETROS_OTROS] = "";
                 foreach ($this->parametros as $value) {                    
                     $parametros['mostrar-col'] .= "-$k";
@@ -800,6 +859,8 @@
                                         $('#myModal-Ventana-Titulo').html('');
                                         $('#myModal-Ventana').modal('show');
                                     });
+                                    PanelOperator.initPanels('');
+                                        ScrollBar.initScroll();
 /*
                                     $('.ver-reporte').on('click', function (event) {
                                         event.preventDefault();
@@ -950,7 +1011,7 @@
                 $contenido_1['TIPOS'] = $ut_tool->OptionsComboArrayMultiple($ids, $desc);
                 $contenido_1[RESPONSABLE_ACCIONES] .= $ut_tool->OptionsCombo($sql
                                                                     , 'cod_emp'
-                                                                    , 'nombres', null);
+                                                                    , 'nombres', strlen($_SESSION[CookCodEmp])>0?$_SESSION[CookCodEmp]:null);
                 $contenido_1['ACCION'] = ($val["accion"]);
                 $contenido_1['FECHA_ACORDADA'] = ($val["fecha_acordada"]);
                 $contenido_1['FECHA_REALIZADA'] = ($val["fecha_realizada"]);
@@ -1015,13 +1076,30 @@
                          $item = $item.  '<td>' .
                                             ' <textarea id="accion_'. $i . '" name="accion_'. $i . '" class="form-control" data-validation="required">'. $value[observacion] .'</textarea>'.
                                          '</td>';
+                         /*SI ES SUPER USUARIO PUEDE EDITAR CUALQUIERA*/
+                         if($_SESSION[SuperUser]=='S'){
+                             $sql= "SELECT cod_emp, 
+                                                                        CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  nombres_a
+                                                                            FROM mos_personal p 
+                                                                            WHERE (interno = 1 AND workflow = 'S' ) OR cod_emp = $value[id_persona]
+                                                                            ORDER BY nombres, apellido_paterno";
+                         }
+                         else// if ($this->restricciones->per_ == 'S') 
+                         {
+                            //$_SESSION[CookCodEmp]
+                             $sql= "SELECT cod_emp, 
+                                                                        CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  nombres_a
+                                                                            FROM mos_personal p 
+                                                                            WHERE cod_emp = $value[id_persona]
+                                                                            ORDER BY nombres, apellido_paterno";
+                         }
+                         
+                         
                          $item = $item . '<td class="td-table-data">'.
                                             '  <select id="responsable_acc_'. $i .  '" name="responsable_acc_'. $i .  '" class="form-control" data-validation="required" data-live-search="true">'.
                                             '<option value="">-- Seleccione --</option>' . 
                                                 //$('#option_responsables').val() .
-                                                $ut_tool->OptionsCombo("SELECT cod_emp, 
-                                                                        CONCAT(initcap(SUBSTR(p.nombres,1,IF(LOCATE(' ' ,p.nombres,1)=0,LENGTH(p.nombres),LOCATE(' ' ,p.nombres,1)-1))),' ',initcap(p.apellido_paterno))  nombres_a
-                                                                            FROM mos_personal p WHERE interno = 1 AND workflow = 'S' ORDER BY nombres, apellido_paterno"
+                                                $ut_tool->OptionsCombo($sql
                                                                     , 'cod_emp'
                                                                     , 'nombres_a', $value[id_persona]) . 
                                             '</select>' .
@@ -1065,6 +1143,26 @@
                 $contenido_1['ITEMS_ESP'] = $item;
                 $contenido_1['NUM_ITEMS_ESP'] = $i;
                 
+                /*Historico Flujo de Trabajo*/
+                $sql = "SELECT fecha_hora f1,DATE_FORMAT(fecha_hora, '%d/%m/%Y %H:%i')fecha_registro"
+                        . ", (SELECT mos_nombres_campos.texto FROM mos_nombres_campos
+                                    WHERE mos_nombres_campos.nombre_campo = accion AND mos_nombres_campos.modulo = 16 AND id_idioma = $_SESSION[CookIdIdioma]) as accion"
+                        . ", anterior"
+                        . ",CONCAT(initcap(SUBSTR(user.nombres,1,IF(LOCATE(' ' ,user.nombres,1)=0,LENGTH(user.nombres),LOCATE(' ' ,user.nombres,1)-1))),' ',initcap(user.apellido_paterno)) usuario "
+                        . "FROM mos_log wf inner join mos_usuario user "
+                        . " on wf.realizo= user.id_usuario "
+                        . " WHERE codigo_accion = 22 AND wf.id_registro = $parametros[id] order by f1 desc";
+                //echo $sql;
+                $historia = $this->dbl->query($sql, array());
+                foreach ($historia as $value) {
+                    $item_histo .="<tr>";
+                    $item_histo .="<td>".$value[fecha_registro]."</td>";
+                    $item_histo .="<td>".$value[accion].". $value[anterior]</td>";
+                    $item_histo .="<td>".$value[usuario]."</td>";
+                    $item_histo .="</tr>";
+                }
+                $contenido_1['ITEMS_HISTO'] = $item_histo;
+                /*FIN HISTORICO*/
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'acciones_ac/';
                 $template->setTemplate("formulario_h");
@@ -1075,12 +1173,17 @@
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
                 $template->setTemplate("formulario_h");
 
-                $contenido['TITULO_FORMULARIO'] = "Editar&nbsp;AccionesAC";
+                $contenido['TITULO_FORMULARIO'] = "Editar&nbsp;";
                 $contenido['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;AccionesAC";
                 $contenido['PAGINA_VOLVER'] = "listarAccionesAC.php";
                 $contenido['DESC_OPERACION'] = "Guardar";
                 $contenido['OPC'] = "upd";
                 $contenido['ID'] = $val["id"];
+                
+                $contenido['DESC_OPERACION'] = "Solo Guardar";
+                $contenido[JS_PREVIO_GUARDAR] = "$('#notificar').val('');";
+                $contenido['OTRO_BOTON_PRINCIPAL'] = '<button type="button" class="btn btn-primary" onClick="$(\'#notificar\').val(\'si\');validar(document);" id="btn-guardar-not">Guardar y Notificar</button>';
+
 
                 $template->setVars($contenido);
                 
@@ -1105,7 +1208,181 @@
                 return $objResponse;
             }
      
- 
+            public function WFAccionesAC($parametros)
+            {
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                $ut_tool = new ut_Tool();
+                $val = $this->verAccionesAC($parametros[id]); 
+
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido_1["N_" . strtoupper($key)] =  $value;
+                }                
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido_1["P_" . strtoupper($key)] =  $value;
+                }    
+                $objResponse = new xajaxResponse();
+                $contenido_1['TIPO'] = $val["tipo_desc"];
+                /*
+                $objResponse->addScript("$('#hv-tipo').val('$val[tipo]');");
+                $objResponse->addScript("$('#hv-accion').html('$val[accion]');");
+                $objResponse->addScript("$('#hv-fecha_acordada').val('$val[fecha_acordada]');");
+                $objResponse->addScript("$('#hv-fecha_realizada').val('$val[fecha_realizada]');");
+                $objResponse->addScript('$("#hv-id_responsable").select2("val", "'.$val["id_responsable"].'")'); */
+                if($_SESSION[SuperUser]=='S'){
+                    $sql = "SELECT cod_emp, 
+                            CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno))  nombres
+                                FROM mos_personal p WHERE interno = 1 AND workflow = 'S'
+                                ORDER BY nombres";
+                }
+                else
+                {
+                    $sql = "SELECT cod_emp, 
+                            CONCAT(initcap(p.nombres), ' ', initcap(p.apellido_paterno))  nombres
+                                FROM mos_personal p WHERE interno = 1 AND workflow = 'S' AND p.cod_emp = $_SESSION[CookCodEmp]
+                                ORDER BY nombres";
+                }
+                $ids = array('', 'Avance', 'Cierre'); 
+                $desc = array('-- Seleccione --', 'Avance', 'Cierre');
+                $contenido_1['TIPOS'] = $ut_tool->OptionsComboArrayMultiple($ids, $desc);
+                $contenido_1[RESPONSABLE_ACCIONES] .= $ut_tool->OptionsCombo($sql
+                                                                    , 'cod_emp'
+                                                                    , 'nombres', strlen($_SESSION[CookCodEmp])>0?$_SESSION[CookCodEmp]:null);
+                $contenido_1['ACCION'] = ($val["accion"]);
+                $contenido_1['FECHA_ACORDADA'] = ($val["fecha_acordada"]);
+                $contenido_1['FECHA_REALIZADA'] = ($val["fecha_realizada"]);
+                $contenido_1['ID_RESPONSABLE'] = $val["responsable"];
+                $contenido_1['ID_AC'] = $val["id_ac"];
+                $contenido_1['ID_CORRECION'] = $val["id_correcion"];
+                $contenido_1['ESTATUS_WF'] = $val["estatus_wf"];
+                $contenido_1['ESTADO'] = $this->semaforo_estado($val,'estado');
+
+                /*LISTADO DE TRAZABILIDAD*/
+                import('clases.acciones_trazabildiad.AccionesTrazavilidad');
+                $ac = new AccionesTrazavilidad();
+                $parametros['b-id_accion'] = $val[id];
+                $parametros[corder] = 'fecha_evi';
+                $parametros[sorder] = '';
+                //$parametros[corder] = 'orden';
+                $ac->listarAccionesTrazavilidad($parametros,1,10000);
+                $data=$ac->dbl->data;
+                //print_r($data);
+                $item = "";
+                //$js = "";
+                $i = 0;
+                $contenido_1['TOK_NEW'] = time();       
+                /* EVIDENCIAS ADJUNTADAS*/
+                if(!class_exists('ArchivosAdjuntos')){
+                    import("clases.utilidades.ArchivosAdjuntos");
+                }
+                $adjuntos = new ArchivosAdjuntos();       
+                
+                //$ids = array('7','8','9','1','2','3','5','6','10');
+                //$desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo');
+                foreach ($data as $value) {                          
+                    $i++;                    
+                    $item = $item. '<tr id="tr-esp-' . $i . '">';                      
+                    
+
+                    {
+                        //FOTOS ANEXOS
+                        $anexos = $adjuntos->visualizar_archivos_adjuntos('mos_acciones_evidencia', 'fk_id_trazabilidad',$value["id"],24,'div',$i*100);
+                                //print_r ($anexos);
+                        //$js .= $anexos[js];
+                        //$adjuntos->ingresar_archivos_adjuntos_temp('mos_acciones_evidencia', 'fk_id_trazabilidad',$value["id"],$contenido_1['TOK_NEW']*1-$i);
+                        
+                                                          //paperclip          
+                        /*$item = $item. '<td align="center">'.
+                                            
+//                                             '<i class="subir glyphicon glyphicon-arrow-up cursor-pointer"></i>
+//                                              <i class="bajar glyphicon glyphicon-arrow-down cursor-pointer"></i>'.
+                        '<i class="bajar glyphicon glyphicon-paperclip cursor-pointer" id="ico_cmb_din_'. $i . '" tok="'. $i .'" title="Administrar Anexos"></i>'.
+                                              
+                                              '<input id="id_unico_din_'. $i . '" name="id_unico_din_'. $i . '" value="'.$value[id].'" type="hidden" >'.                                              
+                                              '<input id="orden_din_'. $i . '" name="orden_din_'. $i . '" value="'.($value[orden] == '' ? $i : $value[orden]).'" type="hidden" >'.
+                                       '  </td>';*/
+                         $item = $item. '<td class="td-table-data">'.$value[tipo].
+                                             
+                                        '</td>';
+//                         $item = $item. '<td>' .
+//                                            $ut_tool->combo_array("tipo_din_$i", $desc, $ids, false, $value["tipo"],"actualizar_atributo_dinamico($i);")  .
+//                                         '</td>';
+                         $item = $item.  '<td>' . $value[observacion] .
+                                            $anexos[html] .
+                                         '</td>';
+                         
+                         
+                         $item = $item . '<td class="td-table-data">'.$value[persona]
+                                             .
+                                       '</td>';
+                         $item = $item . '<td class="td-table-data">'.$value[fecha_evi_a].'</td>';
+                        
+                        
+                        $item = $item. '</tr>' ;                    
+                        
+                        
+                        
+                    }
+                }               
+                //echo $item;
+                $contenido_1['ITEMS_ESP'] = $item;
+                $contenido_1['NUM_ITEMS_ESP'] = $i;
+                $contenido_1['ID'] = $val["id"];
+                
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'acciones_ac/';
+                $template->setTemplate("formulario_h_wf");
+                $template->setVars($contenido_1);
+
+                $contenido['CAMPOS'] = $template->show();
+
+                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
+                $template->setTemplate("formulario_h");
+
+                $contenido['TITULO_FORMULARIO'] = "Flujo de Trabajo&nbsp;";
+                $contenido['TITULO_FORMULARIO'] .= '<br>
+                    <button  {MOSTRARCAMBIAR} type="button" class="btn btn-primary" onclick="CambiarEstadoWF(\'cerrada_verificada\','.$val[id].');"><i class="glyphicon glyphicon-ok"></i> &nbsp;Aprobar</button>
+                    <button {MOSTRARRECHAZAR} type="button" class="btn btn-default" onclick="$(\'#myModal-observacion-rechazo\').modal(\'show\');"><i class="glyphicon glyphicon-remove"></i> &nbsp;Rechazar</button>';
+
+                $contenido['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;AccionesAC";
+                $contenido['PAGINA_VOLVER'] = "listarAccionesAC.php";
+                $contenido['DESC_OPERACION'] = '<i class="glyphicon glyphicon-ok"></i> &nbsp;Aprobar';
+                $contenido['OPC'] = "upd";
+                $contenido['ID'] = $val["id"];
+                                
+                $contenido['OTRO_BOTON_PRINCIPAL'] = '<button type="button" class="btn btn-default" onClick="$(\'#myModal-observacion-rechazo\').modal(\'show\');" id="btn-guardar-not"><i class="glyphicon glyphicon-remove"></i> Rechazar</button>';
+
+
+                $template->setVars($contenido);
+                
+                /*
+                $objResponse->addScript("$('#id-hv').val('$parametros[id]');");
+                $objResponse->addScript("$('#opc-hv').val('upd');");
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("$.validate({
+                            lang: 'es'  
+                          });");
+                $objResponse->addScript("$('.nav-tabs a[href=\"#hv-red\"]').tab('show');");*/
+                $objResponse->addAssign('contenido-form',"innerHTML",  str_replace('validar(document);', 'CambiarEstadoWF(\'cerrada_verificada\','.$val[id].');', $template->show()) );
+                $objResponse->addScriptCall("calcHeight");
+                $objResponse->addScriptCall("MostrarContenido2");          
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("$.validate({
+                            lang: 'es'  
+                          });");
+                $objResponse->addScript($js);
+//                $objResponse->addScript("$('#fecha_acordada').datetimepicker();");
+//                $objResponse->addScript("$('#fecha_realizada').datetimepicker();");
+                return $objResponse;
+            }
+            
             public function actualizar($parametros)
             {
                 session_name("$GLOBALS[SESSION]");
@@ -1113,7 +1390,28 @@
                 $objResponse = new xajaxResponse();
                 unset ($parametros['opc']);
                 $parametros['id_usuario']= $_SESSION['USERID'];
-
+                $bandera = 0;
+                if ($parametros[notificar] == 'si'){
+                    $bandera = 0;
+                    for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
+                        //GUARDAMOS LAS ACCIONES VALIDAS
+                        //if (!isset($parametros["id_unico_din_$i"]))
+                        { 
+                            if ((isset($parametros["tipo_$i"])) && ($parametros["tipo_$i"] == 'Cierre')){
+                                $bandera++;
+                            }
+                        }
+                    }
+                    if ($bandera < 1){
+                        $objResponse->addScriptCall('VerMensaje','error',"Debes ingresar al menos una trazabilidad tipo Cierre");
+                        return $objResponse;
+                    }
+                    if ($bandera > 1){
+                        $objResponse->addScriptCall('VerMensaje','error',"Existe mas de una trazabilidad tipo Cierre");
+                        return $objResponse;
+                    }
+                }
+                
                 $validator = new FormValidator();
                 
                 if(!$validator->ValidateForm($parametros)){
@@ -1142,6 +1440,14 @@
                     }     
                     //print_r($parametros);
                     //echo $parametros[num_items_esp];
+                    /* EVIDENCIAS ADJUNTADAS*/
+                    if(!class_exists('ArchivosAdjuntos')){
+                        import("clases.utilidades.ArchivosAdjuntos");
+                    }
+                    $adjuntos = new ArchivosAdjuntos();
+                    
+                    /*FIN EVIDENNCIAS*/
+                    
                     for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
                         //GUARDAMOS LAS ACCIONES VALIDAS
                         if (!isset($parametros["id_unico_din_$i"])){ 
@@ -1152,7 +1458,13 @@
                                 $params[fecha_evi] = formatear_fecha_hora($parametros["fecha_acordada_$i"]);
                                 //$params[orden] = $parametros["orden_din_$i"];     
                                 $params[id_accion] = $parametros[id];
-                                //$trazabilidad->ingresarAccionesTrazavilidad($params);                                                               
+                                $id_traza = $trazabilidad->ingresarAccionesTrazavilidad($params);   
+                                //SE GUARDAN LAS EVIDENCIAS
+                                $atr[tabla] = 'mos_acciones_evidencia';
+                                $atr[clave_foranea] = 'fk_id_trazabilidad';
+                                $atr[valor_clave_foranea] = $id_traza;
+                                $atr[tok_new_edit] = $parametros[tok_new_edit]*1+$i;
+                                $adjuntos->guardar($atr);
                             }
                         }else{
                             if (isset($parametros["tipo_$i"])){
@@ -1164,8 +1476,21 @@
                                 $params[id_accion] = $parametros[id];   
                                 $params[id] = $parametros["id_unico_din_$i"]; 
                                 $trazabilidad->modificarAccionesTrazavilidad($params);
+                                //SE GUARDAN LAS EVIDENCIAS
+                                $atr[tabla] = 'mos_acciones_evidencia';
+                                $atr[clave_foranea] = 'fk_id_trazabilidad';
+                                $atr[valor_clave_foranea] = $parametros["id_unico_din_$i"];
+                                $atr[tok_new_edit] = $parametros[tok_new_edit]*1-$i;
+                                $adjuntos->guardar($atr);
                             }
                         }
+                    }
+                    
+                    /*SI GUARDA Y NOTIFICA SE ACTIVA EL WF PARA LA VERIFICACION*/
+                    if ($bandera == 1){
+                        $parametros= $this->dbl->corregir_parametros($parametros);
+                        $sql = "update mos_acciones_ac_co set estatus_wf = 'cerrada_verificar' where id = $parametros[id]";
+                        $this->dbl->insert_update($sql);
                     }
                     //$respuesta = $this->modificarAccionesAC($parametros);
 
@@ -1187,6 +1512,196 @@
                 return $objResponse;
             }
      
+            public function verWFemail($id){
+                $atr=array();
+                $sql = "select 
+                                mos_personal.email
+                                ,CONCAT(initcap(SUBSTR(mos_personal.nombres,1,IF(LOCATE(' ' ,mos_personal.nombres,1)=0,LENGTH(mos_personal.nombres),LOCATE(' ' ,mos_personal.nombres,1)-1))),' ',initcap(mos_personal.apellido_paterno)) nombres 
+                                ,u.recibe_notificaciones
+                                ,pv.email email_validador
+                                ,CONCAT(initcap(SUBSTR(pv.nombres,1,IF(LOCATE(' ' ,pv.nombres,1)=0,LENGTH(pv.nombres),LOCATE(' ' ,pv.nombres,1)-1))),' ',initcap(pv.apellido_paterno)) nombres_validador 
+                                ,uv.recibe_notificaciones
+                                ,ac.accion
+                                ,ac.estatus_wf
+                            from mos_acciones_ac_co ac
+                            inner JOIN mos_personal on mos_personal.cod_emp = ac.id_responsable
+                            LEFT JOIN mos_usuario u on u.email = mos_personal.email
+                            left JOIN mos_personal pv on pv.cod_emp = ac.id_validador
+                            LEFT JOIN mos_usuario uv on uv.email = pv.email
+                            where ac.id = $id
+                        ;"; 
+                //echo $sql;
+                $this->operacion($sql, $atr);
+                return $this->dbl->data[0];
+            }
+            
+            
+            
+            public function cambiar_estado($parametros)
+            {   //print_r($parametros);
+                $parametros['id_usuario']= $_SESSION['CookIdUsuario'];
+                $parametros[fecha_estado_wf] = formatear_fecha_hora($parametros[fecha_estado_wf]);
+                $respuesta = $this->cambiarestadowf($parametros);
+                //$val = $this->verDocumentos($parametros[id]);
+                $objResponse = new xajaxResponse();
+               // echo $respuesta;
+               // print_r($parametros);
+                if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
+                        $cc=array();
+                        $from=array();
+                        $ut_tool = new ut_Tool();
+                        $correowf = $this->verWFemail($parametros[id]);
+                        switch ($correowf[estatus_wf]) {
+                            case 'cerrada_verificada':
+                                
+
+                                break;
+
+                            default:
+                                break;
+                        }
+                        
+                        //echo $correowf[email];
+                        /*$this->cargar_nombres_columnas();
+                        $etapa = $this->nombres_columnas[$correowf[etapa_workflow]];
+                        //echo $correowf[email];
+                            
+                            $cuerpo = 'Sr(a). ' .$correowf[nombres] . '<br><br> Usted tiene una notificación de un documento "'.$etapa.'"<br><br>';
+                            $asunto = 'Documento '. $etapa . ': ' . $val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                           // $correowf[email] = 'azambrano75@gmail.com';
+                            $nombres = $correowf[nombres];
+                            //echo $cuerpo;
+                           // print_r($correowf);
+                        if($correowf[etapa_workflow]=='estado_pendiente_aprobacion' && $correowf[estado_workflow]=='OK') {                            
+                            if($correowf[recibe_notificaciones]=='S'){
+                                $from = array(array('correo' => $correowf[email], 'nombres'=>$nombres));                                
+                            }                            
+                            if($correowf[recibe_notificaciones_responsable]=='S'){
+                                $cc = array(array('correo' => $correowf[email_responsable], 'nombres'=>$correowf[nombre_responsable]));
+                               // $cc = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_responsable]));
+                            }
+                            if(sizeof($from)>0 || sizeof($cc)>0){
+                                   $anexo_adicional ='<br><strong>'. $this->nombres_columnas['elaboro'].'</strong>&nbsp;';
+                                   $anexo_adicional .=$correowf[nombre_responsable].' &rarr;';
+                                   $anexo_adicional .='<strong>'. $this->nombres_columnas['reviso'].'</strong>&nbsp;';
+                                   $anexo_adicional .=$correowf[nombre_revisa].'.<br>';
+                                   $cuerpo .= $anexo_adicional.'<br>'.APPLICATION_ROOT;
+                                   $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array(),$cc); 
+                            }
+                        }
+                        
+                        else if($correowf[estado_workflow]=='RECHAZADO'){
+                            $cuerpo = 'Rechazado por:&nbsp;'.$correowf[nombres];
+                            $cuerpo .= '<br><br>Motivo del Rechazo:<br><span style="color:red">'.$correowf[observacion_rechazo].'</span>';                            
+                            $asunto = 'Documento RECHAZADO: ' . $val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                            //echo $_SESSION[CookEmail].' '.$correowf[email_aprueba].' '.$correowf[recibe_notificaciones_revisa].' '.$correowf[recibe_notificaciones_responsable];
+                            if($_SESSION[CookEmail]==$correowf[email_aprueba]){
+                                if($correowf[recibe_notificaciones_revisa]=='S'){
+                                    $cc = array(array('correo' => $correowf[email_revisa], 'nombres'=>$correowf[nombre_revisa]));
+                                    //$cc = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_revisa]));
+                                }
+                                if($correowf[recibe_notificaciones_responsable]=='S'){
+                                    $from = array(array('correo' => $correowf[email_responsable], 'nombres'=>$correowf[nombre_responsable]));
+                                    //$from = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_responsable]));
+                                }
+                                if(sizeof($from)>0 || sizeof($cc)>0){
+                                    $cuerpo .= '<br><br>'.APPLICATION_ROOT;
+                                    //echo $cuerpo;
+                                    //$correowf[email] = 'azambrano75@gmail.com';
+                                    $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array(),$cc);                                
+                                }
+                            }            
+                        }
+                        
+
+                        //SE CARGA LA NOTIFICACION
+                            //echo 'etapa:'.$correowf[etapa_workflow];
+                            //echo 'edo:'.$correowf[estado_workflow];
+                            import('clases.notificaciones.Notificaciones');
+                            $noti = new Notificaciones();
+                            $atr[cuerpo] .=$val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT).'<br>';
+                            if($correowf[etapa_workflow]=='estado_pendiente_revision' && $correowf[estado_workflow]=='OK') {
+                                //$atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su revision<br>';
+                                $atr[asunto]='Tiene un documento '.$etapa.'';
+                            }
+                            else 
+                                if($correowf[etapa_workflow]=='estado_pendiente_aprobacion' && $correowf[estado_workflow]=='OK') {
+                                    //$atr[cuerpo] .=$etapa.'. Se le ha asignado el documento para su aprobacion<br>';
+                                    $atr[asunto]='Tiene un documento '.$etapa.'';
+                                }
+                                else
+                                    if($correowf[estado_workflow]=='RECHAZADO') {
+                                        //$atr[cuerpo] .='Tiene un documento Rechazado<br>';
+                                        $atr[asunto]='Tiene un documento Rechazado';
+                                    } else
+                                    if($correowf[etapa_workflow]=='estado_aprobado') {
+                                        //$atr[cuerpo] .='Tiene un documento Aprobado<br>';
+                                        //ESTE BLOQUE APLICA SI EL DOCUMENTO TIENE LISTA DE DISTR ACTIVA
+                                        //print_r($val);
+                                        if($val[requiere_lista_distribucion]=='S'){
+                                            //echo 'paso';
+                                            $this->NotificacionListaDistribucion($val);
+                                        }
+                                        
+                                        if(!class_exists('Template')){
+                                            import("clases.interfaz.Template");
+                                        }
+                                        $contenido   = array();
+                                        $contenido['ELABORADOR']=$correowf[nombre_responsable];
+                                        if($val["version"]>1){
+                                            $contenido['MENSAJE']='Se ha actualizado el documento';
+                                            $contenido['DOCUMENTO']=$val[Codigo_doc].'-'.$val[nombre_doc].' a la versi&oacute;n '.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                                        }
+                                        else {
+                                            $contenido['MENSAJE']='Se ha publicado el documento';
+                                            $contenido['DOCUMENTO']=$val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                                        }
+                                        $asunto = 'Documento Publicado: ' . $val[Codigo_doc].'-'.$val[nombre_doc].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT);
+                                        
+                                        $template = new Template();
+                                        $template->PATH = PATH_TO_TEMPLATES.'documentos/';
+                                        $template->setTemplate("cuerpo_notificacion");
+                                        $template->setVars($contenido);
+                                        $cuerpo = $template->show();
+
+                                        //echo $cuerpo;
+                                        if($correowf[recibe_notificaciones_revisa]=='S'){
+                                            $cc = array(array('correo' => $correowf[email_revisa], 'nombres'=>$correowf[nombre_revisa]));
+                                           // $cc = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_revisa]));
+                                        }
+                                        if($correowf[recibe_notificaciones_responsable]=='S'){
+                                            $from = array(array('correo' => $correowf[email_responsable], 'nombres'=>$correowf[nombre_responsable]));
+                                           // $from = array(array('correo' => 'azambrano75@gmail.com', 'nombres'=>$correowf[nombre_responsable]));
+                                        }
+                                        if(sizeof($from)>0 || sizeof($cc)>0){
+                                            $anexo_adicional ='<br><strong>'. $this->nombres_columnas['elaboro'].'</strong>&nbsp;';
+                                            $anexo_adicional .=$correowf[nombre_responsable].' &rarr;';
+                                            $anexo_adicional .='<strong>'. $this->nombres_columnas['reviso'].'</strong>&nbsp;';
+                                            $anexo_adicional .=$correowf[nombre_revisa].' &rarr;';
+                                            $anexo_adicional .='<strong>'. $this->nombres_columnas['aprobo'].'</strong>&nbsp;';
+                                            $anexo_adicional .=$correowf[nombre_aprueba].'.<br>';
+                                            $cuerpo .= $anexo_adicional.'<br>'.APPLICATION_ROOT;
+                                            $ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array(),$cc);                                
+                                        }
+                                        $atr[asunto]='Tiene un documento Aprobado';
+                                    }
+                            
+                            $atr[modulo]='DOCUMENTOS';
+                            $atr[funcion] = "verWorkFlowPopup(".$val[IDDoc].");";
+                            $atr[email]=$correowf[email];
+                            $atr[id_entidad]=$val[IDDoc];
+                            $mensaje=$noti->ingresarNotificaciones($atr);
+                        //die;
+                         * */
+                         
+                    $objResponse->addScriptCall("MostrarContenido");
+                    $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+                }
+                else
+                    $objResponse->addScriptCall('VerMensaje','error',$respuesta);
+                $objResponse->addScript("$('#MustraCargando').hide();");
+            return $objResponse;
+            }
  
             public function eliminar($parametros)
             {
@@ -1210,8 +1725,8 @@
             {
                 $grid = $this->verListaAccionesAC($parametros);                
                 $objResponse = new xajaxResponse();
-                $objResponse->addAssign('grid-hv',"innerHTML",$grid[tabla]);
-                //$objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
+                $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
+                $objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
                           
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("PanelOperator.resize();");
