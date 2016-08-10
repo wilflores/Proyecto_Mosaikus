@@ -23,6 +23,21 @@
                 $sql = "SELECT cod_parametro, espanol FROM mos_parametro WHERE cod_categoria = '3' AND vigencia = 'S' ORDER BY cod_parametro";
                 $this->parametros = $this->dbl->query($sql, array());
             }
+            private function cargar_nombres_columnas(){
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and  modulo in (34,100)";
+                $nombres_campos = $this->dbl->query($sql, array());
+                foreach ($nombres_campos as $value) {
+                    $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
+                }                
+            }
+             private function cargar_placeholder(){
+                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and  modulo in (34,100)";
+                $nombres_campos = $this->dbl->query($sql, array());
+                foreach ($nombres_campos as $value) {
+                    $this->placeholder[$value[nombre_campo]] = $value[placeholder];
+                }
+                
+            }    
 
             /**
         * Activa los nodos donde se tiene acceso
@@ -687,6 +702,18 @@
                 $template->setVars($contenido);
                 $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
                 $template->PATH = PATH_TO_TEMPLATES.'arbol_procesos/';
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }                
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                }     
 
                 $template->setTemplate("listar");
                 $template->setVars($contenido);
