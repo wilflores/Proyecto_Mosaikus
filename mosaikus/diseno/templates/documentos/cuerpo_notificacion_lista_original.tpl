@@ -1,6 +1,6 @@
 <p>
 Sr.(a)&nbsp;{NOMBRES}<br><br>    
-Se ha publicado el Documento {CODIGONOMBREVERSION}, se debe enviar copia controlada a los siguientes colaboradores:<br>
+{N_CUERPO_NOTIFICACION_LISTA_ORIGINAL_1} {CODIGONOMBREVERSION}, {N_CUERPO_NOTIFICACION_LISTA_ORIGINAL_2}:<br>
 {LISTADOCARGOS}
 </p>
 <br>

@@ -19,13 +19,13 @@
                                 <li>
                                     <a href="#"  onClick="exportarExcel();">
                                         <i class="icon icon-transmision"></i>
-                                        <span>Exportar</span>
+                                        <span>{N_EXPORTAR}</span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#" title="Generar PDF" onclick="reporte_ao_pdf();">
                                         <i class="icon icon-alert-print"></i>
-                                        <span>Imprimir</span>
+                                        <span>{N_IMPRIMIR}</span>
                                     </a>
                                 </li>                                  
                             </ul>
@@ -43,16 +43,16 @@
                 <div id="container" role="main">
                     <div class="row">
                         <div class="col-md-11 col-sm-11 col-xs-11">
-                             <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_abrir_ao();"><i class="glyphicon glyphicon-folder-open"></i> Abrir Todos</button>
-                            <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_cerrar_ao();"><i class="glyphicon glyphicon-folder-close"></i> Cerrar Todos</button>                            
+                             <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_abrir_ao();"><i class="glyphicon glyphicon-folder-open"></i> {N_ABRIR_TODOS}</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_cerrar_ao();"><i class="glyphicon glyphicon-folder-close"></i> {N_CERRAR_TODOS}</button>                            
                         </div>
 
                         <div class="col-md-13 col-sm-13 col-xs-13" style="">
-                             <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_create();"><i class="glyphicon glyphicon-asterisk"></i> Crear</button>
-                            <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_rename();"><i class="glyphicon glyphicon-pencil"></i> Renombrar</button>
-                            <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_delete();"><i class="glyphicon glyphicon-remove"></i> Eliminar</button>
-                            <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_abrir();"><i class="glyphicon glyphicon-folder-open"></i> Abrir Todos</button>
-                            <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_cerrar();"><i class="glyphicon glyphicon-folder-close"></i> Cerrar Todos</button>                            
+                             <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_create();"><i class="glyphicon glyphicon-asterisk"></i> {N_CREAR}</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_rename();"><i class="glyphicon glyphicon-pencil"></i> {N_RENOMBRAR}</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_delete();"><i class="glyphicon glyphicon-remove"></i> {N_ELIMINAR}</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_abrir();"><i class="glyphicon glyphicon-folder-open"></i> {N_ABRIR_TODOS}</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="padding-left: 20px;padding-right: 20px;" onclick="demo_cerrar();"><i class="glyphicon glyphicon-folder-close"></i> {N_CERRAR_TODOS}</button>                            
    
                         </div>
                     </div>
@@ -63,11 +63,11 @@
                         </div>
                         <div class="col-md-11 col-sm-11 col-xs-12" >
                             <div class="jstree-title"> 
-                                Árbol de Procesos 
-                                &nbsp;&nbsp;<input type="text" value="" style="box-shadow:inset 0 0 4px #eee; width:220px; margin:0; padding:6px 12px; border-radius:4px; border:1px solid silver; font-size:1.1em;" id="demo_q" placeholder="Buscar">
+                                {N_ARBOL_PROCESO} 
+                                &nbsp;&nbsp;<input type="text" value="" style="box-shadow:inset 0 0 4px #eee; width:220px; margin:0; padding:6px 12px; border-radius:4px; border:1px solid silver; font-size:1.1em;" id="demo_q" placeholder="{N_BUSCAR}">
                             </div>  
                             <div id="id-tree-ap">
-                                <div id="tree">Seleccione un Área para administrar el Arbol de Procesos</div>
+                                <div id="tree">{N_SELECCIONE_AREA_ADMIN_ARBOL}</div>
                             </div>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 <p>
 Sr.(a)&nbsp;{NOMBRES}<br><br>
-Se ha Actualizado el Documento {CODIGONOMBRE} a la Versión {VERSION}, se debe actualizar copia controlada a los siguientes colaboradores:<br>
+{N_CUERPO_NOTIFICACION_LISTA_VERSION_1} {CODIGONOMBRE} {N_CUERPO_NOTIFICACION_LISTA_VERSION_2} {VERSION}, {N_CUERPO_NOTIFICACION_LISTA_VERSION_3}:<br>
 {LISTADOCARGOS}
 </p>
 <br>

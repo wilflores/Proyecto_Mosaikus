@@ -36,9 +36,9 @@
                             </div>
                                     <div class="form-group">                                  
                                     <label class="checkbox-inline" style="padding-top: 0px;">
-                                        Si <input type="radio" name="b-vigencia" id="b-vigencia" value="S">   &nbsp;
-                                        No <input type="radio" name="b-vigencia" id="b-vigencia" value="N">   &nbsp;
-                                        Todos <input type="radio" name="b-vigencia" id="b-vigencia" value="" checked="checked">   &nbsp;
+                                        {N_SI} <input type="radio" name="b-vigencia" id="b-vigencia" value="S">   &nbsp;
+                                        {N_NO} <input type="radio" name="b-vigencia" id="b-vigencia" value="N">   &nbsp;
+                                        {N_TODOS} <input type="radio" name="b-vigencia" id="b-vigencia" value="" checked="checked">   &nbsp;
                                       </label>
                                
                             </div>
@@ -52,10 +52,10 @@
                                   
                                                                     
                                       <label class="checkbox-inline" style="padding-top: 0px;">
-                                        Si  <input type="radio" value="S" id="b-aplica_evaluacion" name="b-aplica_evaluacion">  &nbsp;
+                                        {N_SI}  <input type="radio" value="S" id="b-aplica_evaluacion" name="b-aplica_evaluacion">  &nbsp;
                                       
-                                         No  <input type="radio" value="N" id="b-aplica_evaluacion" name="b-aplica_evaluacion"> &nbsp;
-                                         Todos <input type="radio" id="b-aplica_evaluacion" name="b-aplica_evaluacion" value="" checked="checked">   &nbsp;
+                                         {N_NO}  <input type="radio" value="N" id="b-aplica_evaluacion" name="b-aplica_evaluacion"> &nbsp;
+                                         {N_TODOS} <input type="radio" id="b-aplica_evaluacion" name="b-aplica_evaluacion" value="" checked="checked">   &nbsp;
                                       </label>
                                                           
                             </div>

@@ -8,7 +8,7 @@
                         <div class="form-group">
                             <div class="col-lg-offset-2 col-lg-20">
                                 <button type="button" id="btn-guardar" class="btn btn-primary" onClick="validar_cambio_contrasena(document);">{DESC_OPERACION}</button>
-                                <button type="button" class="btn btn-default"  data-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-default"  data-dismiss="modal">{N_CANCELAR}</button>
 
                                 <input type="hidden" id="opc" name="opc" value="{OPC}">
                                 <input type="hidden" id="id"  name="id"  value="{ID}">

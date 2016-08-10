@@ -42,7 +42,7 @@
                                         <li class="">
                                             <a href="#contenido"  onClick="MostrarContenido();">
                                                 <i class="glyphicon glyphicon-menu-left"></i>
-                                                <span>Volver</span>
+                                                <span>{N_VOLVER}</span>
                                             </a>
                                         </li>
                                     </ul>
@@ -57,7 +57,7 @@
                             <div class="col-lg-offset-2 col-lg-20">                                
                                 <button type="button" class="btn btn-primary" onClick="{JS_PREVIO_GUARDAR}validar(document);" id="btn-guardar">{DESC_OPERACION}</button>                                
                                 {OTRO_BOTON_PRINCIPAL}
-                                <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">Cancelar</button>
+                                <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">{N_CANCELAR}</button>
 
                                 <input type="hidden" id="opc" name="opc" value="{OPC}">
                                 <input type="hidden" id="id"  name="id"  value="{ID}">

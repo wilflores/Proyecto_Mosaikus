@@ -14,7 +14,7 @@
                 <div class="row">
                     <div class="col-xs-24">
                         <div class="form-group">
-                            <label for="archivo" class="col-md-4 control-label">Árbol Organizacional </label>
+                            <label for="archivo" class="col-md-4 control-label">{N_ARBOL_ORGANIZACIONAL} </label>
                             <div class="col-md-10" >
                                 <!--label for="vigencia" class="col-md-10 control-label" style="text-align: left;">Árbol organizacional</label>
                                 <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
@@ -28,7 +28,7 @@
                             <label  class="col-md-4 control-label">{N_TIPO_DOCUMENTO}</label>                                                
                             <div class="col-md-10">
                                 <select id="tipo_documento" name="tipo_documento" class="form-control" data-validation="required">
-                                    <option  value="">-- Selecione --</option>
+                                    <option  value="">-- Seleccione --</option>
                                     {TIPOS_DOCUMENTOS}
                                 </select>
                           </div>   
@@ -123,16 +123,16 @@
                                         <label for="semaforo" class="col-md-4 control-label">{N_SEMAFORO}</label>
                                         <div class="col-md-10" style="font-size: 12px;">
                                           
-                                          <span style=""><strong> Aviso >=</strong></span>
+                                          <span style=""><strong> {N_AVISO} >=</strong></span>
                                           {SEMAFORO}                                          
-                                          <span style=""><strong> Semanas </strong></span>
+                                          <span style=""><strong> {N_SEMANAS} </strong></span>
                                                                                     
                                       </div>    
                                           <div class="col-md-10" style="font-size: 12px;">
-                                            <span style=""><strong> Vigencia >=</strong></span>                                          
+                                            <span style=""><strong> {N_VIGENCIA} >=</strong></span>                                          
                                           
                                           {V_MESES}
-                                          <span style=""><strong> Mes(es) </strong></span>   
+                                          <span style=""><strong> {N_MESES} </strong></span>   
                                                                                     
                                       </div>  
                                   </div>
@@ -151,9 +151,9 @@
                                     <div class="col-md-24">
                                         <div class="tabs">
                                         <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">
-                                            <li id="li1"><a href="#hv-red-2" data-toggle="tab" style="padding: 8px 32px;">Otros Datos</a></li>
-                                            <li id="li2"><a href="#hv-orange-2" data-toggle="tab" style="padding: 8px 32px;"id="tabs-form-reg" >Parámetros para Indexación de Registros </a></li>
-                                            <li id="li3"><a href="#hv-orange-3" data-toggle="tab" style="padding: 8px 32px;"id="tabs-lista" > Anexos / Documentos Relacionados</a></li>
+                                            <li id="li1"><a href="#hv-red-2" data-toggle="tab" style="padding: 8px 32px;">{N_OTROS_DATOS}</a></li>
+                                            <li id="li2"><a href="#hv-orange-2" data-toggle="tab" style="padding: 8px 32px;"id="tabs-form-reg" >{N_PARAMETROS_INDEXACION} </a></li>
+                                            <li id="li3"><a href="#hv-orange-3" data-toggle="tab" style="padding: 8px 32px;"id="tabs-lista" > {N_ANEXOS_DOC_RELACIONADOS}</a></li>
                                         </ul>
                                         <div id="my-tab-content" class="tab-content" style="padding: 45px 15px;">
                                             <div class="tab-pane active" id="hv-red-2">
@@ -179,13 +179,13 @@
                                                     <label  class="col-md-6 control-label">{N_REQUIERE_LISTA_DISTRIBUCION}</label>                                                
                                                     <div class="col-md-14">
                                                         <select id="requiere_lista_distribucion" name="requiere_lista_distribucion" class="form-control" data-validation="required" onchange="CargaComboCargo(this.value)">
-                                                        <option  value="N">No</option>
-                                                        <option  value="S">SI</option>
+                                                        <option  value="N">{N_NO}</option>
+                                                        <option  value="S">{N_SI}</option>
                                                      </select>
                                                   </div>   
                                                 </div>
                                                 <div class="form-group">
-                                                    <label  class="col-md-6 control-label">Cargos</label>                                                
+                                                    <label  class="col-md-6 control-label">{N_CARGOS}</label>                                                
                                                     <div class="col-md-14" id="div_cargos">
                                                   </div>                                                       
                                                 </div>
@@ -206,7 +206,7 @@
                                                    <input type="hidden" id="tok_new_edit" name="tok_new_edit" value="{TOK_NEW}"/>
                                                    <!--<input type="button" class="button add" value="Agregar" onClick="agregar_esp();" >-->
                                                                                                     
-                                                    <button type="button" onClick="agregar_esp();" class="btn btn-primary  btn-xs">Agregar</button>
+                                                    <button type="button" onClick="agregar_esp();" class="btn btn-primary  btn-xs">{N_AGREGAR}</button>
                                                    &nbsp;<label for="actualizacion_activa" class="control-label">{N_ACTUALIZACION_ACTIVA}</label>
                                                     <input type="checkbox" name="actualizacion_activa" id="actualizacion_activa" value="S" {CHECKED_ACTUALIZACION_ACTIVA}>
                                                    
@@ -223,17 +223,17 @@
                                                                 </th>
                                                                 <th width="25%">
                                                                     <div align="left">
-                                                                        <div style="cursor:pointer;display:inline;">Nombre</div>
+                                                                        <div style="cursor:pointer;display:inline;">{N_NOMBRE_REGISTROS}</div>
                                                                     </div>
                                                                 </th>
                                                                 <th width="25%">
                                                                     <div align="left">
-                                                                        <div style="cursor:pointer;display:inline;">Tipo</div>
+                                                                        <div style="cursor:pointer;display:inline;">{N_TIPO_REGISTROS}</div>
                                                                     </div>
                                                                 </th>
                                                                 <th width="35%">
                                                                     <div align="left">
-                                                                        <div style="cursor:pointer;display:inline;">Valores</div>                                                
+                                                                        <div style="cursor:pointer;display:inline;">{N_VALORES_REGISTROS}</div>                                                
                                                                     </div>
                                                                 </th>
                                                                 <th width="5%">
@@ -252,11 +252,11 @@
                                                </div>
                                              <div class="tab-pane active" id="hv-orange-3">
                                                 <div class="form-group" id="tabla_fileUpload_anexo">
-                                                        <label for="archivo" class="col-md-6 control-label">Anexos</label>
+                                                        <label for="archivo" class="col-md-6 control-label">{N_ANEXOS}</label>
                                                         {ARCHIVOS_ADJUNTOS}                                          
                                                  </div> 
                                                 <div class="form-group">
-                                                    <label  class="col-md-6 control-label">Documentos Relacionados</label>                                                
+                                                    <label  class="col-md-6 control-label">{N_DOCUMENTOS_RELACIONADOS}</label>                                                
                                                     <div class="col-md-18" id="div_doc_relacionados">
                                                         <select id="documento_relacionado" class="form-control" name="documento_relacionado[]" data-actions-box="true" data-live-search="true" multiple>
                                                         {DOCUMENTOS_RELACIONADOS}
@@ -277,7 +277,7 @@
             <button type="button" class="btn btn-primary" onClick="document.getElementById('notificar').value='';validar(document);" id="btn-guardar">{DESC_OPERACION}</button>
             <button type="button" class="btn btn-primary" onClick="document.getElementById('notificar').value='si';validar(document);" id="btn-guardar-not">{DESC_OPERACION_NOTIFICAR}</button>
             <!--<input class="button " type="button" value="Cancelar" >-->
-            <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">Cancelar</button>
+            <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">{N_CANCELAR}</button>
             
             <input type="hidden" id="opc" name="opc" value="{OPC}">
             <input type="hidden" id="id"  name="id"  value="{ID}">

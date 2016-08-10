@@ -52,7 +52,7 @@
                         <div class="row-height">
                             <div class="col-md-11" id="div-origen">
 <div class="form-group">
-                                          <label for="id_documento" class="col-md-10 control-label"><b>Personal Disponible</b></label>
+                                          <label for="id_documento" class="col-md-10 control-label"><b>{N_PERSONAL_DISPONIBLE}</b></label>
                                                                       
                                   </div>
                                 <select name="origen[]" class="form-control" id="origen" multiple="multiple" style="height: 350px;">
@@ -66,7 +66,7 @@
                             </div>
                             <div class="col-md-11 "  >
                                 <div class="form-group">
-                                          <label for="id_documento" class="col-md-10 control-label"><b>Personal Capacitado</b></label>
+                                          <label for="id_documento" class="col-md-10 control-label"><b>{N_PERSONAL_CAPACITADO}</b></label>
                                                                       
                                   </div>
                                 <select name="destino[]" class="form-control" id="destino" multiple="multiple" data-validation="required" style="height: 350px;">
@@ -82,7 +82,7 @@
                          <div class="col-md-4 ">
                             </div>
                         <div class="col-md-10 " style="" >
-                            <strong id="total-pers-sel"> {TOTAl_PER_SEL} Personas seleccionadas.</strong>
+                            <strong id="total-pers-sel"> {TOTAl_PER_SEL} {N_PERSONAS_SELECCIONADAS}.</strong>
                          </div>
                     </div><br>
                          <div class="form-group" id="tabla_fileUpload">

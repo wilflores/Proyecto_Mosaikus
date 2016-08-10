@@ -13,7 +13,7 @@
                 <div class="row">
                     <div class="col-xs-24">
                 <div class="form-group">
-                        <label for="nombres" class="col-md-4 control-label">USUARIO :</label>
+                        <label for="nombres" class="col-md-4 control-label">{N_USUARIO} :</label>
                         <div class="col-md-10">
                             <input type="hidden" class="form-control" value="{ID_FILIAL}" id="id_filial" name="id_filial" placeholder="{N_ID_FILIAL}"  data-validation="required" />
                             <input type="hidden" class="form-control" value="{ID_USUARIO}" id="id_usuario" name="id_usuario" placeholder="{N_ID_USUARIO}"  data-validation="required" />
@@ -21,7 +21,7 @@
                         </div>        
                     </div>
                     <div class="form-group">
-                        <label for="nombres" class="col-md-4 control-label">PERFIL :</label>
+                        <label for="nombres" class="col-md-4 control-label">{N_PERFIL} :</label>
                         <div class="col-md-10">
                             <input type="hidden" class="form-control" value="{COD_PERFIL}" id="cod_perfil" name="cod_perfil" placeholder="{N_COD_PERFIL}"  data-validation="required" />
                             <input type="text" readonly class="form-control" value="{DESCRIPCION_PERFIL}" id="descripcion_perfil" name="descripcion_perfil" placeholder="{N_DESCRIPCION_PERFIL}" data-validation="required"/>
@@ -30,7 +30,7 @@
 
                     <div class="form-group">
                         <div class="col-md-9">
-                            <label for="vigencia" class="col-md-10 control-label" style="text-align: left;">Accesos&nbsp;a&nbsp;Estructura</label>
+                            <label for="vigencia" class="col-md-10 control-label" style="text-align: left;">{N_ACCESO_ESTRUCTURA}</label>
                             <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
                              {DIV_ARBOL_ORGANIZACIONAL}
                              <!--
@@ -48,7 +48,7 @@
                                 <input class="button " type="button" value="Cancelar" onclick="funcion_volver('{PAGINA_VOLVER}');">
                                 -->
                                 <button type="button" id="btn-guardar" class="btn btn-primary" onClick="validar_perfil_usuario(document);">{DESC_OPERACION}</button>                                
-                                <button type="button" class="btn btn-default" onclick="perfil_especialista({ID_USUARIO});">Cancelar</button>
+                                <button type="button" class="btn btn-default" onclick="perfil_especialista({ID_USUARIO});">{N_CANCELAR}</button>
 
                                 <input type="hidden" id="opc" name="opc" value="{OPC}">
                                 <input type="hidden" id="id"  name="id"  value="{ID}">

@@ -24,11 +24,11 @@
                                 <label for="fecha" class="control-label">{N_FECHA_NACIMIENTO}</label>
                                 <div class="row">
                                     <div class="col-xs-12">
-                                        <label for="exampleInputPassword1">Desde</label>
+                                        <label for="exampleInputPassword1">{N_DESDE}</label>
                                         <input type="text" class="form-control " data-date-format="DD/MM/YYYY" id="b-fecha_nacimiento-desde" name="b-fecha_nacimiento-desde" placeholder="dd/mm/yyyy"  />
                                     </div>   
                                     <div class="col-xs-12">
-                                        <label for="exampleInputPassword1">Hasta</label> 
+                                        <label for="exampleInputPassword1">{N_HASTA}</label> 
                                         <input type="text" class="form-control " data-date-format="DD/MM/YYYY" id="b-fecha_nacimiento-hasta" name="b-fecha_nacimiento-hasta" placeholder="dd/mm/yyyy"  />
                                     </div>                                
                                 </div>
@@ -38,9 +38,9 @@
                             </div>
                             <div class="form-group" {DISPLAY_GENERO}>                                  
                                     <label class="checkbox-inline" style="padding-top: 0px;">
-                                         <input type="radio" id="b-genero" name="b-genero" value="1">   Masculino<br>
-                                          <input type="radio" id="b-genero" name="b-genero" value="2">  Femenino <br>
-                                             <input type="radio" id="b-genero" name="b-genero" value="" checked="checked">  Todos &nbsp;
+                                         <input type="radio" id="b-genero" name="b-genero" value="1">   {N_MASCULINO}<br>
+                                          <input type="radio" id="b-genero" name="b-genero" value="2">  {N_FEMENINO} <br>
+                                             <input type="radio" id="b-genero" name="b-genero" value="" checked="checked">  {N_TODOS} &nbsp;
                                     </label>                               
                             </div> 
                             <div class="form-group">
@@ -74,9 +74,9 @@
                                     </div>
                                     <div class="form-group">                                  
                                         <label class="checkbox-inline" style="padding-top: 0px;">
-                                            <input type="radio" value="S" id="b-vigencia" name="b-vigencia">  Si<br>
-                                            <input type="radio" value="N" id="b-vigencia" name="b-vigencia">  No <br>
-                                            <input type="radio" value=""  id="b-vigencia" name="b-vigencia" checked="checked">  Todos 
+                                            <input type="radio" value="S" id="b-vigencia" name="b-vigencia">  {N_SI}<br>
+                                            <input type="radio" value="N" id="b-vigencia" name="b-vigencia">  {N_NO} <br>
+                                            <input type="radio" value=""  id="b-vigencia" name="b-vigencia" checked="checked">  {N_TODOS} 
                                         </label>                               
                                     </div> 
                                 </div>
@@ -86,9 +86,9 @@
                                     </div>
                                     <div class="form-group">                                  
                                         <label class="checkbox-inline" style="padding-top: 0px;">
-                                            <input type="radio" value="S" id="b-workflow" name="b-workflow">  Si<br>
-                                            <input type="radio" value="N" id="b-workflow" name="b-workflow">  No <br>
-                                            <input type="radio" value=""  id="b-workflow" name="b-workflow" checked="checked">  Todos 
+                                            <input type="radio" value="S" id="b-workflow" name="b-workflow">  {N_SI}<br>
+                                            <input type="radio" value="N" id="b-workflow" name="b-workflow">  {N_NO} <br>
+                                            <input type="radio" value=""  id="b-workflow" name="b-workflow" checked="checked">  {N_TODOS} 
                                         </label>                               
                                     </div> 
                                 </div>
@@ -101,9 +101,9 @@
                                     </div>
                                     <div class="form-group">                                  
                                         <label class="checkbox-inline" style="padding-top: 0px;">
-                                            <input type="radio" value="S" id="b-relator" name="b-relator">  Si<br>
-                                            <input type="radio" value="N" id="b-relator" name="b-relator">  No <br>
-                                            <input type="radio" value=""  id="b-relator" name="b-relator" checked="checked">  Todos
+                                            <input type="radio" value="S" id="b-relator" name="b-relator">  {N_SI}<br>
+                                            <input type="radio" value="N" id="b-relator" name="b-relator">  {N_NO} <br>
+                                            <input type="radio" value=""  id="b-relator" name="b-relator" checked="checked">  {N_TODOS}
                                         </label>                               
                                     </div> 
                                 </div>
@@ -113,9 +113,9 @@
                                     </div>
                                     <div class="form-group">                                  
                                         <label class="checkbox-inline" style="padding-top: 0px;">
-                                            <input type="radio" value="S" id="b-reviso" name="b-reviso">  Si<br>
-                                            <input type="radio" value="N" id="b-reviso" name="b-reviso">  No <br>
-                                            <input type="radio" value=""  id="b-reviso" name="b-reviso" checked="checked">  Todos 
+                                            <input type="radio" value="S" id="b-reviso" name="b-reviso">  {N_SI}<br>
+                                            <input type="radio" value="N" id="b-reviso" name="b-reviso">  {N_NO} <br>
+                                            <input type="radio" value=""  id="b-reviso" name="b-reviso" checked="checked">  {N_TODOS} 
                                         </label>                               
                                     </div> 
                                 </div>
@@ -128,9 +128,9 @@
                                     </div>
                                     <div class="form-group">                                  
                                         <label class="checkbox-inline" style="padding-top: 0px;">
-                                            <input type="radio" value="S" id="b-elaboro" name="b-elaboro">  Si<br>
-                                            <input type="radio" value="N" id="b-elaboro" name="b-elaboro">  No <br>
-                                            <input type="radio" value=""  id="b-elaboro" name="b-elaboro" checked="checked">  Todos
+                                            <input type="radio" value="S" id="b-elaboro" name="b-elaboro">  {N_SI}<br>
+                                            <input type="radio" value="N" id="b-elaboro" name="b-elaboro">  {N_NO} <br>
+                                            <input type="radio" value=""  id="b-elaboro" name="b-elaboro" checked="checked">  {N_TODOS}
                                         </label>                               
                                     </div> 
                                 </div>
@@ -140,9 +140,9 @@
                                     </div>
                                     <div class="form-group">                                  
                                         <label class="checkbox-inline" style="padding-top: 0px;">
-                                            <input type="radio" value="S" id="b-aprobo" name="b-aprobo">  Si<br>
-                                            <input type="radio" value="N" id="b-aprobo" name="b-aprobo">  No <br>
-                                            <input type="radio" value=""  id="b-aprobo" name="b-aprobo" checked="checked">  Todos 
+                                            <input type="radio" value="S" id="b-aprobo" name="b-aprobo">  {N_SI}<br>
+                                            <input type="radio" value="N" id="b-aprobo" name="b-aprobo">  {N_NO} <br>
+                                            <input type="radio" value=""  id="b-aprobo" name="b-aprobo" checked="checked">  {N_TODOS} 
                                         </label>                               
                                     </div> 
                                 </div>
@@ -155,10 +155,10 @@
                             </div>
                             <div class="form-group">                                    
                                     <label class="checkbox-inline" style="padding-top: 0px;">
-                                        <input type="radio" value="SI" id="b-extranjero" name="b-extranjero"> Si &nbsp;
+                                        <input type="radio" value="SI" id="b-extranjero" name="b-extranjero"> {N_SI} &nbsp;
                                       
-                                          <input type="radio" value="NO" id="b-extranjero" name="b-extranjero"> No &nbsp;
-                                          <input type="radio" value="" id="b-extranjero" name="b-extranjero" checked="checked"> Todos
+                                          <input type="radio" value="NO" id="b-extranjero" name="b-extranjero"> {N_NO} &nbsp;
+                                          <input type="radio" value="" id="b-extranjero" name="b-extranjero" checked="checked"> {N_TODOS}
                                       </label>
                                 
                             </div>

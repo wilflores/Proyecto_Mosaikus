@@ -10,15 +10,15 @@
 <div id="my-tab-content" class="tab-content">
     <div class="tab-pane active" id="red">-->
 <div class="form-group">
-    <label for="semaforo" class="control-label">Días validez</label>
+    <label for="semaforo" class="control-label">{N_DIAS_VALIDEZ}</label>
     <div class="row">
       <div class="col-xs-12">
-        <label for="exampleInputPassword1">Desde</label>
+        <label for="exampleInputPassword1">{N_DESDE}</label>
         <input type="text" class="form-control" id="b-semaforo-desde" name="b-semaforo-desde" placeholder="Nro. de Dias"  />                                      
       </div>
 
       <div class="col-xs-12">
-        <label for="exampleInputPassword1">Hasta</label>
+        <label for="exampleInputPassword1">{N_HASTA}</label>
         <input type="text" class="form-control" id="b-semaforo-hasta" name="b-semaforo-hasta" placeholder="Nro. de Dias"  />
       </div>
     </div>
@@ -41,27 +41,27 @@
     </div>
 </div>
 <div class="form-group">
-    <label for="fecha" class="control-label">{N_FECHA} Versión</label>
+    <label for="fecha" class="control-label">{N_FECHA} {N_VERSION}</label>
     <div class="row">
         <div class="col-xs-12">
-            <label for="exampleInputPassword1">Desde</label>
+            <label for="exampleInputPassword1">{N_DESDE}</label>
             <input type="text" class="form-control" data-date-format="DD/MM/YYYY"  id="b-fecha-desde" name="b-fecha-desde" placeholder="{N_FECHA}"  />
         </div>   
         <div class="col-xs-12">
-            <label for="exampleInputPassword1">Hasta</label> 
+            <label for="exampleInputPassword1">{N_HASTA}</label> 
             <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha-hasta" name="b-fecha-hasta" placeholder="{N_FECHA}"  />
         </div>                                
     </div>
 </div>
 <div class="form-group">
-    <label for="fecha" class="control-label">Fecha Revisión</label>
+    <label for="fecha" class="control-label">{N_FECHA_REVISION}</label>
     <div class="row">
         <div class="col-xs-12">
-            <label for="exampleInputPassword1">Desde</label>
+            <label for="exampleInputPassword1">{N_DESDE}</label>
             <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_rev-desde" name="b-fecha_rev-desde" placeholder="{N_FECHA}"  />
         </div>   
         <div class="col-xs-12">
-            <label for="exampleInputPassword1">Hasta</label>
+            <label for="exampleInputPassword1">{N_HASTA}</label>
             <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_rev-hasta" name="b-fecha_rev-hasta" placeholder="{N_FECHA}"  />
         </div>                                
     </div>
@@ -241,9 +241,9 @@
                                     </div>                                    
                                     <div class="form-group"> 
                                         <label class="checkbox-inline" style="padding-top: 0px;"> 
-                                            <input type="radio" checked="checked" value="S" id="b-requiere-lista" name="b-requiere-lista"> Si &nbsp; 
-                                            <input type="radio" value="N" id="b-requiere-lista" name="b-requiere-lista"> No &nbsp; 
-                                            <input type="radio" checked="checked" value="T" id="b-requiere-lista" name="b-requiere-lista"> Todos &nbsp; 
+                                            <input type="radio" checked="checked" value="S" id="b-requiere-lista" name="b-requiere-lista"> {N_SI} &nbsp; 
+                                            <input type="radio" value="N" id="b-requiere-lista" name="b-requiere-lista"> {N_NO} &nbsp; 
+                                            <input type="radio" checked="checked" value="T" id="b-requiere-lista" name="b-requiere-lista"> {N_TODOS} &nbsp; 
                                         </label>
                                      </div>
 

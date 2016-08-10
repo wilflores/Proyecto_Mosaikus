@@ -4,14 +4,14 @@
             <div class="panel-heading">
                 <div class="row">
                     <div class="panel-title col-xs-20" id="div-titulo-for">
-                        Revisiones del Documento
+                        {N_REVISIONES_DOCUMENTOS}
                     </div>   
                     <div class="panel-actions col-xs-4">
                         <ul class="navbar">                                          
                             <li class="">
                                 <a href="#contenido"  onClick="MostrarContenido();">
                                     <i class="glyphicon glyphicon-menu-left"></i>
-                                    <span>Volver</span>
+                                    <span>{N_VOLVER}</span>
                                 </a>
                             </li>
                         </ul>
@@ -23,8 +23,8 @@
                 <div class="col-xs-24">
                     <div class="tabs"> 
                         <ul id="tabs-hv" class="nav nav-tabs" data-tabs="tabs">
-                            <li><a href="#hv-red" data-toggle="tab">Crear Revisión </a></li>
-                            <li><a href="#hv-blue" data-toggle="tab">Histórico de Revisiones</a></li>                
+                            <li><a href="#hv-red" data-toggle="tab">{N_CREAR_REVISION} </a></li>
+                            <li><a href="#hv-blue" data-toggle="tab">{N_HISTORICO_REVISION}</a></li>                
                         </ul>        
                         <div id="my-tab-content" style="padding-right: 5%;" class="tab-content">
                             <div class="tab-pane active" id="hv-red">
@@ -41,7 +41,7 @@
 
                                         </div>
                                         <div class="form-group" id="info_archivo_adjunto">
-                                            <label for="archivo" class="col-md-4 control-label">Revisión</label>
+                                            <label for="archivo" class="col-md-4 control-label">{N_REVISION}</label>
                                             <div class="col-md-2">
                                                 <p class="form-control-static" style="">
                                                     <!--<img src="{PAHT_TO_IMG}adjunto.png">-->
@@ -78,7 +78,7 @@
                                             <div class="col-lg-offset-2 col-lg-10">
 
                                                 <button type="button" class="btn btn-primary" onClick="validar_rev(document);" id="btn-guardar">{DESC_OPERACION}</button>            
-                                                <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">Cancelar</button>
+                                                <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">{N_CANCELAR}</button>
 
                                                 <input type="hidden" id="opc" name="opc" value="{OPC}">
                                                 <input type="hidden" id="id"  name="id"  value="{ID}">

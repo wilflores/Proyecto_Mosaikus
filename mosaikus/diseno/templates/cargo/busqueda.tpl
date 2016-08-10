@@ -22,13 +22,13 @@
                                        </div>  
                                <div class="form-group">                                   
                                     <label class="radio-inline" style="padding-top: 0px;">
-                                          <input type="radio" value="S" id="b-interno" name="b-interno"> Si
+                                          <input type="radio" value="S" id="b-interno" name="b-interno"> {N_SI}
                                       </label>
                                       <label class="radio-inline" style="padding-top: 0px;">
-                                          <input type="radio" value="N" id="b-interno" name="b-interno"> No
+                                          <input type="radio" value="N" id="b-interno" name="b-interno"> {N_NO}
                                       </label>
                                   <label class="radio-inline" style="padding-top: 0px;">
-                                          <input type="radio" value="" id="b-interno" name="b-interno" checked="checked"> Todos
+                                          <input type="radio" value="" id="b-interno" name="b-interno" checked="checked"> {N_TODOS}
                                       </label>   
                                                             
                             </div>
@@ -37,13 +37,13 @@
                                 </div>  
                                <div class="form-group">     
                                     <label class="radio-inline" style="padding-top: 0px;">
-                                          <input type="radio" value="S" id="b-vigencia" name="b-vigencia"> Si
+                                          <input type="radio" value="S" id="b-vigencia" name="b-vigencia"> {N_SI}
                                       </label>
                                       <label class="radio-inline" style="padding-top: 0px;">
-                                          <input type="radio" value="N" id="b-vigencia" name="b-vigencia"> No
+                                          <input type="radio" value="N" id="b-vigencia" name="b-vigencia"> {N_NO}
                                       </label>
                                       <label class="radio-inline" style="padding-top: 0px;">
-                                          <input type="radio" value="" id="b-vigencia" name="b-vigencia" checked="checked"> Todos
+                                          <input type="radio" value="" id="b-vigencia" name="b-vigencia" checked="checked"> {N_TODOS}
                                       </label>                      
                                   
                             </div>

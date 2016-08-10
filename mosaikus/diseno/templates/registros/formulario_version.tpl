@@ -4,7 +4,7 @@
                                 <div class="panel-heading">
                                     <div class="row">
                                         <div class="panel-title col-xs-19" id="div-titulo-for">
-                                            {N_VERSIONES_DOCUMENTO}
+                                            Versiones del Documento
                                         </div>                
                                         <div class="panel-actions col-xs-4">
                                             <ul class="navbar">                                          
@@ -12,7 +12,7 @@
                                               <li class="">
                                                 <a href="#contenido"  onClick="MostrarContenido();">
                                                   <i class="glyphicon glyphicon-menu-left"></i>
-                                                  <span>{N_VOLVER}</span>
+                                                  <span>Volver</span>
                                                 </a>
                                               </li>
                                             </ul>
@@ -24,8 +24,8 @@
     <div class="col-xs-24">
 <div class="tabs"> 
     <ul id="tabs-hv" class="nav nav-tabs" data-tabs="tabs">
-        <li><a href="#hv-red" data-toggle="tab">{N_CREAR_VERSION} </a></li>
-        <li><a href="#hv-blue" data-toggle="tab">{N_HISTORICO_VERSIONES}</a></li>                
+        <li><a href="#hv-red" data-toggle="tab">Crear Versión </a></li>
+        <li><a href="#hv-blue" data-toggle="tab">Histórico de Versiones</a></li>                
     </ul>        
     <div id="my-tab-content" style="padding-right: 5%;" class="tab-content">
         <div class="tab-pane active" id="hv-red">
@@ -33,7 +33,7 @@
             <form id="idFormulario" class="form-horizontal form-horizontal-red" role="form">
     
                             <div class="form-group">
-                                <label for="archivo" class="col-md-5 control-label">{N_AGREGAR_NUEVA_VERSION_DOCUMENTO}</label>
+                                <label for="archivo" class="col-md-5 control-label">Agregar Nueva Versión Documento</label>
                                 <div class="col-md-12">
                                     <p class="form-control-static" style="">
                                         <!--<img src="{PAHT_TO_IMG}adjunto.png">-->
@@ -129,7 +129,7 @@
                                 <div class="form-group">
                                         <label for="fecha" class="col-md-5 control-label">{N_FECHA}</label>
                                         <div class="col-md-12">
-                                            <input type="text" class="form-control" style="width: 120px;" data-date-format="DD/MM/YYYY"  value="{FECHA}" id="fecha" name="fecha" placeholder="{N_FECHA}"  data-validation="required"/>
+                                            <input type="text" class="form-control" style="width: 120px;" value="{FECHA}" id="fecha" name="fecha" placeholder="{N_FECHA}"  data-validation="required"/>
                                             <input type="hidden" class="form-control" value="{VERSION}" id="version" name="version"/>
                                             <input type="hidden" class="form-control" value="{CODIGO_DOC}" id="Codigo_doc" name="Codigo_doc" placeholder="{N_CODIGO_DOC}" data-validation="required"/>
                                             <input type="hidden" class="form-control" value="{NOMBRE_DOC}" id="nombre_doc" name="nombre_doc" placeholder="{N_NOMBRE_DOC}" data-validation="required"/>
@@ -150,7 +150,7 @@
                         
                         <button type="button" class="btn btn-primary" onClick="document.getElementById('notificar').value='si';validar_ver(document);" id="btn-guardar">{DESC_OPERACION}</button>      
                         
-                        <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">{N_CANCELAR}</button>
+                        <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">Cancelar</button>
                         <input type="hidden" id="notificar"  name="notificar"  value="">
                         <input type="hidden" id="opc" name="opc" value="{OPC}">
                         <input type="hidden" id="id"  name="id"  value="{ID}">

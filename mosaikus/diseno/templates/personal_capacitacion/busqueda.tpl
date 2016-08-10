@@ -18,11 +18,11 @@
                                 <label for="fecha" class="control-label">{N_FECHA}</label>
                                 <div class="row">
                                     <div class="col-xs-12">
-                                        <label for="exampleInputPassword1">Desde</label>
+                                        <label for="exampleInputPassword1">{N_DESDE}</label>
                                         <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha-desde" name="b-fecha-desde" placeholder="dd/mm/yyyy"  />
                                     </div>   
                                     <div class="col-xs-12">
-                                        <label for="exampleInputPassword1">Hasta</label> 
+                                        <label for="exampleInputPassword1">{N_HASTA}</label> 
                                         <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha-hasta" name="b-fecha-hasta" placeholder="dd/mm/yyyy"  />
                                     </div>                                
                                 </div>
@@ -32,11 +32,11 @@
                                 <label for="fecha" class="control-label">{N_FECHA_TERMINO}</label>
                                 <div class="row">
                                     <div class="col-xs-12">
-                                        <label for="exampleInputPassword1">Desde</label>
+                                        <label for="exampleInputPassword1">{N_DESDE}</label>
                                         <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_termino-desde" name="b-fecha_termino-desde"  placeholder="dd/mm/yyyy"  />
                                     </div>   
                                     <div class="col-xs-12">
-                                        <label for="exampleInputPassword1">Hasta</label> 
+                                        <label for="exampleInputPassword1">{N_HASTA}</label> 
                                         <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_termino-hasta" name="b-fecha_termino-hasta" placeholder="dd/mm/yyyy"  />
                                     </div>                                
                                 </div>

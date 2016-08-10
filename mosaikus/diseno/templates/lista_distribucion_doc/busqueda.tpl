@@ -11,13 +11,13 @@
                                         <label class="checkbox-inline"> 
                                             <input type="checkbox" value="Completado" name="b-estado[]" id="b-estado"> 
                                     <img style="margin-top: -6px;" src="diseno/images/verde.png"> 
-                                    Completado 
+                                    {N_COMPLETADO} 
                                         </label>
                                         <br>&nbsp;&nbsp;&nbsp;&nbsp;
                                         <label class="checkbox-inline"> 
                                             <input type="checkbox" value="Pendiente" name="b-estado[]" id="b-estado"> 
                                     <img style="margin-top: -6px;" src="diseno/images/atrasado.png"> 
-                                    Pendiente 
+                                    {N_PENDIENTE} 
                                         </label>
                                         <br>
                                 </div>
@@ -37,11 +37,11 @@
                                   <label for="fecha_ejecutada" class="control-label">{N_FECHA_EJECUTADA}</label>
                                   <div class="row">
                                         <div class="col-xs-12">
-                                            <label>Desde</label>
+                                            <label>{N_DESDE}</label>
                                             <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_ejecutada-desde" name="b-fecha_ejecutada-desde" placeholder="dd/mm/yyyy"  />
                                         </div>   
                                         <div class="col-xs-12">
-                                            <label>Hasta</label>
+                                            <label>{N_HASTA}</label>
                                           <input type="text" class="form-control" data-date-format="DD/MM/YYYY" id="b-fecha_ejecutada-hasta" name="b-fecha_ejecutada-hasta" placeholder="dd/mm/yyyy"  />
                                         </div> 
                                   </div>

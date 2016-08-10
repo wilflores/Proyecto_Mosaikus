@@ -22,7 +22,7 @@
                                   <li style="{PERMISO_INGRESAR}">
                                     <a href="javascript:volverindex();" >
                                       <i class="icon icon-back-document"></i>
-                                      <span>Volver</span>
+                                      <span>{N_VOLVER}</span>
                                     </a>
                                   </li>        
                                 </ul>
@@ -70,7 +70,7 @@
               <div class="modal-content">
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  <h4 class="modal-title" id="myModalLabel">Opciones de visualización</h4>
+                  <h4 class="modal-title" id="myModalLabel">{N_OPCIONES_VISUALIZACION}</h4>
                 </div>
                   <div class="modal-body">
                     <form id="FrmMostrar-Columns" class="form-horizontal form-horizontal-form form-horizontal-form-left" role="form"> 
@@ -78,7 +78,7 @@
                              
                                       <label class="checkbox-inline">
                                           <input type="checkbox" name="Interno" id="InternoPer" checked="checked" onclick="marcar_desmarcar_checked_columns(this.checked);">   &nbsp;
-                                      Todos</label>
+                                      {N_TODOS}</label>
                             
                             </div>
                         {CAMPOS_MOSTRAR_COLUMNS}
@@ -86,8 +86,8 @@
                     
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                  <button type="button" class="btn btn-primary" onclick="filtrar_mostrar_colums();">Seleccionar</button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">{N_CERRAR}</button>
+                  <button type="button" class="btn btn-primary" onclick="filtrar_mostrar_colums();">{N_SELECCIONAR}</button>
                 </div>
               </div>
             </div>

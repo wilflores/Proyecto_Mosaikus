@@ -16,28 +16,28 @@
                             
                             <div class="searchform">
                                     <button class="btn btn-info" role="button" data-toggle="collapse" href="#searchform-wrapper-aux">
-                                      Filtro Avanzado |
+                                      {N_FILTRO_AVANZADO} |
                                       <i class="glyphicon glyphicon glyphicon-search  "></i>
                                     </button>
                                     <div id="searchform-wrapper-aux" class="collapsible panel-collapse collapse">
                                       <div class="search-title">
-                                        Filtrar por
+                                        {N_FILTRAR_POR}
                                         <a data-toggle="collapse" href="#searchform-wrapper-aux">
-                                          Minimizar Filtro | <i class="glyphicon glyphicon glyphicon-triangle-top"></i>
+                                          {N_MINIMIZAR_FILTRO} | <i class="glyphicon glyphicon glyphicon-triangle-top"></i>
                                         </a>
                                       </div>
                                       
                                       <form id="r-busquedaFrm" >
                                           <div class="form-group">
 
-                                          <button type="button" class="btn btn-default" onClick="r_filtrar_listado();">Filtrar</button>
+                                          <button type="button" class="btn btn-default" onClick="r_filtrar_listado();">{N_FILTRAR}</button>
                                         </div>
                                         {CAMPOS_BUSCAR}
 
                                           
                                         <div class="form-group">
 
-                                          <button type="button" class="btn btn-default" onClick="r_filtrar_listado();">Filtrar</button>
+                                          <button type="button" class="btn btn-default" onClick="r_filtrar_listado();">{N_FILTRAR}</button>
                                         </div>
                                           
                                         <input type="hidden" name="mostrar-col" id="r-mostrar-col" value="{MOSTRAR_COL}" />
@@ -49,7 +49,7 @@
                                       <div class="searh-footer">
 
                                         <a data-toggle="collapse" href="#searchform-wrapper-aux">
-                                          Minimizar Filtro |  <i class="glyphicon glyphicon glyphicon-triangle-top"></i>
+                                          {N_MINIMIZAR_FILTRO} |  <i class="glyphicon glyphicon glyphicon-triangle-top"></i>
                                         </a>
                                       </div>
                                     </div>
@@ -59,7 +59,7 @@
                             
                         </div>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="r-b-filtro" name="b-filtro" placeholder="Filtrar Listado">
+                            <input type="text" class="form-control" id="r-b-filtro" name="b-filtro" placeholder="{P_FILTRAR_LISTADO}">
                             <span class="input-group-addon cursor-pointer" id="r-btn-filtro"><span class="glyphicon glyphicon-search"></span></span>
                         </div>
                         <div >
@@ -113,13 +113,13 @@
                                   <li class="separator">
                                     <a href="#contenido" onClick=" MostrarContenido();">
                                       <i class="glyphicon glyphicon-menu-left"></i>
-                                      <span>volver</span
+                                      <span>{N_VOLVER}</span
                                     </a>
                                   </li>
                                   <li>
                                     <a href="#" data-toggle="modal" data-target="#r-myModal-Mostrar-Colums">
                                       <i class="icon icon-squares"></i>
-                                      <span>Personalizar</span>
+                                      <span>{N_PERSONALIZAR}</span>
                                     </a>
                                   </li>
 
@@ -210,7 +210,7 @@
               <div class="modal-content">
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  <h4 class="modal-title" id="r-myModalLabel">Opciones de visualización</h4>
+                  <h4 class="modal-title" id="r-myModalLabel">{N_OPCIONES_VISUALIZACION}</h4>
                 </div>
                   <div class="modal-body">
                     <form id="r-FrmMostrar-Columns" class="form-horizontal form-horizontal-form form-horizontal-form-left" role="form"> 
@@ -218,7 +218,7 @@
                              
                                       <label class="checkbox-inline">
                                           <input type="checkbox" name="Interno" id="InternoPer" checked="checked" onclick="r_marcar_desmarcar_checked_columns(this.checked);">   &nbsp;
-                                      Todos</label>
+                                      {N_TODOS}</label>
                             
                             </div>
                         {CAMPOS_MOSTRAR_COLUMNS}
@@ -226,8 +226,8 @@
                     
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                  <button type="button" class="btn btn-primary" onclick="r_filtrar_mostrar_colums();">Seleccionar</button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">{N_CERRAR}</button>
+                  <button type="button" class="btn btn-primary" onclick="r_filtrar_mostrar_colums();">{N_SELECCIONAR}</button>
                 </div>
               </div>
             </div>

@@ -5,8 +5,8 @@
 
     <div class="tabs">
         <ul id="tabs-config" class="nav nav-tabs" data-tabs="tabs">
-            <li id="li1"><a href="#hv-1" data-toggle="tab" style="padding: 8px 32px;">Mi Usuario</a></li>
-            <li id="li2"><a href="#hv-2" data-toggle="tab" style="padding: 8px 32px;"id="tabs-form-reg" >General</a></li>
+            <li id="li1"><a href="#hv-1" data-toggle="tab" style="padding: 8px 32px;">{N_MI_USUARIO}</a></li>
+            <li id="li2"><a href="#hv-2" data-toggle="tab" style="padding: 8px 32px;"id="tabs-form-reg" >{N_GENERAL}</a></li>
         </ul>
         <div id="my-tab-content" class="tab-content" style="padding: 45px 15px; height: 440px;">
             <div class="tab-pane active" id="hv-1">

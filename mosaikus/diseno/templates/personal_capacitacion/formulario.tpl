@@ -15,9 +15,9 @@
                 <div class="col-xs-24">
                     <div class="tabs"> 
     <ul id="tabs-hv" class="nav nav-tabs" data-tabs="tabs">
-        <li><a href="#hv-red" data-toggle="tab">Datos Capacitación</a></li>
-        <li><a href="#hv-orange" data-toggle="tab">Personal Capacitado</a></li>        
-        <li><a href="#hv-blue" data-toggle="tab">Evaluación de Capacitación</a></li>  
+        <li><a href="#hv-red" data-toggle="tab">{N_DATOS_CAPACITACION}</a></li>
+        <li><a href="#hv-orange" data-toggle="tab">{N_PERSONAL_CAPACITADO}</a></li>        
+        <li><a href="#hv-blue" data-toggle="tab">{N_EVALUACION_CAPACITACION}</a></li>  
     </ul>
     
                         <div id="my-tab-content" class="tab-content" style="padding: 45px 5%;">
@@ -146,8 +146,8 @@
                                     <input class="button save" name="guardar" type="button" value="Siguiente" onClick="validar_p1();">
                                     <input class="button " type="button" value="Cancelar" onclick="funcion_volver('{PAGINA_VOLVER}');">
                                     -->
-                                    <button type="button" class="btn btn-primary" onClick="validar_p1();">Siguiente</button>            
-                                    <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">Cancelar</button>
+                                    <button type="button" class="btn btn-primary" onClick="validar_p1();">{N_SIGUIENTE}</button>            
+                                    <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">{N_CANCELAR}</button>
                                 </div>
                             </div>
                      </form>
@@ -156,27 +156,27 @@
                 <div class="form-group" style="border-bottom: 0px solid #ffffff;">
                     <form id="busquedaFrm-Per" class="form-horizontal" role="form">
                         <div class="form-group">
-                                <label for="id_personal" class="col-md-3 control-label">Filtrar Por:</label>
+                                <label for="id_personal" class="col-md-3 control-label">{N_FILTRAR_POR}:</label>
                                 <label for="id_personal" class="col-md-1 control-label">{N_COD_EMP}</label>
                                 <div class="col-md-4">
                                     <input type="text" class="form-control" id="b-id_personal" name="b-id_personal" placeholder="Id Personal" />
                                 </div>                                
 
-                                  <label for="nombres" class="col-md-4 control-label">Nombres</label>
+                                  <label for="nombres" class="col-md-4 control-label">{N_NOMBRES}</label>
                                   <div class="col-md-4">
                                     <input type="text" class="form-control" id="b-nombres" name="b-nombres" placeholder="Nombres" />
                                 </div>                                
                             
-                                  <label for="apellido_paterno" class="col-md-4 control-label">Apellido Paterno</label>
+                                  <label for="apellido_paterno" class="col-md-4 control-label">{N_APELLIDO_PATERNO}</label>
                                   <div class="col-md-4">
                                     <input type="text" class="form-control" id="b-apellido_paterno" name="b-apellido_paterno" placeholder="Apellido Paterno" />
                                 </div>  </div>
                         <div class="form-group">
-                                <label for="apellido_materno" class="col-md-4 control-label">Apellido Materno</label>
+                                <label for="apellido_materno" class="col-md-4 control-label">{N_APELLIDO_MATERNO}</label>
                                   <div class="col-md-4">
                                     <input type="text" class="form-control" id="b-apellido_materno" name="b-apellido_materno" placeholder="Apellido Materno" />
                                 </div>   
-                                <label for="apellido_materno" class="col-md-4 control-label">Arbol Organizacional</label>
+                                <label for="apellido_materno" class="col-md-4 control-label">{N_ARBOL_ORGANIZACIONAL}</label>
                                 <div class="col-md-10" style="">  
                                     
                                     <a href="#" data-toggle="modal" style="" data-target="#myModal-Filtrar-Arbol">[Seleccionar]</a> 
@@ -190,16 +190,16 @@
                               <div class="modal-content">
                                 <div class="modal-header">
                                   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                  <h4 class="modal-title" id="myModalLabel">Filtrar Por</h4>
+                                  <h4 class="modal-title" id="myModalLabel">{N_FILTRAR_POR}</h4>
                                 </div>
                                 <div class="modal-body">
                                     <iframe width="100%" height="350px" id="b-iframe" frameborder="0" scrolling="no" src="pages/personas/emb_jstree_single.php"></iframe>
                                     <input type="hidden" id="b-id_organizacion" name="b-id_organizacion" value=""/>
                                 </div>
                                 <div class="modal-footer">
-                                  <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                                  <button type="button" class="btn btn-default" onClick="limpiar_arbol()">Limpiar</button>
-                                  <button type="button" class="btn btn-primary" onClick="filtrar_arbol()">Filtrar</button>
+                                  <button type="button" class="btn btn-default" data-dismiss="modal">{N_CERRAR}</button>
+                                  <button type="button" class="btn btn-default" onClick="limpiar_arbol()">{N_LIMPIAR}</button>
+                                  <button type="button" class="btn btn-primary" onClick="filtrar_arbol()">{N_FILTRAR}</button>
                                 </div>
                               </div>
                             </div>
@@ -227,12 +227,12 @@
                     </div>
                     <div class="row">
                         <div class="col-md-10" style="">
-                            <strong> Total {TOTAl_PER} Personas.</strong>
+                            <strong> Total {TOTAl_PER} {N_PERSONAS}.</strong>
                         </div>
                          <div class="col-md-4 ">
                             </div>
                         <div class="col-md-10 " style="" >
-                            <strong id="total-pers-sel"> {TOTAl_PER_SEL} Personas seleccionadas.</strong>
+                            <strong id="total-pers-sel"> {TOTAl_PER_SEL} {N_PERSONAS_SELECCIONADAS}.</strong>
                          </div>
                     </div>
                     <div class="form-group">
@@ -241,8 +241,8 @@
                         
                         <div class="col-md-offset-2 col-md-10">
                             
-                            <button type="button" class="btn btn-primary" onClick="validar_p2();">Siguiente</button>            
-                            <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">Cancelar</button>
+                            <button type="button" class="btn btn-primary" onClick="validar_p2();">{N_SIGUIENTE}</button>            
+                            <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">{N_CANCELAR}</button>
                             
                             <!--
                             <input class="button save" name="guardar" type="button" value="Siguiente" onClick="validar_p2();">
@@ -273,7 +273,7 @@
                                             </th>
                                             <th width="15%">
                                                 <div align="left">
-                                                    <div style="cursor:pointer;display:inline;">Nombres y Apellidos</div>
+                                                    <div style="cursor:pointer;display:inline;">{N_NOMBRES_APELLIDOS}</div>
                                                 </div>
                                             </th>
                                             <th width="7%">
@@ -314,7 +314,7 @@
                         <input class="button " type="button" value="Cancelar" onclick="funcion_volver('{PAGINA_VOLVER}');">-->
                         
                         <button type="button" class="btn btn-primary" onClick="validar(document);" id="btn-guardar">{DESC_OPERACION}</button>            
-                        <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">Cancelar</button>
+                        <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">{N_CANCELAR}</button>
 
                         <input type="hidden" id="opc" name="opc" value="{OPC}">
                         

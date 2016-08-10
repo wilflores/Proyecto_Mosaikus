@@ -8,15 +8,15 @@
               <div class="modal-content">
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  <h4 class="modal-title" id="myModalLabel">Vigencia</h4>
+                  <h4 class="modal-title" id="myModalLabel">{N_VIGENCIA_TITULO}</h4>
                 </div>
                 <div class="modal-body">
-                    Motivo de Vigencia
+                    {N_MOTIVO_VIGENCIA}
                     <textarea  id="observacion_vigencia" cols="30" rows="2" name="observacion_vigencia" class="form-control" placeholder="Indique un comentario o motivo"></textarea>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>                                  
-                  <button type="button" class="btn btn-primary" onClick="$('#myModal-observacion-vigencia').modal('hide');">Aceptar</button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">{N_CANCELAR}</button>                                  
+                  <button type="button" class="btn btn-primary" onClick="$('#myModal-observacion-vigencia').modal('hide');">{N_ACEPTAR}</button>
                 </div>
               </div>
             </div>            
@@ -35,7 +35,7 @@
         <div class="row">
             <div class="col-xs-24">
                 <div class="form-group">
-                <label for="archivo" class="col-md-4 control-label">Árbol Organizacional </label>
+                <label for="archivo" class="col-md-4 control-label">{N_ARBOL_ORGANIZACIONAL} </label>
                 <div class="col-md-10" >
                                         <!--label for="vigencia" class="col-md-12 control-label" style="text-align: left;">Árbol organizacional</label>
                                         
@@ -129,16 +129,16 @@
                                         <label for="semaforo" class="col-md-4 control-label">{N_SEMAFORO}</label>
                                         <div class="col-md-10" style="font-size: 12px;">
                                           
-                                          <span style=""><strong> Aviso >=</strong></span>
+                                          <span style=""><strong> {N_AVISO} >=</strong></span>
                                           {SEMAFORO}                                          
-                                          <span style=""><strong> Semanas </strong></span>
+                                          <span style=""><strong> {N_SEMANAS} </strong></span>
                                                                                     
                                       </div>    
                                           <div class="col-md-10" style="font-size: 12px;">
-                                            <span style=""><strong> Vigencia >=</strong></span>                                          
+                                            <span style=""><strong> {N_VIGENCIA_TITULO} >=</strong></span>                                          
                                           
                                           {V_MESES}
-                                          <span style=""><strong> Mes(es) </strong></span>   
+                                          <span style=""><strong> {N_MESES} </strong></span>   
                                                                                     
                                       </div>  
                                   </div>
@@ -171,10 +171,10 @@
                                     <div class="col-md-24">
                                         <div class="tabs"> 
                                         <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">
-                                            <li id="li1"><a href="#hv-red-2" data-toggle="tab" style="padding: 8px 32px;">Otros Datos</a></li>
-                                            <li id="li2"><a href="#hv-orange-2" data-toggle="tab" style="padding: 8px 32px;" id="tabs-form-reg" >Parámetros para Indexación de Registros</a></li>
-                                            <li id="li3"><a href="#hv-orange-4" data-toggle="tab" style="padding: 8px 32px;" id="tabs-lista" > Anexos / Documentos Relacionados</a></li>
-                                            <li id="li3"><a href="#hv-orange-3" data-toggle="tab" style="padding: 8px 32px;" id="tabs-historico-wf" >Hist&oacute;rico Flujo de Datos</a></li>
+                                            <li id="li1"><a href="#hv-red-2" data-toggle="tab" style="padding: 8px 32px;">{N_OTROS_DATOS}</a></li>
+                                            <li id="li2"><a href="#hv-orange-2" data-toggle="tab" style="padding: 8px 32px;" id="tabs-form-reg" >{N_PARAMETROS_INDEXACION}</a></li>
+                                            <li id="li3"><a href="#hv-orange-4" data-toggle="tab" style="padding: 8px 32px;" id="tabs-lista" > {N_ANEXOS_DOC_RELACIONADOS}</a></li>
+                                            <li id="li3"><a href="#hv-orange-3" data-toggle="tab" style="padding: 8px 32px;" id="tabs-historico-wf" >{N_HISTORICO_FLUJO_DATOS}</a></li>
                                         </ul>
                                         <div id="my-tab-content" class="tab-content" style="padding: 45px 15px;">
                                             <div class="tab-pane active" id="hv-red-2">
@@ -291,17 +291,17 @@
                                                             <tr bgcolor="#FFFFFF" height="30px">
                                                                 <th width="20%">
                                                                     <div align="left">
-                                                                        <div style="cursor:pointer;display:inline;">Fecha</div>
+                                                                        <div style="cursor:pointer;display:inline;">{N_FECHA}</div>
                                                                     </div>
                                                                 </th>
                                                                 <th width="55%">
                                                                     <div align="left">
-                                                                        <div style="cursor:pointer;display:inline;">Operaci&oacute;n</div>
+                                                                        <div style="cursor:pointer;display:inline;">{N_OPERACION}</div>
                                                                     </div>
                                                                 </th>
                                                                 <th width="25%">
                                                                     <div align="left">
-                                                                        <div style="cursor:pointer;display:inline;">Usuario Responsable</div>                                                
+                                                                        <div style="cursor:pointer;display:inline;">{N_USUARIO_RESPONSABLE}</div>                                                
                                                                     </div>
                                                                 </th>
                                                             </tr>

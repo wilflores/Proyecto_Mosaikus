@@ -4,7 +4,7 @@
             <div class="panel-heading">
                 <div class="row">
                     <div class="panel-title col-xs-12" id="div-titulo-for">
-                        Administracion de Accesos                   
+                        {N_ADMINISTRACION_ACCESO}                   
                     </div>                
                 </div>
             </div>
@@ -17,7 +17,7 @@
             </div>
             <div class="form-group">
                 <div class="col-lg-offset-2 col-lg-10">                                
-                    <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">Volver</button>
+                    <button type="button" class="btn btn-default" onclick="funcion_volver('{PAGINA_VOLVER}');">{N_VOLVER}</button>
                     <input type="hidden" id="opc" name="opc" value="{OPC}">
                     <input type="hidden" id="id"  name="id"  value="{ID}">
                 </div>

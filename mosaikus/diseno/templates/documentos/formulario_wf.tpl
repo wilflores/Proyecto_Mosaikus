@@ -8,15 +8,15 @@
               <div class="modal-content">
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  <h4 class="modal-title" id="myModalLabel">Flujo de Trabajo</h4>
+                  <h4 class="modal-title" id="myModalLabel">{N_FLUJO_TRABAJO}</h4>
                 </div>
                 <div class="modal-body">
-                    Observaciones de Rechazo de Documento
+                    {N_OBSERVACION_RECHAZO_DOCUMENTO}
                     <textarea  id="observacion_rechazo" cols="30" rows="2" name="observacion" class="form-control" placeholder="Indique comentarios de rechazo. Se enviará correo electrónico a {N_ELABORO}"></textarea>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>                                  
-                  <button type="button" class="btn btn-primary" onClick="RechazarWF('RECHAZADO','{ETAPARECHAZO}',{IDDOC});">Enviar</button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">{N_CANCELAR}</button>                                  
+                  <button type="button" class="btn btn-primary" onClick="RechazarWF('RECHAZADO','{ETAPARECHAZO}',{IDDOC});">{N_ENVIAR}</button>
                 </div>
               </div>
             </div>            
@@ -36,7 +36,7 @@
                       <li class="">
                         <a href="#contenido"  onClick="MostrarContenido();">
                           <i class="glyphicon glyphicon-menu-left"></i>
-                          <span>Volver</span>
+                          <span>{N_VOLVER}</span>
                         </a>
                       </li>
                     </ul>
@@ -45,11 +45,11 @@
         </div>
         <div class="row">
             <div style="height: 500px;" class="col-xs-12">
-               DOCUMENTO FUENTE 
+               {N_DOCUMENTO_FUENTE} 
                {DOCFUENTE}
            </div>
             <div class="col-xs-12">
-                DOCUMENTO DE VISUALIZACI&Oacute;N
+                {N_DOCUMENTO_VISUALIZACION}
                 {DOCVISUALIZA}
             </div>
         </div>
