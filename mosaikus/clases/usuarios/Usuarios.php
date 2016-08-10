@@ -396,18 +396,64 @@
             $template->setVars($contenido);
             //$this->contenido['CONTENIDO']  = $template->show();
             
-            $objResponse = new xajaxResponse();
+ //           $objResponse = new xajaxResponse();
             //$objResponse->addAssign('contenido',"innerHTML",$template->show());
             
+            //$objResponse->addAssign('myModal-Ventana-Cuerpo',"innerHTML",$template->show());
+            //$objResponse->addAssign('cambio_contrasena',"innerHTML",$template->show());
+//            $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
+            //$objResponse->addAssign('modulo_actual',"value","parametros_det");
+//            $objResponse->addIncludeScript(PATH_TO_JS . 'usuarios/usuarios.js');
+            //$objResponse->addScript("$('#MustraCargando').hide();");
+            //$objResponse->addScript("$('#myModal-Ventana').modal('show');");
+            //$objResponse->addScript("$('#myModal-Ventana-Titulo').html('Cambiar Contraseña');");
+
+            //$objResponse->addScript("$('#hv-fecha').datetimepicker();");
+//            $objResponse->addScript("$.formUtils.addValidator({
+//            name : 'igual_pw',
+//            validatorFunction : function(value, \$el, config, language, \$form) { 
+//                if ((value != $('#password').val())){                    
+//                    
+//                    return false;
+//                }                  
+//              return true;
+//            },
+//            errorMessage : 'La contraseña nueva no coincide con la confirmacion de contraseña.',
+//            errorMessageKey: 'badEvenNumber'
+//          });");
+            //return $objResponse;
+//            $this->asigna_contenido($this->contenido);
+               return $template->show();
+        }
+        public function configuraciones()
+        {
+            
+            if(!class_exists('Template')){
+                import("clases.interfaz.Template");
+            }
+            session_name($GLOBALS[SESSION]);
+            session_start();
+            //echo 1;
+            $val = $this->verUsuario($_SESSION['CookIdUsuario']);
+            $template = new Template();
+            //echo 2;
+            
+            $template->PATH = PATH_TO_TEMPLATES.'usuarios/';
+            $template->setTemplate("configuraciones");
+            $contenido['CAMBIOCONTRASENA'] = $this->editar_contrasena();
+            $template->setVars($contenido);
+            $objResponse = new xajaxResponse();
+            //$objResponse->addAssign('contenido',"innerHTML",$template->show());
+            //$objResponse->addAssign('cambio_contrasena',"innerHTML",$this->editar_contrasena());
             $objResponse->addAssign('myModal-Ventana-Cuerpo',"innerHTML",$template->show());
             $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
             //$objResponse->addAssign('modulo_actual',"value","parametros_det");
             $objResponse->addIncludeScript(PATH_TO_JS . 'usuarios/usuarios.js');
+            $objResponse->addScript("$('#tabs-config').tab();"
+                        . "$('#tabs-config a:first').tab('show');");
             $objResponse->addScript("$('#MustraCargando').hide();");
             $objResponse->addScript("$('#myModal-Ventana').modal('show');");
-            $objResponse->addScript("$('#myModal-Ventana-Titulo').html('Cambiar Contraseña');");
-
-            //$objResponse->addScript("$('#hv-fecha').datetimepicker();");
+            $objResponse->addScript("$('#myModal-Ventana-Titulo').html('Configuraciones');");
             $objResponse->addScript("$.formUtils.addValidator({
             name : 'igual_pw',
             validatorFunction : function(value, \$el, config, language, \$form) { 
@@ -420,11 +466,12 @@
             errorMessage : 'La contraseña nueva no coincide con la confirmacion de contraseña.',
             errorMessageKey: 'badEvenNumber'
           });");
+            
+
             return $objResponse;
 //            $this->asigna_contenido($this->contenido);
 //            return $template->show();
         }
-
         public function recuperar_contrasena()
         {
             if(!class_exists('Template')){
@@ -577,7 +624,7 @@
         }
 
         public function actualizar_contrasena($parametros)
-        {
+        {//print_r($parametros);
             session_name($GLOBALS[SESSION]);
             session_start();
             $objResponse = new xajaxResponse();

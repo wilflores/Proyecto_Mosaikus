@@ -96,7 +96,7 @@
             }
             
             private function cargar_nombres_columnas(){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo = 21";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo in (21,100) ";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
@@ -112,7 +112,7 @@
             }            
             
             private function cargar_placeholder(){
-                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo = 21";
+                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo in (21,100)";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->placeholder[$value[nombre_campo]] = $value[placeholder];
@@ -585,6 +585,20 @@
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
                 $template->setTemplate("configurar_perfil_usuario");
+                //***PARA MONTAR LAS VARIABLES DE LOS TPL POR IDIOMAS***//
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }                
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido_1["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido_1["P_" . strtoupper($key)] =  $value;
+                }     
+                
                 $template->setVars($contenido_1);
                 
                 $contenido['CAMPOS'] = $template->show();
@@ -654,6 +668,20 @@
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
                 $template->setTemplate("configurar_perfil_usuario_portal");
+                //***PARA MONTAR LAS VARIABLES DE LOS TPL POR IDIOMAS***//
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }                
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido_1["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido_1["P_" . strtoupper($key)] =  $value;
+                }     
+                
                 $template->setVars($contenido_1);               
                 $contenido['CAMPOS'] = $template->show();
                 $objResponse = new xajaxResponse();
@@ -700,6 +728,12 @@
 
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
                 $template->setTemplate("formulario");
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                }     
 
                 $contenido['TITULO_FORMULARIO'] = "Configurar&nbsp;Perfiles";
                 $contenido['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Usuarios";
@@ -963,6 +997,19 @@
                 $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
                 $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
                 $template->setTemplate("listar_volver");
+                //***PARA MONTAR LAS VARIABLES DE LOS TPL POR IDIOMAS***//
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }                
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                }     
                 
                 $template->setVars($contenido);
                 if (isset($parametros['html']))
@@ -1032,6 +1079,19 @@
                 $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
                 $template->PATH = PATH_TO_TEMPLATES.'mos_usuario/';
                 $template->setTemplate("listar_volver");
+                //***PARA MONTAR LAS VARIABLES DE LOS TPL POR IDIOMAS***//
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }                
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                }     
                 
                 $template->setVars($contenido);
                 if (isset($parametros['html']))
@@ -1135,6 +1195,14 @@
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
 
                 $template->setTemplate("listar");
+                //****para cargar los nombres variables de los TPL****//
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                }     
+                
                 $template->setVars($contenido);
                 //$this->contenido['CONTENIDO']  = $template->show();
                 //$this->asigna_contenido($this->contenido);
@@ -1201,7 +1269,13 @@
                 //print_r($contenido);
                 $contenido['OPC'] = "new";
                 $contenido['ID'] = "-1";
-
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                }     
+                
                 $template->setVars($contenido);
                 $objResponse = new xajaxResponse();               
                 $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
@@ -1314,6 +1388,12 @@
 
                 $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
                 $template->setTemplate("formulario");
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                }     
 
                 $contenido['TITULO_FORMULARIO'] = "Editar&nbsp;mos_usuario";
                 $contenido['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;mos_usuario";
@@ -1971,6 +2051,20 @@ $objResponse->addScript("$('#fecha_expi').datetimepicker();");
             $template->setTemplate("configuraciones");
             $contenido['CAMBIOCONTRASENA'] = $this->editar_contrasena();
             $contenido['GENERAL'] = $this->editar_general();
+            //***PARA MONTAR LAS VARIABLES DE LOS TPL POR IDIOMAS***//
+            if (count($this->nombres_columnas) <= 0){
+                    $this->cargar_nombres_columnas();
+            }
+            if (count($this->placeholder) <= 0){
+                    $this->cargar_placeholder();
+            }                
+            foreach ( $this->nombres_columnas as $key => $value) {
+                $contenido["N_" . strtoupper($key)] =  $value;
+            }          
+            foreach ( $this->placeholder as $key => $value) {
+                $contenido["P_" . strtoupper($key)] =  $value;
+            }     
+            
             $template->setVars($contenido);
             $objResponse = new xajaxResponse();
             //$objResponse->addAssign('contenido',"innerHTML",$template->show());
@@ -2055,6 +2149,13 @@ $objResponse->addScript("$('#fecha_expi').datetimepicker();");
                 $contenido['DESC_OPERACION'] = "Guardar";
                 $contenido['OPC'] = "upd";
                 $contenido['ID'] = $val["id"];
+                //***PARA MONTAR LAS VARIABLES DE LOS TPL POR IDIOMAS***//
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                }     
 
                 $template->setVars($contenido);
                 return $template->show();
@@ -2102,6 +2203,13 @@ $objResponse->addScript("$('#fecha_expi').datetimepicker();");
                 $contenido['DESC_OPERACION'] = "Guardar";
                 $contenido['OPC'] = "upd";
                 $contenido['ID'] = $val["id"];
+                //***PARA MONTAR LAS VARIABLES DE LOS TPL POR IDIOMAS***//
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                }     
 
                 $template->setVars($contenido);
                 return $template->show();

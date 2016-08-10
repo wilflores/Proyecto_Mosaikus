@@ -34,7 +34,7 @@
             }
 
             private function cargar_nombres_columnas(){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 4";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and  modulo in (4,100)";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
@@ -52,7 +52,7 @@
             }
             
             private function cargar_placeholder(){
-                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE modulo = 4";
+                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and  modulo in (4,100)";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->placeholder[$value[nombre_campo]] = $value[placeholder];
@@ -526,7 +526,12 @@
                 $contenido['DESC_OPERACION'] = "Guardar";
                 $contenido['OPC'] = "new";
                 $contenido['ID'] = "-1";
-
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                }
                 $template->setVars($contenido);
                 $objResponse = new xajaxResponse();               
                 $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
@@ -631,7 +636,12 @@
                 $contenido['DESC_OPERACION'] = "Guardar";
                 $contenido['OPC'] = "upd";
                 $contenido['ID'] = $val["cod_curso"];
-
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                }
                 $template->setVars($contenido);
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('contenido-form',"innerHTML",$template->show());

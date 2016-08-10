@@ -4,7 +4,7 @@ require_once(dirname(__FILE__) . '/class.tree.php');
 
 switch ($_SERVER['SERVER_NAME']) {
     case 'localhost':
-        $cadena_conn = 'mysqli://root:123456@127.0.0.1/santateresa';
+        $cadena_conn = 'mysqli://root:admin.123@127.0.0.1/santateresa2';
                 //$id_empresa = 8;
                 break;
     default:

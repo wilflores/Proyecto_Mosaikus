@@ -1,0 +1,16 @@
+[07-Jul-2016 11:50:30]  > Connect error: 1045
+[07-Jul-2016 11:50:34]  > Connect error: 1045
+[07-Jul-2016 11:51:08]  > Connect error: 1045
+[07-Jul-2016 11:51:15]  > Connect error: 1045
+[07-Jul-2016 11:52:17]  > Connect error: 1045
+[07-Jul-2016 11:52:25]  > Connect error: 1045
+[07-Jul-2016 11:53:02]  > Connect error: 1045
+[07-Jul-2016 11:53:07]  > Connect error: 1045
+[07-Jul-2016 11:57:15]  > Connect error: 1045
+[07-Jul-2016 11:58:26]  > Connect error: 1045
+[07-Jul-2016 11:58:33]  > Connect error: 1045
+[07-Jul-2016 11:59:10]  > Connect error: 1045
+[07-Jul-2016 11:59:19]  > Connect error: 1045
+[07-Jul-2016 12:02:19]  > Could not prepare : Table 'santateresa.mos_organizacion_nombres' doesn't exist < SELECT s.id, s.left_a, s.right_a, s.level, s.parent_id, s.position, d.title FROM mos_organizacion s, mos_organizacion_nombres d WHERE s.id = d.id AND s.id = 44>
+[07-Jul-2016 12:02:32]  > Could not prepare : Table 'santateresa.mos_organizacion_nombres' doesn't exist < SELECT s.id, s.left_a, s.right_a, s.level, s.parent_id, s.position, d.title FROM mos_organizacion s, mos_organizacion_nombres d WHERE s.id = d.id AND s.id = 44>
+[07-Jul-2016 12:02:36]  > Could not prepare : Table 'santateresa.mos_organizacion_nombres' doesn't exist < SELECT s.id, s.left_a, s.right_a, s.level, s.parent_id, s.position, d.title FROM mos_organizacion s, mos_organizacion_nombres d WHERE s.id = d.id AND s.id = 44>

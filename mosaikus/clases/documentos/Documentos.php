@@ -371,7 +371,7 @@ echo $Consulta3;
             }
             
             public function cargar_nombres_columnas($modulo=6){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo = $modulo";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo in ($modulo,100) ";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
@@ -379,7 +379,7 @@ echo $Consulta3;
                 
             }
             public function cargar_nombres_columnas_xls($campo,$formulario,$modulo=6){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and nombre_campo='$campo' and modulo = $modulo";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and nombre_campo='$campo' and modulo in ($modulo,100)";
                 $nombres_campos = $this->dbl->query($sql, array());
                 if($formulario=='S') {
                     $cod_categoria = 15;
@@ -445,7 +445,7 @@ echo $Consulta3;
            }
        }            
             private function cargar_placeholder(){
-                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo = 6";
+                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo in (6,100)";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->placeholder[$value[nombre_campo]] = $value[placeholder];
@@ -6331,6 +6331,19 @@ echo $Consulta3;
                $contenido_1['TITULO_FORMULARIO'] =$val["Codigo_doc"].'-'.$val["nombre_doc"].'-V'.  str_pad($val["version"], 2, "0", STR_PAD_LEFT). '<br>Flujo de Trabajo "'.$this->nombres_columnas[$val[etapa_workflow]].'"-'.$val[estado_workflow].' por '.$persona_pendiente;
                //echo $val[etapa_workflow] 
               // print_r($this->nombres_columnas);
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido_1["N_" . strtoupper($key)] =  $value;
+                }                
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido_1["P_" . strtoupper($key)] =  $value;
+                }     
+               
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'documentos/';
                 $template->setTemplate("formulario_wf");
@@ -6560,6 +6573,15 @@ echo $Consulta3;
                     $cuerpo_cargos .='</table>';
                     $contenido['NOMBRES']= $value[nombres];
                     $contenido['LISTADOCARGOS']= $cuerpo_cargos;
+                    
+                    if (count($this->nombres_columnas) <= 0){
+                            $this->cargar_nombres_columnas();
+                    }
+                    foreach ( $this->nombres_columnas as $key => $value) {
+                        $contenido["N_" . strtoupper($key)] =  $value;
+                    }                
+     
+                    
                     $template->PATH = PATH_TO_TEMPLATES.'documentos/';
                     $template->setTemplate($nombretpl);
                     $template->setVars($contenido);
