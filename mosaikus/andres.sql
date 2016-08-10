@@ -651,3 +651,12 @@ INSERT INTO `mos_nombres_link_idiomas` VALUES ('92', '2', 'migração de Respons
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('93', '1', 'Seguimiento de Acciones Correctivas');
 INSERT INTO `mos_nombres_link_idiomas` VALUES ('93', '2', 'Seguimento de Ação Corretiva');
 
+
+
+/****************************************/
+/*cambio del 10-08*/
+/****************************************/
+
+ALTER TABLE `mos_nombres_campos`
+MODIFY COLUMN `texto`  varchar(250) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `nombre_campo`,
+MODIFY COLUMN `placeholder`  varchar(250) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `modulo`;
