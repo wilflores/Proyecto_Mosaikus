@@ -23,7 +23,7 @@
 
         $filename= $datos[Codigo_doc].'arbol de proceso.xlsx';
         
-        $titulo2 ='Formulario['.$datos[Codigo_doc].'-'.$datos[descripcion].'] -> Lista de Registros';
+        $titulo2 ='Arbol de Proceso';
         
         $hoja2='Arbol de Proceso';
 
