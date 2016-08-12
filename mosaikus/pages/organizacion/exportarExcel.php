@@ -20,11 +20,11 @@
         //print_r($datos);
         //$datosBd = $doc->exportarPHPExcelDatosBD($_GET);
 
-        $filename= $datos[Codigo_doc].'lista de registros.xlsx';
+        $filename= $datos[Codigo_doc].'Arbol Organizacional.xlsx';
         
         $titulo2 ='Formulario['.$datos[Codigo_doc].'-'.$datos[descripcion].'] -> Lista de Registros';
         
-        $hoja2='Lista de Registros';
+        $hoja2='Árbol Organizacional';
 
         $objPHPExcel = new PHPExcel(); // Create new PHPExcel object
         $objPHPExcel->getProperties()->setCreator("Sigit prasetya n")
@@ -57,11 +57,6 @@
         //$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(2);
         $objActSheet->mergeCells('A1:E1'); 
         $objPHPExcel->getActiveSheet()->getStyle('A1:E1')->applyFromArray( $style_titulo ); //
-        //$columnas = $reg->cargar_nombres_columnas_xls();
-        //$datos = $reg->exportarPHPExcelDatosBD($_GET,$columnas);
-
-        //print_r($columnas);
-        //print_r($datos);
         ///////////////////////////////////////////////////////////////////////////
         ///////////////TABLA SIN ESTILOS PARA LA DINAMICA//////////////////////////////////////
         /////PARA HACER EL ENCABEZADO DE LA TABLA
@@ -107,10 +102,15 @@
         $params[modo] = $_GET[modo];
         $params[reg_por_pagina] = 5000;
         $params[niveles] = $pagina->numeroNivelesHijos(array($params["b-id_organizacion"]));
-        
+        if (count($pagina->nombres_columnas) <= 0){
+                $pagina->cargar_nombres_columnas();
+        }
+//        foreach ( $this->nombres_columnas as $key => $value) {
+//            $contenido["N_" . strtoupper($key)] =  $value;
+//        }                
         for($i=1;$i<=$params[niveles];$i++){
             //$out[titulo] .= "<th style=\"width: ". 100 / $niveles  . "%\" >Nivel $i</th>" ;
-            $objActSheet->setCellValueByColumnAndRow($i-1,6, "Nivel $i"); 
+            $objActSheet->setCellValueByColumnAndRow($i-1,6, $pagina->nombres_columnas['nivel']." ". $i); 
             $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($i-1,6)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
             $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($i-1,6)->applyFromArray( $style_header_resumen_head ); // give style to header
 
@@ -118,43 +118,47 @@
         $pagina->cargar_acceso_nodos($params);
         $pagina->listarArbolOrganizacionalReporte($params, 1, $params[reg_por_pagina]);
         $data=$pagina->dbl->data;
-        //print_r($data);exit;
+       // print_r($data);exit;
         $columnas = array('A','B','C','D', 'E', 'F', 'G', 'H');
+        
         for($i=1;$i<=$params[niveles];$i++){  
             $row = 7;
             $con_g = 7;
-            //if (count($data)>0)$id_aux = $data[0]["id_$i"];
+            $veces=0;
+            $id_aux=$data[0]["id_$i"];
+            //echo $id_aux.'-';
             foreach ($data as $value) { 
-                
-                if ($value["id_$i"] != $id_aux){                                        
-                    $id_aux = $value["id_$i"];
-                    if (($row-$con_g)>0){
-                    //echo $columnas[$i-1].$con_g.':'.$columnas[$i-1].($row-1);
-                    //exit;
-                    $objActSheet->mergeCells($columnas[$i-1].$con_g.':'.$columnas[$i-1].($row-1));
+               // print_r($value);
+                if ($value["id_$i"] != $id_aux ){
+                    if($veces>1){
+                        $objActSheet->mergeCells($columnas[$i-1].($row-$veces).':'.$columnas[$i-1].($row-1));
+                        $objPHPExcel->getActiveSheet()->getColumnDimension($columnas[$i-1])->setAutoSize(true);
                     }
-                    
-                    $objActSheet->setCellValueByColumnAndRow($i-1,$row, $value["nombre_$i"]);
-                    $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($i-1,$row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-                    $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($i-1)->setAutoSize(true);
-                    $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($i-1,$row)->getAlignment()->setWrapText(true);
-                    $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($i-1,$row)->applyFromArray( $style_header_sencillo ); // give style to header        
-
-                    $con_g = $row;
+                    $veces=1;
+                    $id_aux = $value["id_$i"];
                 }
-                //else
-                //    $con_g++;
-                $row++;
+                else
+                {   if ($value["nombre_$i"]<>''){
+                        $veces++;
+                    }
+                    $id_aux = $value["id_$i"];
+                
+                }
+                    $objActSheet->setCellValue($columnas[$i-1].$row, $value["nombre_$i"]);
+                    $objPHPExcel->getActiveSheet()->getStyle($columnas[$i-1].$row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+                    $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($i)->setAutoSize(true);
+                    $objPHPExcel->getActiveSheet()->getStyle($columnas[$i-1].$row)->getAlignment()->setWrapText(true);
+                    $objPHPExcel->getActiveSheet()->getStyle($columnas[$i-1].$row)->applyFromArray( $style_header_sencillo ); // give style to header        
+                    $row++;
             }  
-            if ($value["id_$i"] != $id_aux){
-            $objActSheet->setCellValueByColumnAndRow($i-1,$row, $value["nombre_$i"]);
-            $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($i-1,$row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-            $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($i-1)->setAutoSize(true);
-            $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($i-1,$row)->getAlignment()->setWrapText(true);
-            $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($i-1,$row)->applyFromArray( $style_header_sencillo ); // give style to header        
+            if($veces>1){
+                $objActSheet->mergeCells($columnas[$i-1].($row-$veces).':'.$columnas[$i-1].($row-1));
+                $objPHPExcel->getActiveSheet()->getColumnDimension($columnas[$i-1])->setAutoSize(true);
             }
 
-        }
+       }
+
+        //exit;
         /////PARA HACER EL detalle DE LA TABLA
         $col=0;
         /*
