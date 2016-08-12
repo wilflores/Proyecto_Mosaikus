@@ -30,7 +30,7 @@
             }
             
             public function cargar_nombres_columnas(){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo = 15";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo in (15,100)";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
@@ -835,7 +835,7 @@
                     $sql = "SELECT ac.id
                                     ,estado
                                     ,(SELECT mos_nombres_campos.texto FROM mos_nombres_campos
-                                    WHERE mos_nombres_campos.nombre_campo = ac.estatus AND mos_nombres_campos.modulo = 15) as estatus_a
+                                    WHERE id_idioma=$_SESSION[CookIdIdioma] and mos_nombres_campos.nombre_campo = ac.estatus AND mos_nombres_campos.modulo = 15) as estatus_a
                                     ,ac.id as id_2
                                     ,alto_potencial
                                     ,oac.descripcion origen_hallazgo
@@ -4810,6 +4810,9 @@
                 $contenido['OPC'] = "new";
                 $contenido['ID'] = "-1";
 
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                } 
                 $template->setVars($contenido);
                 $objResponse = new xajaxResponse();               
                 $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
@@ -5311,6 +5314,9 @@
                 $contenido['OPC'] = "upd";
                 $contenido['ID'] = $val["id"];
 
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }
                 $template->setVars($contenido);
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
