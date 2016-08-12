@@ -141,7 +141,8 @@
         $pagina->cargar_acceso_nodos($params);
         $pagina->listarArbolProcesosReporte($params, 1, $params[reg_por_pagina]);
         $data=$pagina->dbl->data;
-       // print_r($data);exit;
+        //print_r($data);
+        //exit;
         $columnas = array('A','B','C','D', 'E', 'F', 'G', 'H');
         
         for($i=1;$i<=$params[niveles];$i++){  
@@ -153,6 +154,7 @@
             foreach ($data as $value) { 
                // print_r($value);
                 if ($value["id_$i"] != $id_aux ){
+                    
                     if($veces>1){
                         $objActSheet->mergeCells($columnas[$i-1].($row-$veces).':'.$columnas[$i-1].($row-1));
                         $objPHPExcel->getActiveSheet()->getColumnDimension($columnas[$i-1])->setAutoSize(true);
@@ -161,7 +163,7 @@
                     $id_aux = $value["id_$i"];
                 }
                 else
-                {   if ($value["nombre_$i"]<>''){
+                {   if (($i==1)||($value["nombre_$i"]<>'')){
                         $veces++;
                     }
                     $id_aux = $value["id_$i"];
@@ -176,6 +178,7 @@
                     $objPHPExcel->getActiveSheet()->getStyle($columnas[$i-1].$row)->getAlignment()->setWrapText(true);
                     $objPHPExcel->getActiveSheet()->getStyle($columnas[$i-1].$row)->applyFromArray( $style_header_sencillo ); // give style to header        
                     $row++;
+                    //echo "veces:$veces y id=".$value["id_$i"]."\n";
             }  
             if($veces>1){
                 $objActSheet->mergeCells($columnas[$i-1].($row-$veces).':'.$columnas[$i-1].($row-1));
