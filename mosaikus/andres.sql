@@ -660,3 +660,17 @@ INSERT INTO `mos_nombres_link_idiomas` VALUES ('93', '2', 'Seguimento de Ação 
 ALTER TABLE `mos_nombres_campos`
 MODIFY COLUMN `texto`  varchar(250) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `nombre_campo`,
 MODIFY COLUMN `placeholder`  varchar(250) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `modulo`;
+/****************************************/
+/*cambio del 12-08*/
+/****************************************/
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'nivel', 'Nivel', '34','Nivel',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'nivel', 'Nível', '34','Nível',2);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'nivel', 'Nivel', '33','Nivel',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'nivel', 'Nível', '33','Nível',2);
+
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'proceso', 'Proceso', '34','Proceso',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'actividad', 'Actividad', '34','Actividad',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'sub_actividad', 'Sub Actividad', '34','Sub Actividad',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'proceso', 'Processo', '34','Processo',2);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'actividad', 'Atividade', '34','Atividade',2);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'sub_actividad', 'Sub Atividade', '34','Sub Atividade',2);
