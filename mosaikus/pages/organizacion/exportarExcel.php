@@ -22,7 +22,7 @@
 
         $filename= $datos[Codigo_doc].'Arbol Organizacional.xlsx';
         
-        $titulo2 ='Formulario['.$datos[Codigo_doc].'-'.$datos[descripcion].'] -> Lista de Registros';
+        $titulo2 ='Árbol Organizacional';
         
         $hoja2='Árbol Organizacional';
 
