@@ -33,10 +33,10 @@
             <form id="idFormulario" class="form-horizontal form-horizontal-red" role="form">
                 <div class="panel-heading">
                     <div class="row">
-                            <div class="panel-title col-xs-20" id="div-titulo-for">
+                            <div class="panel-title col-xs-19" id="div-titulo-for">
                                 {TITULO_FORMULARIO}                    
                             </div>       
-                            <div class="panel-actions col-xs-4">
+                            <div class="panel-actions col-xs-5">
                                     <ul class="navbar">                                          
 
                                         <li class="">

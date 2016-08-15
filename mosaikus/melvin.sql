@@ -692,51 +692,7 @@ end;
 ;;
 /*FIN ERROR*/
 
--- Cambios nuevos para inspecciones
-INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('descripcion_larga', 'Descripción Larga', '22', 'Descripción Larga');
-INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('responsable_desvio', 'Responsable Desvío', '15', 'Responsable Desvío');
-INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('reportado_por', 'Reportado Pór', '15', 'Reportado Pór');
 
-
-ALTER TABLE `mos_parametro_det`
-DROP PRIMARY KEY,
-ADD PRIMARY KEY (`cod_parametro_det`);
-
-ALTER TABLE `mos_parametro_det` DROP FOREIGN KEY `mos_parametro_det_ibfk_1`;
-
-ALTER TABLE `mos_parametro_det`
-DROP INDEX `Ind04`,
-DROP INDEX `Ind02`,
-DROP INDEX `Ind03`,
-DROP INDEX `Ind01`,
-DROP INDEX `Ind05`;
-
-ALTER TABLE `mos_acciones_correctivas`
-ADD COLUMN `responsable_desvio`  int NULL AFTER `fecha_cambia_estado`;
-
-ALTER TABLE `mos_acciones_correctivas`
-ADD COLUMN `reportado_por`  int NULL AFTER `responsable_desvio`;
-
-
-
-rename table mos_acciones_evidencia TO mos_acciones_trazabilidad;
-
-insert into mos_acciones_evidencia(fk_id_trazabilidad, nomb_archivo,archivo,contenttype)
-select id, nomb_archivo, archivo, contenttype from mos_acciones_trazabilidad where LENGTH(archivo) > 0;
-
-DROP TABLE IF EXISTS `mos_evidencias_temp`;
-CREATE TABLE `mos_evidencias_temp` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_md5` varchar(250) DEFAULT NULL,
-  `nomb_archivo` varchar(250) DEFAULT NULL,
-  `contenttype` varchar(50) DEFAULT NULL,
-  `fecha` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `tok` int(11) DEFAULT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
-  `estado` int(11) DEFAULT NULL COMMENT '0 => Sin Cambios\r\n1 => Nuevo\r\n2 => Editar\r\n3 => Eliminar',
-  `clave_foranea` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 /*Ejecutar solo en mosaikus_admin*/
 
@@ -859,7 +815,7 @@ CREATE TABLE `mos_documentos_distribucion_per` (
 
 
 delete from mos_historico_wf_documentos where IDDoc not in (select IDDoc from mos_documentos);
-ALTER TABLE `mos_historico_wf_documentos` ADD FOREIGN KEY (`IDDoc`) REFERENCES  ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `mos_historico_wf_documentos` ADD FOREIGN KEY (`IDDoc`) REFERENCES `mos_documentos` (`IDDoc`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 DROP TRIGGER IF EXISTS `registra_mos_historico_wf_documentos`;
 DELIMITER ;;
@@ -891,4 +847,454 @@ END;
 ;;
 DELIMITER ;
 
+DROP TABLE IF EXISTS `mos_evidencias_temp`;
+CREATE TABLE `mos_evidencias_temp` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_md5` varchar(250) DEFAULT NULL,
+  `nomb_archivo` varchar(250) DEFAULT NULL,
+  `contenttype` varchar(50) DEFAULT NULL,
+  `fecha` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `tok` int(11) DEFAULT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
+  `estado` int(11) DEFAULT NULL COMMENT '0 => Sin Cambios\r\n1 => Nuevo\r\n2 => Editar\r\n3 => Eliminar',
+  `clave_foranea` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*FIN LISTA DISTRIBUCION*/
+
+/*TAMAÑO CONTENTTYPE*/
+ALTER TABLE `mos_documentos_anexos`
+MODIFY COLUMN `contenttype`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `archivo`;
+
+ALTER TABLE `mos_evidencias_temp`
+MODIFY COLUMN `contenttype`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `nomb_archivo`;
+
+ALTER TABLE `mos_documentos_distribucion_evi`
+MODIFY COLUMN `contenttype`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `archivo`;
+
+
+/*FIN TAMAÑO*/
+
+
+ALTER TABLE `mos_cargo`
+MODIFY COLUMN `cod_cargo`  int(9) NOT NULL AUTO_INCREMENT FIRST ;
+
+/* CAMBIO 12/07/2016*/
+ALTER TABLE `mos_registro`
+ADD PRIMARY KEY (`idRegistro`);
+
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('tipo_documento', 'Tipo de Documento', '6');
+ALTER TABLE `mos_documentos`
+ADD COLUMN `tipo_documento`  int NULL DEFAULT 6 AFTER `requiere_lista_distribucion`;
+
+DROP TABLE IF EXISTS `mos_documentos_codigo_correlativo`;
+CREATE TABLE `mos_documentos_codigo_correlativo` (
+  `id_organizacion` int(11) DEFAULT NULL,
+  `tipo` int(11) DEFAULT NULL,
+  `correlativo` int(11) DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of mos_documentos_codigo_correlativo
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `mos_documentos_tipos`
+-- ----------------------------
+DROP TABLE IF EXISTS `mos_documentos_tipos`;
+CREATE TABLE `mos_documentos_tipos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `codigo` varchar(50) DEFAULT NULL,
+  `descripcion` varchar(250) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+INSERT INTO `mos_documentos_tipos` VALUES ('1', 'FOR', 'Formularios');
+INSERT INTO `mos_documentos_tipos` VALUES ('2', 'POL', 'Políticas ');
+INSERT INTO `mos_documentos_tipos` VALUES ('3', 'INT', 'Instructivos');
+INSERT INTO `mos_documentos_tipos` VALUES ('4', 'MAN', 'Manual');
+INSERT INTO `mos_documentos_tipos` VALUES ('5', 'HDS', 'Hojas de Seguridad');
+INSERT INTO `mos_documentos_tipos` VALUES ('6', 'PRO', 'Procedimientos');
+INSERT INTO `mos_documentos_tipos` VALUES ('7', 'STW', 'Standard Work');
+INSERT INTO `mos_documentos_tipos` VALUES ('8', 'PAP', 'Paso a Paso');
+
+
+-- Cambios nuevos para inspecciones
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('descripcion_larga', 'Descripción Larga', '22', 'Descripción Larga');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('responsable_desvio', 'Responsable de Ocurrencia', '15', 'Responsable de Ocurrencia');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('reportado_por', 'Reportado Pór', '15', 'Reportado Pór');
+
+
+ALTER TABLE `mos_parametro_det`
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`cod_parametro_det`);
+
+ALTER TABLE `mos_parametro_det` DROP FOREIGN KEY `mos_parametro_det_ibfk_1`;
+
+ALTER TABLE `mos_parametro_det`
+DROP INDEX `Ind04`,
+DROP INDEX `Ind02`,
+DROP INDEX `Ind03`,
+DROP INDEX `Ind01`,
+DROP INDEX `Ind05`;
+
+ALTER TABLE `mos_acciones_correctivas`
+ADD COLUMN `responsable_desvio`  int NULL AFTER `fecha_cambia_estado`;
+
+ALTER TABLE `mos_acciones_correctivas`
+ADD COLUMN `reportado_por`  int NULL AFTER `responsable_desvio`;
+
+
+
+rename table mos_acciones_evidencia TO mos_acciones_trazabilidad;
+
+DROP TABLE IF EXISTS `mos_acciones_evidencia`;
+CREATE TABLE `mos_acciones_evidencia` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `fk_id_trazabilidad` int(11) DEFAULT NULL,
+  `nomb_archivo` varchar(250) DEFAULT NULL,
+  `archivo` longblob,
+  `contenttype` varchar(50) DEFAULT NULL,
+  `fk_id_accion_c` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_id_trazabilidad` (`fk_id_trazabilidad`),
+  KEY `fk_id_accion_c` (`fk_id_accion_c`),
+  CONSTRAINT `mos_acciones_evidencia_ibfk_1` FOREIGN KEY (`fk_id_trazabilidad`) REFERENCES `mos_acciones_trazabilidad` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `mos_acciones_evidencia_ibfk_2` FOREIGN KEY (`fk_id_accion_c`) REFERENCES `mos_acciones_correctivas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+insert into mos_acciones_evidencia(fk_id_trazabilidad, nomb_archivo,archivo,contenttype)
+select id, nomb_archivo, archivo, contenttype from mos_acciones_trazabilidad where LENGTH(archivo) > 0;
+/*
+DROP TABLE IF EXISTS `mos_evidencias_temp`;
+CREATE TABLE `mos_evidencias_temp` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_md5` varchar(250) DEFAULT NULL,
+  `nomb_archivo` varchar(250) DEFAULT NULL,
+  `contenttype` varchar(50) DEFAULT NULL,
+  `fecha` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `tok` int(11) DEFAULT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
+  `estado` int(11) DEFAULT NULL COMMENT '0 => Sin Cambios\r\n1 => Nuevo\r\n2 => Editar\r\n3 => Eliminar',
+  `clave_foranea` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+*/
+ALTER TABLE `mos_acciones_ac_co` 
+ADD COLUMN `orden`  int NULL AFTER `fecha_cambia_estado`;
+
+ALTER TABLE `mos_acciones_correctivas`
+ADD COLUMN `estatus`  varchar(100) NULL AFTER `reportado_por`;
+
+ALTER TABLE `mos_acciones_correctivas`
+ADD COLUMN `id_usuario`  int NULL AFTER `estatus`;
+
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('en_elaboracion', 'Borrador', '15');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('en_buzon', 'En Buzón', '15');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('sin_responsable_analisis', 'Sin Responsable de Analisis', '15');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('sin_plan_accion', 'Sin Plan de Acción', '15');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('implementacion_acciones', 'Implementación de Acciones', '15');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('verificacion_eficacia', 'Verificación de Eficacia', '15');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('cerrada_verificada', 'Cerrada y Verificada', '15');
+
+INSERT INTO `mos_link` (`descripcion`, `nombre_link`, `dependencia`, `tipo`, `orden`) VALUES ('AccionesCorrectivas-indexAccionesCorrectivas-clases.acciones_correctivas.AccionesCorrectivas', 'Seguimiento de Acciones y Correcciones', '8', '2', '51');
+UPDATE `mos_link` SET `cod_link`='93' WHERE (`cod_link`='0');
+UPDATE `mos_link` SET `descripcion`='AccionesAC-indexAccionesAC-clases.acciones_ac.AccionesAC' WHERE (`cod_link`='93');
+
+ALTER TABLE `mos_acciones_ac_co`
+ADD COLUMN `fecha_realizada_temp`  date NULL COMMENT 'Guarda la fecha ejecutada de una accion de manera temporal, hasta que la misma sea aprobada' AFTER `orden`,
+ADD COLUMN `estatus_wf`  varchar(50) NULL DEFAULT 'en_ejecucion' COMMENT 'borrador\r\nen_ejecucion\r\ncerrada_verificar\r\ncerrada_verificada' AFTER `fecha_realizada_temp`;
+
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('estatus_wf', 'Flujo de Trabajo', '16');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('en_ejecucion', 'En Ejecución', '16');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('cerrada_verificar', 'Cerrada por Verificar', '16');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('cerrada_verificada', 'Cerrada y Verificada', '16');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('accion_ejecutada', 'Acción Ejecutada', '16');
+
+ALTER TABLE `mos_acciones_trazabilidad`
+DROP COLUMN `archivo`,
+DROP COLUMN `contenttype`,
+MODIFY COLUMN `fecha_evi`  timestamp NULL DEFAULT NULL AFTER `id_accion`;
+
+ALTER TABLE `mos_acciones_trazabilidad`
+DROP COLUMN `nomb_archivo`,
+ADD COLUMN `tipo`  varchar(25) NULL COMMENT 'Avance\r\nCierre' AFTER `id_accion`;
+
+update mos_acciones_trazabilidad set tipo = 'Avance';
+
+DELETE from mos_nombres_campos where modulo = 17;
+
+UPDATE `mos_link` SET `nombre_link`='Ocurrencias' WHERE (`cod_link`='8');
+UPDATE `mos_link` SET `nombre_link`='Administrador de  Ocurrencias con Plan de Acción' WHERE (`cod_link`='50');
+UPDATE `mos_link` SET `nombre_link`='Administrador de  Ocurrencias con Correcciones' WHERE (`cod_link`='77');
+UPDATE `mos_link` SET `nombre_link`='Seguimiento de Acciones Correctivas' WHERE (`cod_link`='93');
+UPDATE `mos_nombres_campos` SET `texto`='Fecha Comprometida' WHERE (`nombre_campo`='fecha_acordada' and modulo = 16);
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('anexos', 'Anexos', '15');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('validador_accion', 'Validador', '16');
+UPDATE `mos_link` SET `orden`='50' WHERE (`cod_link`='77');
+UPDATE `mos_link` SET `nombre_link`='Reportes de Ocurrencias con Plan de Acción', `orden`='52' WHERE (`cod_link`='52');
+UPDATE `mos_link` SET `nombre_link`='Configuración', `orden`='53' WHERE (`cod_link`='51');
+UPDATE `mos_link` SET `dependencia`='51' WHERE (`cod_link`='78');
+UPDATE `mos_link` SET `dependencia`='51' WHERE (`cod_link`='79');
+
+DROP TRIGGER IF EXISTS `colocar_estatus_de_ac`;
+DELIMITER ;;
+CREATE TRIGGER `colocar_estatus_de_ac` BEFORE INSERT ON `mos_acciones_correctivas` FOR EACH ROW BEGIN
+          IF (NEW.estatus IS NULL) THEN
+                      IF NOT (NEW.responsable_analisis IS NULL) THEN
+                              SET NEW.estatus = 'sin_plan_accion';                      
+                       ELSEIF NOT (NEW.responsable_desvio IS NULL) THEN
+                              SET NEW.estatus = 'sin_responsable_analisis';
+                       ELSE 
+                              SET NEW.estatus = 'en_buzon';
+                       END IF;
+          END IF;
+
+END
+;;
+DELIMITER ;
+DROP TRIGGER IF EXISTS `validar_verificacion_acciones`;
+DELIMITER ;;
+CREATE TRIGGER `validar_verificacion_acciones` BEFORE UPDATE ON `mos_acciones_correctivas` FOR EACH ROW BEGIN
+   DECLARE contador INT; 
+   DECLARE edo varchar(30);
+    IF NOT (NEW.fecha_acordada IS NULL) THEN
+            SET contador = (select count(*) from mos_acciones_ac_co  where id_ac = NEW.id and fecha_realizada is null);
+            IF (contador > 0) THEN
+                         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '- Existen acciones por cerrar, no se puede planificar la verificacion mientras esten acciones abiertas';
+            END IF;
+            
+            /*VALIDAMOS QUE LA FECHA REALIZADA SEA MENOR O IGUAL AL DIA DE HOY*/
+           IF (NEW.fecha_realizada is not null)THEN
+	 IF (DATEDIFF(NEW.fecha_realizada,NOW())<=0)THEN
+		/*CALCULAMOS EL ESTADO DE LA ACCION CUANDO TIENE FECHA REALIZADA*/
+		SET edo = (case 
+				 when DATEDIFF(NEW.fecha_acordada,NEW.fecha_realizada)<0 then 3
+				 when DATEDIFF(NEW.fecha_acordada,NEW.fecha_realizada)>=0 then 4 end);
+		SET NEW.estado= edo;
+		SET NEW.fecha_cambia_estado= now();
+                                     SET NEW.estatus = 'cerrada_verificada';
+	ELSE
+		set edo=-1;
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '- La fecha realizada no puede ser mayor a la fecha de hoy';
+	 END IF;
+           ELSE
+		SET edo = (case 
+				 when  DATEDIFF(NEW.fecha_acordada,NOW())<0  then 1 
+				 else 2 end);
+		SET NEW.estado= edo;
+		SET NEW.fecha_cambia_estado= now();
+                                     SET NEW.estatus = 'verificacion_eficacia';
+           END IF;
+   ELSE
+            SET NEW.fecha_realizada = NULL;
+            SET NEW.id_responsable_segui = NULL;
+            IF (NEW.estatus IS NULL) THEN
+                      IF NOT (NEW.responsable_analisis IS NULL) THEN
+                              SET NEW.estatus = 'sin_plan_accion';                      
+                       ELSEIF NOT (NEW.responsable_desvio IS NULL) THEN
+                              SET NEW.estatus = 'sin_responsable_analisis';
+                       ELSE 
+                              SET NEW.estatus = 'en_buzon';
+                       END IF;
+          -- ELSE 
+                --  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = NEW.estatus;
+          END IF;
+   END IF;
+   
+END
+;;
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS `modifica_estado_acciones_ins`;
+DELIMITER ;;
+CREATE TRIGGER `modifica_estado_acciones_ins` BEFORE INSERT ON `mos_acciones_ac_co` FOR EACH ROW BEGIN
+DECLARE edo varchar(30);
+DECLARE peso int;
+/*VALIDAMOS QUE LA FECHA REALIZADA SEA MENOR O IGUAL AL DIA DE HOY*/
+IF (NEW.fecha_realizada is not null)THEN
+	IF (DATEDIFF(NEW.fecha_realizada,NOW())<=0)THEN
+		/*CALCULAMOS EL ESTADO DE LA ACCION CUANDO TIENE FECHA REALIZADA*/
+		SET edo = (case 
+				 when DATEDIFF(NEW.fecha_acordada,NEW.fecha_realizada)<0 then 3
+				 when DATEDIFF(NEW.fecha_acordada,NEW.fecha_realizada)>=0 then 4 end);
+			SET NEW.estado= edo;
+			SET NEW.fecha_cambia_estado= now();
+	ELSE
+		set edo=-1;
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '- La fecha realizada no puede ser mayor a la fecha de hoy';
+	END IF;
+ELSE
+		SET edo = (case 
+				 when  DATEDIFF(NEW.fecha_acordada,NOW())<0  then 1 
+				 else 2 end);
+			SET NEW.estado= edo;
+			SET NEW.fecha_cambia_estado= now();
+END IF;
+
+end
+;;
+DELIMITER ;
+DROP TRIGGER IF EXISTS `modificar_estado_ac_ins`;
+DELIMITER ;;
+CREATE TRIGGER `modificar_estado_ac_ins` AFTER INSERT ON `mos_acciones_ac_co` FOR EACH ROW BEGIN
+         DECLARE contador INT;  
+			/*PARA ACCIONES CORRECTIVAS*/
+			IF(NEW.id_ac is not null)THEN
+        SET contador = (select MIN(estado) from mos_acciones_ac_co  where id_ac = NEW.id_ac);
+       UPDATE mos_acciones_correctivas SET estado = contador,fecha_cambia_estado= now()  WHERE id = NEW.id_ac and mos_acciones_correctivas.fecha_realizada is null;
+			END IF;
+			/*PARA CORRECCIONES*/
+			IF(NEW.id_correcion is not null) THEN
+        SET contador = (select MIN(estado) from mos_acciones_ac_co  where id_correcion = NEW.id_correcion);
+       UPDATE mos_correcciones SET estado = contador, fecha_cambia_estado= now()  WHERE id = NEW.id_correcion;
+			END IF;
+
+END
+;;
+DELIMITER ;
+DROP TRIGGER IF EXISTS `modifica_estado_acciones_upd`;
+DELIMITER ;;
+CREATE TRIGGER `modifica_estado_acciones_upd` BEFORE UPDATE ON `mos_acciones_ac_co` FOR EACH ROW BEGIN
+DECLARE edo varchar(30);
+DECLARE edo_correcion_ant varchar(30);
+DECLARE id_accion_correctiva int;
+DECLARE peso int;
+DECLARE peso2 int;
+set peso=0;
+/*VALIDAMOS QUE LA FECHA REALIZADA SEA MENOR O IGUAL AL DIA DE HOY*/
+IF (NEW.fecha_realizada is not null)THEN
+	IF (DATEDIFF(NEW.fecha_realizada,NOW())<=0)THEN
+		/*CALCULAMOS EL ESTADO DE LA ACCION CUANDO TIENE FECHA REALIZADA*/
+		SET edo = (case 
+				 when DATEDIFF(NEW.fecha_acordada,NEW.fecha_realizada)<0 then 3
+				 when DATEDIFF(NEW.fecha_acordada,NEW.fecha_realizada)>=0 then 4 end);
+			SET NEW.estado= edo;
+			SET NEW.fecha_cambia_estado= now();
+	ELSE
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '- La fecha realizada no puede ser mayor a la fecha de hoy';
+	END IF;
+ELSE
+		SET edo = (case 
+				 when  DATEDIFF(NEW.fecha_acordada,NOW())<0  then 1 
+				 else 2 end);
+			SET NEW.estado= edo;
+			SET NEW.fecha_cambia_estado= now();
+END IF;
+end
+;;
+DELIMITER ;
+DROP TRIGGER IF EXISTS `modificar_estado_ac`;
+DELIMITER ;;
+CREATE TRIGGER `modificar_estado_ac` AFTER UPDATE ON `mos_acciones_ac_co` FOR EACH ROW BEGIN
+         DECLARE contador INT;  
+			IF(NEW.id_ac is not null)THEN
+        SET contador = (select MIN(estado) from mos_acciones_ac_co  where id_ac = NEW.id_ac);
+       UPDATE mos_acciones_correctivas SET estado = contador,  fecha_cambia_estado= now()  WHERE id = NEW.id_ac and mos_acciones_correctivas.fecha_realizada is null;
+			END IF;
+			/*PARA CORRECCIONES*/
+			IF(NEW.id_correcion is not null) THEN
+        SET contador = (select MIN(estado) from mos_acciones_ac_co  where id_correcion = NEW.id_correcion);
+       UPDATE mos_correcciones SET estado = contador ,  fecha_cambia_estado= now() WHERE id = NEW.id_correcion;
+			END IF;
+END
+;;
+DELIMITER ;
+
+/*NUEVOS AJUSTES ACCIONES CORRECTIVAS*/
+ALTER TABLE `mos_acciones_correctivas`
+MODIFY COLUMN `estado`  int(11) NULL DEFAULT 2 AFTER `alto_potencial`;
+
+ALTER TABLE `mos_acciones_ac_co`
+ADD COLUMN `id_validador`  int NULL AFTER `fecha_realizada_temp`;
+
+ALTER TABLE `mos_acciones_ac_co`
+ADD COLUMN `id_usuario_wf`  int NULL AFTER `estatus_wf`,
+ADD COLUMN `fecha_estado_wf`  datetime NULL AFTER `id_usuario_wf`;
+
+ALTER TABLE `mos_acciones_ac_co`
+ADD COLUMN `observacion_rechazo`  text NULL AFTER `estatus_wf`;
+
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`) VALUES ('rechazado', 'Rechazado', '16');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `id_idioma`) VALUES ('rechazado', 'Rejeitados', '16', '2');
+
+ALTER TABLE `mos_acciones_correctivas`
+ADD COLUMN `desc_verificacion`  text NULL AFTER `id_usuario`;
+
+ALTER TABLE `mos_acciones_correctivas`
+ADD COLUMN `fecha_realizada_temp`  date NULL COMMENT 'Guarda la fecha ejecutada de verifiacion de forma temporal' AFTER `fecha_realizada`;
+
+ALTER TABLE `mos_acciones_evidencia`
+ADD COLUMN `fk_id_accion_c_ver`  int NULL AFTER `fk_id_accion_c`;
+
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('desc_verificacion', 'Observación', '15', 'Observación');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`, `id_idioma`) VALUES ('desc_verificacion', 'Observação', '15', 'Observação', '2');
+
+ALTER TABLE `mos_acciones_correctivas`
+ADD COLUMN `descripcion_val`  text NULL COMMENT 'Descripcion Final de La Ocurrencia' AFTER `descripcion`,
+ADD COLUMN `alto_potencial_val`  varchar(2) NULL COMMENT 'Validación de Alto Potencial' AFTER `alto_potencial`;
+
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('descripcion_val', 'Descripción Final', '15', 'Descripción Final');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`, `id_idioma`) VALUES ('descripcion_val', 'Descrição Final', '15', 'Descrição Final',2);
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`) VALUES ('alto_potencial_val', 'Verificación de Alto Potencial', '15', 'Alto Potencial');
+INSERT INTO `mos_nombres_campos` (`nombre_campo`, `texto`, `modulo`, `placeholder`, `id_idioma`) VALUES ('alto_potencial_val', 'Verificación de Alto Potencial', '15', 'Alto Potencial',2);
+
+
+
+/*CAMBIO EN TRIGGER CREAR/MODIFICAR DOCUMENTO PARA CORREGIR ERROR DE IDIOMA*/
+DELIMITER ;
+DROP TRIGGER IF EXISTS `registra_mos_historico_wf_documentos`;
+DELIMITER ;;
+CREATE TRIGGER `registra_mos_historico_wf_documentos` AFTER INSERT ON `mos_documentos` FOR EACH ROW BEGIN
+/*guarda historico al insertar un doc*/
+         DECLARE etapa text;  
+			IF(NEW.id_workflow_documento is not null)THEN
+				set etapa= (SELECT
+				IFNULL(mos_nombres_campos.texto,'')
+				FROM
+				mos_nombres_campos
+				WHERE
+				mos_nombres_campos.modulo = 6 AND
+				mos_nombres_campos.nombre_campo = NEW.etapa_workflow AND mos_nombres_campos.id_idioma = (select id_idioma from mos_usuario where id_usuario = NEW.id_usuario_workflow));
+
+        INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+				VALUES (NEW.IDDoc,'Documento Creado',NEW.id_usuario_workflow);
+        IF (NEW.estado_workflow is NOT NULL) THEN
+            INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+            VALUES (NEW.IDDoc,CONCAT('ESTADO:',NEW.estado_workflow,' ',IFNULL(NEW.observacion_rechazo,''),',cambió a ',etapa),NEW.id_usuario_workflow);
+        END IF;
+      ELSE
+        INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+				VALUES (NEW.IDDoc,'Documento Creado',NEW.id_usuario_workflow);
+			END IF;
+END
+;;
+DELIMITER ;
+DROP TRIGGER IF EXISTS `registra_mos_historico_wf_documentos_cambio`;
+DELIMITER ;;
+CREATE TRIGGER `registra_mos_historico_wf_documentos_cambio` BEFORE UPDATE ON `mos_documentos` FOR EACH ROW BEGIN
+/*guarda historico al modificar un doc si cambian los datos del wf*/
+        DECLARE etapa text;  
+				set etapa= (SELECT
+				IFNULL(mos_nombres_campos.texto,'')
+				FROM
+				mos_nombres_campos
+				WHERE
+				mos_nombres_campos.modulo = 6 AND
+				mos_nombres_campos.nombre_campo = NEW.etapa_workflow AND mos_nombres_campos.id_idioma = (select id_idioma from mos_usuario where id_usuario = NEW.id_usuario_workflow));
+
+			IF((NEW.etapa_workflow<>OLD.etapa_workflow) or (NEW.estado_workflow<>OLD.estado_workflow)) THEN
+        INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+				VALUES (NEW.IDDoc,CONCAT('ESTADO:',NEW.estado_workflow,' ',IFNULL(NEW.observacion_rechazo,''),',cambió a ',etapa),NEW.id_usuario_workflow);
+			END IF;
+			IF(OLD.etapa_workflow is Null and NEW.etapa_workflow<>'') THEN
+        INSERT into mos_historico_wf_documentos (IDDoc,descripcion_operacion,id_usuario) 
+				VALUES (NEW.IDDoc,CONCAT('ESTADO:',NEW.estado_workflow,' ',IFNULL(NEW.observacion_rechazo,''),',cambió a ',etapa),NEW.id_usuario_workflow);
+			END IF;
+END
+;;
+DELIMITER ;
+
+/*FIN*/
+
+/**/

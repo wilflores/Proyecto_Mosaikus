@@ -109,4 +109,94 @@
                 });        
         $("#ver_ficha_trabajador").trigger('click');        
     }
-    
+
+    /******** funcion para mostrarselect de formulario**/
+    function CargaComboForm(id_requisito_item){
+        var id_it=$(id_requisito_item).val();
+    //alert('valor '+id_it);
+        //if(id_requisito_item.checked){
+        if($(id_requisito_item).is(":checked")){
+            $('#formulario_doc_'+id_it).show();
+            // $('#combos_form_'+id_it).show();
+            
+        }
+        else{
+            $('#formulario_doc_'+id_it).hide();
+            $('#combos_form_'+id_it).hide();
+            //$('#valores_form_'+id_it).hide();
+        }
+        }
+        
+    /*********** funcion para mostrar parametros de acurdo al formulario seleccionado */
+   function CargaComboParametros(id_formulario,id_requisito_item,tipo,vigencia){
+    array = new XArray();
+   $('#combos_form_'+id_it).hide();
+    var id_form=$(id_formulario).val();
+    var id_it=id_requisito_item;
+    if(id_form=='') return;//en caso de que marque opcion seleccione
+    array.setObjeto('RequisitosCargos','Comboparametros');
+    array.addParametro('id_form',id_form);
+    array.addParametro('id_req_item',id_it);
+    array.addParametro('tipo_req',tipo);
+    array.addParametro('vigencia_req',vigencia);
+    array.addParametro('import','clases.requisitos_cargos.RequisitosCargos');
+    xajax_Loading(array.getArray());
+
+
+    //$('#combos_form_'+id_it).show();
+    }
+
+      /*********** funcion para mostrar valores de parametros de acuerdo al parametro de indexacion seleccionado */
+   function CargaValoresParametros(id_parametro,id_formulario,id_requisito_item,id_persona,condicion){
+   var id_params=$(id_parametro).val();
+   var id_form=id_formulario;
+   var id_it=id_requisito_item;
+   $('#valores_form_'+id_it).hide();
+   if(id_form=='') return;
+   if(id_params!=null){
+
+  // alert("envio "+envio);
+   var envio=false;
+    array = new XArray();
+   array.setObjeto('RequisitosCargos','ValoresParametros');
+   switch(condicion){
+    case 1://solo combo
+           id_combo=id_params[0];
+           array.addParametro('id_combo',id_combo);
+           envio=true;
+    break;
+    case 2://combo y vigencia
+            id_combo=id_params[0];
+            id_vigencia=id_params[1];
+            if (id_combo !== undefined && id_vigencia !== undefined){ //deben estar marcadas las dos opciones del select
+                envio= true;
+                array.addParametro('id_combo',id_combo);
+                array.addParametro('id_vigencia',id_vigencia);
+            }
+            else
+                envio = false; 
+
+    break;
+    case 4://solo vigencia
+            id_vigencia=id_params[0];
+            array.addParametro('id_vigencia',id_vigencia);
+            envio=true;
+    break;
+
+
+   }
+       //var texto = "Opciones Seleccionadas: ";
+
+//alert('gfhgf'+id_params);
+    array.addParametro('id_form',id_form);
+    array.addParametro('id_req_item',id_it);
+    array.addParametro('id_persona',id_persona);
+    array.addParametro('condicion',condicion);
+    array.addParametro('import','clases.requisitos_cargos.RequisitosCargos');
+    if(envio==true)
+        xajax_Loading(array.getArray());
+}
+else
+$('#valores_form_'+id_it).hide();
+    //$('#combos_form_'+id_it).show();
+    }  

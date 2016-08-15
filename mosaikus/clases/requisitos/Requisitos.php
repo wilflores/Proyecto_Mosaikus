@@ -930,9 +930,8 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                                 $params[id] = $temp;
                                 $this->ingresarArbol($params);
                         }
-
                          /******** guardar relacion de requisitos con items ****/
-                         $columnas_fam=$this->cargar_parametros_familias();//extraer id de familias para los select dnamicos            
+                        $columnas_fam=$this->cargar_parametros_familias();//extraer id de familias para los select dnamicos            
                         foreach ($columnas_fam as $value) {
                             $id_item=$parametros["campo_".$value[id].""];
                          $this->ingresarRequisitosItems($id_item,$params[id_requisito]);

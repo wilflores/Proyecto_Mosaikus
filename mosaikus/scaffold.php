@@ -34,9 +34,17 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
     $columnas_mostrar = '';
     $campos_log_ant = $campos_log_new = '';
     $filtro_listar = '';
+    $sql = "select id from mos_idiomas ";
+    $data_idiomas=$dbl->query($sql);
+    $sql = "delete from mos_nombres_campos where modulo = $modulo";
+    $dbl->query($sql);
     foreach($data as $fila ){
-        $sql = "INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder) VALUES( '$fila[Field]','$fila[Field]',$modulo,'$fila[Field]')";
-        $dbl->insert_update($sql);
+        foreach ($data_idiomas as $value_idioma) {
+            $sql = "INSERT INTO mos_nombres_campos(nombre_campo, texto, modulo, placeholder, id_idioma) VALUES( '$fila[Field]','$fila[Field]',$modulo,'$fila[Field]', $value_idioma[id])";
+            $dbl->insert_update($sql);
+            echo $sql . '<br>';
+        }
+        
         if($fila['Field']!='id'){
             //PARA EL DATAGRID
             $titulos_grilla .="\n               array( \"width\"=>\"10%\",\"ValorEtiqueta\"=>link_titulos(\$this->nombres_columnas[".$fila['Field']."], \"".$fila['Field']."\", \$parametros)),";
@@ -229,7 +237,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
             }
             
             private function cargar_nombres_columnas(){
-                \$sql = \"SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = $modulo\";
+                \$sql = \"SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo IN ($modulo,100) AND  AND id_idioma = \$_SESSION[CookIdIdioma]\";
                 \$nombres_campos = \$this->dbl->query(\$sql, array());
                 foreach (\$nombres_campos as \$value) {
                     \$this->nombres_columnas[\$value[nombre_campo]] = \$value[texto];
@@ -238,7 +246,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
             }
             
             private function cargar_placeholder(){
-                \$sql = \"SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE modulo = $modulo\";
+                \$sql = \"SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE modulo = $modulo  AND id_idioma = \$_SESSION[CookIdIdioma]\";
                 \$nombres_campos = \$this->dbl->query(\$sql, array());
                 foreach (\$nombres_campos as \$value) {
                     \$this->placeholder[\$value[nombre_campo]] = \$value[placeholder];
@@ -634,15 +642,20 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 \$template->setVars(\$contenido_1);
                 \$contenido['CAMPOS'] = \$template->show();
 
+                
                 \$template->PATH = PATH_TO_TEMPLATES.'interfaz/';
                 \$template->setTemplate(\"formulario\");
                 \$contenido['TITULO_FORMULARIO'] = \"Crear&nbsp;$nombre_clase\";
-                \$contenido['TITULO_VOLVER'] = \"Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;$nombre_clase\";
-                \$contenido['PAGINA_VOLVER'] = \"listar$nombre_clase.php\";
+                //\$contenido['TITULO_VOLVER'] = \"Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;$nombre_clase\";
+                //\$contenido['PAGINA_VOLVER'] = \"listar$nombre_clase.php\";
                 \$contenido['DESC_OPERACION'] = \"Guardar\";
                 \$contenido['OPC'] = \"new\";
                 \$contenido['ID'] = \"-1\";
 
+                foreach ( \$this->nombres_columnas as \$key => \$value) {
+                    \$contenido[\"N_\" . strtoupper(\$key)] =  \$value;
+                }
+                
                 \$template->setVars(\$contenido);
                 \$objResponse = new xajaxResponse();               
                 \$objResponse->addAssign('contenido-form',\"innerHTML\",\$template->show());
@@ -696,6 +709,9 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 \$contenido['OPC'] = \"upd\";
                 \$contenido['ID'] = \$val[\"id\"];
 
+                foreach ( \$this->nombres_columnas as \$key => \$value) {
+                    \$contenido[\"N_\" . strtoupper(\$key)] =  \$value;
+                }
                 \$template->setVars(\$contenido);
                 \$objResponse = new xajaxResponse();
                 \$objResponse->addAssign('contenido-form',\"innerHTML\",\$template->show());
@@ -748,7 +764,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 \$objResponse = new xajaxResponse();
                 unset (\$parametros['opc']);
                 unset (\$parametros['id']);
-                \$parametros['id_usuario']= \$_SESSION['USERID'];
+                \$parametros['id_usuario']= \$_SESSION['CookIdUsuario'];
 
                 \$validator = new FormValidator();
                 $campos_validator
@@ -786,7 +802,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
                 session_start();
                 \$objResponse = new xajaxResponse();
                 unset (\$parametros['opc']);
-                \$parametros['id_usuario']= \$_SESSION['USERID'];
+                \$parametros['id_usuario']= \$_SESSION['CookIdUsuario'];
 
                 \$validator = new FormValidator();
                 $campos_validator
@@ -819,7 +835,7 @@ if ($nombre_clase!='' && $nombre_fisico!='' && $tabla!=''){
     $eliminar = "
             public function eliminar(\$parametros)
             {
-                \$val = \$this->ver$nombre_clase(\$parametros[id]);
+                //\$val = \$this->ver$nombre_clase(\$parametros[id]);
                 \$respuesta = \$this->eliminar$nombre_clase(\$parametros);
                 \$objResponse = new xajaxResponse();
                 if (preg_match(\"/ha sido eliminada con exito/\",\$respuesta ) == true) {
@@ -1134,6 +1150,8 @@ $pages_ver="<?php
             array = new XArray();
             array.setObjeto('$nombre_clase','crear');
             array.addParametro('import','clases.$nombre_fisico.$nombre_clase');
+            array.addParametro('modo',document.getElementById('modo').value);            
+            array.addParametro('cod_link',document.getElementById('cod_link').value);
             xajax_Loading(array.getArray());
     }
 
@@ -1160,6 +1178,8 @@ $pages_ver="<?php
         array.setObjeto('$nombre_clase','editar');
         array.addParametro('id',id);
         array.addParametro('import','clases.$nombre_fisico.$nombre_clase');
+            array.addParametro('modo',document.getElementById('modo').value);            
+            array.addParametro('cod_link',document.getElementById('cod_link').value);
         xajax_Loading(array.getArray());
     }
 
@@ -1192,6 +1212,8 @@ $pages_ver="<?php
         array.addParametro('permiso',document.getElementById('permiso_modulo').value);
         array.addParametro('pag',pag);
         array.setObjeto('$nombre_clase','buscar');
+        array.addParametro('modo',document.getElementById('modo').value);            
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
         array.addParametro('import','clases.$nombre_fisico.$nombre_clase');
         $('#MustraCargando').show();
         xajax_Loading(array.getArray());
@@ -1269,16 +1291,16 @@ echo "SE CREARON LOS TEMPLATES, PAGES, JS Y CLASES PARA: ".$nombre_clase;
                 </tr>
                 <tr>
                     <td class='td-table-data-alt'>
-                        <input type='text' name='clase' size="20" id='clase' class="form-box" value="<? echo $nombre_clase;?>"/>
+                        <input type='text' name='clase' size="20" id='clase' class="form-box" value="<?php echo $nombre_clase;?>"/>
                     </td>
                     <td class='td-table-data-alt'>
-                        <input type='text' name='fisico' id='fisico' class="form-box" value="<? echo $nombre_fisico;?>"/>
+                        <input type='text' name='fisico' id='fisico' class="form-box" value="<?php echo $nombre_fisico;?>"/>
                     </td>
                     <td class='td-table-data-alt'>
-                        <input type='text' name='tabla' id='tabla' class="form-box" value="<? echo $tabla;?>"/>
+                        <input type='text' name='tabla' id='tabla' class="form-box" value="<?php echo $tabla;?>"/>
                     </td>
                     <td class='td-table-data-alt'>
-                        <input type='text' name='modulo' id='modulo' class="form-box" value="<? echo $modulo;?>"/>
+                        <input type='text' name='modulo' id='modulo' class="form-box" value="<?php echo $modulo;?>"/>
                     </td>
                 </tr>
                 <tr> <td class='td-table-data-alt' colspan="3" align="center">

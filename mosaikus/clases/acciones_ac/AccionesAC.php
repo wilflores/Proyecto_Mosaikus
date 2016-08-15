@@ -27,7 +27,7 @@
             }
             
             private function cargar_nombres_columnas(){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 16  AND id_idioma = $_SESSION[CookIdIdioma]";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo in (16,100)  AND id_idioma = $_SESSION[CookIdIdioma]";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
@@ -803,12 +803,12 @@
                                                                         descripcion
                                                                             FROM mos_tipo_ac ORDER BY descripcion"
                                                                     , 'id'
-                                                                    , 'descripcion', $value[valor]);
+                                                                    , 'descripcion');
                 $contenido[RESPONSABLE_ANALISIS] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
                                                                             FROM mos_personal p WHERE interno = 1"
                                                                     , 'cod_emp'
-                                                                    , 'nombres', $value[valor]);
+                                                                    , 'nombres');
                 
                 if (isset($parametros[reporte_ac]))
                     $contenido[DISPLAY_AM] = 'display:none;';
@@ -1163,6 +1163,7 @@
                 }
                 $contenido_1['ITEMS_HISTO'] = $item_histo;
                 /*FIN HISTORICO*/
+                
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'acciones_ac/';
                 $template->setTemplate("formulario_h");
@@ -1179,6 +1180,9 @@
                 $contenido['DESC_OPERACION'] = "Guardar";
                 $contenido['OPC'] = "upd";
                 $contenido['ID'] = $val["id"];
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }  
                 
                 $contenido['DESC_OPERACION'] = "Solo Guardar";
                 $contenido[JS_PREVIO_GUARDAR] = "$('#notificar').val('');";

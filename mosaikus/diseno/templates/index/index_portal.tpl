@@ -60,7 +60,7 @@
                 {USUARIO}<span class="caret"></span>
               </a>
               <ul class="dropdown-menu">
-                <li><a href="javascript:contrasena()">Cambiar contraseña</a></li>
+                <li><a href="javascript:VerConfiguraciones();">Configuraciones</a></li>
                 <li><a href="login.php?cerrar=true">Salir</a></li>
               </ul>
             </div>
