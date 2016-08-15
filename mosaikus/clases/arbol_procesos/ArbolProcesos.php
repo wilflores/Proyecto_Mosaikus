@@ -187,7 +187,8 @@
                     $sql = "select COUNT(*) total_registros
                         from $sql_left
                                 where NOT a2.id_organizacion IS NULL $sql_where ";   
-                    //echo $sql;
+
+
                     $total_registros = $this->dbl->query($sql, $atr);
                     return $total_registros[0][total_registros];  
              }
@@ -210,7 +211,7 @@
                         if ($k==2){
                             $sql_left .= "mos_arbol_procesos a$k ";  
                             $sql_order = "a$k.id_organizacion,a$k.level,a$k.position";
-                            $sql_col_left .= ",a$k.id_organizacion id_1,a$k.id id_$k, a$k.title nombre_$k";   
+                            $sql_col_left .= ",a$k.id_organizacion id_1,a$k.id id_$k, a$k.title nombre_$k";
                             $sql_where .= " AND a$k.id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ") ";
                             
                         }
@@ -240,6 +241,8 @@
                             . " ORDER BY $sql_order";
                     $sql .= " LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                    //   echo $sql;
+
+
                     $this->operacion($sql, $atr);
              }
              
@@ -440,7 +443,7 @@
                 $this->listarArbolProcesosReporte($parametros, $parametros['pag'], $reg_por_pagina);
                 $data=$this->dbl->data;                                
                 $out[filas] = count($data);
-                //print_r($data);
+
                 $html = "";
                 
                 $id_aux = $ids = $con_g = array();
@@ -545,6 +548,7 @@
                     import('clases.organizacion.ArbolOrganizacional');
                 }
                 $ao = new ArbolOrganizacional();
+
                 foreach ($data as $value) {
                     
                     $html .= '<tr class="odd gradeX">';
@@ -767,7 +771,7 @@
                             </div>';
                     $k++;
                 }
-                $parametros["b-id_organizacion"] = 2;
+                //$parametros["b-id_organizacion"] = 2;
                 if (count($this->id_org_acceso) <= 0){
                     $this->cargar_acceso_nodos($parametros);
                 }

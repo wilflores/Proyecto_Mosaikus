@@ -5,11 +5,12 @@
         private $bd;
         private $total_registros;
         private $parametros;
-        private $nombres_columnas;
+        public $nombres_columnas;
         private $placeholder;
         private $campos_activos;
         private $restricciones;
-            
+
+
             public function Cargos(){
                 parent::__construct();
                 $this->asigna_script('cargo/cargo.js');                                             
@@ -28,7 +29,7 @@
                 $this->parametros = $this->dbl->query($sql, array());
             }
 
-            private function cargar_nombres_columnas(){
+            public function cargar_nombres_columnas(){
                 $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and  modulo in (3,100)";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
@@ -89,7 +90,7 @@
                 $this->operacion($sql, $atr);
                 return $this->dbl->data;
             }
-            
+
             public function ingresarCargosArbol($atr){
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
@@ -233,7 +234,41 @@
 
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+
                     $this->operacion($sql, $atr);
+            }
+
+            public function listarCargosReporte($atr, $pag, $registros_x_pagina)
+            {
+                $atr = $this->dbl->corregir_parametros($atr);
+                $sql_where = "";
+
+                $id_org = -1;
+                if ((strlen($atr["b-id_organizacion"])>0) && ($atr["b-id_organizacion"] != "2")){
+                    if(!class_exists('ArbolOrganizacional')){
+                        import('clases.organizacion.ArbolOrganizacional');
+                    }
+
+                    $ao = new ArbolOrganizacional();
+                    $id_org = $ao->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
+                    $sql_where .= " AND mcea.id IN (". $id_org . ")";
+                }
+                $sql = "SELECT 1, 
+                               mcea.id,
+                               mo.title,
+                                     mcea.cod_cargo,
+                               mc.descripcion
+                        from   mos_cargo_estrorg_arbolproc mcea,
+                                     mos_cargo mc,
+                               mos_organizacion mo
+                        where  
+                               NOT mcea.id IS NULL $sql_where 
+                        AND    mcea.cod_cargo = mc.cod_cargo
+                        AND    mo.id = mcea.id ORDER BY mcea.id,mc.cod_cargo";
+                        //LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                $this->operacion($sql ,$atr);
+
+
             }
              
             public function eliminarCargos($atr){
@@ -271,7 +306,7 @@
                     }
              }
      
- 
+
      public function verListaCargos($parametros){
                 $grid= "";
                 $grid= new DataGrid();
@@ -313,12 +348,21 @@
                 }
                 if ($parametros['permiso'][1] == "1")
                     array_push($func,array('nombre'=> 'verCargos','imagen'=> "<img style='cursor:pointer' src='diseno/images/find.png' title='Ver Cargos'>"));
-                */
+
+
+
                 if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
                     array_push($func,array('nombre'=> 'editarCargos','imagen'=> "<i style='cursor:pointer' class=\"icon icon-edit\" title='Editar Cargos'></i>"));
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
                     array_push($func,array('nombre'=> 'eliminarCargos','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\" title='Eliminar Cargos'></i>"));
-               
+                */
+                if($this->restricciones->per_editar =='S'){
+                    array_push($func,array('nombre'=> 'editarCargos','imagen'=> "<i style='cursor:pointer' class=\"icon icon-edit\" title='Editar Cargos'></i>"));
+                }
+                if($this->restricciones->per_eliminar == 'S'){
+                    array_push($func,array('nombre'=> 'eliminarCargos','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\" title='Eliminar Cargos'></i>"));
+                }
+
                 $config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
                 $array_columns =  explode('-', $parametros['mostrar-col']);
@@ -355,7 +399,69 @@
                 }
                 return $out;
             }
-     
+
+        public function verListaCargosReporte($parametros)
+        {
+            $grid= "";
+            $grid= new DataGrid();
+            if ($parametros['pag'] == null)
+                $parametros['pag'] = 1;
+            $reg_por_pagina = getenv("PAGINACION");
+            if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina'];
+
+            $out[niveles] = $niveles = $parametros[niveles] = 2;
+            $out[titulo] = "";
+            if ($niveles == 2){
+                $ancho_area = 35;
+            }
+            else $ancho_area = 30;
+            $out[titulo] .= "<th style=\"width: ".$ancho_area  . "%\" >&Aacute;rea</th>" ;
+            $out[titulo] .= "<th style=\"width: ". (100  - $ancho_area) / $niveles  . "%\" >Cargos</th>" ;
+
+            $this->listarCargosReporte($parametros, $parametros['pag'], $reg_por_pagina);
+            $data=$this->dbl->data;
+
+            $html = "";
+
+            $areas = array();
+            $data = array_slice($data,(($parametros['pag'] - 1) * $reg_por_pagina), $parametros['pag'] * $reg_por_pagina);
+
+            $aux_id = $data[0]['id'];
+            $cargos = array();
+
+            foreach ($data as $d){
+                if($aux_id != $d['id']){
+                    $areas[$aux_id] = $cargos;
+                    $aux_id = $d['id'];
+                    $cargos = array();
+                    array_push($cargos, $d['descripcion']);
+                }else{
+                    array_push($cargos, $d['descripcion']);
+                }
+            }
+            $areas[$aux_id] = $cargos;
+
+            if (!class_exists('ArbolOrganizacional')){
+                import('clases.organizacion.ArbolOrganizacional');
+            }
+            $ao = new ArbolOrganizacional();
+
+            //print_r($areas);
+
+            foreach($areas as $k => $values){
+                $html .= '<tr class="odd gradeX">';
+                $nombre_area = $ao->BuscaOrganizacional(array('id_organizacion'=>$k));
+                $html .= '<td>'.$nombre_area.'</td>';
+                $html .= '<td>';
+                foreach ($values as $v){
+                    $html .= $v . "<br/>";
+                }
+                $html .= '</td>';
+                $html .= '</tr>';
+            }
+            $out[tabla] = $html;
+            return $out;
+        }
  
         public function exportarExcel($parametros){
 
@@ -408,7 +514,95 @@
 
             return $grid->armarTabla();
         }
- 
+
+            public    function cargar_acceso_nodos($parametros){
+                if (strlen($parametros[cod_link])>0){
+                    if(!class_exists('mos_acceso')){
+                        import("clases.mos_acceso.mos_acceso");
+                    }
+                    $acceso = new mos_acceso();
+                    $data_ids_acceso = $acceso->obtenerArbolEstructura($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros[modo]);
+                    //print_r($data_ids_acceso);
+                    foreach ($data_ids_acceso as $value) {
+                        $this->id_org_acceso[$value[id]] = $value;
+                    }
+                }
+            }
+
+        public function indexCargosReporte($parametros)
+        {
+            $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
+            if(!class_exists('Template')){
+                import("clases.interfaz.Template");
+            }
+            if ($parametros['corder'] == null) $parametros['corder']="descripcion";
+            if ($parametros['sorder'] == null) $parametros['sorder']="asc";
+            if ($parametros['mostrar-col'] == null)
+                $parametros['mostrar-col']="1-3-4-5-6";
+
+            $k = 19;
+            $contenido[PARAMETROS_OTROS] = "";
+            foreach ($this->parametros as $value) {
+                $parametros['mostrar-col'] .= "-$k";
+                $contenido[PARAMETROS_OTROS] .= '<div class="form-group">
+                                  <label for="SelectAcc" class="col-md-9 control-label">' . $value[espanol] . '</label>
+                                  <div class="col-md-3">      
+                                      <label class="checkbox-inline">
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                      </label>
+                                  </div>
+                            </div>';
+                $k++;
+            }
+
+            if (count($this->id_org_acceso) <= 0){
+                $this->cargar_acceso_nodos($parametros);
+            }
+
+            $parametros[reg_por_pagina] = 5000;
+            $grid = $this->verListaCargosReporte($parametros);
+            $contenido['MODO'] = $parametros['modo'];
+            $contenido['COD_LINK'] = $parametros['cod_link'];
+            $contenido['CORDER'] = $parametros['corder'];
+            $contenido['SORDER'] = $parametros['sorder'];
+            $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
+            $contenido['TABLA'] = $grid['tabla'];
+            $contenido[TITULO_TABLA] = $grid['titulo'];
+
+            $contenido['PAGINADO'] = $grid['paginado'];
+            $contenido['FECHA'] = date('d/m/Y');
+            $contenido['OPCIONES_BUSQUEDA'] = " <option value='campo'>campo</option>";
+            $contenido['JS_NUEVO'] = 'nuevo_ArbolProcesos();';
+            $contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;Cargos';
+            $contenido['TABLA'] = $grid['tabla'];
+            $contenido['PAGINADO'] = $grid['paginado'];
+            $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
+
+            import('clases.organizacion.ArbolOrganizacional');
+            $ao = new ArbolOrganizacional();
+            $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
+
+            $template = new Template();
+            $template->PATH = PATH_TO_TEMPLATES.'cargo/';
+            $contenido[ID_EMPRESA] = $_SESSION[CookIdEmpresa];
+            $template->setTemplate("listar_reporte");
+            $template->setVars($contenido);
+
+
+            if (isset($parametros['html']))
+                return $template->show();
+            $objResponse = new xajaxResponse();
+            $objResponse->addAssign('contenido',"innerHTML",$template->show());
+            $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
+            $objResponse->addAssign('modulo_actual',"value","cargo");
+            $objResponse->addIncludeScript(PATH_TO_JS . 'cargo/cargo.js?'. rand());
+            $objResponse->addScript("$('#MustraCargando').hide();");
+            //$objResponse->addScript('PanelOperator.initPanels("");ScrollBar.initScroll();');
+            $objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
+            $objResponse->addScript('init_filtro_ao_simple();');
+            return $objResponse;
+
+        }
  
             public function indexCargos($parametros)
             {
@@ -419,7 +613,7 @@
                 if ($parametros['corder'] == null) $parametros['corder']="descripcion";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="1-3-4-5-6"; 
+                    $parametros['mostrar-col']="1-3-4-5-6";
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */               
@@ -437,6 +631,14 @@
                             </div>';
                     $k++;
                 }
+                if (!isset($parametros['b-formulario'])){
+                    $contenido[OTRAS_OPCIONES] = '<li>
+                                    <a href="#"  onClick="reporte_cargos_pdf();">
+                                      <i class="icon icon-alert-print"></i>
+                                      <span>Cargos</span>
+                                    </a>
+                                  </li>';
+                }
                 
                 import('clases.utilidades.NivelAcceso');
                 $this->restricciones = new NivelAcceso();
@@ -444,6 +646,7 @@
                 $this->restricciones->cargar_permisos($parametros);
                 
                 $grid = $this->verListaCargos($parametros);
+                $contenido['MODO'] = $parametros['modo'];
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
@@ -454,7 +657,14 @@
                 $contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;Cargos';
                 $contenido['TABLA'] = $grid['tabla'];
                 $contenido['PAGINADO'] = $grid['paginado'];
-                $contenido['PERMISO_INGRESAR'] = $this->restricciones->per_crear == 'S' ? '' : 'display:none;';
+                //$contenido['PERMISO_INGRESAR'] = $this->restricciones->per_crear == 'S' ? '' : 'display:none;';
+                $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
+                $contenido['PERMISO_INGRESAR'] = 'display:none;';
+
+                import('clases.organizacion.ArbolOrganizacional');
+                $ao = new ArbolOrganizacional();
+                $ao->cargar_acceso_nodos_explicito($parametros);
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(1,$parametros);
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'cargo/';
@@ -496,6 +706,7 @@
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 //$objResponse->addScript('PanelOperator.initPanels("");ScrollBar.initScroll();');
                 $objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
+                $objResponse->addScript('init_filtro_ao_simple();');
                 return $objResponse;
             }
          
@@ -755,13 +966,34 @@
  
             public function buscar($parametros)
             {
-                $grid = $this->verListaCargos($parametros);                
+                /*$grid = $this->verListaCargos($parametros);
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
                 $objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
                           
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("PanelOperator.resize();");
+                return $objResponse;*/
+
+                if (strlen($parametros['b-id_organizacion'])== 0)
+                    $parametros['b-id_organizacion'] = 2;
+                if (count($this->id_org_acceso) <= 0){
+                    $this->cargar_acceso_nodos($parametros);
+                }
+
+                $parametros[reg_por_pagina] = 5000;
+                $grid = $this->verListaCargosReporte($parametros);
+                $html = '<table class="table table-report  ">
+                      <thead>
+                      <tr>'.$grid[titulo].'</tr>
+                      </thead>
+                      <tbody>'.$grid[tabla].'</tbody>
+                    </table>';
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('grid',"innerHTML",$html);
+                //$objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
+
+                $objResponse->addScript("$('#MustraCargando').hide();");
                 return $objResponse;
             }
          
@@ -798,5 +1030,33 @@
 
                 return $template->show();
             }
-     
+
+            public function ContarCargosReporte($atr)
+            {
+                $atr = $this->dbl->corregir_parametros($atr);
+                $sql_where = "";
+
+                $id_org = -1;
+                if ((strlen($atr["b-id_organizacion"])>0) && ($atr["b-id_organizacion"] != "2")){
+                    if(!class_exists('ArbolOrganizacional')){
+                        import('clases.organizacion.ArbolOrganizacional');
+                    }
+
+                    $ao = new ArbolOrganizacional();
+                    $id_org = $ao->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
+                    $sql_where .= " AND mcea.id IN (". $id_org . ")";
+                }
+                $sql = "SELECT  
+                               count(DISTINCT mcea.id) as total_registros
+                        from   mos_cargo_estrorg_arbolproc mcea,
+                                     mos_cargo mc,
+                               mos_organizacion mo
+                        where  
+                               NOT mcea.id IS NULL $sql_where 
+                        AND    mcea.cod_cargo = mc.cod_cargo
+                        AND    mo.id = mcea.id";
+
+                $total_registros = $this->dbl->query($sql, $atr);
+                return $total_registros[0][total_registros];
+            }
  }?>

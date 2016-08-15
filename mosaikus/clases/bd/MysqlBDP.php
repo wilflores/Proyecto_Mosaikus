@@ -48,17 +48,17 @@ class MysqlBDP{
 //    global $PORT;
     if($conex != -1)
      $CONEXION = $conex;
-    $this->db_name = 'grupopri_rutero';//[$CONEXION];
-    $this->db_host = 'grupoprincipal.com.ve';//[$CONEXION];
-    $this->db_user = 'grupopri_rutero';//[$CONEXION];
-    $this->db_pass = 'gfpss';//[$CONEXION];
+    //$this->db_name = 'grupopri_rutero';//[$CONEXION];
+    //$this->db_host = 'grupoprincipal.com.ve';//[$CONEXION];
+    //$this->db_user = 'grupopri_rutero';//[$CONEXION];
+    //$this->db_pass = 'gfpss';//[$CONEXION];
     $this->db_name = 'mosaikus_admin';//[$CONEXION];
     //$this->db_name = 'sslma135_five';//[$CONEXION];
     $this->db_host = 'localhost';//[$CONEXION];
-	$this->db_user = 'adm_bd';//[$CONEXION];
+	//$this->db_user = 'adm_bd';//[$CONEXION];
     $this->db_user = 'root';//[$CONEXION];
-    $this->db_pass = '672312';//[$CONEXION];
-	$this->db_pass = '123456';//[$CONEXION];
+    //$this->db_pass = '672312';//[$CONEXION];
+	$this->db_pass = '';//[$CONEXION];
     
 //    $this->db_name = 'sslma135_ssp';//[$CONEXION];
 //    $this->db_host = 'localhost';//[$CONEXION];

@@ -84,8 +84,14 @@
         {
              $('form')[0].reset();             
         }
-        array.getForm('busquedaFrm'); 
-        if ((isNaN(document.getElementById("reg_por_pag").value) == true) || (parseInt(document.getElementById("reg_por_pag").value) <= 0)){
+        array.getForm('busquedaFrm');
+
+        array.setObjeto('Cargos','buscar');
+        array.addParametro('import','clases.cargo.Cargos');
+        $('#MustraCargando').show();
+        xajax_Loading(array.getArray());
+
+        /*if ((isNaN(document.getElementById("reg_por_pag").value) == true) || (parseInt(document.getElementById("reg_por_pag").value) <= 0)){
             array.addParametro('reg_por_pagina', 10);
             document.getElementById("reg_por_pag").value = 10
         }
@@ -98,7 +104,7 @@
         array.setObjeto('Cargos','buscar');
         array.addParametro('import','clases.cargo.Cargos');
         $('#MustraCargando').show();
-        xajax_Loading(array.getArray());
+        xajax_Loading(array.getArray());*/
     }
 
     function verCargos(id){
@@ -157,4 +163,10 @@ function ao_multiple(){
     });  
 //    $('#div-ao-form').jstree(true).open_all();               
         
-}    
+}
+
+    function reporte_ao_pdf(){
+        var params =  getForm('busquedaFrm');
+        window.open('pages/cargo/reporte_cargos_pdf.php?'+params,'_blank');
+
+    }
