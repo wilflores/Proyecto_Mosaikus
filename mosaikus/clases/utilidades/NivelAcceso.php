@@ -108,12 +108,13 @@ import("clases.interfaz.Pagina");
            /**
             * Activa los nodos donde se tiene acceso a informacion de terceros
             */
-           private function cargar_acceso_nodos_modificar_terceros($parametros){
+           public function cargar_acceso_nodos_modificar_terceros($parametros){
+              // print_r($parametros);
                if (count($this->id_org_acceso_explicito) <= 0){
                      $this->cargar_acceso_nodos_explicito($parametros);
                 }                     
                 foreach ($this->id_org_acceso_explicito as $value) {
-                    if ($value['visualizar_terceros'])
+                    if ($value['modificar_terceros'])
                         $this->id_org_acceso_mod_terceros[$value[id]] = $value;
                 } 
            }
