@@ -24,6 +24,15 @@
                                 <input type="hidden" name="nodo_area" id="nodo_area"/>
                             </div>
                         </div>
+                                
+                        <div class="form-group">        
+                            <label for="vigencia" class="col-md-4 control-label">{N_PUBLICO}</label>
+                            <div class="col-md-6">      
+                                <label class="checkbox-inline" style="padding-top: 5px;">
+                                    <input type="checkbox" name="publico" id="publico" value="S" {CHECKED_PUBLICO}>   &nbsp;                                                                
+                                </label>
+                            </div>    
+                        </div>            
                         <div class="form-group">
                             <label  class="col-md-4 control-label">{N_TIPO_DOCUMENTO}</label>                                                
                             <div class="col-md-10">
@@ -165,12 +174,6 @@
                                                                 <input type="hidden" class="form-control" value="{WORKFLOW}" id="workflow" name="workflow" placeholder="{N_WORKFLOW}" data-validation="required"/>
                                                             </label>
                                                         </div>
-                                                        <label for="vigencia" class="col-md-6 control-label">{N_PUBLICO}</label>
-                                                        <div class="col-md-6">      
-                                                            <label class="checkbox-inline" style="padding-top: 5px;">
-                                                                <input type="checkbox" name="publico" id="publico" value="S" {CHECKED_PUBLICO}>   &nbsp;                                                                
-                                                            </label>
-                                                        </div>    
                                                 </div>
                                                 <!--<div class="form-group">
                                                         

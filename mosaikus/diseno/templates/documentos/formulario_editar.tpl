@@ -37,13 +37,23 @@
                 <div class="form-group">
                 <label for="archivo" class="col-md-4 control-label">{N_ARBOL_ORGANIZACIONAL} </label>
                 <div class="col-md-10" >
-                                        <!--label for="vigencia" class="col-md-12 control-label" style="text-align: left;">Árbol organizacional</label>
-                                        
-                                        <iframe id="iframearbol" src="pages/cargo/prueba_arbolV4.php?IDDoc={IDDOC}" frameborder="0" width="100%" height="310px" scrolling="no"></iframe-->
-                                        <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
-                                        {DIV_ARBOL_ORGANIZACIONAL}
-                                    </div>
+                    <!--label for="vigencia" class="col-md-12 control-label" style="text-align: left;">Árbol organizacional</label>
+
+                    <iframe id="iframearbol" src="pages/cargo/prueba_arbolV4.php?IDDoc={IDDOC}" frameborder="0" width="100%" height="310px" scrolling="no"></iframe-->
+                    <input type="hidden" value="{NODOS}" name="nodos" id="nodos"/>
+                    {DIV_ARBOL_ORGANIZACIONAL}
+                </div>
                  </div>
+                
+                
+                <div class="form-group">
+                <label for="vigencia" class="col-md-4 control-label">{N_PUBLICO}</label>
+                <div class="col-md-10">      
+                    <label class="checkbox-inline" style="padding-top: 0px;">
+                    <input type="checkbox" name="publico" id="publico" value="S" {CHECKED_PUBLICO}>   &nbsp;                                                                
+                    </label>
+                </div>                              
+                </div>
                 <div class="form-group">
                             <label  class="col-md-4 control-label">{N_TIPO_DOCUMENTO}</label>                                                
                             <div class="col-md-10">
@@ -186,12 +196,6 @@
                                                                 <input type="hidden" class="form-control" value="{WORKFLOW}" id="workflow" name="workflow" placeholder="{N_WORKFLOW}" data-validation="required"/>
                                                             </label>
                                                         </div>
-                                                        <label for="vigencia" class="col-md-6 control-label">{N_PUBLICO}</label>
-                                                        <div class="col-md-3">      
-                                                            <label class="checkbox-inline" style="padding-top: 0px;">
-                                                                <input type="checkbox" name="publico" id="publico" value="S" {CHECKED_PUBLICO}>   &nbsp;                                                                
-                                                            </label>
-                                                        </div>                              
                                                 </div>  
                                                             <!--
                                                 <div class="form-group">
