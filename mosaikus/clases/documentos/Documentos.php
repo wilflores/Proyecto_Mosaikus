@@ -6763,6 +6763,43 @@ echo $Consulta3;
             $wf = new WorkflowDocumentos(); 
             $val = $this->verDocumentos($parametros[id]);
             $ut_tool = new ut_Tool(); 
+            ///EXCLUSIVO SI EL USUARIO TIENE PERMISO DE MODIFICAR TERCEROS//
+            /*Carga Acceso segun el arbol*/
+            if(!class_exists('NivelAcceso')){
+                import("clases.utilidades.NivelAcceso");
+            }
+            $acceso = new NivelAcceso();
+            $acceso->cargar_acceso_nodos_modificar_terceros($parametros);
+            //print_r($acceso->id_org_acceso_mod_terceros);                    
+            $ids_org_ter = array();
+            foreach ($acceso->id_org_acceso_mod_terceros as $value){
+                $ids_org_ter[] = $value[id];
+            } 
+            //print_r($ids_org_ter);
+            $cod_emp_terceros='';
+            if(sizeof($ids_org_ter)>0){
+               $sql ="SELECT
+                    GROUP_CONCAT(DISTINCT(mos_personal.cod_emp)) cod_emp_resp
+                    FROM
+                    mos_personal
+                    WHERE
+                    mos_personal.id_organizacion IN (".implode(",", array_values($ids_org_ter)).");";
+                
+               $sql ="SELECT
+                    GROUP_CONCAT(DISTINCT(mos_responsable_area.cod_emp)) cod_emp_resp
+                    FROM
+                    mos_responsable_area
+                    WHERE
+                    mos_responsable_area.id_organizacion IN (".implode(",", array_values($ids_org_ter)).");";
+                    $this->operacion($sql, $atr);
+                    // echo $sql;
+                    $datos = $this->dbl->data[0];
+                   // print_r($datos);
+                    if($datos[cod_emp_resp]!='')
+                        $cod_emp_terceros = $datos[cod_emp_resp];
+            }
+            ///FIN EXCLUSIVO SI EL USUARIO TIENE PERMISO DE MODIFICAR TERCEROS//
+            //echo 'datos:'. $cod_emp_terceros;
             $campos = "SELECT wf.id,
                             CONCAT(CONCAT(initcap(SUBSTR(perso_responsable.nombres,1,IF(LOCATE(' ' ,perso_responsable.nombres,1)=0,LENGTH(perso_responsable.nombres),LOCATE(' ' ,perso_responsable.nombres,1)-1))),' ',initcap(perso_responsable.apellido_paterno))
                             ,' &rarr; ', 
@@ -6951,9 +6988,13 @@ echo $Consulta3;
                    }
                }
             }
+            if($cod_emp_terceros!=''){
+                $sql .=" UNION ALL ". $campos ." WHERE (wf.id_personal_responsable in (".$cod_emp_terceros.")) ";
+            }
             //$sql .=" UNION ALL ".$campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
             //$sql .=" UNION ALL ".$campos ." WHERE (wf.id_personal_responsable='".$_SESSION['CookCodEmp']."') and wf.id_personal_aprueba not in (".$cod_emp." )";
-           // echo $sql;    
+            //echo $sql;    
+            $sql = "select DISTINCT id,wf from (".$sql.") todos";
             if($val['id_workflow_documento']=='' && $seleccionar==''){
                 $js = "$('#id_workflow_documento option').eq(1).attr('selected', 'selected');";
             }
