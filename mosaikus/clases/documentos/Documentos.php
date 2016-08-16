@@ -6784,13 +6784,6 @@ echo $Consulta3;
                     mos_personal
                     WHERE
                     mos_personal.id_organizacion IN (".implode(",", array_values($ids_org_ter)).");";
-                
-               $sql ="SELECT
-                    GROUP_CONCAT(DISTINCT(mos_responsable_area.cod_emp)) cod_emp_resp
-                    FROM
-                    mos_responsable_area
-                    WHERE
-                    mos_responsable_area.id_organizacion IN (".implode(",", array_values($ids_org_ter)).");";
                     $this->operacion($sql, $atr);
                     // echo $sql;
                     $datos = $this->dbl->data[0];
