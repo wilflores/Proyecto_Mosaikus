@@ -144,7 +144,7 @@
         //print_r($data);
         //exit;
         $columnas = array('A','B','C','D', 'E', 'F', 'G', 'H');
-        
+        $ancho_fijo=20;
         for($i=1;$i<=$params[niveles];$i++){  
             $row = 7;
             $con_g = 7;
@@ -157,7 +157,8 @@
                     
                     if($veces>1){
                         $objActSheet->mergeCells($columnas[$i-1].($row-$veces).':'.$columnas[$i-1].($row-1));
-                        $objPHPExcel->getActiveSheet()->getColumnDimension($columnas[$i-1])->setAutoSize(true);
+                        $objPHPExcel->getActiveSheet()->getColumnDimension($columnas[$i-1])->setWidth($ancho_fijo);
+                        //$objPHPExcel->getActiveSheet()->getColumnDimension($columnas[$i-1])->setAutoSize(true);
                     }
                     $veces=1;
                     $id_aux = $value["id_$i"];
@@ -174,7 +175,8 @@
                     else
                         $objActSheet->setCellValue($columnas[$i-1].$row, $value["nombre_".($i)]);
                     $objPHPExcel->getActiveSheet()->getStyle($columnas[$i-1].$row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
-                    $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($i-1)->setAutoSize(true);
+                    $objPHPExcel->getActiveSheet()->getColumnDimension($columnas[$i-1])->setWidth($ancho_fijo);
+                    //$objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($i-1)->setAutoSize(true);
                     $objPHPExcel->getActiveSheet()->getStyle($columnas[$i-1].$row)->getAlignment()->setWrapText(true);
                     $objPHPExcel->getActiveSheet()->getStyle($columnas[$i-1].$row)->applyFromArray( $style_header_sencillo ); // give style to header        
                     $row++;
@@ -182,7 +184,8 @@
             }  
             if($veces>1){
                 $objActSheet->mergeCells($columnas[$i-1].($row-$veces).':'.$columnas[$i-1].($row-1));
-                $objPHPExcel->getActiveSheet()->getColumnDimension($columnas[$i-1])->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->getColumnDimension($columnas[$i-1])->setWidth($ancho_fijo);
+                //$objPHPExcel->getActiveSheet()->getColumnDimension($columnas[$i-1])->setAutoSize(true);
             }
 
        }
