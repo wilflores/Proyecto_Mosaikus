@@ -5,8 +5,8 @@
                                                              
                             </div>
 <div class="form-group">
-                                  <label for="id_requisito_items" class="control-label">{N_ID_REQUISITO_ITEMS}</label>
+                                  <label for="id_area" class="control-label">{N_ID_AREA}</label>
                                   
-                                    <input type="text" class="form-control" id="b-id_requisito_items" name="b-id_requisito_items" placeholder="{N_ID_REQUISITO_ITEMS}"/>
+                                    <input type="text" class="form-control" id="b-id_area" name="b-id_area" placeholder="{N_ID_AREA}"/>
                                                              
                             </div>

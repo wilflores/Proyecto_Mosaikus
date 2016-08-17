@@ -36,7 +36,7 @@
             }
             
             private function cargar_nombres_columnas(){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 30";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo in (30,100)";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
@@ -45,7 +45,7 @@
             }
             
             private function cargar_placeholder(){
-                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE modulo = 30";
+                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo in (30,100)";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->placeholder[$value[nombre_campo]] = $value[placeholder];
@@ -844,7 +844,10 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                 $contenido['DESC_OPERACION'] = "Guardar";
                 $contenido['OPC'] = "new";
                 $contenido['ID'] = "-1";
-
+                                //aqui va el forech que mando melvin
+                foreach ( $this->nombres_columnas as $key => $value) {
+                        $contenido["N_" . strtoupper($key)] = $value;
+                }
                 $template->setVars($contenido);
                 $objResponse = new xajaxResponse();               
                 $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
@@ -1060,7 +1063,10 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                 $contenido['DESC_OPERACION'] = "Guardar";
                 $contenido['OPC'] = "upd";
                 $contenido['ID'] = $val["id"];
-
+                //aqui va el foreach que mando melvin
+                foreach ( $this->nombres_columnas as $key => $value) {
+                        $contenido["N_" . strtoupper($key)] = $value;
+                }
                 $template->setVars($contenido);
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('contenido-form',"innerHTML",$template->show());

@@ -8,7 +8,7 @@
                                     
                                       <label >
                                           <input type="checkbox" name="SelectAcc" id="SelectAcc" value="2" class="checkbox-mos-col" checked="checked">   &nbsp;
-                                      {N_ID_REQUISITO_ITEMS}</label>
+                                      {N_ID_AREA}</label>
                                   
                             </div>
                             {PARAMETROS_OTROS}

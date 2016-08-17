@@ -29,12 +29,12 @@
 
 
 //asociar requisito al cargo y area
-    function relacion_RequisitosCargos(cod_cargo, id_area){//recibe como parametro e cargo y el area escogida
+    function relacion_RequisitosCargos(id_cargo, id_area){//recibe como parametro e cargo y el area escogida
             array = new XArray();
             array.setObjeto('RequisitosCargos','crear');
             array.addParametro('modo',document.getElementById('modo').value);            
             array.addParametro('cod_link',document.getElementById('cod_link').value); 
-            array.addParametro('cod_cargo',cod_cargo);//envia dos parametros al crear
+            array.addParametro('id_cargo',id_cargo);//envia dos parametros al crear
             array.addParametro('id_area',id_area);
             array.addParametro('import','clases.requisitos_cargos.RequisitosCargos');
             xajax_Loading(array.getArray());
@@ -57,10 +57,13 @@
         }
     }
 
-    function editarRequisitosCargos(id){
+    function editarRequisitosCargos(id_cargo,id_area){
         array = new XArray();
         array.setObjeto('RequisitosCargos','editar');
-        array.addParametro('id',id);
+        array.addParametro('id_cargo',id_cargo);//envia dos parametros para buscar las relaciones ya exustentesS
+        array.addParametro('id_area',id_area);
+        array.addParametro('modo',document.getElementById('modo').value);            
+        array.addParametro('cod_link',document.getElementById('cod_link').value); 
         array.addParametro('import','clases.requisitos_cargos.RequisitosCargos');
         xajax_Loading(array.getArray());
     }

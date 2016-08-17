@@ -31,7 +31,7 @@
             }
             
             private function cargar_nombres_columnas(){
-                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE modulo = 31";
+                $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo in (31,100)";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
@@ -40,7 +40,7 @@
             }
             
             private function cargar_placeholder(){
-                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE modulo = 31";
+                $sql = "SELECT nombre_campo, placeholder FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and modulo in (31,100)";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->placeholder[$value[nombre_campo]] = $value[placeholder];
@@ -53,9 +53,19 @@
             public function colum_admin($tupla)
             {
                 $html = "&nbsp;";
-                $html .= '<a onclick="javascript:relacion_RequisitosCargos(\''.$tupla[cod_cargo].'\',\''.$tupla[id_area].'\' );">
+                $sql="select COUNT(*) from mos_requisitos_cargos where id_area=".$tupla[id_area]." and id_cargo=".$tupla[cod_cargo];
+                $this->operacion($sql, $tupla);
+                $id_cantidad = $this->dbl->data[0][0];//para saber si hy ya alguna relcion
+                if($id_cantidad==0){//NO hay asociacion. se crea nuevo
+                        $html .= '<a onclick="javascript:relacion_RequisitosCargos(\''.$tupla[cod_cargo].'\',\''.$tupla[id_area].'\' );">
                                     <i style="cursor:pointer" class="icon icon-more"  title="Administrar Requisitos del Cargo" style="cursor:pointer"></i>
                                 </a>';
+                }
+                else{//para modificar la asociacion con requiditos que ya esta echa
+                        $html .= '<a onclick="javascript:editarRequisitosCargos(\''.$tupla[cod_cargo].'\',\''.$tupla[id_area].'\' );">
+                                    <i style="cursor:pointer" class="icon icon-more"  title="Administrar Requisitos del Cargo" style="cursor:pointer"></i>
+                                </a>';
+                }
                 /*if (strlen($tupla[id_registro])<=0){
                     if($this->restricciones->per_editar  == 'S'){
                         $html .= '<a onclick="javascript:editarRequisitosCargos(\''.$tupla[cod_cargo].'\' );">
@@ -91,16 +101,13 @@
 
      
 */
-             public function verRequisitosCargos($id){
+             public function verRequisitosCargos($id_cargo,$id_area){
                 $atr=array();
-                $sql = "SELECT id
-,id_cargo
-,id_requisito_items
-
+                $sql = "SELECT id,id_cargo,id_area,id_requisito_items
                          FROM mos_requisitos_cargos 
-                         WHERE id = $id "; 
-                $this->operacion($sql, $atr);
-                return $this->dbl->data[0];
+                         WHERE id_area = $id_area and id_cargo=$id_cargo order by id_requisito_items"; 
+                $requisitos_cargos= $this->dbl->query($sql, array());
+                return $requisitos_cargos;
             }
             public function ingresarRequisitosCargos($atr){
                 try {
@@ -165,7 +172,7 @@
                     $sql = "UPDATE mos_requisitos_cargos SET                            
                                     id = $atr[id],id_cargo = $atr[id_cargo],id_requisito_items = $atr[id_requisito_items]
                             WHERE  id = $atr[id]";      
-                    $val = $this->verRequisitosCargos($atr[id]);
+                    $val = $this->verRequisitosCargos($atr[id_cargo],$atr[id_area]);
                     $this->dbl->insert_update($sql);
                     $nuevo = "Id Cargo: \'$atr[id_cargo]\', Id Requisito Items: \'$atr[id_requisito_items]\', ";
                     $anterior = "Id Cargo: \'$val[id_cargo]\', Id Requisito Items: \'$val[id_requisito_items]\', ";
@@ -213,8 +220,8 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
                                  if (strlen($atr["b-id_cargo"])>0)
                         $sql .= " AND descrip_cargo = '". $atr["b-id_cargo"] . "'";
-             if (strlen($atr["b-id_requisito_items"])>0)
-                        $sql .= " AND descrip_area = '". $atr["b-id_requisito_items"] . "'";
+             if (strlen($atr["b-id_area"])>0)
+                        $sql .= " AND descrip_area = '". $atr["b-id_area"] . "'";
 
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
@@ -232,8 +239,8 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id $sql_left";
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
                                  if (strlen($atr["b-id_cargo"])>0)
                         $sql .= " AND descrip_cargo = '". $atr["b-id_cargo"] . "'";
-             if (strlen($atr["b-id_requisito_items"])>0)
-                        $sql .= " AND descrip_area = '". $atr["b-id_requisito_items"] . "'";
+             if (strlen($atr["b-id_area"])>0)
+                        $sql .= " AND descrip_area = '". $atr["b-id_area"] . "'";
 
                     $sql .= " order by mc.$atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
@@ -243,7 +250,7 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id $sql_left";
              public function eliminarRequisitosCargos($atr){
                     try {
                         $atr = $this->dbl->corregir_parametros($atr);
-                        $val = $this->verRequisitosCargos($atr[id]);
+                        $val = $this->verRequisitosCargos($atr[id_cargo],$atr[id_area]);
                         $respuesta = $this->dbl->delete("mos_requisitos_cargos", "id = " . $atr[id]);
                         $nuevo = "Id Cargo: \'$val[id_cargo]\', Id Requisito Items: \'$val[id_requisito_items]\', ";
                         $this->registraTransaccionLog(86,$nuevo,'', $atr[id]);
@@ -258,6 +265,7 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id $sql_left";
      
  
      public function verListaRequisitosCargos($parametros){
+        //print_r($parametros);
                 $grid= "";
                 $grid= new DataGrid();
                 if ($parametros['pag'] == null) 
@@ -440,7 +448,7 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id $sql_left";
                 $contenido['PAGINADO'] = $grid['paginado'];
                 $contenido['OPCIONES_BUSQUEDA'] = " <option value='campo'>campo</option>";
                // $contenido['JS_NUEVO'] = 'nuevo_RequisitosCargos();';
-                $contenido['JS_NUEVO'] = 'relacion_RequisitosCargos('.$parametros["cod_cargo"].','.$parametros["id_area"].');';//agregar relacion de cargos areas y requisitos
+                //$contenido['JS_NUEVO'] = 'relacion_RequisitosCargos('.$parametros["cod_cargo"].','.$parametros["id_area"].');';//agregar relacion de cargos areas y requisitos
                 $contenido['TITULO_NUEVO'] = 'Agregar&nbsp;Nueva&nbsp;RequisitosCargos';
                 $contenido['TABLA'] = $grid['tabla'];
                 $contenido['PAGINADO'] = $grid['paginado'];
@@ -685,7 +693,7 @@ $js="$('#valores_form_'+".$parametros[id_req_item].").show()";
             public function crear($parametros)
             {
                 $js='';
-                
+                //print_r($parametros);
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
@@ -698,11 +706,11 @@ $js="$('#valores_form_'+".$parametros[id_req_item].").show()";
                  $this->operacion($sql_area, $parametros);
                 $descripcion_area=$this->dbl->data[0][title];
                // $descripcion_area=$arbol->BuscaOrganizacional(array('id_organizacion'=>$parametros[id_area]));//obtener descripcion del area
-                $sql_cargo="select descripcion from mos_cargo where cod_cargo=".$parametros[cod_cargo];
+                $sql_cargo="select descripcion from mos_cargo where cod_cargo=".$parametros[id_cargo];
                     $this->operacion($sql_cargo, $parametros);
                 $descripcion_cargo=$this->dbl->data[0][descripcion];
                 $contenido_1[OTROS_CAMPOS] = '<input type="hidden"  value="'.$parametros[id_area].'" id="id_area" name="id_area"/>
-                                        <input type="hidden" value="'.$parametros[cod_cargo].'" id="id_cargo" name="id_cargo" />
+                                        <input type="hidden" value="'.$parametros[id_cargo].'" id="id_cargo" name="id_cargo" />
                 <div class="form-group">
                                         <label for="id_cargo" class="col-md-4 control-label">Area</label>
                                         <div class="col-md-10">
@@ -749,7 +757,7 @@ AND (
 mo.parent_id =".$parametros[id_area]."
 OR mo.id =".$parametros[id_area]."
 )
-AND map.cod_cargo =".$parametros[cod_cargo]." GROUP BY id_items";
+AND map.cod_cargo =".$parametros[id_cargo]." GROUP BY id_items";
 //echo $sql_items;
                     $items = $this->dbl->query($sql_items, array());
                         $contenido_1[ITEMS_FAMILIA].='<div class="tab-pane active" id="hv-red-'.$k.'">';
@@ -770,7 +778,7 @@ AND (
 mo.parent_id =".$parametros[id_area]."
 OR mo.id =".$parametros[id_area]."
 )
-AND map.cod_cargo =".$parametros[cod_cargo]." and 
+AND map.cod_cargo =".$parametros[id_cargo]." and 
  mif.id=".$items[$j][id_items]."
 GROUP BY ID_REQ";
                         //echo  $sql_requisitos;
@@ -802,8 +810,7 @@ HAVING COUNT(id_unico) <= 1 ) AND IDDoc in (select IDDoc from mos_documentos_dat
 }
     // echo $sql_formulario;                                      
      $formularios_req = $this->dbl->query($sql_formulario, array());
-
-     //COmbo para formularios
+     //Combo para formularios
                     $contenido_1[ITEMS_FAMILIA].= '<div id="formulario_doc_'.$requisitos[$x][id_req_item].'" style="display:none;"  class="col-md-10"><select id="form_'.$requisitos[$x][id_req_item].'" name="form_'.$requisitos[$x][id_req_item].'" class="form-control" data-validation="required" onchange="CargaComboParametros(this,'.$requisitos[$x][id_req_item].',\''.$requisitos[$x][tipo_req].'\',\''.$requisitos[$x][vigencia_req].'\')">';
                     $contenido_1[ITEMS_FAMILIA].='<option value="">--Seleccione--</option>';
                   //  $contenido_1[ITEMS_FAMILIA].= '<option  value="1">hola</option><option  value="2">pedrooo</option>';
@@ -860,7 +867,11 @@ $contenido_1[ITEMS_FAMILIA].= '</div>';
                 $contenido['DESC_OPERACION'] = "Guardar";
                 $contenido['OPC'] = "new";
                 $contenido['ID'] = "-1";
-                
+                                //aqui va el foreach que mando melvin
+                foreach ( $this->nombres_columnas as $key => $value) {
+                        $contenido["N_" . strtoupper($key)] = $value;
+                }
+                //print_r($this->nombres_columnas);
                 $template->setVars($contenido);
                 $objResponse = new xajaxResponse();  
                 $objResponse->addScript("$js");             
@@ -962,11 +973,12 @@ $contenido_1[ITEMS_FAMILIA].= '</div>';
  
             public function editar($parametros)
             {
+               // print_r($parametros);
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
                 $ut_tool = new ut_Tool();
-                $val = $this->verRequisitosCargos($parametros[id]); 
+                $requisitos_cargos = $this->verRequisitosCargos($parametros[id_cargo],$parametros[id_area]); 
 
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
@@ -979,9 +991,51 @@ $contenido_1[ITEMS_FAMILIA].= '</div>';
                 }
                 foreach ( $this->placeholder as $key => $value) {
                     $contenido_1["P_" . strtoupper($key)] =  $value;
-                }    
-                            $contenido_1['ID_CARGO'] = $val["id_cargo"];
-            $contenido_1['ID_REQUISITO_ITEMS'] = $val["id_requisito_items"];
+
+                } 
+                //construir el formulario con los datos cargados
+                $sql_area="select title from mos_organizacion where id=".$parametros[id_area];
+                 $this->operacion($sql_area, $parametros);
+                $descripcion_area=$this->dbl->data[0][title];
+               // $descripcion_area=$arbol->BuscaOrganizacional(array('id_organizacion'=>$parametros[id_area]));//obtener descripcion del area
+                $sql_cargo="select descripcion from mos_cargo where cod_cargo=".$parametros[id_cargo];
+                    $this->operacion($sql_cargo, $parametros);
+                $descripcion_cargo=$this->dbl->data[0][descripcion];
+                $contenido_1[OTROS_CAMPOS] = '<input type="hidden"  value="'.$parametros[id_area].'" id="id_area" name="id_area"/>
+                                        <input type="hidden" value="'.$parametros[id_cargo].'" id="id_cargo" name="id_cargo" />
+                <div class="form-group">
+                                        <label for="id_cargo" class="col-md-4 control-label">Area</label>
+                                        <div class="col-md-10">
+
+                                        <input type="text" class="form-control" value="'.$descripcion_area.'" id="desc_area" readonly="true" name="desc_area" data-validation="required"/>
+                                      </div>                                
+                                  </div>
+                                    <div class="form-group">
+                                        <label for="id_cargo" class="col-md-4 control-label">Cargo</label>
+                                        <div class="col-md-10">
+
+                                        <input type="text" class="form-control" value="'.$descripcion_cargo.'" id="desc_cargo" readonly="true"name="desc_cargo" data-validation="required"/>
+                                      </div>                                
+                                  </div>
+                                  ';
+/*** generar las pestañas de las familias existentes******/
+                 $contenido_1[FAMILIAS]='<div class="form-group"> 
+                                    <div class="col-md-24">
+                                        <div class="tabs">
+                                        <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">';
+$columnas_fam=$this->cargar_parametros_familias();
+$k=2;
+                foreach ($columnas_fam as $value) {                  
+                    $descripcion_fam=ucwords(strtolower($value[descripcion]));
+                    $contenido_1[FAMILIAS].='<li id="li1"><a href="#hv-red-'.$k.'" data-toggle="tab" style="padding: 8px 32px;">'.$descripcion_fam.'</a></li>';
+                    $k++;
+                 }      
+                $contenido_1[FAMILIAS].='</ul>';
+                $k=2;
+                /********* obtener los requisitos de cada familia*****/ 
+
+                $contenido_1['ID_CARGO'] = $val["id_cargo"];
+                $contenido_1['ID_AREA'] = $val["id_area"];
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'requisitos_cargos/';
@@ -1000,6 +1054,12 @@ $contenido_1[ITEMS_FAMILIA].= '</div>';
                 $contenido['OPC'] = "upd";
                 $contenido['ID'] = $val["id"];
 
+
+
+                //aqui va el forech que mando melvin
+                foreach ( $this->nombres_columnas as $key => $value) {
+                        $contenido["N_" . strtoupper($key)] = $value;
+                }
                 $template->setVars($contenido);
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
@@ -1008,7 +1068,8 @@ $contenido_1[ITEMS_FAMILIA].= '</div>';
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
-                          });");  return $objResponse;
+                          });");  
+                return $objResponse;
             }
      
  
@@ -1088,10 +1149,10 @@ $contenido_1[ITEMS_FAMILIA].= '</div>';
                     import("clases.interfaz.Template");
                 }
 
-                $val = $this->verRequisitosCargos($parametros[id]);
+                $val = $this->verRequisitosCargos($parametros[id_cargo],$parametros[id_area]);
 
                             $contenido_1['ID_CARGO'] = $val["id_cargo"];
-            $contenido_1['ID_REQUISITO_ITEMS'] = $val["id_requisito_items"];
+            $contenido_1['ID_AREA'] = $val["id_area"];
 ;
 
 
