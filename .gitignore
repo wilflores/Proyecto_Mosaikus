@@ -1,1 +1,4 @@
 .idea
+.gitignore
+mosaikus/nbproject
+mosaikus/clases/bd
