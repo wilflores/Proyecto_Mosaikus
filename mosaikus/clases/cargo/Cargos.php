@@ -598,8 +598,11 @@
             $objResponse->addIncludeScript(PATH_TO_JS . 'cargo/cargo.js?'. rand());
             $objResponse->addScript("$('#MustraCargando').hide();");
             //$objResponse->addScript('PanelOperator.initPanels("");ScrollBar.initScroll();');
-            $objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
-            $objResponse->addScript('init_filtro_ao_simple();');
+            //$objResponse->addScript('setTimeout(function(){ init_filtrar(); }, 500);');
+            $objResponse->addScript('init_filtro_ao_simple();
+                                        PanelOperator.initPanels("");
+                                        ScrollBar.initScroll();
+                                        PanelOperator.resize();');
             return $objResponse;
 
         }
