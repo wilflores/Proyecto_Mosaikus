@@ -144,12 +144,13 @@
         //print_r($data);
         //exit;
         $columnas = array('A','B','C','D', 'E', 'F', 'G', 'H');
-        $ancho_fijo=20;
+        $ancho_fijo=30;
         for($i=1;$i<=$params[niveles];$i++){  
             $row = 7;
             $con_g = 7;
             $veces=0;
             $id_aux=$data[0]["id_$i"];
+            $ancho_fijo = $i == 1 ? 40 : 30;
             //echo $id_aux.'-';
             foreach ($data as $value) { 
                // print_r($value);
