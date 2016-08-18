@@ -244,8 +244,10 @@ function ao_multiple_responsable(){
             array = new XArray();
             if (doc.getElementById("opc").value == "new")
                 array.setObjeto('Personas','guardar');
-            else
+            if (doc.getElementById("opc").value == "upd")
                 array.setObjeto('Personas','actualizar');
+            if (doc.getElementById("opc").value == "updpromocion")
+                array.setObjeto('Personas','actualizar_promover');
             array.addParametro('permiso',document.getElementById('permiso_modulo').value);
             /**/
             array.addParametro('modo',document.getElementById('modo').value);
@@ -259,6 +261,15 @@ function ao_multiple_responsable(){
         }
     }
 
+    function crearPromocion(id){
+        array = new XArray();
+        array.setObjeto('Personas','editar_promocion');
+        array.addParametro('id',id);
+        array.addParametro('import','clases.personas.Personas');
+        array.addParametro('modo',document.getElementById('modo').value);
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
+        xajax_Loading(array.getArray());
+    }
     function editarPersonas(id){
         array = new XArray();
         array.setObjeto('Personas','editar');
@@ -268,7 +279,6 @@ function ao_multiple_responsable(){
         array.addParametro('cod_link',document.getElementById('cod_link').value);
         xajax_Loading(array.getArray());
     }
-
 
     function eliminarPersonas(id){
         if(confirm("¿Desea Eliminar el Personas Seleccionado?")){
