@@ -6590,18 +6590,20 @@ echo $Consulta3;
                     //echo $asunto;
                     //echo $cuerpo;
                     //$from = array(array('correo' => $value[correo], 'nombres'=>$value[nombres]));
-                    if($value[recibe_notificaciones]=='S'){
-                        //$ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array());
-                        $this->registraCorreoTareaProgramada($id_entidad,$atr[modulo], $asunto, $cuerpo, $value[correo], $value[nombres]);
-                        $a=1;
-                    }
+                    
                     $atr[email]=$value[correo];
                     /*SE GUARDA REGISTRO EN LISTA DE DISTRIBUCION*/
                     $id_entidad = $lista_distribucion->ingresarListaDistribucionDocNotioficacion($parametros[IDDoc],$value[id_organizacion], $value[cod_emp]);
                     $atr[id_entidad]=$id_entidad;//$parametros[IDDoc];
                     $atr[funcion] = "verListaDistribucionPopup(".$id_entidad.");";
                     /**/
-                    $mensaje=$noti->ingresarNotificaciones($atr);                
+                    $mensaje=$noti->ingresarNotificaciones($atr);
+                    
+                    if($value[recibe_notificaciones]=='S'){
+                        //$ut_tool->EnviarEMail('Notificaciones Mosaikus', $from, $asunto, $cuerpo, array());
+                        $this->registraCorreoTareaProgramada($id_entidad,$atr[modulo], $asunto, $cuerpo, $value[correo], $value[nombres]);
+                        $a=1;
+                    }
                 }
             }
             public function cambiar_estado($parametros)
