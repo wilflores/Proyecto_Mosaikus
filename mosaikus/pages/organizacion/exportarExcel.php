@@ -120,7 +120,7 @@
         $data=$pagina->dbl->data;
        // print_r($data);exit;
         $columnas = array('A','B','C','D', 'E', 'F', 'G', 'H');
-        $ancho_fijo=18;
+        $ancho_fijo=30;
         for($i=1;$i<=$params[niveles];$i++){  
             $row = 7;
             $con_g = 7;
