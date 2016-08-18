@@ -229,5 +229,5 @@ function cargar_autocompletado(){
     
 function exportarExcel_maestro(){
 var params =  getForm('busquedaFrm');
-window.open('pages/' +  document.getElementById("modulo_actual").value + '/exportarphpexcel.php?'+params,null,'toolbar=no, location=no, menubar=no, width=600,height=400');
+window.open('pages/' +  document.getElementById("modulo_actual").value + '/exportarphpexcel.php?'+params,'_blank');
 }

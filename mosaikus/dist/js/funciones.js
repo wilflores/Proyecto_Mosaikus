@@ -998,7 +998,7 @@ function funcion_volver(pagina){
 function exportarExcel(){
     var params =  getForm('busquedaFrm');
     //window.open('pages/' +  document.getElementById("modulo_actual").value + '/exportarExcel.php?campo='+document.getElementById("campo").value + '&valor=' + document.getElementById("valor").value + '&corder=' + document.getElementById("corder").value + '&sorder=' + document.getElementById("sorder").value,null,'toolbar=no, location=no, menubar=no, width=600,height=400');
-    window.open('pages/' +  document.getElementById("modulo_actual").value + '/exportarExcel.php?'+params,null,'toolbar=no, location=no, menubar=no, width=600,height=400');
+    window.open('pages/' +  document.getElementById("modulo_actual").value + '/exportarExcel.php?'+params,'_blank');
 }
 
 function addOption(id,text,value){
