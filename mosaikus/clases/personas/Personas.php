@@ -192,10 +192,10 @@
                     else $atr[email] = "NULL";
                     
                     $sql = "INSERT INTO mos_personal(cod_emp,id_personal,nombres,apellido_paterno,apellido_materno,genero,fecha_nacimiento,vigencia,interno,id_filial,id_organizacion,cod_cargo,workflow,email,relator,reviso,elaboro,aprobo,extranjero, fecha_ingreso, fecha_egreso
-                        , responsable_area, promover_cargo)
+                        , responsable_area)
                             VALUES(
                                 $atr[cod_emp],'$atr[id_personal]','$atr[nombres]','$atr[apellido_paterno]','$atr[apellido_materno]','$atr[genero]',$atr[fecha_nacimiento],'$atr[vigencia]','$atr[interno]',$atr[id_filial],$atr[id_organizacion],$atr[cod_cargo],'$atr[workflow]',$atr[email],'$atr[relator]','$atr[reviso]','$atr[elaboro]','$atr[aprobo]','$atr[extranjero]'
-                                    ,$atr[fecha_ingreso],$atr[fecha_egreso],'$atr[responsable_area]','$atr[promover_cargo]'
+                                    ,$atr[fecha_ingreso],$atr[fecha_egreso],'$atr[responsable_area]'
                                 )";
                     $this->dbl->insert_update($sql);
                     //PARA GUARDAR LAS AREAS DONDE ES RESPONSABLE
@@ -337,7 +337,7 @@
                     $sql = "UPDATE mos_personal SET                            
                                     id_personal = '$atr[id_personal]',nombres = '$atr[nombres]',apellido_paterno = '$atr[apellido_paterno]',apellido_materno = '$atr[apellido_materno]',genero = '$atr[genero]',fecha_nacimiento = $atr[fecha_nacimiento],vigencia = '$atr[vigencia]',interno = '$atr[interno]',id_organizacion = $atr[id_organizacion],cod_cargo = $atr[cod_cargo],workflow = '$atr[workflow]',email = $atr[email],relator = '$atr[relator]',reviso = '$atr[reviso]',elaboro = '$atr[elaboro]',aprobo = '$atr[aprobo]'                            
                                         ,fecha_ingreso=$atr[fecha_ingreso], fecha_egreso=$atr[fecha_egreso]
-                                        ,responsable_area = '$atr[responsable_area]',promover_cargo = '$atr[promover_cargo]',fecha_promocion = $atr[fecha_promocion]
+                                        ,responsable_area = '$atr[responsable_area]',promover_cargo = 'N'
                             WHERE  cod_emp = ".$atr[id];
                     //echo $sql;
                     $this->dbl->insert_update($sql);
@@ -375,6 +375,53 @@
                         return $error; 
                     }
             }
+            
+            public function modificarPersonasPromover($atr){
+              // print_r($atr);
+                try {
+                    $atr = $this->dbl->corregir_parametros($atr);
+
+                    /*Carga Acceso segun el arbol*/
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);
+                    }                    
+                    /*Valida Restriccion*/
+                    if (!isset($this->id_org_acceso[$atr[id_organizacion]]))
+                        return '- Acceso denegado para registrar persona en el &aacute;rea seleccionada.';
+                    if (!(($this->id_org_acceso[$atr[id_organizacion]][nuevo]== 'S') || ($this->id_org_acceso[$atr[id_organizacion]][modificar] == S)))
+                        return '- Acceso denegado para registrar persona en el &aacute;rea ' . $this->id_org_acceso[$atr[id_organizacion]][title] . '.';
+
+                    
+                    if (strlen($atr[fecha_promocion])== 10){
+                        $atr[fecha_promocion] = "'$atr[fecha_promocion]'";                        
+                    }                    
+                    else $atr[fecha_promocion] = "NULL";
+                    
+                    $sql = "UPDATE mos_personal SET                            
+                            id_organizacion = $atr[id_organizacion],cod_cargo = $atr[cod_cargo],                            
+                            promover_cargo = 'S',fecha_promocion = $atr[fecha_promocion]
+                            WHERE  cod_emp = ".$atr[id];
+                    //echo $sql;
+                    $this->dbl->insert_update($sql);
+                    $val = $this->verPersonas($atr[id]);
+                    
+                    //unset($org_resp[$ind_eliminar]);
+                    //print_r($org_resp);
+                    //$sql = "delete from mos_responsable_area  where cod_emp=".$atr[id];    
+                   // $this->dbl->insert_update($sql);
+                    /*Desactivado campo extranjero , Extranjero: \'$atr[extranjero]\'  , Extranjero: \'$val[extranjero]\'*/
+                    $nuevo = "Rut: \'$atr[id_personal]\',Nombres: \'$atr[nombres]\', Apellido Paterno: \'$atr[apellido_paterno]\', Apellido Materno: \'$atr[apellido_materno]\', Genero: \'$atr[genero]\', Fecha Nacimiento: $atr[fecha_nacimiento], Vigencia: \'$atr[vigencia]\', Interno: \'$atr[interno]\', Id Organizacion: $atr[id_organizacion], Cargo: $atr[cod_cargo], Workflow: \'$atr[workflow]\', Email: $atr[email], Relator: \'$atr[relator]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\'";
+                    $anterior = "Rut: \'$val[id_personal]\',Nombres: \'$val[nombres]\', Apellido Paterno: \'$val[apellido_paterno]\', Apellido Materno: \'$val[apellido_materno]\', Genero: \'$val[genero]\', Fecha Nacimiento: \'$val[fecha_nacimiento]\', Vigencia: \'$val[vigencia]\', Interno: \'$val[interno]\', Id Organizacion: $val[id_organizacion], Cargo: $val[cod_cargo], Workflow: \'$val[workflow]\', Email: \'$val[email]\', Relator: \'$val[relator]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\'";
+                    $this->registraTransaccionLog(19,$nuevo,$anterior, '');
+                    //$this->registraTransaccion('Modificar','Modifico el Personas ' . $atr[descripcion_ano], 'mos_personal');
+                    return "'$atr[nombres] $atr[apellido_paterno]' ha sido actualizado con exito";
+                } catch(Exception $e) {
+                        $error = $e->getMessage();                     
+                        if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
+                            return "Ya existe una sección con el mismo nombre.";                        
+                        return $error; 
+                    }
+            }            
              public function listarPersonas($atr, $pag, $registros_x_pagina){
                     
                     $atr = $this->dbl->corregir_parametros($atr);
@@ -788,13 +835,17 @@
             }
             
         public function colum_admin($tupla)
-        {
+        {   //print_r($tupla);
             //echo 1;
             //if($_SESSION[CookM] == 'S')
             if ($this->id_org_acceso[$tupla[id_organizacion]][modificar] == 'S')
             {
                 //<img title=\"Modificar Documento $tupla[nombre_doc]\" src=\"diseno/images/ico_modificar.png\" style=\"cursor:pointer\">
-                $html = "<a href=\"#\" onclick=\"javascript:editarPersonas('". $tupla[cod_emp] . "');\"  title=\"Editar Personas\">                            
+                $html .= '<a href="#" onclick="javascript:crearPromocion(\''. $tupla[cod_emp] . '\');" title="Promover cargo">                        
+                            <i class="icon icon-v"></i>
+                    </a>'; 
+                
+                $html .= "<a href=\"#\" onclick=\"javascript:editarPersonas('". $tupla[cod_emp] . "');\"  title=\"Editar Personas\">                            
                             <i class=\"icon icon-edit\"></i>
                         </a>";
             }
@@ -1297,6 +1348,103 @@
                                         $( '#btn-guardar' ).prop( 'disabled', false );");
                 return $objResponse;
             }
+            public function editar_promocion($parametros)
+            {
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                $ut_tool = new ut_Tool();
+                $contenido_1 = array();
+                
+                $genero_validacion = '';
+
+                $val = $this->verPersonas($parametros[id]); 
+
+                
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido_1["N_" . strtoupper($key)] =  $value;
+                }  
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido_1["P_" . strtoupper($key)] =  $value;
+                } 
+                $contenido_1['COD_EMP'] = $val["cod_emp"];
+                $contenido_1['ID_PERSONAL'] = ($val["id_personal"]);
+                $contenido_1['NOMBRES'] = ($val["nombres"]);
+                $contenido_1['APELLIDO_PATERNO'] = ($val["apellido_paterno"]);
+                $contenido_1['APELLIDO_MATERNO'] = ($val["apellido_materno"]);
+                //$contenido_1['GENERO'] = ($val["genero"]);
+                $ids = array('', '1', '2'); 
+                $contenido_1['OPCION_CARGO_VACIO'] = 'Seleccione';
+                $contenido_1['CARGOS'] = $ut_tool->OptionsCombo("Select c.cod_cargo,c.descripcion From mos_cargo c
+                        inner join mos_cargo_estrorg_arbolproc r ON r.cod_cargo = c.cod_cargo
+                        Where r.id = ".$val["id_organizacion"]." 
+                        Order By c.descripcion "
+                                                                    , 'cod_cargo'
+                                                                    , 'descripcion', $val['cod_cargo']);
+                $contenido_1['ID_ORGANIZACION'] = $val["id_organizacion"];
+                import('clases.organizacion.ArbolOrganizacional');
+                $ao = new ArbolOrganizacional();
+                $parametros[opcion] = 'simple';
+                $parametros[nodos_seleccionados] = array($val[id_organizacion]);
+                $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
+                
+                //print_r($org_resp);
+                
+                if(!class_exists('Parametros')){
+                    import("clases.parametros.Parametros");
+                }
+                $campos_dinamicos = new Parametros();
+                $array = $campos_dinamicos->crear_campos_dinamicos_form_h(3,$val["cod_emp"]);
+                $contenido_1[OTROS_CAMPOS] = $array[html];
+                $js = $array[js];
+                
+                
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'personas/';
+                $template->setTemplate("formulario_promocion");
+                $template->setVars($contenido_1);
+
+                $contenido['CAMPOS'] = $template->show();
+
+                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
+                $template->setTemplate("formulario_h");
+
+                $contenido['TITULO_FORMULARIO'] = "Promover&nbsp;Cargo";
+                $contenido['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Personas";
+                $contenido['PAGINA_VOLVER'] = "listarPersonas.php";
+                $contenido['DESC_OPERACION'] = "Guardar";
+                $contenido['OPC'] = "updpromocion";
+                $contenido['ID'] = $val["cod_emp"];
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                }
+                $template->setVars($contenido);
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
+                $objResponse->addScriptCall("calcHeight");
+                $objResponse->addScriptCall("MostrarContenido2");          
+                $objResponse->addScriptCall("cargar_autocompletado");    
+                
+                $objResponse->addScript("$('#MustraCargando').hide();"); 
+                $objResponse->addScript("
+                          
+                            $.validate({
+                            lang: 'es'  
+                          });");
+                $objResponse->addScript("$('#fecha_promocion').datetimepicker();");
+                $objResponse->addScript($js);
+                $objResponse->addScript('ao_simple();');
+                return $objResponse;
+            }
      
  
             public function editar($parametros)
@@ -1412,9 +1560,7 @@
                 //$contenido_1['EXTRANJERO'] = ($val["extranjero"]);
                 $contenido_1[CHECKED_EXT_NO] = $val["extranjero"] == 'NO' ? 'checked="checked"' : '';
                 $contenido_1[CHECKED_EXT_SI] = $val["extranjero"] == 'SI' ? 'checked="checked"' : '';
-                $contenido_1[CHECKED_PROMOVER_CARGO] = $val["promover_cargo"] == 'S' ? 'checked="checked"' : '';
-                $contenido_1[MOSTRAR_FECHA_PROMOCION] = $val["promover_cargo"] == 'S' ? '' : 'none';
-                $contenido_1[PROMOVER_CARGO] = $val["promover_cargo"];
+                
                 import('clases.organizacion.ArbolOrganizacional');
                 $ao = new ArbolOrganizacional();
                 $parametros[opcion] = 'simple';
@@ -1560,6 +1706,61 @@
                     if (!isset($parametros[elaboro])) $parametros[elaboro] = 'N';
                     if (!isset($parametros[responsable_area])) $parametros[responsable_area] = 'N';
                     $respuesta = $this->modificarPersonas($parametros);
+
+                    if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) 
+                    //if (1==1)
+                    {
+//                        if (count($this->parametros) <= 0){
+//                            $this->cargar_parametros();
+//                        }                
+//                                                
+//                        $params[id_registro] = $parametros[id];
+//                        $this->eliminarParametros($params);
+//                        foreach ($this->parametros as $value) {                                                
+//                            $params[cod_parametro_det] = $parametros["cmb-".$value[cod_parametro]];
+//                            $params[cod_parametro] = $value[cod_parametro];
+//                            if (strlen($params[cod_parametro_det])>0)
+//                                $this->ingresarParametro($params);
+//                        }
+                        if(!class_exists('Parametros')){
+                            import("clases.parametros.Parametros");
+                        }
+                        $campos_dinamicos = new Parametros();
+                        $campos_dinamicos->guardar_parametros_dinamicos($parametros, 3);
+                        $objResponse->addScriptCall("MostrarContenido");
+                        $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+                    }
+                    else
+                        $objResponse->addScriptCall('VerMensaje','error',$respuesta);
+                }
+                          
+                $objResponse->addScript("$('#MustraCargando').hide();"); 
+                $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                                        $( '#btn-guardar' ).prop( 'disabled', false );");
+                return $objResponse;
+            }
+            public function actualizar_promover($parametros)
+            { //print_r($parametros);
+                session_name("$GLOBALS[SESSION]");
+                session_start();
+                $objResponse = new xajaxResponse();
+                unset ($parametros['opc']);
+                $parametros['id_usuario']= $_SESSION['USERID'];
+
+                $validator = new FormValidator();
+                
+                if(!$validator->ValidateForm($parametros)){
+                        $error_hash = $validator->GetErrors();
+                        $mensaje="";
+                        foreach($error_hash as $inpname => $inp_err){
+                                $mensaje.="- $inp_err <br/>";
+                        }
+                         $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
+                }else{
+                    $parametros["fecha_promocion"] = strlen($parametros["fecha_promocion"]) >=10 ? formatear_fecha($parametros["fecha_promocion"]) : '';
+                    $parametros[id_personal] = str_replace(".", "" , $parametros[id_personal]);
+                    $parametros[id_personal] = str_replace("-", "" , $parametros[id_personal]);
+                    $respuesta = $this->modificarPersonasPromover($parametros);
 
                     if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) 
                     //if (1==1)
