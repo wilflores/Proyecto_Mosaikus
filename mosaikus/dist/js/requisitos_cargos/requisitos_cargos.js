@@ -126,7 +126,7 @@
         else{
             $('#formulario_doc_'+id_it).hide();
             $('#combos_form_'+id_it).hide();
-            //$('#valores_form_'+id_it).hide();
+            $('#valores_form_'+id_it).hide();
         }
         }
         
@@ -164,7 +164,7 @@
    array.setObjeto('RequisitosCargos','ValoresParametros');
    switch(condicion){
     case 1://solo combo
-           id_combo=id_params[0];
+           id_combo=id_params;
            array.addParametro('id_combo',id_combo);
            envio=true;
     break;
@@ -181,7 +181,7 @@
 
     break;
     case 4://solo vigencia
-            id_vigencia=id_params[0];
+            id_vigencia=id_params;
             array.addParametro('id_vigencia',id_vigencia);
             envio=true;
     break;
@@ -190,7 +190,7 @@
    }
        //var texto = "Opciones Seleccionadas: ";
 
-//alert('gfhgf'+id_params);
+//alert('combo '+id_combo+" vigencia "+id_vigencia);
     array.addParametro('id_form',id_form);
     array.addParametro('id_req_item',id_it);
     array.addParametro('id_persona',id_persona);

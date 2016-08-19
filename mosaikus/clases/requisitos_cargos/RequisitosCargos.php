@@ -629,6 +629,7 @@ $combo .='</select>';
 if($parametros[condicion]==1){//1. requisito tipo listado y no aplica vigencia - solo combo
     /********** consulta de valores del parametro seleccionado*********/
 $sql_valores="SELECT id,descripcion FROM mos_documentos_formulario_items where fk_id_unico=".$parametros[id_combo];
+//echo $sql_valores;
 $valores_index = $this->dbl->query($sql_valores, array());
    $combo .='<select id="valores_'.$parametros[id_req_item].'" name="valores_'.$parametros[id_req_item].'" class="form-control" data-validation="required">';
 /*$combo.='<option value="">--Seleccione--</option>';
@@ -645,6 +646,7 @@ $valores_index = $this->dbl->query($sql_valores, array());
  $combo.='<input name="id_combo_'.$parametros[id_req_item].'" id="id_combo_'.$parametros[id_req_item].'" type="hidden" value="'.$parametros[id_combo].'"/>';
   $combo.='<input name="id_vigencia_'.$parametros[id_req_item].'" id="id_vigencia_'.$parametros[id_req_item].'" type="hidden" value="NULL"/>';
 }
+
 if($parametros[condicion]==2){//2. requisito tipo listado y aplica vigencia - combo y vigencia
     /********** consulta de valores del parametro seleccionado*********/
 $sql_valores="SELECT id,descripcion FROM mos_documentos_formulario_items where fk_id_unico=".$parametros[id_combo];
