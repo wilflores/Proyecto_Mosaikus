@@ -131,7 +131,7 @@ function OptionsComboMultiple($strSQL,$ids,$descs,$seleccionado=null,$parametros
         //echo $strSQL;
         $resultado = $bd->query($strSQL);
         //print_r($resultado);
-        $datos2 = split("-",$descs);
+        $datos2 = explode("-",$descs);
         $descripcion = "";
         if (count($datos2)>0){
             $descripcion = ' . ($resultado[$i]["' . $datos2[0] . '"]) ';
