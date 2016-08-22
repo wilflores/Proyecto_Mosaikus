@@ -1485,3 +1485,44 @@ INSERT INTO `mos_nombres_link_portal_idiomas` VALUES ('78', '1', 'Parámetros de
 INSERT INTO `mos_nombres_link_portal_idiomas` VALUES ('78', '2', 'Parâmetros Correções');
 INSERT INTO `mos_nombres_link_portal_idiomas` VALUES ('79', '1', 'Parámetros de AC');
 INSERT INTO `mos_nombres_link_portal_idiomas` VALUES ('79', '2', 'Parâmetros Ac');
+
+
+/*******19/08/2016*********/
+ALTER TABLE `mos_personal`
+ADD COLUMN `analisis_causa`  varchar(1) NULL DEFAULT 'N' AFTER `fecha_promocion`,
+ADD COLUMN `verifica_eficacia`  varchar(1) NULL DEFAULT 'N' AFTER `analisis_causa`,
+ADD COLUMN `valida_acc_co`  varchar(1) NULL DEFAULT 'N' AFTER `verifica_eficacia`,
+ADD COLUMN `impresion_cc`  varchar(255) NULL DEFAULT 'N' AFTER `valida_acc_co`;
+
+update mos_nombres_link_idiomas
+set nombre_link='Administrador de Usuarios'
+where cod_link=66 and id_idioma=1;
+update mos_nombres_link_idiomas
+set nombre_link='Administrador de Usuário'
+where cod_link=66 and id_idioma=2;
+update mos_link
+set dependencia=66
+where cod_link=64;
+INSERT INTO `mos_link` VALUES ('93', 
+'Personas-indexPersonasUsuarioAsignacion-clases.personas.Personas', 
+'Asignación de Usuarios', '66', '2', 
+'mos_personal.php', '2', null);
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('93', '1', 'Asignación de Usuarios');
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('93', '2', 'Atribuição de Usuários');
+
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'analisis_causa', 'Análisis de Causa', '1','Análisis de Causa',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'verifica_eficacia', 'Verificación de Eficacia', '1','Verificación de Eficacia',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'valida_acc_co', 'Validar Acciones correctivas y Correcciones', '1','Validar Acciones correctivas y Correcciones',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'impresion_cc', 'Impresion de Copia Controlada', '1','Impresion de Copia Controlada',1);
+
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'analisis_causa', 'Análise de causa', '1','Análise de causa',2);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'verifica_eficacia', 'Verificação de eficácia', '1','Verificação de eficácia',2);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'valida_acc_co', 'Validar as ações corretivas e correções', '1','Validar as ações corretivas e correções',2);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'impresion_cc', 'Controlado Copiar Imprimir', '1','Controlado Copiar Imprimir',2);
+
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'gestion_modulo_documento', 'Gestión en Modulo de Documentos', '1','Gestión en Modulo de Documentos',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'acc_co', 'Acciones Correctivas y Correcciones', '1','Acciones Correctivas y Correcciones',1);
+
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'gestion_modulo_documento', 'Módulo de Gestão de Documentos', '1','Módulo de Gestão de Documentos',2);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'acc_co', 'Ações corretivas e correções', '1','Ações corretivas e correções',2);
+
