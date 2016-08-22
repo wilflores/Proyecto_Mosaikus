@@ -82,16 +82,16 @@
     
     function cargar_cargos(id_arbol,cod_cargo) {            
         {
-
-          array = new XArray();
-          array.setObjeto('Personas','cargos');
-            //array.addParametro('id',id);
-          array.addParametro('import','clases.personas.Personas');                           
-          array.addParametro('id_arbol',id_arbol);
-          array.addParametro('cod_cargo',cod_cargo);
-          $('#id_organizacion').val(id_arbol);
-
-          xajax_Loading(array.getArray());
+          if (doc.getElementById("opc").value != "asignacion")  {
+            array = new XArray();
+            array.setObjeto('Personas','cargos');
+              //array.addParametro('id',id);
+            array.addParametro('import','clases.personas.Personas');                           
+            array.addParametro('id_arbol',id_arbol);
+            array.addParametro('cod_cargo',cod_cargo);
+            $('#id_organizacion').val(id_arbol);
+            xajax_Loading(array.getArray());
+          }
         }
             
     }
@@ -248,6 +248,8 @@ function ao_multiple_responsable(){
                 array.setObjeto('Personas','actualizar');
             if (doc.getElementById("opc").value == "updpromocion")
                 array.setObjeto('Personas','actualizar_promover');
+            if (doc.getElementById("opc").value == "asignacion")
+                array.setObjeto('Personas','actualizar_usuario');
             array.addParametro('permiso',document.getElementById('permiso_modulo').value);
             /**/
             array.addParametro('modo',document.getElementById('modo').value);
@@ -279,7 +281,15 @@ function ao_multiple_responsable(){
         array.addParametro('cod_link',document.getElementById('cod_link').value);
         xajax_Loading(array.getArray());
     }
-
+    function editarPersonasUsuario(id){
+        array = new XArray();
+        array.setObjeto('Personas','editar_usuario');
+        array.addParametro('id',id);
+        array.addParametro('import','clases.personas.Personas');
+        array.addParametro('modo',document.getElementById('modo').value);
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
+        xajax_Loading(array.getArray());
+    }
     function eliminarPersonas(id){
         if(confirm("¿Desea Eliminar el Personas Seleccionado?")){
             array = new XArray();
@@ -307,7 +317,10 @@ function ao_multiple_responsable(){
         }
         array.addParametro('permiso',document.getElementById('permiso_modulo').value);
         array.addParametro('pag',pag);
-        array.setObjeto('Personas','buscar');
+        if(document.getElementById("usuario-asig"))
+            array.setObjeto('Personas','buscar_usuario');
+        else
+            array.setObjeto('Personas','buscar');
         array.addParametro('import','clases.personas.Personas');
          $('#MustraCargando').show();
         xajax_Loading(array.getArray());
