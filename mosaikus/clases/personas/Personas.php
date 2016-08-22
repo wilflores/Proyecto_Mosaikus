@@ -119,6 +119,10 @@
                             ,responsable_area
                             ,id_organizacion_resp
                             ,promover_cargo
+                            ,analisis_causa
+                            ,verifica_eficacia
+                            ,valida_acc_co
+                           , impresion_cc
                          FROM mos_personal p
                         LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo left join
                         (select cod_emp,
@@ -335,9 +339,9 @@
                             
                     
                     $sql = "UPDATE mos_personal SET                            
-                                    id_personal = '$atr[id_personal]',nombres = '$atr[nombres]',apellido_paterno = '$atr[apellido_paterno]',apellido_materno = '$atr[apellido_materno]',genero = '$atr[genero]',fecha_nacimiento = $atr[fecha_nacimiento],vigencia = '$atr[vigencia]',interno = '$atr[interno]',id_organizacion = $atr[id_organizacion],cod_cargo = $atr[cod_cargo],workflow = '$atr[workflow]',email = $atr[email],relator = '$atr[relator]',reviso = '$atr[reviso]',elaboro = '$atr[elaboro]',aprobo = '$atr[aprobo]'                            
-                                        ,fecha_ingreso=$atr[fecha_ingreso], fecha_egreso=$atr[fecha_egreso]
-                                        ,responsable_area = '$atr[responsable_area]',promover_cargo = 'N'
+                                    id_personal = '$atr[id_personal]',nombres = '$atr[nombres]',apellido_paterno = '$atr[apellido_paterno]',apellido_materno = '$atr[apellido_materno]',genero = '$atr[genero]',fecha_nacimiento = $atr[fecha_nacimiento],vigencia = '$atr[vigencia]',interno = '$atr[interno]',id_organizacion = $atr[id_organizacion],cod_cargo = $atr[cod_cargo],email = $atr[email]                            
+                                    ,fecha_ingreso=$atr[fecha_ingreso], fecha_egreso=$atr[fecha_egreso]
+                                    ,responsable_area = '$atr[responsable_area]',promover_cargo = 'N'
                             WHERE  cod_emp = ".$atr[id];
                     //echo $sql;
                     $this->dbl->insert_update($sql);
@@ -375,8 +379,7 @@
                         return $error; 
                     }
             }
-            
-            public function modificarPersonasPromover($atr){
+              public function modificarPersonasPromover($atr){
               // print_r($atr);
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
@@ -402,6 +405,40 @@
                             promover_cargo = 'S',fecha_promocion = $atr[fecha_promocion]
                             WHERE  cod_emp = ".$atr[id];
                     //echo $sql;
+                    $this->dbl->insert_update($sql);
+                    $val = $this->verPersonas($atr[id]);
+                    
+                    //unset($org_resp[$ind_eliminar]);
+                    //print_r($org_resp);
+                    //$sql = "delete from mos_responsable_area  where cod_emp=".$atr[id];    
+                   // $this->dbl->insert_update($sql);
+                    /*Desactivado campo extranjero , Extranjero: \'$atr[extranjero]\'  , Extranjero: \'$val[extranjero]\'*/
+                    $nuevo = "Rut: \'$atr[id_personal]\',Nombres: \'$atr[nombres]\', Apellido Paterno: \'$atr[apellido_paterno]\', Apellido Materno: \'$atr[apellido_materno]\', Genero: \'$atr[genero]\', Fecha Nacimiento: $atr[fecha_nacimiento], Vigencia: \'$atr[vigencia]\', Interno: \'$atr[interno]\', Id Organizacion: $atr[id_organizacion], Cargo: $atr[cod_cargo], Workflow: \'$atr[workflow]\', Email: $atr[email], Relator: \'$atr[relator]\', Reviso: \'$atr[reviso]\', Elaboro: \'$atr[elaboro]\', Aprobo: \'$atr[aprobo]\'";
+                    $anterior = "Rut: \'$val[id_personal]\',Nombres: \'$val[nombres]\', Apellido Paterno: \'$val[apellido_paterno]\', Apellido Materno: \'$val[apellido_materno]\', Genero: \'$val[genero]\', Fecha Nacimiento: \'$val[fecha_nacimiento]\', Vigencia: \'$val[vigencia]\', Interno: \'$val[interno]\', Id Organizacion: $val[id_organizacion], Cargo: $val[cod_cargo], Workflow: \'$val[workflow]\', Email: \'$val[email]\', Relator: \'$val[relator]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\'";
+                    $this->registraTransaccionLog(19,$nuevo,$anterior, '');
+                    //$this->registraTransaccion('Modificar','Modifico el Personas ' . $atr[descripcion_ano], 'mos_personal');
+                    return "'$atr[nombres] $atr[apellido_paterno]' ha sido actualizado con exito";
+                } catch(Exception $e) {
+                        $error = $e->getMessage();                     
+                        if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
+                            return "Ya existe una sección con el mismo nombre.";                        
+                        return $error; 
+                    }
+            }            
+          
+            public function modificarPersonasUsuario($atr){
+              // print_r($atr);
+                try {
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    
+                    $sql = "UPDATE mos_personal SET   
+                            aprobo= '$atr[aprobo]',
+                            relator= '$atr[relator]', workflow= '$atr[workflow]',                            
+                            reviso= '$atr[reviso]', elaboro= '$atr[elaboro]',                                  
+                            impresion_cc= '$atr[impresion_cc]', analisis_causa= '$atr[analisis_causa]',                                  
+                            verifica_eficacia= '$atr[verifica_eficacia]', valida_acc_co= '$atr[valida_acc_co]'                                      
+                            WHERE  cod_emp = ".$atr[id];
+                   // echo $sql;
                     $this->dbl->insert_update($sql);
                     $val = $this->verPersonas($atr[id]);
                     
@@ -619,6 +656,155 @@
                     //echo $sql;
                     $this->operacion($sql, $atr);
              }
+             public function listarPersonasUsuarios($atr, $pag, $registros_x_pagina){
+                    //print_r($atr);
+                    $atr = $this->dbl->corregir_parametros($atr);
+                    $sql_left = $sql_col_left = "";
+                    if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                    }                    
+                    $k = 1;                    
+                    foreach ($this->parametros as $value) {
+                        $sql_left .= " LEFT JOIN(select t1.id_registro, t2.descripcion as nom_detalle from mos_parametro_modulos t1
+                                inner join mos_parametro_det t2 on t1.cod_categoria=t2.cod_categoria and t1.cod_parametro=t2.cod_parametro and t1.cod_parametro_det=t2.cod_parametro_det
+                        where t1.cod_categoria='3' and t1.cod_parametro='$value[cod_parametro]' ) AS p$k ON p$k.id_registro = p.cod_emp "; 
+                        $sql_col_left .= ",p$k.nom_detalle p$k ";
+                        $k++;
+                    }
+                    
+                    if (count($this->id_org_acceso) <= 0){
+                        $this->cargar_acceso_nodos($atr);
+                    }
+                    
+                    $sql = "SELECT COUNT(*) total_registros
+                         FROM mos_personal p
+                            LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo
+                         WHERE 1 = 1 ";
+                    if (strlen($atr['b-filtro-sencillo'])>0){
+                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);                                                  
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                           $sql .= " AND (upper(concat(nombres, ' ', apellido_paterno, ' ' , apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                        } 
+                    }
+                    if (strlen($atr[valor])>0)
+                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
+                    if (strlen($atr["b-cod_emp"])>0)
+                        $sql .= " AND cod_emp = '". $atr[b-cod_emp] . "'";
+                    if (strlen($atr["b-id_personal"])>0)
+                                $sql .= " AND upper(id_personal) like '%" . strtoupper($atr["b-id_personal"]) . "%'";
+                    if (strlen($atr["b-nombres"])>0)
+                                $sql .= " AND upper(nombres) like '%" . strtoupper($atr["b-nombres"]) . "%'";
+                    if (strlen($atr["b-apellido_paterno"])>0)
+                                $sql .= " AND upper(apellido_paterno) like '%" . strtoupper($atr["b-apellido_paterno"]) . "%'";
+                    if (strlen($atr["b-apellido_materno"])>0)
+                                $sql .= " AND upper(apellido_materno) like '%" . strtoupper($atr["b-apellido_materno"]) . "%'";
+                    $id_org = -1;
+                    if ((strlen($atr["b-id_organizacion"])>0) && ($atr["b-id_organizacion"] != "2")){                             
+                        $id_org = $this->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
+                        $sql .= " AND id_organizacion IN (". $id_org . ")";
+                    }
+                    if (strlen($atr["b-cod_cargo"])>0)
+                        $sql .= " AND c.descripcion = '". $atr[b-cod_cargo] . "'";
+                    if (strlen($atr["b-workflow"])>0)
+                                $sql .= " AND upper(workflow) like '%" . strtoupper($atr["b-workflow"]) . "%'";
+                    if (strlen($atr["b-relator"])>0)
+                                $sql .= " AND upper(relator) like '%" . strtoupper($atr["b-relator"]) . "%'";
+                    if (strlen($atr["b-reviso"])>0)
+                                $sql .= " AND upper(reviso) like '%" . strtoupper($atr["b-reviso"]) . "%'";
+                    if (strlen($atr["b-elaboro"])>0)
+                                $sql .= " AND upper(elaboro) like '%" . strtoupper($atr["b-elaboro"]) . "%'";
+                    if (strlen($atr["b-aprobo"])>0)
+                                $sql .= " AND upper(aprobo) like '%" . strtoupper($atr["b-aprobo"]) . "%'";
+                    if (strlen($atr["b-analisis-causa"])>0)
+                                $sql .= " AND upper(analisis_causa) like '%" . strtoupper($atr["b-analisis-causa"]) . "%'";
+                    if (strlen($atr["b-verifica-eficacia"])>0)
+                                $sql .= " AND upper(verifica_eficacia) like '%" . strtoupper($atr["b-verifica-eficacia"]) . "%'";
+                    if (strlen($atr["b-valida-acc-co"])>0)
+                                $sql .= " AND upper(valida_acc_co) like '%" . strtoupper($atr["b-valida-acc-co"]) . "%'";
+                    if (strlen($atr["b-impresion-cc"])>0)
+                                $sql .= " AND upper(impresion_cc) like '%" . strtoupper($atr["b-impresion-cc"]) . "%'";
+
+                    //if (count($this->id_org_acceso)>0)
+                    {                            
+                        $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
+                    }
+                    
+
+                    $total_registros = $this->dbl->query($sql, $atr);
+                    $this->total_registros = $total_registros[0][total_registros];                       
+                    //print_r($atr);
+                    
+            
+                    $sql = "SELECT cod_emp
+                                    ,id_personal
+                                    ,initcap(nombres) nombres
+                                    ,initcap(apellido_paterno) apellido_paterno
+                                    ,initcap(apellido_materno) apellido_materno
+                                    ,id_organizacion
+                                    ,c.descripcion cod_cargo
+                                    ,CASE workflow  when 'S' then 'Si' Else 'No' END workflow
+                                    ,CASE relator  when 'S' then 'Si' Else 'No' END relator
+                                    ,CASE elaboro when 'S' then 'Si' Else 'No' END elaboro
+                                    ,CASE reviso when 'S' then 'Si' Else 'No' END reviso                                    
+                                    ,CASE aprobo  when 'S' then 'Si' Else 'No' END aprobo
+                                    ,CASE analisis_causa  when 'S' then 'Si' Else 'No' END analisis_causa
+                                    ,CASE verifica_eficacia  when 'S' then 'Si' Else 'No' END verifica_eficacia
+                                    ,CASE valida_acc_co  when 'S' then 'Si' Else 'No' END valida_acc_co
+                                    ,CASE impresion_cc  when 'S' then 'Si' Else 'No' END impresion_cc
+                                    
+                           FROM mos_personal p
+                            LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo 
+                            WHERE 1 = 1 ";
+                    if (strlen($atr['b-filtro-sencillo'])>0){
+                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);                                                  
+                        foreach ($nombre_supervisor as $supervisor_aux) {
+                           $sql .= " AND (upper(concat(nombres, ' ', apellido_paterno, ' ' , apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
+                        } 
+                    }
+                    if (strlen($atr[valor])>0)
+                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
+                                 if (strlen($atr["b-cod_emp"])>0)
+                        $sql .= " AND cod_emp = '". $atr[b-cod_emp] . "'";
+                    if (strlen($atr["b-id_personal"])>0)
+                                $sql .= " AND upper(id_personal) like '%" . strtoupper($atr["b-id_personal"]) . "%'";
+                    if (strlen($atr["b-nombres"])>0)
+                                $sql .= " AND upper(nombres) like '%" . strtoupper($atr["b-nombres"]) . "%'";
+                    if (strlen($atr["b-apellido_paterno"])>0)
+                                $sql .= " AND upper(apellido_paterno) like '%" . strtoupper($atr["b-apellido_paterno"]) . "%'";
+                    if (strlen($atr["b-apellido_materno"])>0)
+                                $sql .= " AND upper(apellido_materno) like '%" . strtoupper($atr["b-apellido_materno"]) . "%'";
+                    if ((strlen($atr["b-id_organizacion"])>0) && ($atr["b-id_organizacion"] != "2")){                             
+                        //$id_org = $this->BuscaOrgNivelHijos($atr[b-id_organizacion]);
+                        $sql .= " AND id_organizacion IN (". $id_org . ")";
+                    }
+                    if (strlen($atr["b-cod_cargo"])>0)
+                               $sql .= " AND c.descripcion = '". $atr[b-cod_cargo] . "'";
+                    if (strlen($atr["b-workflow"])>0)
+                                $sql .= " AND upper(workflow) like '%" . strtoupper($atr["b-workflow"]) . "%'";
+                    if (strlen($atr["b-relator"])>0)
+                                $sql .= " AND upper(relator) like '%" . strtoupper($atr["b-relator"]) . "%'";
+                    if (strlen($atr["b-reviso"])>0)
+                                $sql .= " AND upper(reviso) like '%" . strtoupper($atr["b-reviso"]) . "%'";
+                    if (strlen($atr["b-elaboro"])>0)
+                                $sql .= " AND upper(elaboro) like '%" . strtoupper($atr["b-elaboro"]) . "%'";
+                    if (strlen($atr["b-aprobo"])>0)
+                                $sql .= " AND upper(aprobo) like '%" . strtoupper($atr["b-aprobo"]) . "%'";
+                    if (strlen($atr["b-analisis-causa"])>0)
+                                $sql .= " AND upper(analisis_causa) like '%" . strtoupper($atr["b-analisis-causa"]) . "%'";
+                    if (strlen($atr["b-verifica-eficacia"])>0)
+                                $sql .= " AND upper(verifica_eficacia) like '%" . strtoupper($atr["b-verifica-eficacia"]) . "%'";
+                    if (strlen($atr["b-valida-acc-co"])>0)
+                                $sql .= " AND upper(valida_acc_co) like '%" . strtoupper($atr["b-valida-acc-co"]) . "%'";
+                    if (strlen($atr["b-impresion-cc"])>0)
+                                $sql .= " AND upper(impresion_cc) like '%" . strtoupper($atr["b-impresion-cc"]) . "%'";
+                    {                            
+                        $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
+                    }
+                    $sql .= " order by $atr[corder] $atr[sorder] ";
+                    $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                    echo $sql;
+                    $this->operacion($sql, $atr);
+             }
              public function listarPersonasSinFiltro($atr){
                     $atr = $this->dbl->corregir_parametros($atr);
                     
@@ -833,6 +1019,93 @@
                 }
                 return $out;
             }
+     public function verListaPersonasUsuarios($parametros){
+                $grid= "";
+                $grid= new DataGrid();
+                if ($parametros['pag'] == null) 
+                    $parametros['pag'] = 1;
+                $reg_por_pagina = getenv("PAGINACION");
+                if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
+                $this->listarPersonasUsuarios($parametros, $parametros['pag'], $reg_por_pagina);
+                $data=$this->dbl->data;
+
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                
+                $grid->SetConfiguracionMSKS("tblPersonas", "");
+                $config_col=array(
+                    
+               //array( "width"=>"10%","ValorEtiqueta"=>link_titulos("Cod Emp", "cod_emp", $parametros,80)),
+                    array("width"=>"5%", "ValorEtiqueta"=>"<div style='width:80px'>&nbsp;</div>"),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_personal], "id_personal", $parametros,90)),
+               array( "width"=>"8%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[nombres], "nombres", $parametros)),
+               array( "width"=>"8%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apellido_paterno], "apellido_paterno", $parametros)),
+               array( "width"=>"8%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[apellido_materno], "apellido_materno", $parametros)),
+               
+               array( "width"=>"15%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_organizacion], "id_organizacion", $parametros,200)),     
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[cod_cargo], "cod_cargo", $parametros)),     
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[workflow], "workflow", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[relator], "relator", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[elaboro], "elaboro", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[reviso], "reviso", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[aprobo], "aprobo", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[analisis_causa], "analisis_causa", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[verifica_eficacia], "verifica_eficacia", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[valida_acc_co], "valida_acc_co", $parametros)),
+               array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[impresion_cc], "impresion_cc", $parametros))
+                );
+                if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                }
+                $k = 1;
+
+
+                $func= array();
+
+                $columna_funcion = -1;
+                $config=array();
+                $grid->setPaginado($reg_por_pagina, $this->total_registros);
+                $array_columns =  explode('-', $parametros['mostrar-col']);
+                //print_r($array_columns);
+                for($i=0;$i<count($config_col);$i++){
+                    switch ($i) {                                             
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            array_push($config,$config_col[$i]);
+                            break;
+
+                        default:
+                            
+                            if (in_array($i, $array_columns)) {
+                                array_push($config,$config_col[$i]);
+                            }
+                            else                                
+                                $grid->hidden[$i] = true;
+                            
+                            break;
+                    }
+                }
+                 //print_r($grid->hidden);
+                $grid->setParent($this);
+                $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
+                $grid->setFuncion("id_personal", "formatear_rut");
+                $grid->setFuncion("cod_emp", "colum_admin_usuario");
+                $grid->setFuncion("id_organizacion", "BuscaOrganizacional");
+                //
+                //$grid->setAligns(1,"center");
+                //$grid->hidden = array(0 => true);
+    
+                $grid->setDataMSKS("td-table-data", $data, $func,$columna_funcion, $parametros['pag'] );
+                $out['tabla']= $grid->armarTabla();
+                //if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina))
+                {
+                    $out['paginado']=$grid->setPaginadohtmlMSKS("verPagina", "document");
+                }
+                return $out;
+            }
             
         public function colum_admin($tupla)
         {   //print_r($tupla);
@@ -864,6 +1137,21 @@
                 $html .= '<a href="#" onclick="javascript:HojadeVida(\''. $tupla[cod_emp] . '\');" title="Hoja de Vida">                        
                             <i class="icon icon-hoja-vida"></i>
                     </a>'; 
+            }
+            
+            return $html;
+            
+        }
+        public function colum_admin_usuario($tupla)
+        {   //print_r($tupla);
+            //echo 1;
+            //if($_SESSION[CookM] == 'S')
+            if ($this->id_org_acceso[$tupla[id_organizacion]][modificar] == 'S')
+            {
+                //<img title=\"Modificar Documento $tupla[nombre_doc]\" src=\"diseno/images/ico_modificar.png\" style=\"cursor:pointer\">
+                $html .= "<a href=\"#\" onclick=\"javascript:editarPersonasUsuario('". $tupla[cod_emp] . "');\"  title=\"Editar Personas\">                            
+                            <i class=\"icon icon-edit\"></i>
+                        </a>";
             }
             
             return $html;
@@ -974,7 +1262,113 @@
             return $grid->armarTabla();
         }
  
- 
+             public function indexPersonasUsuarioAsignacion($parametros)
+            {
+                $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                $parametros['b-interno'] = 1;
+                if ($parametros['corder'] == null) $parametros['corder']="apellido_paterno";
+                if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
+                if ($parametros['mostrar-col'] == null) 
+                    $parametros['mostrar-col']="0-1-2-3-4-7-8-9-10-11-12-13-14-15"; 
+                if (count($this->campos_activos) <= 0){
+                        $this->cargar_campos_activos();
+                }                 
+                foreach ($this->campos_activos as $key => $value) {
+                    if ($value[0] == '1'){
+                        $parametros['mostrar-col'].= '-' . $value[1];
+                        if ($value[1] < 15){
+                            $contenido["CHECKED_". strtoupper($key)] = 'checked="checked"';
+                        }
+                    }else
+                    {
+                        $contenido["DISPLAY_". strtoupper($key)] = 'style="display:none;"';
+                    }
+                }                
+                if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                }                
+                $k = 21;
+                $contenido[PARAMETROS_OTROS] = "";
+                foreach ($this->parametros as $value) {                    
+                    $parametros['mostrar-col'] .= "-$k";
+                    $contenido[PARAMETROS_OTROS] .= '
+                                  <div class="checkbox">      
+                                      <label >
+                                          <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="checkbox-mos-col" checked="checked">   &nbsp;
+                                      ' . $value[espanol] . '</label>
+                                  </div>
+                            ';
+                    $k++;
+                }
+                
+                $grid = $this->verListaPersonasUsuarios($parametros);
+                $contenido['CORDER'] = $parametros['corder'];
+                $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];
+                $contenido['SORDER'] = $parametros['sorder'];
+                $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['OPCIONES_BUSQUEDA'] = " <option value='campo'>campo</option>";
+                $contenido['TABLA'] = $grid['tabla'];
+                $contenido['PAGINADO'] = $grid['paginado'];
+                $contenido['PERMISO_INGRESAR'] =  'display:none;';
+                
+                import('clases.organizacion.ArbolOrganizacional');
+
+
+                $ao = new ArbolOrganizacional();
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
+
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'personas/';
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }  
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                } 
+                $template->setTemplate("busqueda_usuario");
+                $template->setVars($contenido);
+                $contenido['CAMPOS_BUSCAR'] = $template->show();
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'personas/';
+
+                $template->setTemplate("mostrar_colums_usuario");
+                $template->setVars($contenido);
+                $contenido['CAMPOS_MOSTRAR_COLUMNS'] = $template->show();
+                
+                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
+
+                $template->setTemplate("listar");
+                $template->setVars($contenido);
+                //$this->contenido['CONTENIDO']  = $template->show();
+                //$this->asigna_contenido($this->contenido);
+                //return $template->show();
+                if (isset($parametros['html']))
+                    return $template->show();
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('contenido',"innerHTML",$template->show());
+                $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
+                $objResponse->addAssign('modulo_actual',"value","personas");
+                $objResponse->addIncludeScript(PATH_TO_JS . 'personas/personas.js?'.rand());
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript('PanelOperator.initPanels("");
+                        ScrollBar.initScroll();
+                        init_filtro_rapido();
+                        init_filtro_ao_simple();');
+                //$objResponse->addScript('PanelOperator.initPanels("");ScrollBar.initScroll();');
+                return $objResponse;
+            }
             public function indexPersonas($parametros)
             {
                 $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
@@ -1445,9 +1839,7 @@
                 $objResponse->addScript('ao_simple();');
                 return $objResponse;
             }
-     
- 
-            public function editar($parametros)
+             public function editar($parametros)
             {
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
@@ -1546,18 +1938,7 @@
                 $contenido_1['ID_FILIAL'] = $val["id_filial"];
                 $contenido_1['ID_ORGANIZACION'] = $val["id_organizacion"];
                 $contenido_1['COD_CARGO'] = $val["cod_cargo"];
-                $contenido_1['WORKFLOW'] = ($val["workflow"]);
-                $contenido_1[CHECKED_WORKFLOW] = $val["workflow"] == 'S' ? 'checked="checked"' : '';
                 $contenido_1['EMAIL'] = ($val["email"]);
-                //$contenido_1['RELATOR'] = ($val["relator"]);
-                $contenido_1[CHECKED_RELATOR] = $val["relator"] == 'S' ? 'checked="checked"' : '';
-                //$contenido_1['REVISO'] = ($val["reviso"]);
-                $contenido_1[CHECKED_REVISO] = $val["reviso"] == 'S' ? 'checked="checked"' : '';
-                //$contenido_1['ELABORO'] = ($val["elaboro"]);
-                $contenido_1[CHECKED_ELABORO] = $val["elaboro"] == 'S' ? 'checked="checked"' : '';
-                //$contenido_1['APROBO'] = ($val["aprobo"]);
-                $contenido_1[CHECKED_APROBO] = $val["aprobo"] == 'S' ? 'checked="checked"' : '';
-                //$contenido_1['EXTRANJERO'] = ($val["extranjero"]);
                 $contenido_1[CHECKED_EXT_NO] = $val["extranjero"] == 'NO' ? 'checked="checked"' : '';
                 $contenido_1[CHECKED_EXT_SI] = $val["extranjero"] == 'SI' ? 'checked="checked"' : '';
                 
@@ -1672,6 +2053,144 @@
                 $objResponse->addScript('ao_multiple_responsable();');
                 return $objResponse;
             }
+    
+ 
+            public function editar_usuario($parametros)
+            {
+                if(!class_exists('Template')){
+                    import("clases.interfaz.Template");
+                }
+                $ut_tool = new ut_Tool();
+                $contenido_1 = array();
+                
+                $genero_validacion = '';
+                if (count($this->campos_activos) <= 0){
+                        $this->cargar_campos_activos();
+                }
+                foreach ($this->campos_activos as $key => $value) {
+                    if ($value[0] == '1'){                        
+                        if ($value[1] != 20){
+                            $contenido_1["VALIDACION_". strtoupper($key)] = 'data-validation="required"';
+                        }
+                        if ($value[1] == 7){
+                            $genero_validacion = 'data-validation="required"';
+                        }
+                    }else
+                    {
+                        $contenido_1["DISPLAY_". strtoupper($key)] = 'style="display:none;"';
+                    }
+                }   
+
+                $val = $this->verPersonas($parametros[id]); 
+
+                
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido_1["N_" . strtoupper($key)] =  $value;
+                }  
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido_1["P_" . strtoupper($key)] =  $value;
+                } 
+                $contenido_1['COD_EMP'] = $val["cod_emp"];
+                $contenido_1['ID_PERSONAL'] = ($val["id_personal"]);
+                $contenido_1['NOMBRES'] = ($val["nombres"]);
+                $contenido_1['APELLIDO_PATERNO'] = ($val["apellido_paterno"]);
+                $contenido_1['APELLIDO_MATERNO'] = ($val["apellido_materno"]);
+                //$contenido_1['GENERO'] = ($val["genero"]);
+                $ids = array('', '1', '2'); 
+                $contenido_1['OPCION_CARGO_VACIO'] = 'Seleccione';
+                $contenido_1['CARGOS'] = $ut_tool->OptionsCombo("Select c.cod_cargo,c.descripcion From mos_cargo c
+                        inner join mos_cargo_estrorg_arbolproc r ON r.cod_cargo = c.cod_cargo
+                        Where r.id = ".$val["id_organizacion"]." 
+                        Order By c.descripcion "
+                                                                    , 'cod_cargo'
+                                                                    , 'descripcion', $val['cod_cargo']);
+                $contenido_1['ID_FILIAL'] = $val["id_filial"];
+                $contenido_1['ID_ORGANIZACION'] = $val["id_organizacion"];
+                $contenido_1['COD_CARGO'] = $val["cod_cargo"];
+                $contenido_1['WORKFLOW'] = ($val["workflow"]);
+                $contenido_1[CHECKED_WORKFLOW] = $val["workflow"] == 'S' ? 'checked="checked"' : '';
+                $contenido_1[CHECKED_RELATOR] = $val["relator"] == 'S' ? 'checked="checked"' : '';
+                $contenido_1[CHECKED_REVISO] = $val["reviso"] == 'S' ? 'checked="checked"' : '';
+                $contenido_1[CHECKED_ELABORO] = $val["elaboro"] == 'S' ? 'checked="checked"' : '';
+                $contenido_1[CHECKED_APROBO] = $val["aprobo"] == 'S' ? 'checked="checked"' : '';
+                
+                $contenido_1[CHECKED_ANALISIS_CAUSA] = $val["analisis_causa"] == 'S' ? 'checked="checked"' : '';
+                $contenido_1[CHECKED_VERIFICA_EFICACIA] = $val["verifica_eficacia"] == 'S' ? 'checked="checked"' : '';
+                $contenido_1[CHECKED_VALIDA_ACC_CO] = $val["valida_acc_co"] == 'S' ? 'checked="checked"' : '';
+                $contenido_1[CHECKED_IMPRESION_CC] = $val["impresion_cc"] == 'S' ? 'checked="checked"' : '';
+                
+                import('clases.organizacion.ArbolOrganizacional');
+                $ao = new ArbolOrganizacional();
+                $parametros[opcion] = 'simple';
+                $parametros[nodos_seleccionados] = array($val[id_organizacion]);
+                $contenido_1[DIV_ARBOL_ORGANIZACIONAL] =  $ao->jstree_ao(0,$parametros);
+                
+                $aomultiple = new ArbolOrganizacional();
+                //print_r($val);
+                $org_resp = array();
+                
+                if(strpos($val[id_organizacion_resp],',')){    
+                    $org_resp = explode(",", $val[id_organizacion_resp]);
+                }
+                else{
+                    $org_resp[] = $val[id_organizacion_resp];                                 
+                }
+                //print_r($org_resp);
+                
+                if(!class_exists('Parametros')){
+                    import("clases.parametros.Parametros");
+                }
+                $campos_dinamicos = new Parametros();
+                $array = $campos_dinamicos->crear_campos_dinamicos_form_h(3,$val["cod_emp"]);
+                $contenido_1[OTROS_CAMPOS] = $array[html];
+                $js = $array[js];
+                
+                
+                $template = new Template();
+                $template->PATH = PATH_TO_TEMPLATES.'personas/';
+                $template->setTemplate("formulario_usuario");
+                $template->setVars($contenido_1);
+
+                $contenido['CAMPOS'] = $template->show();
+
+                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
+                $template->setTemplate("formulario_h");
+
+                $contenido['TITULO_FORMULARIO'] = "Asignación&nbsp;de&nbsp;Usuarios";
+                $contenido['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Personas";
+                $contenido['PAGINA_VOLVER'] = "listarPersonas.php";
+                $contenido['DESC_OPERACION'] = "Guardar";
+                $contenido['OPC'] = "asignacion";
+                $contenido['ID'] = $val["cod_emp"];
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido["N_" . strtoupper($key)] =  $value;
+                }          
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido["P_" . strtoupper($key)] =  $value;
+                }
+                $template->setVars($contenido);
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('contenido-form',"innerHTML",$template->show());
+                $objResponse->addScriptCall("calcHeight");
+                $objResponse->addScriptCall("MostrarContenido2");          
+                $objResponse->addScriptCall("cargar_autocompletado");    
+                $objResponse->addScript("$('#MustraCargando').hide();"); 
+                $objResponse->addScript("
+                          
+                            $.validate({
+                            lang: 'es'  
+                          });");
+                $objResponse->addScript($js);
+                $objResponse->addScript('ao_simple();');
+                $objResponse->addScript("$('arbol1').unbind('click');");                 
+                return $objResponse;
+            }
      
  
             public function actualizar($parametros)
@@ -1700,10 +2219,6 @@
                     $parametros[id_personal] = str_replace("-", "" , $parametros[id_personal]);
                     if (!isset($parametros[interno])) $parametros[interno] = 0;
                     if (!isset($parametros[vigencia])) $parametros[vigencia] = 'N';
-                    if (!isset($parametros[relator])) $parametros[relator] = 'N';
-                    if (!isset($parametros[workflow])) $parametros[workflow] = 'N';
-                    if (!isset($parametros[reviso])) $parametros[reviso] = 'N';
-                    if (!isset($parametros[elaboro])) $parametros[elaboro] = 'N';
                     if (!isset($parametros[responsable_area])) $parametros[responsable_area] = 'N';
                     $respuesta = $this->modificarPersonas($parametros);
 
@@ -1794,6 +2309,57 @@
                                         $( '#btn-guardar' ).prop( 'disabled', false );");
                 return $objResponse;
             }
+            
+            public function actualizar_usuario($parametros)
+            { //print_r($parametros);
+                session_name("$GLOBALS[SESSION]");
+                session_start();
+                $objResponse = new xajaxResponse();
+                unset ($parametros['opc']);
+                $parametros['id_usuario']= $_SESSION['USERID'];
+
+                $validator = new FormValidator();
+                
+                if(!$validator->ValidateForm($parametros)){
+                        $error_hash = $validator->GetErrors();
+                        $mensaje="";
+                        foreach($error_hash as $inpname => $inp_err){
+                                $mensaje.="- $inp_err <br/>";
+                        }
+                         $objResponse->addScriptCall('VerMensaje','error',utf8_encode($mensaje));
+                }else{
+                    $parametros[id_personal] = str_replace(".", "" , $parametros[id_personal]);
+                    $parametros[id_personal] = str_replace("-", "" , $parametros[id_personal]);
+                    if (!isset($parametros[relator])) $parametros[relator] = 'N';
+                    if (!isset($parametros[workflow])) $parametros[workflow] = 'N';
+                    if (!isset($parametros[reviso])) $parametros[reviso] = 'N';
+                    if (!isset($parametros[elaboro])) $parametros[elaboro] = 'N';
+                    if (!isset($parametros[aprobo])) $parametros[aprobo] = 'N';
+                    if (!isset($parametros[impresion_cc])) $parametros[impresion_cc] = 'N';
+                    if (!isset($parametros[analisis_causa])) $parametros[analisis_causa] = 'N';
+                    if (!isset($parametros[verifica_eficacia])) $parametros[verifica_eficacia] = 'N';
+                    if (!isset($parametros[valida_acc_co])) $parametros[valida_acc_co] = 'N';
+                    
+                    $respuesta = $this->modificarPersonasUsuario($parametros);
+
+                    if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {
+                        if(!class_exists('Parametros')){
+                            import("clases.parametros.Parametros");
+                        }
+                        $campos_dinamicos = new Parametros();
+                        $campos_dinamicos->guardar_parametros_dinamicos($parametros, 3);
+                        $objResponse->addScriptCall("MostrarContenido");
+                        $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+                    }
+                    else
+                        $objResponse->addScriptCall('VerMensaje','error',$respuesta);
+                }
+                          
+                $objResponse->addScript("$('#MustraCargando').hide();"); 
+                $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                                        $( '#btn-guardar' ).prop( 'disabled', false );");
+                return $objResponse;
+            }
      
  
             public function eliminar($parametros)
@@ -1816,6 +2382,17 @@
             public function buscar($parametros)
             {
                 $grid = $this->verListaPersonas($parametros);
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('grid',"innerHTML",$grid['tabla']);
+                $objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
+                          
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("PanelOperator.resize();");
+                return $objResponse;
+            }
+            public function buscar_usuario($parametros)
+            {
+                $grid = $this->verListaPersonasUsuarios($parametros);
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('grid',"innerHTML",$grid['tabla']);
                 $objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
