@@ -1526,3 +1526,35 @@ INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma)
 INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'gestion_modulo_documento', 'Módulo de Gestão de Documentos', '1','Módulo de Gestão de Documentos',2);
 INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'acc_co', 'Ações corretivas e correções', '1','Ações corretivas e correções',2);
 
+/*******23/08/2016*********/
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'nombres_apellidos', 'Nombres y Apellidos', '1','Nombres y Apellidos',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'nombres_apellidos', 'Nomes e Sobrenomes', '1','Nomes e Sobrenomes',2);
+
+ALTER TABLE `mos_personal`
+ADD COLUMN `comentario_promocion`  text NULL AFTER `fecha_promocion`;
+
+ALTER TABLE `mos_historico_cargos_promocion`
+ADD COLUMN `comentario_promocion`  text NULL AFTER `fecha_registro`;
+
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'comentario_promocion', 'Comentario', '1','Comentario',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'comentario_promocion', 'Comentário', '1','Comentário',2);
+
+CREATE TRIGGER `registra_mos_historico_cargos_promocion_upd` BEFORE UPDATE ON `mos_personal`
+FOR EACH ROW BEGIN
+/*guarda historico de la promocion de los cargos*/
+			IF(NEW.promover_cargo='S') THEN
+        INSERT into mos_historico_cargos_promocion (cod_emp, id_organizacion, cod_cargo, id_organizacion_promovida, cod_cargo_promovido, fecha_promocion, comentario_promocion) 
+				VALUES (NEW.cod_emp, OLD.id_organizacion, OLD.cod_cargo, NEW.id_organizacion, NEW.cod_cargo, NEW.fecha_promocion, NEW.comentario_promocion);
+			END IF;
+END;
+
+DROP TRIGGER IF EXISTS `registra_mos_historico_cargos_promocion_ins`;
+
+CREATE TRIGGER `registra_mos_historico_cargos_promocion_ins` AFTER INSERT ON `mos_personal`
+FOR EACH ROW BEGIN
+/*guarda historico de la promocion de los cargos*/
+			IF(NEW.promover_cargo='S') THEN
+        INSERT into mos_historico_cargos_promocion (cod_emp, id_organizacion, cod_cargo, id_organizacion_promovida, cod_cargo_promovido, fecha_promocion, comentario_promocion) 
+				VALUES (NEW.cod_emp, NEW.id_organizacion, NEW.cod_cargo, NEW.id_organizacion, NEW.cod_cargo, NEW.fecha_ingreso, NEW.comentario_promocion);
+			END IF;
+END;
