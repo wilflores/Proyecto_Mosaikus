@@ -1503,17 +1503,17 @@ where cod_link=66 and id_idioma=2;
 update mos_link
 set dependencia=66
 where cod_link=64;
-INSERT INTO `mos_link` VALUES ('93', 
+INSERT INTO `mos_link` VALUES ('94', 
 'Personas-indexPersonasUsuarioAsignacion-clases.personas.Personas', 
 'Asignación de Usuarios', '66', '2', 
 'mos_personal.php', '2', null);
-INSERT INTO `mos_nombres_link_idiomas` VALUES ('93', '1', 'Asignación de Usuarios');
-INSERT INTO `mos_nombres_link_idiomas` VALUES ('93', '2', 'Atribuição de Usuários');
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('94', '1', 'Asignación de Usuarios');
+INSERT INTO `mos_nombres_link_idiomas` VALUES ('94', '2', 'Atribuição de Usuários');
 
 INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'analisis_causa', 'Análisis de Causa', '1','Análisis de Causa',1);
 INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'verifica_eficacia', 'Verificación de Eficacia', '1','Verificación de Eficacia',1);
 INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'valida_acc_co', 'Validar Acciones correctivas y Correcciones', '1','Validar Acciones correctivas y Correcciones',1);
-INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'impresion_cc', 'Impresion de Copia Controlada', '1','Impresion de Copia Controlada',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'impresion_cc', 'Impresión de Copia Controlada', '1','Impresion de Copia Controlada',1);
 
 INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'analisis_causa', 'Análise de causa', '1','Análise de causa',2);
 INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'verifica_eficacia', 'Verificação de eficácia', '1','Verificação de eficácia',2);
