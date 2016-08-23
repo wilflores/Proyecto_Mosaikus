@@ -802,7 +802,7 @@
                     }
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
-                    echo $sql;
+                   // echo $sql;
                     $this->operacion($sql, $atr);
              }
              public function listarPersonasSinFiltro($atr){
