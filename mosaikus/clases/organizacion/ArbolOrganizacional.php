@@ -1057,6 +1057,28 @@
         }
         
         /**
+         *  Devuelve los ID de los Hijos
+        */            
+        public function BuscaOrgNivelPadres($IDORG)
+        {
+            $OrgNom = $IDORG;            
+            $Consulta3="select id as id_organizacion, parent_id as organizacion_padre, title as identificacion from mos_organizacion where id='".$IDORG."' order by id";            
+            $data = $this->dbl->query($Consulta3,array());
+            foreach( $data as $Fila3)
+            {                    
+                if(($Fila3[organizacion_padre]==2)||($Fila3[organizacion_padre]==1))
+                {
+                    $OrgNom.=($Fila3[organizacion_padre]);
+                    return($OrgNom);                                        
+                }
+                else{
+                    $OrgNom .= ",".$this->BuscaOrgNivelPadres($Fila3[organizacion_padre]);
+                }
+            }
+            return $OrgNom;
+        }
+        
+        /**
          *  Devuelve la estructura HTML para el arbol jtree 
          * 
          * @param int $contar Plus para informacion adicional 1=> Documentos, 2 => Registro, 3 => Acciones Correctivas
@@ -1539,7 +1561,7 @@
 	}
         
         /**
-         * Devuelve los padres de un nodo del arbol
+         * Devuelve los nombres de los padres de un nodo del arbol
          * @param array $tupla 
          * @return string
          */
