@@ -7,25 +7,11 @@
                                         <input readonly type="text"value="{ID_PERSONAL}" class="form-control" id="id_personal" name="id_personal" placeholder="{P_ID_PERSONAL}" data-validation="required"/>  <!--onblur="fomatear_rut(this.value);"-->
                                     </div>    
                                     <div class="form-group col-xs-8">
-                                        <label for="nombres" class="">{N_NOMBRES}</label>                                        
-                                        <input readonly type="text" class="form-control" value="{NOMBRES}" id="nombres" name="nombres" placeholder="{P_NOMBRES}" data-validation="required sololetras"/>
+                                        <label for="nombres" class="">{N_NOMBRES_APELLIDOS}</label>                                        
+                                        <input readonly type="text" class="form-control" value="{NOMBRES_APELLIDOS}" id="nombres_apellidos" name="nombres_apellidos" placeholder="{P_NOMBRES_APELLIDOS}" />
                                     </div>  
                                 </div>
-                                </div> 
-                            <div class="form-group"> 
-                                <div class="row">
-
-                                    <div class="form-group col-xs-8">
-                                        <label for="apellido_paterno" class="">{N_APELLIDO_PATERNO}</label>
-
-                                        <input readonly type="text" class="form-control" value="{APELLIDO_PATERNO}" id="apellido_paterno" name="apellido_paterno" placeholder="{P_APELLIDO_PATERNO}" data-validation="required sololetras"/>
-                                    </div>                                
-                                    <div class="form-group col-xs-8">
-                                        <label for="apellido_materno" class="">{N_APELLIDO_MATERNO}</label>                                        
-                                        <input type="text" class="form-control"  value="{APELLIDO_MATERNO}" id="apellido_materno" name="apellido_materno" placeholder="{P_APELLIDO_MATERNO}" data-validation="sololetras"/>
-                                    </div>  
-                                </div>
-                            </div>  
+                           </div> 
                             
                         <div class="form-group">
                             <div class="row">
@@ -52,9 +38,17 @@
                                     </div> 
                                 <div class="form-group col-xs-8" id="div_fecha_promocion" >
                                         <label for="fecha_promocion"  class="">{N_FECHA_PROMOCION}</label>
-                                        <input style="" type="text" data-date-format="DD/MM/YYYY" class="form-control" value="" id="fecha_promocion" name="fecha_promocion" placeholder="{P_FECHA_PROMOCION}" />
+                                        <input style="" type="text" data-date-format="DD/MM/YYYY" class="form-control" value="" id="fecha_promocion" name="fecha_promocion" placeholder="{P_FECHA_PROMOCION}" data-validation="required"/>
                                     </div> 
                                 </div>
+                        </div>
+                        <div class="form-group">     
+                             <div class="row">
+                                 <div class="col-xs-10">
+                                    <label for="comentario_promocion" >{N_COMENTARIO_PROMOCION}</label>
+                                    <textarea id="comentario_promocion" class="form-control" name="comentario_promocion" placeholder="{P_COMENTARIO_PROMOCION}"></textarea>
+                                 </div> 
+                             </div>
                         </div>
                      </div>                    
                     <input type="hidden" class="form-control" id="id_organizacion" name="id_organizacion" value="{ID_ORGANIZACION}" placeholder="Id Organizacion"  data-validation="required"/>
