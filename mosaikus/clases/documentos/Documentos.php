@@ -2891,7 +2891,11 @@ echo $Consulta3;
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
                 $array_columns =  explode('-', $parametros['mostrar-col']);
                 for($i=0;$i<count($config_col);$i++){
-                    switch ($i) {                                             
+                    switch ($i) { 
+                        //LISTA DE DISTRIBUCION DESACTIVADA TEMPORALMENTE
+                        case 13:
+                            $grid->hidden[$i] = true;
+                            BREAK;
                         //case 1:
 //                        case 2:
 //                        case 3:
