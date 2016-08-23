@@ -402,7 +402,7 @@
                     
                     $sql = "UPDATE mos_personal SET                            
                             id_organizacion = $atr[id_organizacion],cod_cargo = $atr[cod_cargo],                            
-                            promover_cargo = 'S',fecha_promocion = $atr[fecha_promocion]
+                            promover_cargo = 'S',fecha_promocion = $atr[fecha_promocion], comentario_promocion = '$atr[comentario_promocion]'
                             WHERE  cod_emp = ".$atr[id];
                     //echo $sql;
                     $this->dbl->insert_update($sql);
@@ -417,7 +417,7 @@
                     $anterior = "Rut: \'$val[id_personal]\',Nombres: \'$val[nombres]\', Apellido Paterno: \'$val[apellido_paterno]\', Apellido Materno: \'$val[apellido_materno]\', Genero: \'$val[genero]\', Fecha Nacimiento: \'$val[fecha_nacimiento]\', Vigencia: \'$val[vigencia]\', Interno: \'$val[interno]\', Id Organizacion: $val[id_organizacion], Cargo: $val[cod_cargo], Workflow: \'$val[workflow]\', Email: \'$val[email]\', Relator: \'$val[relator]\', Reviso: \'$val[reviso]\', Elaboro: \'$val[elaboro]\', Aprobo: \'$val[aprobo]\'";
                     $this->registraTransaccionLog(19,$nuevo,$anterior, '');
                     //$this->registraTransaccion('Modificar','Modifico el Personas ' . $atr[descripcion_ano], 'mos_personal');
-                    return "'$atr[nombres] $atr[apellido_paterno]' ha sido actualizado con exito";
+                    return "'$atr[nombres_apellidos] ' ha sido actualizado con exito";
                 } catch(Exception $e) {
                         $error = $e->getMessage();                     
                         if (preg_match("/ano_escolar_niveles_secciones_nivel_academico_key/",$error ) == true) 
@@ -1769,9 +1769,7 @@
                 } 
                 $contenido_1['COD_EMP'] = $val["cod_emp"];
                 $contenido_1['ID_PERSONAL'] = ($val["id_personal"]);
-                $contenido_1['NOMBRES'] = ($val["nombres"]);
-                $contenido_1['APELLIDO_PATERNO'] = ($val["apellido_paterno"]);
-                $contenido_1['APELLIDO_MATERNO'] = ($val["apellido_materno"]);
+                $contenido_1['NOMBRES_APELLIDOS'] = ($val["nombres"].' '.$val["apellido_paterno"].' '.$val["apellido_materno"]);
                 //$contenido_1['GENERO'] = ($val["genero"]);
                 $ids = array('', '1', '2'); 
                 $contenido_1['OPCION_CARGO_VACIO'] = 'Seleccione';
