@@ -82,7 +82,7 @@
     
     function cargar_cargos(id_arbol,cod_cargo) {            
         {
-          if (doc.getElementById("opc").value != "asignacion")  {
+          if (document.getElementById("opc").value != "asignacion")  {
             array = new XArray();
             array.setObjeto('Personas','cargos');
               //array.addParametro('id',id);
@@ -221,23 +221,25 @@ function ao_multiple_responsable(){
 } 
 
     function validar(doc){
-        if ($('#apellido_materno').val().length == 0) $('#apellido_materno').val(' ');
-        if (($('#workflow').is(':checked'))||($('#reviso').is(':checked'))||($('#elaboro').is(':checked'))||($('#aprobo').is(':checked'))){ 
-            $('#email').attr('data-validation',"email");
-        }
-        else {
-            $('#email').removeAttr('data-validation');
-        }      
-        if (!$('#vigencia').is(':checked')){ 
-            if ( $('#fecha_egreso').is(":visible") ){
-                $('#fecha_egreso').attr('data-validation',"required");
-            }else {
+        if (doc.getElementById("opc").value != "updpromocion" && doc.getElementById("opc").value != "asignacion"){
+            if ($('#apellido_materno').val().length == 0) $('#apellido_materno').val(' ');
+            if (($('#workflow').is(':checked'))||($('#reviso').is(':checked'))||($('#elaboro').is(':checked'))||($('#aprobo').is(':checked'))){ 
+                $('#email').attr('data-validation',"email");
+            }
+            else {
+                $('#email').removeAttr('data-validation');
+            }      
+            if (!$('#vigencia').is(':checked')){ 
+                if ( $('#fecha_egreso').is(":visible") ){
+                    $('#fecha_egreso').attr('data-validation',"required");
+                }else {
+                    $('#fecha_egreso').removeAttr('data-validation');
+                }
+            }
+            else {
                 $('#fecha_egreso').removeAttr('data-validation');
             }
         }
-        else {
-            $('#fecha_egreso').removeAttr('data-validation');
-        }  
         if($('#idFormulario').isValid()) {
             $( "#btn-guardar" ).html('Procesando..');
             $( "#btn-guardar" ).prop( "disabled", true );
