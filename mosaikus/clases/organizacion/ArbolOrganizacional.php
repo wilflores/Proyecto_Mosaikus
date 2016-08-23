@@ -1068,7 +1068,7 @@
             {                    
                 if(($Fila3[organizacion_padre]==2)||($Fila3[organizacion_padre]==1))
                 {
-                    $OrgNom.=($Fila3[organizacion_padre]);
+                    $OrgNom.=(",".$Fila3[organizacion_padre]);
                     return($OrgNom);                                        
                 }
                 else{
