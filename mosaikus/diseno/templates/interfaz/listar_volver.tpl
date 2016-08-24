@@ -4,7 +4,7 @@
 
 <!-- .panel Panel Busqueda  -->
             <div id="search-aux"
-                 class=" panel-hidden  panel-container col-md-offset-1  col-xs-5 ">
+                 class=" panel-hidden  panel-container col-md-offset-1  col-xs-6 ">
               <div class="content-panel panel">
                 <div class="content">
 

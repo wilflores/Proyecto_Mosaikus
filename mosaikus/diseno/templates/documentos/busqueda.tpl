@@ -235,11 +235,11 @@
                                             {TIPOS_DOCUMENTOS}
                                          </select>
                                     </div>
-                                    <div class="form-group">
+                                         <div class="form-group" style="display: none;">
                                         <label for="requiere_lista" class="col-md-24 control-label">{N_REQUIERE_LISTA_DISTRIBUCION}</label>                                                                                                           
                                         
                                     </div>                                    
-                                    <div class="form-group"> 
+                                    <div class="form-group" style="display: none;"> 
                                         <label class="checkbox-inline" style="padding-top: 0px;"> 
                                             <input type="radio" checked="checked" value="S" id="b-requiere-lista" name="b-requiere-lista"> {N_SI} &nbsp; 
                                             <input type="radio" value="N" id="b-requiere-lista" name="b-requiere-lista"> {N_NO} &nbsp; 

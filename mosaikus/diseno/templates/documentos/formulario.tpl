@@ -178,7 +178,7 @@
                                                 <!--<div class="form-group">
                                                         
                                                 </div>-->
-                                                <div class="form-group">
+                                                <div class="form-group" style="display:none;">
                                                     <label  class="col-md-6 control-label">{N_REQUIERE_LISTA_DISTRIBUCION}</label>                                                
                                                     <div class="col-md-14">
                                                         <select id="requiere_lista_distribucion" name="requiere_lista_distribucion" class="form-control" data-validation="required" onchange="CargaComboCargo(this.value)">

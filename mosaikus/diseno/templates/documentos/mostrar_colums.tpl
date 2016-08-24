@@ -81,7 +81,7 @@
                                       {N_TIPO_DOCUMENTO}</label>
                                   
                             </div>
-                            <div class="checkbox">
+                            <div class="checkbox" style="display: none;">
                                   
                                   
                                       <label>

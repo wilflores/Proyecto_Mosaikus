@@ -1539,22 +1539,25 @@ ADD COLUMN `comentario_promocion`  text NULL AFTER `fecha_registro`;
 INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'comentario_promocion', 'Comentario', '1','Comentario',1);
 INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'comentario_promocion', 'Comentário', '1','Comentário',2);
 
-CREATE TRIGGER `registra_mos_historico_cargos_promocion_upd` BEFORE UPDATE ON `mos_personal`
-FOR EACH ROW BEGIN
-/*guarda historico de la promocion de los cargos*/
-			IF(NEW.promover_cargo='S') THEN
-        INSERT into mos_historico_cargos_promocion (cod_emp, id_organizacion, cod_cargo, id_organizacion_promovida, cod_cargo_promovido, fecha_promocion, comentario_promocion) 
-				VALUES (NEW.cod_emp, OLD.id_organizacion, OLD.cod_cargo, NEW.id_organizacion, NEW.cod_cargo, NEW.fecha_promocion, NEW.comentario_promocion);
-			END IF;
-END;
-
 DROP TRIGGER IF EXISTS `registra_mos_historico_cargos_promocion_ins`;
-
-CREATE TRIGGER `registra_mos_historico_cargos_promocion_ins` AFTER INSERT ON `mos_personal`
-FOR EACH ROW BEGIN
+DELIMITER ;;
+CREATE TRIGGER `registra_mos_historico_cargos_promocion_ins` AFTER INSERT ON `mos_personal` FOR EACH ROW BEGIN
 /*guarda historico de la promocion de los cargos*/
 			IF(NEW.promover_cargo='S') THEN
         INSERT into mos_historico_cargos_promocion (cod_emp, id_organizacion, cod_cargo, id_organizacion_promovida, cod_cargo_promovido, fecha_promocion, comentario_promocion) 
 				VALUES (NEW.cod_emp, NEW.id_organizacion, NEW.cod_cargo, NEW.id_organizacion, NEW.cod_cargo, NEW.fecha_ingreso, NEW.comentario_promocion);
 			END IF;
-END;
+END
+;;
+DELIMITER ;
+DROP TRIGGER IF EXISTS `registra_mos_historico_cargos_promocion_upd`;
+DELIMITER ;;
+CREATE TRIGGER `registra_mos_historico_cargos_promocion_upd` BEFORE UPDATE ON `mos_personal` FOR EACH ROW BEGIN
+/*guarda historico de la promocion de los cargos*/
+			IF(NEW.promover_cargo='S') THEN
+        INSERT into mos_historico_cargos_promocion (cod_emp, id_organizacion, cod_cargo, id_organizacion_promovida, cod_cargo_promovido, fecha_promocion, comentario_promocion) 
+				VALUES (NEW.cod_emp, OLD.id_organizacion, OLD.cod_cargo, NEW.id_organizacion, NEW.cod_cargo, NEW.fecha_promocion, NEW.comentario_promocion);
+			END IF;
+END
+;;
+DELIMITER ;
