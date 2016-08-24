@@ -250,5 +250,40 @@ UPDATE `santateresa`.`mos_link` SET `descripcion` = 'Requisitos-indexRequisitos-
 UPDATE `santateresa`.`mos_link` SET `descripcion` = 'RequisitosCargos-indexRequisitosCargos-clases.requisitos_cargos.RequisitosCargos' WHERE `mos_link`.`cod_link` =60;
 
 ALTER TABLE `mos_requisitos_item`
-MODIFY COLUMN `id`  int(11) NOT NULL AUTO_INCREMENT FIRST ;
+MODIFY COLUMN `id`  int(11) NOT NULL AUTO_INCREMENT FIRST;
+/*************20/08/2016******************/
+/**** CAMBIOS EN LA ESTRUCTURA DE TABLAS RELACIONADAS A REQUISITOS CARGOS*********/
+DROP TABLE IF EXISTS `mos_requisitos_cargos`;
+CREATE TABLE IF NOT EXISTS `mos_requisitos_cargos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_cargo` int(11) NOT NULL,
+  `id_area` int(11) NOT NULL,
+  `id_requisito` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_cargo` (`id_cargo`),
+  KEY `id_requisito` (`id_requisito`),
+  KEY `id_area` (`id_area`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci AUTO_INCREMENT=1 ;
+/***************FORANEA CON MOS_REQUISITOS ******/
+ALTER TABLE `mos_requisitos_cargos` ADD FOREIGN KEY (`id_requisito`) 
+REFERENCES `mos_requisitos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+/*********23/08/16 TAblaa para relacion de requisitoscargos con mos_cursos****/
+DROP TABLE IF EXISTS `mos_requisitos_cursos`;
+CREATE TABLE IF NOT EXISTS `mos_requisitos_cursos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_requisito_cargo` int(11) NOT NULL,
+  `cod_curso` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_requisito_cargo` (`id_requisito_cargo`),
+  KEY `cod_curso` (`cod_curso`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci AUTO_INCREMENT=1 ;
+
+ALTER TABLE `mos_requisitos_cursos` ADD FOREIGN KEY ( `id_requisito_cargo` ) REFERENCES `santateresa`.`mos_requisitos_cargos` (
+`id`
+) ON DELETE CASCADE ON UPDATE CASCADE ;
+
+ALTER TABLE `mos_requisitos_cursos` ADD FOREIGN KEY ( `cod_curso` ) REFERENCES `santateresa`.`mos_cursos` (
+`cod_curso`
+) ON DELETE CASCADE ON UPDATE CASCADE ;
 

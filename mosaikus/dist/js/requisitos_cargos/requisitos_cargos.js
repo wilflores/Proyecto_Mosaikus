@@ -41,6 +41,17 @@
     }
     function validar(doc){        
         if($('#idFormulario').isValid()) {
+            var cont_req=0;
+            var cadena_req=doc.getElementById("vector_req_item").value;
+            var vector_requisitos= cadena_req.split(",");
+            for(i=0;i<(vector_requisitos.length-1);i++){
+                if($("#req_"+vector_requisitos[i]).is(":checked"))
+                        cont_req++;    
+            }
+            if(cont_req==0){
+                VerMensaje('error','Debe seleccionar al menos un requisito');
+                return;
+            }
             $( "#btn-guardar" ).html('Procesando..');
             $( "#btn-guardar" ).prop( "disabled", true );
             array = new XArray();
@@ -120,13 +131,15 @@
         //if(id_requisito_item.checked){
         if($(id_requisito_item).is(":checked")){
             $('#formulario_doc_'+id_it).show();
-            // $('#combos_form_'+id_it).show();
+            $('#form_'+id_it).attr("data-validation", "required");
+           //  $('#form_'+id_it).show();
             
         }
         else{
             $('#formulario_doc_'+id_it).hide();
             $('#combos_form_'+id_it).hide();
             $('#valores_form_'+id_it).hide();
+           $('#form_'+id_it).removeAttr("data-validation");
         }
         }
         
@@ -137,15 +150,27 @@
     var id_form=$(id_formulario).val();
     var id_it=id_requisito_item;
     if(id_form=='') return;//en caso de que marque opcion seleccione
-    array.setObjeto('RequisitosCargos','Comboparametros');
-    array.addParametro('id_form',id_form);
-    array.addParametro('id_req_item',id_it);
-    array.addParametro('tipo_req',tipo);
-    array.addParametro('vigencia_req',vigencia);
-    array.addParametro('import','clases.requisitos_cargos.RequisitosCargos');
-    xajax_Loading(array.getArray());
+    var capacitacion= id_form.split("_");//para ver si se selecciono fue una capacitacion
+ //alert("valor del select "+capacitacion);
 
+    if(capacitacion[0]=='cap'){//si se selecciono un curso
+       // alert('escoge capacitacion');
+        array.setObjeto('RequisitosCargos','GuardarRequisitoCapacitacion');
+        array.addParametro('id_capacitacion',capacitacion[1]);
+        array.addParametro('id_req_item',id_it);
+        array.addParametro('tipo_req',tipo);
+        array.addParametro('vigencia_req',vigencia);
 
+    }
+    else{
+        array.setObjeto('RequisitosCargos','Comboparametros');
+        array.addParametro('id_form',id_form);
+        array.addParametro('id_req_item',id_it);
+        array.addParametro('tipo_req',tipo);
+        array.addParametro('vigencia_req',vigencia);
+    }
+        array.addParametro('import','clases.requisitos_cargos.RequisitosCargos');
+        xajax_Loading(array.getArray());
     //$('#combos_form_'+id_it).show();
     }
 

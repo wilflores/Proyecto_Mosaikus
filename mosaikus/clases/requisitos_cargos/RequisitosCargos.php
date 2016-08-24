@@ -111,6 +111,7 @@
             }
             public function ingresarRequisitosCargos($atr){
                 try {
+                   // print_r($atr);
                     $atr = $this->dbl->corregir_parametros($atr);
                   /*  import('clases.utilidades.NivelAcceso');
                     $this->restricciones = new NivelAcceso();
@@ -125,7 +126,9 @@
                         return '- Acceso denegado para registrar persona en el &aacute;rea ' . $this->restricciones->id_org_acceso_explicito[$atr[id_area]][title] . '.';
                     */
                         for($i=0;$i<count($atr[vector_req_item])-1;$i++){
-                            $sql = "INSERT INTO mos_requisitos_cargos(id_cargo,id_area,id_requisito_items)
+                            $req=$atr[vector_req_item][$i];
+                            if(isset($atr[req_.$req])){//si esta marcado el requisito
+                            $sql = "INSERT INTO mos_requisitos_cargos(id_cargo,id_area,id_requisito)
                             VALUES($atr[id_cargo],$atr[id_area],".$atr[vector_req_item][$i].")";
                                 $this->dbl->insert_update($sql);
                             $sql = "SELECT MAX(id) ultimo FROM mos_requisitos_cargos"; 
@@ -133,6 +136,7 @@
                             $vector_req_cargos[$i] = $this->dbl->data[0][0];//guardar el id de requisitos cargos
                             $nuevo = "Id Cargo: \'$atr[id_cargo]\', Id Requisito Items: \'$atr[vector_req_item][$i]\', ";
                             $this->registraTransaccionLog(97,$nuevo,'', $vector_req_cargos[$i]);
+                             }
                             }
                     
  
@@ -506,10 +510,29 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id $sql_left";
                 $columnas_fam = $this->dbl->query($sql, array());
                 return $columnas_fam;
             }
+
+ /******** guardar relacion de requisitos cargos con curso seleccionado*****/
+ public function GuardarRequisitoCapacitacion($parametros){
+   // print_r($parametros);
+        $combo.='<input type="hidden" id="id_capacitacion_'.$parametros[id_req_item].'" name="id_capacitacion_'.$parametros[id_req_item].'" value="'.$parametros[id_capacitacion].'"/>'; 
+        $combo.='<input type="hidden" id="id_persona_'.$parametros[id_req_item].'" name="id_persona_'.$parametros[id_req_item].'" value="NULL"/>';   
+    $combo .='<input name="id_vigencia_'.$parametros[id_req_item].'" id="id_vigencia_'.$parametros[id_req_item].'" type="hidden" value="NULL"/>';
+     $combo .='<input name="id_combo_'.$parametros[id_req_item].'" id="id_combo_'.$parametros[id_req_item].'" type="hidden" value="NULL"/>';
+        $objResponse = new xajaxResponse();            
+            //echo $combo;
+        $objResponse->addAssign('combos_form_'.$parametros[id_req_item],"innerHTML",$combo);
+        $js="$('#combos_form_'+".$parametros[id_req_item].").show()";
+        $objResponse->addScript("$js");
+        return $objResponse;   
+
+
+ }
+ 
 /*********** obtener los combos parametros de un formulario seleccionado*******/
             public function Comboparametros($parametros){
                 //print_r($parametros);
-            $js = $combos='';
+            $js = $combo='';
+
            
 /************ id del tipo persona del formulario seleccionado***/
 $sql_parametros_persona="select id_unico, Nombre,tipo
@@ -519,7 +542,7 @@ from mos_documentos_datos_formulario where IDDoc = ".$parametros[id_form]."  and
 $parametros_index_persona = $this->dbl->query($sql_parametros_persona, array());
 $id_tipo_persona=$parametros_index_persona[0][id_unico];
 //$id_tipo_persona=1;//mientras para probar
-$combo.='<input type="hidden" id="id_persona_'.$parametros[id_req_item].'" name=""id_persona_'.$parametros[id_req_item].'" value="'.$id_tipo_persona.'"/>';            
+$combo='<input type="hidden" id="id_persona_'.$parametros[id_req_item].'" name="id_persona_'.$parametros[id_req_item].'" value="'.$id_tipo_persona.'"/>';            
 /********** consulta de parametros del formulario seleccionado*********/
 $grupo1=$grupo2='';
 if(($parametros[tipo_req]=='Listado') && ($parametros[vigencia_req]=='N')){//1. requisito tipo listado y no aplica vigencia
@@ -582,6 +605,8 @@ $combo .='</select>';
 
 }
 if(($parametros[tipo_req]=='Unico') && ($parametros[vigencia_req]=='N')){//3. requisito tipo unico y no aplica vigencia
+    $combo .='<input name="id_vigencia_'.$parametros[id_req_item].'" id="id_vigencia_'.$parametros[id_req_item].'" type="hidden" value="NULL"/>';
+     $combo .='<input name="id_combo_'.$parametros[id_req_item].'" id="id_combo_'.$parametros[id_req_item].'" type="hidden" value="NULL"/>';
 
 }
 if(($parametros[tipo_req]=='Unico') && ($parametros[vigencia_req]=='S')){//4. requisito tipo unico y aplica vigencia
@@ -597,7 +622,7 @@ $combo .='<select id="parametro_'.$parametros[id_req_item].'" name="parametro_'.
     <option value="2">Ketchup</option>
     <option value="3">Relish</option>';
 */
-    $combo.='<option value="">--Seleccione--</option>';
+    $combo .='<option value="">--Seleccione--</option>';
 for($i=0;$i<count($parametros_index_1);$i++){
         $combo .='<option value="'.$parametros_index_1[$i][id_unico].'">'.$parametros_index_1[$i][Nombre].'</option>';
     }
@@ -613,7 +638,7 @@ $combo .='</select>';
             $objResponse = new xajaxResponse();            
             //echo $combo;
             $objResponse->addAssign('combos_form_'.$parametros[id_req_item],"innerHTML",$combo);
-                        $objResponse->addScript("$('#parametro_".$parametros[id_req_item]."').selectpicker({
+            $objResponse->addScript("$('#parametro_".$parametros[id_req_item]."').selectpicker({
                                             style: 'btn-combo'
                                           });");
             $objResponse->addScript("$js");
@@ -624,7 +649,7 @@ $combo .='</select>';
  /*********** obtener los valores del combo o vigencia de los parametros de un formulario seleccionado*******/
             public function ValoresParametros($parametros){
                //print_r($parametros);
-            $js = $combos='';
+            $js = $combo='';
            
 if($parametros[condicion]==1){//1. requisito tipo listado y no aplica vigencia - solo combo
     /********** consulta de valores del parametro seleccionado*********/
@@ -643,8 +668,8 @@ $valores_index = $this->dbl->query($sql_valores, array());
     }
       
  $combo .='</select>'; 
- $combo.='<input name="id_combo_'.$parametros[id_req_item].'" id="id_combo_'.$parametros[id_req_item].'" type="hidden" value="'.$parametros[id_combo].'"/>';
-  $combo.='<input name="id_vigencia_'.$parametros[id_req_item].'" id="id_vigencia_'.$parametros[id_req_item].'" type="hidden" value="NULL"/>';
+ $combo .='<input name="id_combo_'.$parametros[id_req_item].'" id="id_combo_'.$parametros[id_req_item].'" type="hidden" value="'.$parametros[id_combo].'"/>';
+  $combo .='<input name="id_vigencia_'.$parametros[id_req_item].'" id="id_vigencia_'.$parametros[id_req_item].'" type="hidden" value="NULL"/>';
 }
 
 if($parametros[condicion]==2){//2. requisito tipo listado y aplica vigencia - combo y vigencia
@@ -691,7 +716,7 @@ $js="$('#valores_form_'+".$parametros[id_req_item].").show()";
 
              //echo $sql; 
             }                               
- 
+/*****************************************************/ 
             public function crear($parametros)
             {
                 $js='';
@@ -700,11 +725,11 @@ $js="$('#valores_form_'+".$parametros[id_req_item].").show()";
                     import("clases.interfaz.Template");
                 }
                 $requisitos_items= '';
-                $ut_tool = new ut_Tool();
                 $contenido_1   = array();
                 import("clases.organizacion.ArbolOrganizacional");
                 $arbol = new ArbolOrganizacional();
-                 $sql_area="select title from mos_organizacion where id=".$parametros[id_area];
+                $areas_involucradas=$arbol->BuscaOrgNivelPadres($parametros[id_area]);// areas padres
+                $sql_area="select title from mos_organizacion where id=".$parametros[id_area];
                  $this->operacion($sql_area, $parametros);
                 $descripcion_area=$this->dbl->data[0][title];
                // $descripcion_area=$arbol->BuscaOrganizacional(array('id_organizacion'=>$parametros[id_area]));//obtener descripcion del area
@@ -728,69 +753,36 @@ $js="$('#valores_form_'+".$parametros[id_req_item].").show()";
                                       </div>                                
                                   </div>
                                   ';
-/*** generar las pestañas de las familias existentes******/
-                 $contenido_1[FAMILIAS]='<div class="form-group"> 
+                $contenido_1[FAMILIAS]='<div class="form-group"> 
                                     <div class="col-md-24">
                                         <div class="tabs">
                                         <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">';
-$columnas_fam=$this->cargar_parametros_familias();
-$k=2;
-                foreach ($columnas_fam as $value) {                  
-                    $descripcion_fam=ucwords(strtolower($value[descripcion]));
-                    $contenido_1[FAMILIAS].='<li id="li1"><a href="#hv-red-'.$k.'" data-toggle="tab" style="padding: 8px 32px;">'.$descripcion_fam.'</a></li>';
-                    $k++;
-                 }      
-                $contenido_1[FAMILIAS].='</ul>';
                 $k=2;
-                 $contenido_1[ITEMS_FAMILIA]='';
-                for($i=0;$i<count($columnas_fam);$i++){
-
-/***** obtener items  de la familia*******/
-                    $sql_items="SELECT mif.id id_items, mif.descripcion desc_items
-                FROM mos_requisitos_items_familias mif
-INNER JOIN mos_requisitos_item mri ON mri.id_item = mif.id
-INNER JOIN mos_requisitos mr ON mr.id = mri.id_requisitos
-INNER JOIN mos_requisitos_organizacion mro ON mro.id_requisito = mr.id
-INNER JOIN mos_organizacion mo ON mo.id = mro.id_area
-INNER JOIN mos_cargo_estrorg_arbolproc map ON map.id = mro.id_area
-AND mo.id = map.id
-WHERE id_familia =".$columnas_fam[$i][id]."
-AND (
-mo.parent_id =".$parametros[id_area]."
-OR mo.id =".$parametros[id_area]."
-)
-AND map.cod_cargo =".$parametros[id_cargo]." GROUP BY id_items";
-//echo $sql_items;
-                    $items = $this->dbl->query($sql_items, array());
-                        $contenido_1[ITEMS_FAMILIA].='<div class="tab-pane active" id="hv-red-'.$k.'">';
-                    for($j=0;$j<count($items);$j++){ //cantidad de items que se relacionan con la familia y tienen requisitos asociados             
-                        $contenido_1[ITEMS_FAMILIA].='<div class="form-group"><label><strong>&nbsp;*'.ucwords(strtolower($items[$j][desc_items])).'</strong></label>
-                                                <br>';
+                $contenido_1[FAMILIAS].='<li id="li1"><a href="#hv-red-'.$k.'" data-toggle="tab" style="padding: 8px 32px;">Requisitos Minimos</a></li>';
+      
+                $contenido_1[FAMILIAS].='</ul>';
+                $contenido_1[ITEMS_FAMILIA].='<div class="tab-pane active" id="hv-red-'.$k.'">';
                         /***** obtener requisitos del items mostrado*/
-                        $sql_requisitos= "SELECT mr.nombre nomb_req, mri.id_requisitos id_req, mri.id id_req_item,mr.tipo tipo_req,mr.vigencia vigencia_req
-FROM mos_requisitos_items_familias mif
-INNER JOIN mos_requisitos_item mri ON mri.id_item = mif.id
-INNER JOIN mos_requisitos mr ON mr.id = mri.id_requisitos
+                $sql_requisitos= "SELECT distinct mr.id id_req,mr.nombre nomb_req,mr.tipo tipo_req,mr.vigencia vigencia_req
+FROM mos_requisitos mr
 INNER JOIN mos_requisitos_organizacion mro ON mro.id_requisito = mr.id
 INNER JOIN mos_organizacion mo ON mo.id = mro.id_area
 INNER JOIN mos_cargo_estrorg_arbolproc map ON map.id = mro.id_area
 AND mo.id = map.id
-WHERE id_familia =".$columnas_fam[$i][id]."
-AND (
+WHERE map.cod_cargo =".$parametros[id_cargo]." AND mo.id in(".$areas_involucradas.")";
+/*AND (
 mo.parent_id =".$parametros[id_area]."
 OR mo.id =".$parametros[id_area]."
-)
-AND map.cod_cargo =".$parametros[id_cargo]." and 
- mif.id=".$items[$j][id_items]."
-GROUP BY ID_REQ";
-                        //echo  $sql_requisitos;
-                        $requisitos = $this->dbl->query($sql_requisitos, array());
-                        for($x=0;$x<count($requisitos);$x++){//requisitos del items
-                            $requisitos_items.=$requisitos[$x][id_req_item].',';
-                               $contenido_1[ITEMS_FAMILIA].='<br><label for="vigencia" class="col-md-6 control-label">'.$requisitos[$x][nomb_req].'</label>
-                                          <div class="col-md-6">
+)";*/
+
+                        //Secho  $sql_requisitos;
+                $requisitos = $this->dbl->query($sql_requisitos, array());
+                for($x=0;$x<count($requisitos);$x++){//requisitos que cumplen con la condicion
+                    $requisitos_items.=$requisitos[$x][id_req].',';
+                    $contenido_1[ITEMS_FAMILIA].='<br><label for="vigencia" class="col-md-6 control-label">'.$requisitos[$x][nomb_req].'</label>
+                         <div class="col-md-6">
                                     <label class="checkbox-inline" style="padding-top: 5px;">
-                                        <input type="checkbox" name="req_'.$requisitos[$x][id_req_item].'" id="req_'.$requisitos[$x][id_req_item].'" value="'.$requisitos[$x][id_req_item].'" onchange="CargaComboForm(this)"></label>
+                                        <input type="checkbox" name="req_'.$requisitos[$x][id_req].'" id="req_'.$requisitos[$x][id_req].'" value="'.$requisitos[$x][id_req].'" onchange="CargaComboForm(this)"></label>
                                              </div>';
 /*** consulta para obtener los formularios que cumplan con la condicion del requisito ***/
 if(($requisitos[$x][tipo_req]=='Listado') && ($requisitos[$x][vigencia_req]=='N')){//1. requisito tipo listado y no aplica vigencia
@@ -805,40 +797,67 @@ HAVING COUNT(id_unico) <= 1 ) AND IDDoc in (select IDDoc from mos_documentos_dat
 if(($requisitos[$x][tipo_req]=='Unico') && ($requisitos[$x][vigencia_req]=='N')){//3. requisito tipo unico y no aplica vigencia
     $sql_formulario="select IDDoc,Codigo_doc,nombre_doc from mos_documentos where vigencia = 'S' AND muestra_doc = 'S'  and formulario='S' and IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (6) GROUP BY IDDoc  
 HAVING COUNT(id_unico) <= 1 )";
+/********** consulta para las capacitaciones***********/
+    $sql_cursos="SELECT * FROM mos_cursos WHERE vigencia = 'S' AND estatus = '1'";
+    $capacitaciones = $this->dbl->query($sql_cursos, array());
+
 }
 if(($requisitos[$x][tipo_req]=='Unico') && ($requisitos[$x][vigencia_req]=='S')){//4. requisito tipo unico y aplica vigencia
     $sql_formulario="select IDDoc,Codigo_doc,nombre_doc from mos_documentos where vigencia = 'S' AND muestra_doc = 'S'  and formulario='S' and IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (6) GROUP BY IDDoc  
 HAVING COUNT(id_unico) <= 1 ) AND IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (13))";
+/********** consulta para capacitaciones***/
+    $sql_cursos="SELECT * FROM mos_cursos WHERE vigencia = 'S' AND estatus = '1'";
+    $capacitaciones = $this->dbl->query($sql_cursos, array());
 }
     // echo $sql_formulario;                                      
      $formularios_req = $this->dbl->query($sql_formulario, array());
      //Combo para formularios
-                    $contenido_1[ITEMS_FAMILIA].= '<div id="formulario_doc_'.$requisitos[$x][id_req_item].'" style="display:none;"  class="col-md-10"><select id="form_'.$requisitos[$x][id_req_item].'" name="form_'.$requisitos[$x][id_req_item].'" class="form-control" data-validation="required" onchange="CargaComboParametros(this,'.$requisitos[$x][id_req_item].',\''.$requisitos[$x][tipo_req].'\',\''.$requisitos[$x][vigencia_req].'\')">';
+                    $contenido_1[ITEMS_FAMILIA].= '<div id="formulario_doc_'.$requisitos[$x][id_req].'" style="display:none;"  class="col-md-10">';
+                    if(($requisitos[$x][tipo_req]=='Listado')){
+                    $contenido_1[ITEMS_FAMILIA].='<select id="form_'.$requisitos[$x][id_req].'" name="form_'.$requisitos[$x][id_req].'" class="form-control" class="selectpicker" onchange="CargaComboParametros(this,'.$requisitos[$x][id_req].',\''.$requisitos[$x][tipo_req].'\',\''.$requisitos[$x][vigencia_req].'\')">';
                     $contenido_1[ITEMS_FAMILIA].='<option value="">--Seleccione--</option>';
-                  //  $contenido_1[ITEMS_FAMILIA].= '<option  value="1">hola</option><option  value="2">pedrooo</option>';
                             for($z=0;$z<count($formularios_req);$z++){
                                 $contenido_1[ITEMS_FAMILIA].= '<option  value="'.$formularios_req[$z][IDDoc].'">'.$formularios_req[$z][Codigo_doc].'-'.$formularios_req[$z][nombre_doc].'</option>';
                             }
-                    $contenido_1[ITEMS_FAMILIA].= '</select></div>'; 
-$js.="$('#form_".$parametros[id_req_item]."').selectpicker({
+                            
+                    $contenido_1[ITEMS_FAMILIA].= '</select>';
+                    }
+                    /******* SI el requisito es unico***/
+                     if(($requisitos[$x][tipo_req]=='Unico')){
+
+                    $contenido_1[ITEMS_FAMILIA].='<select id="form_'.$requisitos[$x][id_req].'" name="form_'.$requisitos[$x][id_req].'" class="form-control" class="selectpicker" onchange="CargaComboParametros(this,'.$requisitos[$x][id_req].',\''.$requisitos[$x][tipo_req].'\',\''.$requisitos[$x][vigencia_req].'\')">';
+                    $contenido_1[ITEMS_FAMILIA].='<optgroup label="Formularios"><option value="">--Seleccione--</option>';
+                            for($z=0;$z<count($formularios_req);$z++){
+                                $contenido_1[ITEMS_FAMILIA].= '<option  value="'.$formularios_req[$z][IDDoc].'">'.$formularios_req[$z][Codigo_doc].'-'.$formularios_req[$z][nombre_doc].'</option>';
+                            }
+                            $contenido_1[ITEMS_FAMILIA].='</optgroup>
+                            <optgroup label="Capacitaciones">';
+                            for($z=0;$z<count($capacitaciones);$z++){
+                                $contenido_1[ITEMS_FAMILIA].= '<option  value="cap_'.$capacitaciones[$z][cod_curso].'">'.$capacitaciones[$z][cod_curso].'-'.$capacitaciones[$z][identificacion].'</option></optgroup>';
+                            }
+                            
+                    $contenido_1[ITEMS_FAMILIA].= '</select>';
+                    }
+
+                     $contenido_1[ITEMS_FAMILIA].= '</div>'; 
+$js.="$('#form_".$requisitos[$x][id_req]."').selectpicker({
                                             style: 'btn-combo'
                                           });";
 /*************** combos de los parametros*****/
                             $contenido_1[ITEMS_FAMILIA].= '<br>
-                                           <label  style="padding-top: 2px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label><div class="col-md-12"></div><div id="combos_form_'.$requisitos[$x][id_req_item].'" class="col-md-10" style="display:none;" >';  
+                                           <label  style="padding-top: 2px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label><div class="col-md-12"></div><div id="combos_form_'.$requisitos[$x][id_req].'" class="col-md-10" style="display:none;" >';  
 
 $contenido_1[ITEMS_FAMILIA].= '</div>';
 
 /************** Combo en caso de que aplique de los valores*/
                                          $contenido_1[ITEMS_FAMILIA].='
-                                           <label  style="padding-top: 2px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label><div class="col-md-12"></div><div id="valores_form_'.$requisitos[$x][id_req_item].'" class="col-md-10" style="display:none;"> <br><div class="col-md-6"></div></div><br><br>';
+                                           <label  style="padding-top: 2px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label><div class="col-md-12"></div><div id="valores_form_'.$requisitos[$x][id_req].'" class="col-md-10" style="display:none;"> <br><div class="col-md-6"></div></div><br><br>';
 
                                  
                               }
                                $contenido_1[ITEMS_FAMILIA].='</div> 
                                   <br>';
-                          }$contenido_1[ITEMS_FAMILIA].='</div>';
-                              $k++;}
+
                              
                 
                          $contenido_1[FAMILIAS].='<input type="hidden" id="vector_req_item" name="vector_req_item" value="'.$requisitos_items.'">';
@@ -897,7 +916,7 @@ $contenido_1[ITEMS_FAMILIA].= '</div>';
             public function guardar($parametros)
             {
                 
-               // print_r($parametros);
+                //print_r($parametros);
                 $requisitos_items = array();
                     if(strpos($parametros[vector_req_item],',')){    
                         $requisitos_items = explode(",", $parametros[vector_req_item]);
@@ -929,13 +948,21 @@ $contenido_1[ITEMS_FAMILIA].= '</div>';
 
                     if (is_array($requisitos_cargos)) {//guardar relacion requisitos cargos con los formularios
                         for($i=0;$i<count($parametros[vector_req_item])-1;$i++){
-                        $id_form=$parametros["form_".$parametros[vector_req_item][$i]];
-                        $id_vigencia=$parametros["id_vigencia_".$parametros[vector_req_item][$i]];
-                        $id_combo=$parametros["id_combo_".$parametros[vector_req_item][$i]];
-                        $id_persona=$parametros["id_persona_".$parametros[vector_req_item][$i]];
-                        $id_valor_params=$parametros["valores_".$parametros[vector_req_item][$i]];
+                            $req=$parametros[vector_req_item][$i];
+                            if(isset($parametros[req_.$req])){//si esta marcado el requisito
+                        $id_form=$parametros["form_".$req];
+                        $id_vigencia=$parametros["id_vigencia_".$req];
+                        $id_combo=$parametros["id_combo_".$req];
+                        $id_persona=$parametros["id_persona_".$req];
+                        $id_valor_params=$parametros["valores_".$req];
+                        $id_capacitacion=$parametros["id_capacitacion_".$req];
+                        if(isset($id_capacitacion)){//se escogio n curso
+                            $sql = "INSERT INTO mos_requisitos_cursos(id_requisito_cargo,cod_curso)
+                            VALUES(".$requisitos_cargos[$i].",".$id_capacitacion.")";
+                                $this->dbl->insert_update($sql);
 
-
+                        }
+                        else{
                             $sql = "INSERT INTO mos_requisitos_formularios(id_requisito_cargo,id_documento_form)
                             VALUES(".$requisitos_cargos[$i].",".$id_form.")";
                                 $this->dbl->insert_update($sql);
@@ -956,8 +983,11 @@ $contenido_1[ITEMS_FAMILIA].= '</div>';
                             //tipo persona siempre aplica un solo tipo persona
                             $sql_parametros = "INSERT INTO mos_requisitos_parametros_index(id_requisitos_formularios,id_parametro_formulario,id_parametro_items)
                             VALUES(".$id_requisitos_form.",".$id_persona.",NULL)";
-                            $this->dbl->insert_update($sql_parametros);    
+                            //echo $sql_parametros;
+                            $this->dbl->insert_update($sql_parametros); 
+                            }   
                             }
+                        }
                         $objResponse->addScriptCall("MostrarContenido");
                         $objResponse->addScriptCall('VerMensaje','exito','Asignacion de Requisitos asignados al cargo exitosamente');
                     }
