@@ -58,7 +58,7 @@ class MysqlBDP{
 	//$this->db_user = 'adm_bd';//[$CONEXION];
     $this->db_user = 'root';//[$CONEXION];
     //$this->db_pass = '672312';//[$CONEXION];
-	$this->db_pass = '';//[$CONEXION];
+	$this->db_pass = '123456';//[$CONEXION];
     
 //    $this->db_name = 'sslma135_ssp';//[$CONEXION];
 //    $this->db_host = 'localhost';//[$CONEXION];
