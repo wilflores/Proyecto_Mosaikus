@@ -2021,7 +2021,7 @@ echo $Consulta3;
                         $sql .= " AND rev.fecha_revision <= '" . ($atr['b-fecha_rev-hasta']) . "'";                        
                     }
                     if (strlen($atr["b-descripcion"])>0)
-                                $sql .= " AND upper(descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
+                                $sql .= " AND upper(d.descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
                     if (strlen($atr["b-palabras_claves"])>0)
                                 $sql .= " AND upper(palabras_claves) like '%" . strtoupper($atr["b-palabras_claves"]) . "%'";
 //                    if (strlen($atr["b-formulario"])>0)
@@ -2225,7 +2225,7 @@ echo $Consulta3;
                         $sql .= " AND rev.fecha_revision <= '" . ($atr['b-fecha_rev-hasta']) . "'";                        
                     }
                     if (strlen($atr["b-descripcion"])>0)
-                                $sql .= " AND upper(descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
+                                $sql .= " AND upper(d.descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
                     if (strlen($atr["b-palabras_claves"])>0)
                                 $sql .= " AND upper(palabras_claves) like '%" . strtoupper($atr["b-palabras_claves"]) . "%'";
 //                    if (strlen($atr["b-formulario"])>0)
@@ -2300,7 +2300,7 @@ echo $Consulta3;
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //print_r(array_keys($this->id_org_acceso));
                     //print_r($atr);
-                   // echo $sql;
+                    //echo $sql;
                     $this->operacion($sql, $atr);
                     
              }
@@ -2549,7 +2549,7 @@ echo $Consulta3;
                         $sql .= " AND rev.fecha_revision <= '" . ($atr['b-fecha_rev-hasta']) . "'";                        
                     }
                     if (strlen($atr["b-descripcion"])>0)
-                                $sql .= " AND upper(descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
+                                $sql .= " AND upper(d.descripcion) like '%" . strtoupper($atr["b-descripcion"]) . "%'";
                     if (strlen($atr["b-palabras_claves"])>0)
                                 $sql .= " AND upper(palabras_claves) like '%" . strtoupper($atr["b-palabras_claves"]) . "%'";
 //                    if (strlen($atr["b-formulario"])>0)
@@ -2705,6 +2705,9 @@ echo $Consulta3;
                             $respuesta = $this->dbl->delete("mos_documentos_datos_formulario", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_documentos_estrorg_arbolproc", "IDDoc = " . $atr[id]);
                             $respuesta = $this->dbl->delete("mos_parametro_modulos", "id_registro = " . $atr[id] . " AND cod_categoria = " . $atr[cod_categoria] . " AND cod_categoria_aux = " . $atr[cod_categoria] . "");                         
+                            /*********PARA ELIMINAR LOS DOC RELACIONADOS DE ESTE MISMO********/
+                            $respuesta = $this->dbl->delete("mos_documentos_relacionados", "IDDoc = " . $atr[id]);
+
                             //$respuesta = $this->dbl->delete("mos_registro", "IDDoc = " . $atr[id]);
                         }
                         else{
@@ -2722,6 +2725,9 @@ echo $Consulta3;
                             //$resp1 = mysql_query($sql);
                             //$arr1  = mysql_fetch_assoc($resp1);
                             $codigo = $arr1[0][IDDoc];
+                            /*********PARA ELIMINAR LOS DOC RELACIONADOS DE ESTE MISMO********/
+                            $sql = "delete from mos_documentos_relacionados  where IDDoc=".$atr[id];    
+                            $this->dbl->insert_update($sql);
 
                             $sql= "Update mos_documentos Set
                                                     muestra_doc = 'S'
@@ -3765,6 +3771,8 @@ echo $Consulta3;
                 $objResponse->addAssign('contenido',"innerHTML",str_replace('exportarExcel()', 'exportarExcel_maestro()', $template->show()));
                 $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
                 $objResponse->addAssign('modulo_actual',"value","documentos");
+                $objResponse->addScript("$('#div-vigencia').hide();");
+                $objResponse->addScript("$('#div-vigencia-titulo').hide();");                 
                 $objResponse->addIncludeScript(PATH_TO_JS . 'documentos/documentos_reporte_reg.js?'.  rand());
                 $objResponse->addScript("$('#MustraCargando').hide();");            
 //                if (($parametros['b-formulario'])=='S'){
@@ -4044,7 +4052,9 @@ echo $Consulta3;
                 $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
                 $objResponse->addAssign('modulo_actual',"value","documentos");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'documentos/documentos_reporte.js?'.  rand());
-                $objResponse->addScript("$('#MustraCargando').hide();");            
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("$('#div-vigencia').hide();");
+                $objResponse->addScript("$('#div-vigencia-titulo').hide();"); 
 //                if (($parametros['b-formulario'])=='S'){
 //                    $objResponse->addScript("$('#b-formulario').prop('checked',true);");
 //                }
@@ -5903,7 +5913,7 @@ echo $Consulta3;
      
  
             public function eliminar($parametros)
-            {               
+            {                         
                 if($_SESSION[ParamAdic]=='formulario') {
                     $parametros[cod_categoria]=15;
                 }
@@ -5911,7 +5921,20 @@ echo $Consulta3;
                     $parametros[cod_categoria]=1;
                 }
                 //$val = $this->verDocumentos($parametros[id]);
-                $respuesta = $this->eliminarDocumentos($parametros);
+                $sql = "SELECT
+                        count(IDDoc_relacionado) total 
+                        FROM
+                        mos_documentos_relacionados
+                        WHERE
+                        IDDoc_relacionado = $parametros[id] "; 
+                $total_registros = $this->dbl->query($sql, $atr);
+                $total = $total_registros[0][total];
+                //echo $parametros[id].'-';
+               // echo $total; die;
+                if($total<=0)
+                    $respuesta = $this->eliminarDocumentos($parametros);
+                else
+                    $respuesta = "No se puede eliminar porque está relacionado a otro documento";
                 $objResponse = new xajaxResponse();
                 if (preg_match("/ha sido eliminada con exito/",$respuesta ) == true) {
                     $objResponse->addScriptCall("MostrarContenido");
@@ -6379,7 +6402,7 @@ echo $Consulta3;
             {   //print_r($parametros);
                 
                 /*FILTRA LOS DOCUMENTOS QUE ESTAN VIGENTES*/
-                $parametros["b-vigencia"] = 'S';
+                $parametros["b-vigencia"] = '';
                 $grid = $this->verListaDocumentosReporte($parametros);
                 $objResponse = new xajaxResponse();
                 
