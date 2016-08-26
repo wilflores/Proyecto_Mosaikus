@@ -103,9 +103,9 @@
 */
              public function verRequisitosCargos($id_cargo,$id_area){
                 $atr=array();
-                $sql = "SELECT id,id_cargo,id_area,id_requisito_items
+                $sql = "SELECT id,id_cargo,id_area,id_requisito
                          FROM mos_requisitos_cargos 
-                         WHERE id_area = $id_area and id_cargo=$id_cargo order by id_requisito_items"; 
+                         WHERE id_area = $id_area and id_cargo=$id_cargo order by id_requisito"; 
                 $requisitos_cargos= $this->dbl->query($sql, array());
                 return $requisitos_cargos;
             }
@@ -164,15 +164,15 @@
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);                    
                     /*Carga Acceso segun el arbol*/
-                    if (count($this->restricciones->id_org_acceso_explicito) <= 0){
+                   /* if (count($this->restricciones->id_org_acceso_explicito) <= 0){
                         $this->restricciones->cargar_acceso_nodos_explicito($atr);
                     }                    
                     /*Valida Restriccion*/
-                    if (!isset($this->restricciones->id_org_acceso_explicito[$atr[id_organizacion]]))
+                  /*  if (!isset($this->restricciones->id_org_acceso_explicito[$atr[id_organizacion]]))
                         return '- Acceso denegado para registrar persona en el &aacute;rea seleccionada.';
                     if (!(($this->restricciones->id_org_acceso_explicito[$atr[id_organizacion]][nuevo]== 'S') || ($this->restricciones->id_org_acceso_explicito[$atr[id_organizacion]][modificar] == S)))
                         return '- Acceso denegado para registrar persona en el &aacute;rea ' . $this->restricciones->id_org_acceso_explicito[$atr[id_organizacion]][title] . '.';
-
+                    ***********/
                     $sql = "UPDATE mos_requisitos_cargos SET                            
                                     id = $atr[id],id_cargo = $atr[id_cargo],id_requisito_items = $atr[id_requisito_items]
                             WHERE  id = $atr[id]";      
@@ -255,8 +255,8 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id $sql_left";
                     try {
                         $atr = $this->dbl->corregir_parametros($atr);
                         $val = $this->verRequisitosCargos($atr[id_cargo],$atr[id_area]);
-                        $respuesta = $this->dbl->delete("mos_requisitos_cargos", "id = " . $atr[id]);
-                        $nuevo = "Id Cargo: \'$val[id_cargo]\', Id Requisito Items: \'$val[id_requisito_items]\', ";
+                        $respuesta = $this->dbl->delete("mos_requisitos_cargos", "id_area = ".$atr[id_area]." and id_cargo=".$atr[id_cargo]);
+                        $nuevo = "Id Cargo: \'$val[id_cargo]\', Id Area: \'$val[id_area]\', ";
                         $this->registraTransaccionLog(86,$nuevo,'', $atr[id]);
                         return "ha sido eliminada con exito";
                     } catch(Exception $e) {
@@ -769,7 +769,7 @@ INNER JOIN mos_requisitos_organizacion mro ON mro.id_requisito = mr.id
 INNER JOIN mos_organizacion mo ON mo.id = mro.id_area
 INNER JOIN mos_cargo_estrorg_arbolproc map ON map.id = mro.id_area
 AND mo.id = map.id
-WHERE map.cod_cargo =".$parametros[id_cargo]." AND mo.id in(".$areas_involucradas.")";
+WHERE map.cod_cargo =".$parametros[id_cargo]." AND mo.id in(".$areas_involucradas.") ORDER BY id_req";
 /*AND (
 mo.parent_id =".$parametros[id_area]."
 OR mo.id =".$parametros[id_area]."
@@ -798,7 +798,7 @@ if(($requisitos[$x][tipo_req]=='Unico') && ($requisitos[$x][vigencia_req]=='N'))
     $sql_formulario="select IDDoc,Codigo_doc,nombre_doc from mos_documentos where vigencia = 'S' AND muestra_doc = 'S'  and formulario='S' and IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (6) GROUP BY IDDoc  
 HAVING COUNT(id_unico) <= 1 )";
 /********** consulta para las capacitaciones***********/
-    $sql_cursos="SELECT * FROM mos_cursos WHERE vigencia = 'S' AND estatus = '1'";
+    $sql_cursos="SELECT * FROM mos_cursos WHERE vigencia = 'S' AND aplica_vigencia = 'N'";
     $capacitaciones = $this->dbl->query($sql_cursos, array());
 
 }
@@ -806,7 +806,7 @@ if(($requisitos[$x][tipo_req]=='Unico') && ($requisitos[$x][vigencia_req]=='S'))
     $sql_formulario="select IDDoc,Codigo_doc,nombre_doc from mos_documentos where vigencia = 'S' AND muestra_doc = 'S'  and formulario='S' and IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (6) GROUP BY IDDoc  
 HAVING COUNT(id_unico) <= 1 ) AND IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (13))";
 /********** consulta para capacitaciones***/
-    $sql_cursos="SELECT * FROM mos_cursos WHERE vigencia = 'S' AND estatus = '1'";
+    $sql_cursos="SELECT * FROM mos_cursos WHERE vigencia = 'S' AND aplica_vigencia = 'S'";
     $capacitaciones = $this->dbl->query($sql_cursos, array());
 }
     // echo $sql_formulario;                                      
@@ -1010,32 +1010,21 @@ $contenido_1[ITEMS_FAMILIA].= '</div>';
                     import("clases.interfaz.Template");
                 }
                 $ut_tool = new ut_Tool();
+                import("clases.organizacion.ArbolOrganizacional");
+                $arbol = new ArbolOrganizacional();
+                $areas_involucradas=$arbol->BuscaOrgNivelPadres($parametros[id_area]);// areas padres
                 $requisitos_cargos = $this->verRequisitosCargos($parametros[id_cargo],$parametros[id_area]); 
 
-                if (count($this->nombres_columnas) <= 0){
-                        $this->cargar_nombres_columnas();
-                }
-                foreach ( $this->nombres_columnas as $key => $value) {
-                    $contenido_1["N_" . strtoupper($key)] =  $value;
-                }                
-                if (count($this->placeholder) <= 0){
-                        $this->cargar_placeholder();
-                }
-                foreach ( $this->placeholder as $key => $value) {
-                    $contenido_1["P_" . strtoupper($key)] =  $value;
-
-                } 
                 //construir el formulario con los datos cargados
                 $sql_area="select title from mos_organizacion where id=".$parametros[id_area];
                  $this->operacion($sql_area, $parametros);
                 $descripcion_area=$this->dbl->data[0][title];
-               // $descripcion_area=$arbol->BuscaOrganizacional(array('id_organizacion'=>$parametros[id_area]));//obtener descripcion del area
                 $sql_cargo="select descripcion from mos_cargo where cod_cargo=".$parametros[id_cargo];
                     $this->operacion($sql_cargo, $parametros);
                 $descripcion_cargo=$this->dbl->data[0][descripcion];
                 $contenido_1[OTROS_CAMPOS] = '<input type="hidden"  value="'.$parametros[id_area].'" id="id_area" name="id_area"/>
                                         <input type="hidden" value="'.$parametros[id_cargo].'" id="id_cargo" name="id_cargo" />
-                <div class="form-group">
+                                <div class="form-group">
                                         <label for="id_cargo" class="col-md-4 control-label">Area</label>
                                         <div class="col-md-10">
 
@@ -1050,24 +1039,137 @@ $contenido_1[ITEMS_FAMILIA].= '</div>';
                                       </div>                                
                                   </div>
                                   ';
-/*** generar las pestañas de las familias existentes******/
+/*** PESTAÑA DE REQUISITOS******/
                  $contenido_1[FAMILIAS]='<div class="form-group"> 
                                     <div class="col-md-24">
                                         <div class="tabs">
                                         <ul id="tabs-hv-2" class="nav nav-tabs" data-tabs="tabs">';
-$columnas_fam=$this->cargar_parametros_familias();
-$k=2;
-                foreach ($columnas_fam as $value) {                  
-                    $descripcion_fam=ucwords(strtolower($value[descripcion]));
-                    $contenido_1[FAMILIAS].='<li id="li1"><a href="#hv-red-'.$k.'" data-toggle="tab" style="padding: 8px 32px;">'.$descripcion_fam.'</a></li>';
-                    $k++;
-                 }      
-                $contenido_1[FAMILIAS].='</ul>';
                 $k=2;
-                /********* obtener los requisitos de cada familia*****/ 
+                $contenido_1[FAMILIAS].='<li id="li1"><a href="#hv-red-'.$k.'" data-toggle="tab" style="padding: 8px 32px;">Requisitos Minimos</a></li>';
+      
+                $contenido_1[FAMILIAS].='</ul>';
+                $contenido_1[ITEMS_FAMILIA].='<div class="tab-pane active" id="hv-red-'.$k.'">';
+                /********* *****/ 
+/***** obtener requisitos del items mostrado*/
+                $sql_requisitos= "SELECT distinct mr.id id_req,mr.nombre nomb_req,mr.tipo tipo_req,mr.vigencia vigencia_req
+FROM mos_requisitos mr
+INNER JOIN mos_requisitos_organizacion mro ON mro.id_requisito = mr.id
+INNER JOIN mos_organizacion mo ON mo.id = mro.id_area
+INNER JOIN mos_cargo_estrorg_arbolproc map ON map.id = mro.id_area
+AND mo.id = map.id
+WHERE map.cod_cargo =".$parametros[id_cargo]." AND mo.id in(".$areas_involucradas.") ORDER BY id_req";
+/*AND (
+mo.parent_id =".$parametros[id_area]."
+OR mo.id =".$parametros[id_area]."
+)";*/
 
-                $contenido_1['ID_CARGO'] = $val["id_cargo"];
-                $contenido_1['ID_AREA'] = $val["id_area"];
+                        //Secho  $sql_requisitos;
+                $requisitos = $this->dbl->query($sql_requisitos, array());
+                for($x=0;$x<count($requisitos);$x++){//requisitos que cumplen con la condicion
+                    //for($y=0;$y<count($requisitos);$y++)// voy por aquiiiiiiiii
+                    $requisitos_items.=$requisitos[$x][id_req].',';
+                    $contenido_1[ITEMS_FAMILIA].='<br><label for="vigencia" class="col-md-6 control-label">'.$requisitos[$x][nomb_req].'</label>
+                         <div class="col-md-6">
+                                    <label class="checkbox-inline" style="padding-top: 5px;">
+                                        <input type="checkbox" name="req_'.$requisitos[$x][id_req].'" id="req_'.$requisitos[$x][id_req].'" value="'.$requisitos[$x][id_req].'" onchange="CargaComboForm(this)"></label>
+                                             </div>';
+/*** consulta para obtener los formularios que cumplan con la condicion del requisito ***/
+if(($requisitos[$x][tipo_req]=='Listado') && ($requisitos[$x][vigencia_req]=='N')){//1. requisito tipo listado y no aplica vigencia
+    $sql_formulario="select IDDoc,Codigo_doc,nombre_doc from mos_documentos where vigencia = 'S'
+     AND muestra_doc = 'S' and formulario='S' and IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (6) GROUP BY IDDoc 
+    HAVING COUNT(id_unico) <= 1) AND IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (9))";
+}
+if(($requisitos[$x][tipo_req]=='Listado') && ($requisitos[$x][vigencia_req]=='S')){//2. requisito tipo listado y aplica vigencia
+    $sql_formulario="select IDDoc,Codigo_doc,nombre_doc from mos_documentos where vigencia = 'S' AND muestra_doc = 'S'  and formulario='S' and IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (6) GROUP BY IDDoc  
+HAVING COUNT(id_unico) <= 1 ) AND IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (13)) AND IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (9))";
+}
+if(($requisitos[$x][tipo_req]=='Unico') && ($requisitos[$x][vigencia_req]=='N')){//3. requisito tipo unico y no aplica vigencia
+    $sql_formulario="select IDDoc,Codigo_doc,nombre_doc from mos_documentos where vigencia = 'S' AND muestra_doc = 'S'  and formulario='S' and IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (6) GROUP BY IDDoc  
+HAVING COUNT(id_unico) <= 1 )";
+/********** consulta para las capacitaciones***********/
+    $sql_cursos="SELECT * FROM mos_cursos WHERE vigencia = 'S' AND estatus = '1'";
+    $capacitaciones = $this->dbl->query($sql_cursos, array());
+
+}
+if(($requisitos[$x][tipo_req]=='Unico') && ($requisitos[$x][vigencia_req]=='S')){//4. requisito tipo unico y aplica vigencia
+    $sql_formulario="select IDDoc,Codigo_doc,nombre_doc from mos_documentos where vigencia = 'S' AND muestra_doc = 'S'  and formulario='S' and IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (6) GROUP BY IDDoc  
+HAVING COUNT(id_unico) <= 1 ) AND IDDoc in (select IDDoc from mos_documentos_datos_formulario where tipo in (13))";
+/********** consulta para capacitaciones***/
+    $sql_cursos="SELECT * FROM mos_cursos WHERE vigencia = 'S' AND estatus = '1'";
+    $capacitaciones = $this->dbl->query($sql_cursos, array());
+}
+    // echo $sql_formulario;                                      
+     $formularios_req = $this->dbl->query($sql_formulario, array());
+     //Combo para formularios
+                    $contenido_1[ITEMS_FAMILIA].= '<div id="formulario_doc_'.$requisitos[$x][id_req].'" style="display:none;"  class="col-md-10">';
+                    if(($requisitos[$x][tipo_req]=='Listado')){
+                    $contenido_1[ITEMS_FAMILIA].='<select id="form_'.$requisitos[$x][id_req].'" name="form_'.$requisitos[$x][id_req].'" class="form-control" class="selectpicker" onchange="CargaComboParametros(this,'.$requisitos[$x][id_req].',\''.$requisitos[$x][tipo_req].'\',\''.$requisitos[$x][vigencia_req].'\')">';
+                    $contenido_1[ITEMS_FAMILIA].='<option value="">--Seleccione--</option>';
+                            for($z=0;$z<count($formularios_req);$z++){
+                                $contenido_1[ITEMS_FAMILIA].= '<option  value="'.$formularios_req[$z][IDDoc].'">'.$formularios_req[$z][Codigo_doc].'-'.$formularios_req[$z][nombre_doc].'</option>';
+                            }
+                            
+                    $contenido_1[ITEMS_FAMILIA].= '</select>';
+                    }
+                    /******* SI el requisito es unico***/
+                     if(($requisitos[$x][tipo_req]=='Unico')){
+
+                    $contenido_1[ITEMS_FAMILIA].='<select id="form_'.$requisitos[$x][id_req].'" name="form_'.$requisitos[$x][id_req].'" class="form-control" class="selectpicker" onchange="CargaComboParametros(this,'.$requisitos[$x][id_req].',\''.$requisitos[$x][tipo_req].'\',\''.$requisitos[$x][vigencia_req].'\')">';
+                    $contenido_1[ITEMS_FAMILIA].='<optgroup label="Formularios"><option value="">--Seleccione--</option>';
+                            for($z=0;$z<count($formularios_req);$z++){
+                                $contenido_1[ITEMS_FAMILIA].= '<option  value="'.$formularios_req[$z][IDDoc].'">'.$formularios_req[$z][Codigo_doc].'-'.$formularios_req[$z][nombre_doc].'</option>';
+                            }
+                            $contenido_1[ITEMS_FAMILIA].='</optgroup>
+                            <optgroup label="Capacitaciones">';
+                            for($z=0;$z<count($capacitaciones);$z++){
+                                $contenido_1[ITEMS_FAMILIA].= '<option  value="cap_'.$capacitaciones[$z][cod_curso].'">'.$capacitaciones[$z][cod_curso].'-'.$capacitaciones[$z][identificacion].'</option></optgroup>';
+                            }
+                            
+                    $contenido_1[ITEMS_FAMILIA].= '</select>';
+                    }
+
+                     $contenido_1[ITEMS_FAMILIA].= '</div>'; 
+$js.="$('#form_".$requisitos[$x][id_req]."').selectpicker({
+                                            style: 'btn-combo'
+                                          });";
+/*************** combos de los parametros*****/
+                            $contenido_1[ITEMS_FAMILIA].= '<br>
+                                           <label  style="padding-top: 2px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label><div class="col-md-12"></div><div id="combos_form_'.$requisitos[$x][id_req].'" class="col-md-10" style="display:none;" >';  
+
+$contenido_1[ITEMS_FAMILIA].= '</div>';
+
+/************** Combo en caso de que aplique de los valores*/
+                                         $contenido_1[ITEMS_FAMILIA].='
+                                           <label  style="padding-top: 2px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label><div class="col-md-12"></div><div id="valores_form_'.$requisitos[$x][id_req].'" class="col-md-10" style="display:none;"> <br><div class="col-md-6"></div></div><br><br>';
+
+                                 
+                              }
+                               $contenido_1[ITEMS_FAMILIA].='</div> 
+                                  <br>';
+
+                             
+                
+                         $contenido_1[FAMILIAS].='<input type="hidden" id="vector_req_item" name="vector_req_item" value="'.$requisitos_items.'">';
+
+
+
+
+                if (count($this->nombres_columnas) <= 0){
+                        $this->cargar_nombres_columnas();
+                }
+                foreach ( $this->nombres_columnas as $key => $value) {
+                    $contenido_1["N_" . strtoupper($key)] =  $value;
+                }                
+                if (count($this->placeholder) <= 0){
+                        $this->cargar_placeholder();
+                }
+                foreach ( $this->placeholder as $key => $value) {
+                    $contenido_1["P_" . strtoupper($key)] =  $value;
+
+                } 
+
+                $contenido_1['ID_CARGO'] = $parametros[id_cargo];
+                $contenido_1['ID_AREA'] = $parametros[id_area];
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'requisitos_cargos/';
@@ -1101,9 +1203,14 @@ $k=2;
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");  
+                 $objResponse->addScript("$('#tabs-hv-2').tab();"
+                        . "$('#tabs-hv-2 a:first').tab('show');");
+                    $objResponse->addScript ("$('.nav-tabs a[href=\"#hv-red\"]').hide();");
                 return $objResponse;
             }
-     
+  
+
+
  
             public function actualizar($parametros)
             {

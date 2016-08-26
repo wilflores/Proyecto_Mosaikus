@@ -134,25 +134,6 @@
                 return $html;
             }
             */
-   /*         public function colum_admin_arbol($tupla)
-            {                
-                print_r($tupla);
-                if ($this->restricciones->id_org_acceso_explicito[$tupla[id_organizacion]][modificar] == 'S')
-                {                    
-                    $html = "<a href=\"#\" onclick=\"javascript:editarRequisitos('". $tupla[id] . "');\"  title=\"Editar Requisitos\">                            
-                                <i class=\"icon icon-edit\"></i>
-                            </a>";
-                }
-                if ($this->restricciones->id_org_acceso_explicito[$tupla[id_organizacion]][eliminar] == 'S')
-                {
-                    $html .= "<a href=\"#\" onclick=\"javascript:eliminarRequisitos('". $tupla[id] . "');\" title=\"Eliminar Requisitos\">
-                            <i class=\"icon icon-remove\"></i>
-
-                        </a>"; 
-                }
-                return $html;
-            }
-*/
  /*funcion para permisos de eliminar o editar en areas asociadas al requisito****/
             public function colum_admin_arbol($tupla)
             {        
@@ -215,15 +196,9 @@
 
              public function verRequisitos($id){
                 $atr=array();
-                $sql = "SELECT id
-,nombre
-,tipo
-,vigencia
-,estatus
-,orden
-
+                $sql = "SELECT id,nombre,tipo,vigencia,estatus,orden
                          FROM mos_requisitos 
-                         WHERE id = $id "; 
+                         WHERE id =$id"; 
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }

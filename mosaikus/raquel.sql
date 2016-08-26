@@ -288,3 +288,5 @@ ALTER TABLE `mos_requisitos_cursos` ADD FOREIGN KEY ( `cod_curso` ) REFERENCES `
 ) ON DELETE CASCADE ON UPDATE CASCADE ;
 /****** nuevo campo en mos_cursos 24/08/16*/
 ALTER TABLE mos_cursos ADD estatus INT NOT NULL DEFAULT '1';
+/**** cambios en tabla mos_cursos 26/08/16***/
+ALTER TABLE `mos_cursos` CHANGE `estatus` `aplica_vigencia` CHAR( 1 ) NOT NULL DEFAULT 'S';
