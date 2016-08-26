@@ -6,16 +6,16 @@
 	include_once('configuracion/configuracion.php');
         session_name($GLOBALS[SESSION]);
         session_start();
-	import('clases.usuarios.Usuarios');
+	import('clases.mos_usuario.mos_usuario');
 
 
-        $pagina = new Usuarios();
-        $data = $pagina->listarUsuarios(array('campo' => 'nombre', 'valor' => $_GET["term"], 'corder' => 'nombre', 'sorder' => 'asc'), 1, 100);
+        $pagina = new mos_usuario();
+        $data = $pagina->listarmos_usuario(array('campo' => 'nombre', 'valor' => $_GET["term"], 'corder' => 'nombres', 'sorder' => 'asc'), 1, 10000);
         $data=$pagina->dbl->data;
         $items = array();
         //$q = strtolower($_GET["q"]);
         for($i=0;$i<count($data);$i++){
-            $items[]= array('label' => $data[$i]['nombre'], 'id' => ($data[$i]['id']), 'correo' => $data[$i]['correo']);
+            $items[]= array('nombre' => $data[$i]['nombres'], 'id' => ($data[$i]['id_usuario']), 'name' => $data[$i]['email']);
         } 
         //if (!$q) return;
         //print_r($items);

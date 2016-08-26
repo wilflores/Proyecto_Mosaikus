@@ -195,7 +195,7 @@ function cargar_autocompletado(){
       }
       
     function filtrar_mostrar_colums(){
-        var colums = '2-';
+        var colums = '2-5-';
         //alert(0000000000);
          $('.checkbox-mos-col').each(function() {
                 if (this.checked){

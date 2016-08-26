@@ -1,4 +1,10 @@
 <div class="form-group">
+                                        <label for="email" class="col-md-4 control-label">{N_EMAIL}</label>
+                                        <div class="col-md-10">
+                                          <input type="text" class="form-control" value="{EMAIL}" id="email" name="email" placeholder="{N_EMAIL}" data-validation="required email" data-provide="typeahead" autocomplete="off"/>                                          
+                                      </div>                                
+                                  </div>
+<div class="form-group">
                                         <label for="nombres" class="col-md-4 control-label">{N_NOMBRES}</label>
                                         <div class="col-md-10">
                                           <input type="hidden" class="form-control" value="{ID_USUARIO}" id="id_usuario" name="id_usuario" placeholder="{N_ID_USUARIO}"   />
@@ -62,12 +68,7 @@
                                       </div>
                                         </label>
                                   </div>                                      
-<div class="form-group">
-                                        <label for="email" class="col-md-4 control-label">{N_EMAIL}</label>
-                                        <div class="col-md-10">
-                                          <input type="text" class="form-control" value="{EMAIL}" id="email" name="email" placeholder="{N_EMAIL}" data-validation="required" />                                          
-                                      </div>                                
-                                  </div>
+
 <div class="form-group">
                                         <label for="password_1" class="col-md-4 control-label">{N_PASSWORD_1}</label>
                                         <div class="col-md-10">

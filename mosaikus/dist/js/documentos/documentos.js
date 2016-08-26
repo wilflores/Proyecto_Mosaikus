@@ -211,7 +211,7 @@ function cargar_autocompletado(){
       }
       
     function filtrar_mostrar_colums(){
-        var colums = '2-3-';
+        var colums = '2-3-5-';
          $('.checkbox-mos-col').each(function() {
                 if (this.checked){
                     colums = colums + this.value + '-';
@@ -766,6 +766,8 @@ function RechazarWF(estado,etapa,id){
             array.setObjeto('Documentos','cargar_combo_wf');
             array.addParametro('nodos',nodos);
             array.addParametro('id',id);
+            array.addParametro('modo',document.getElementById('modo').value);
+            array.addParametro('cod_link',document.getElementById('cod_link').value);            
             array.addParametro('import','clases.documentos.Documentos');
             xajax_Loading(array.getArray());
         }
@@ -780,12 +782,12 @@ function ao_multiple(){
                 "plugins": ["search", "types","checkbox"]
             }
         );
-
+/*
     $("#div-ao-form").on("select_node.jstree", function (e, data) {
         if(data.event) { 
             data.instance.select_node(data.node.children_d);
         }
-    });
+    });*/
     $("#div-ao-form").on("deselect_node.jstree", function (e, data) {
         if(data.event) { data.instance.deselect_node(data.node.children_d); }
     });

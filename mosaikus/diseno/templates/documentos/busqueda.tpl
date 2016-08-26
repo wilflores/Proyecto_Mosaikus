@@ -217,11 +217,11 @@
                                          <input type="hidden" name="b-ocultar-publico" id="b-ocultar-publico">
                                          <input type="hidden" id="b-area_espejo" name="b-area_espejo"/> 
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group" id="div-vigencia-titulo">
                                         <label for="vigencia" class="col-md-24 control-label">{N_VIGENCIA}</label>                                                                                                           
                                         
                                     </div>                                    
-                                    <div class="form-group"> 
+                                    <div class="form-group" id="div-vigencia"> 
                                         <label class="checkbox-inline" style="padding-top: 0px;"> 
                                             <input type="radio" checked="checked" value="S" id="b-vigencia" name="b-vigencia"> Si &nbsp; 
                                             <input type="radio" value="N" id="b-vigencia" name="b-vigencia"> No &nbsp; 

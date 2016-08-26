@@ -26,7 +26,7 @@
                                       {N_CODIGO_DOC}</label>
                                   
                             </div>
-<div class="checkbox">                                                        
+<div class="checkbox" style="display: none;">                                                        
                                       <label >
                                           <input type="checkbox" name="SelectAcc" id="SelectAcc" value="5" class="checkbox-mos-col" checked="checked">   &nbsp;
                                           {N_NOMBRE_DOC}

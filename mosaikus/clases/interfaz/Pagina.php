@@ -183,6 +183,7 @@ class Pagina{
         $this->asigna_script_vendor('Gallery/js/jquery.blueimp-gallery.min.js');  
         $this->asigna_script_vendor('Bootstrap-Image-Gallery/js/bootstrap-image-gallery.min.js');
         $this->asigna_script_vendor('bootstrap-select/dist/js/bootstrap-select.min.js');
+        $this->asigna_script_vendor('Bootstrap-3-Typeahead/bootstrap3-typeahead.min.js');
         
         
       

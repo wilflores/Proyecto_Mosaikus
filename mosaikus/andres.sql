@@ -1561,3 +1561,6 @@ CREATE TRIGGER `registra_mos_historico_cargos_promocion_upd` BEFORE UPDATE ON `m
 END
 ;;
 DELIMITER ;
+
+/*******25/08/2016*********/
+ALTER TABLE `mos_documentos_relacionados` DROP FOREIGN KEY `fk_iddoc_doc_relacionado`;

@@ -180,7 +180,7 @@ function cargar_autocompletado(){
       }
       
     function filtrar_mostrar_colums(){
-        var colums = '2-';
+        var colums = '2-5-';
          $('.checkbox-mos-col').each(function() {
                 if (this.checked){
                     colums = colums + this.value + '-';

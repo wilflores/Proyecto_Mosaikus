@@ -23,7 +23,7 @@
                                     </div>                                
                                     <div class="form-group col-xs-8">
                                         <label for="apellido_materno" class="">{N_APELLIDO_MATERNO}</label>                                        
-                                        <input readonly type="text" class="form-control"  value="{APELLIDO_MATERNO}" id="apellido_materno" name="apellido_materno" placeholder="{P_APELLIDO_MATERNO}" data-validation="sololetras"/>
+                                        <input readonly type="text" class="form-control"  value="{APELLIDO_MATERNO}" id="apellido_materno" name="apellido_materno" placeholder="{P_APELLIDO_MATERNO}" />
                                     </div>  
                                 </div>
                             </div> 

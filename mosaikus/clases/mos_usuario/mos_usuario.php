@@ -1286,8 +1286,41 @@
                             lang: 'es'  
                           });");
                 $objResponse->addScript("$('#fecha_creacion').datetimepicker();");
-            $objResponse->addScript("$('#fecha_expi').datetimepicker();");
-   return $objResponse;
+                $objResponse->addScript("$('#fecha_expi').datetimepicker();");
+                $objResponse->addScript("$.get('pages/autocompletar/personal_directo.php', function(data){
+                                $('#email').typeahead({ source:data });
+                            },'json');");
+                $objResponse->addScript('$("#email").change(function() {
+                                        var current = $("#email").typeahead("getActive");
+                                        if (current) {
+                                            /* Some item from your model is active!*/
+                                            if (current.name == $("#email").val()) {
+                                                $("#nombres").val(current.nombres);
+                                                $("#apellido_paterno").val(current.apellido_pa);
+                                                $("#apellido_materno").val(current.apellido_ma);
+                                                $("#cedula").val(current.id);
+                                                $("#nombres").attr("readonly","true");
+                                                $("#apellido_paterno").attr("readonly","true");
+                                                $("#apellido_materno").attr("readonly","true");
+                                                $("#cedula").attr("readonly","true");
+                                                /* This means the exact match is found. Use toLowerCase() if you want case insensitive match.*/
+                                            } else {
+                                                /* This means it is only a partial match, you can either add a new item 
+                                                // or take the active if you don not want new items*/
+                                                $("#cedula").removeAttr("readonly");
+                                                $("#nombres").removeAttr("readonly");
+                                                $("#apellido_paterno").removeAttr("readonly");
+                                                $("#apellido_materno").removeAttr("readonly");
+                                            }
+                                        } else {
+                                            $("#cedula").removeAttr("readonly");
+                                            $("#nombres").removeAttr("readonly");
+                                            $("#apellido_paterno").removeAttr("readonly");
+                                            $("#apellido_materno").removeAttr("readonly");
+                                            // Nothing is active so it is a new value (or maybe empty value)
+                                        }
+                                    });');
+                return $objResponse;
             }
      
  
