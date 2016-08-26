@@ -242,6 +242,7 @@
             {
                 $atr = $this->dbl->corregir_parametros($atr);
                 $sql_where = "";
+                $sql_limit = "";
 
                 $id_org = -1;
                 if ((strlen($atr["b-id_organizacion"])>0) && ($atr["b-id_organizacion"] != "2")){
@@ -253,6 +254,11 @@
                     $id_org = $ao->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
                     $sql_where .= " AND mcea.id IN (". $id_org . ")";
                 }
+
+                if($atr['pdf_report']=='1') {
+                    $sql_limit = " LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                }
+
                 $sql = "SELECT 1, 
                                mcea.id,
                                mo.title,
@@ -264,8 +270,9 @@
                         where  
                                NOT mcea.id IS NULL $sql_where 
                         AND    mcea.cod_cargo = mc.cod_cargo
-                        AND    mo.id = mcea.id ORDER BY mcea.id,mc.cod_cargo";
-                        //LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+                        AND    mo.id = mcea.id 
+                        AND    mcea.id IN (". implode(',', array_keys($this->id_org_acceso)) . ") 
+                        ORDER BY mcea.id,mc.cod_cargo $sql_limit";
                 $this->operacion($sql ,$atr);
 
 
@@ -424,8 +431,6 @@
             $html = "";
 
             $areas = array();
-            $data = array_slice($data,(($parametros['pag'] - 1) * $reg_por_pagina), $parametros['pag'] * $reg_por_pagina);
-
             $aux_id = $data[0]['id'];
             $cargos = array();
 
@@ -446,8 +451,6 @@
             }
             $ao = new ArbolOrganizacional();
 
-            //print_r($areas);
-
             foreach($areas as $k => $values){
                 $html .= '<tr class="odd gradeX">';
                 $nombre_area = $ao->BuscaOrganizacional(array('id_organizacion'=>$k));
@@ -459,6 +462,7 @@
                 $html .= '</td>';
                 $html .= '</tr>';
             }
+
             $out[tabla] = $html;
             return $out;
         }
@@ -634,14 +638,14 @@
                             </div>';
                     $k++;
                 }
-                if (!isset($parametros['b-formulario'])){
+                /*if (!isset($parametros['b-formulario'])){
                     $contenido[OTRAS_OPCIONES] = '<li>
                                     <a href="#"  onClick="reporte_cargos_pdf();">
                                       <i class="icon icon-alert-print"></i>
                                       <span>Cargos</span>
                                     </a>
                                   </li>';
-                }
+                }*/
                 
                 import('clases.utilidades.NivelAcceso');
                 $this->restricciones = new NivelAcceso();
@@ -662,7 +666,7 @@
                 $contenido['PAGINADO'] = $grid['paginado'];
                 //$contenido['PERMISO_INGRESAR'] = $this->restricciones->per_crear == 'S' ? '' : 'display:none;';
                 $contenido['PERMISO_INGRESAR'] = $_SESSION[CookN] == 'S' ? '' : 'display:none;';
-                $contenido['PERMISO_INGRESAR'] = 'display:none;';
+                //$contenido['PERMISO_INGRESAR'] = 'display:none;';
 
                 import('clases.organizacion.ArbolOrganizacional');
                 $ao = new ArbolOrganizacional();
@@ -969,14 +973,7 @@
  
             public function buscar($parametros)
             {
-                /*$grid = $this->verListaCargos($parametros);
-                $objResponse = new xajaxResponse();
-                $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
-                $objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
-                          
-                $objResponse->addScript("$('#MustraCargando').hide();");
-                $objResponse->addScript("PanelOperator.resize();");
-                return $objResponse;*/
+                print_r($parametros);
 
                 if (strlen($parametros['b-id_organizacion'])== 0)
                     $parametros['b-id_organizacion'] = 2;
@@ -984,20 +981,41 @@
                     $this->cargar_acceso_nodos($parametros);
                 }
 
-                $parametros[reg_por_pagina] = 5000;
-                $grid = $this->verListaCargosReporte($parametros);
-                $html = '<table class="table table-report  ">
+
+                if($parametros['modo']=='Portal'){
+
+                    $parametros[reg_por_pagina] = 5000;
+                    $grid = $this->verListaCargosReporte($parametros);
+                    $html = '<table class="table table-report  ">
                       <thead>
                       <tr>'.$grid[titulo].'</tr>
                       </thead>
                       <tbody>'.$grid[tabla].'</tbody>
                     </table>';
-                $objResponse = new xajaxResponse();
-                $objResponse->addAssign('grid',"innerHTML",$html);
-                //$objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
+                    $objResponse = new xajaxResponse();
+                    $objResponse->addAssign('grid',"innerHTML",$html);
+                    //$objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
 
-                $objResponse->addScript("$('#MustraCargando').hide();");
-                return $objResponse;
+                    $objResponse->addScript("$('#MustraCargando').hide();");
+                    return $objResponse;
+                }else{
+                    import('clases.utilidades.NivelAcceso');
+                    $this->restricciones = new NivelAcceso();
+                    $this->restricciones->cargar_permisos($parametros);
+
+
+                    $grid = $this->verListaCargos($parametros);
+                    $objResponse = new xajaxResponse();
+                    $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
+                    $objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
+
+                    $objResponse->addScript("$('#MustraCargando').hide();");
+                    $objResponse->addScript("PanelOperator.resize();");
+                    return $objResponse;
+                }
+
+
+
             }
          
  
@@ -1049,17 +1067,20 @@
                     $id_org = $ao->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
                     $sql_where .= " AND mcea.id IN (". $id_org . ")";
                 }
-                $sql = "SELECT  
-                               count(DISTINCT mcea.id) as total_registros
+                $sql = "SELECT count(*) as total_registros
                         from   mos_cargo_estrorg_arbolproc mcea,
                                      mos_cargo mc,
                                mos_organizacion mo
                         where  
                                NOT mcea.id IS NULL $sql_where 
                         AND    mcea.cod_cargo = mc.cod_cargo
-                        AND    mo.id = mcea.id";
+                        AND    mo.id = mcea.id
+                        AND    mcea.id IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
+
+                $this->operacion($sql ,$atr);
 
                 $total_registros = $this->dbl->query($sql, $atr);
                 return $total_registros[0][total_registros];
+
             }
  }?>

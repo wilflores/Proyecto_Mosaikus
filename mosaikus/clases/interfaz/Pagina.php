@@ -194,7 +194,7 @@ class Pagina{
         $this->asigna_script('highcharts/highcharts.js');
         //$this->asigna_script('highcharts/exporting.js');
         $this->asigna_script("jquery/bootbox.min.js");
-      
+
         //$this->asigna_script('jquery/jquery.multiselect.js');        temporal
         //$this->asigna_script('jquery/jquery.multiselect.filter.js');  temporal
         

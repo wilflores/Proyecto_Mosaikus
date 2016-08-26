@@ -17,23 +17,23 @@ $params['b-id_organizacion'] = $_GET['b-id_organizacion'];
 $params[cod_link] = $_GET[cod_link];
 $params[modo] = $_GET[modo];
 $pagina->cargar_acceso_nodos($params);
-$params[reg_por_pagina] = 5000;
+$params[reg_por_pagina] = 25;
 $params[niveles] = 2;
 $total_registros = $pagina->ContarCargosReporte($params);
-
+$params[pdf_report] = '1';
 
 $template = new Template();
 $template->PATH = PATH_TO_TEMPLATES . 'cargo/';
 
-$total_paginas = $total_registros / $params[reg_por_pagina];
-$resto = $total_registros % $params[reg_por_pagina];
+$total_paginas = $total_registros / 25;
+$resto = $total_registros % 25;
 
 if ($resto > 0)
     $total_paginas++;
 $paginas = array();
 
 
-for ($i = 1; $i <= $total_paginas; $i++) {
+for ($i = 1; $i <= (int)$total_paginas; $i++) {
     $params[pag] = $i;
     $tabla = $pagina->verListaCargosReporte($params);
 
@@ -50,17 +50,9 @@ for ($i = 1; $i <= $total_paginas; $i++) {
 }
 
 
-
-
-
-//echo $template->show();
-
-
 $string = "";
 require("clases/GenerarPDFReportes.php");
 $pdf = new GenerarPDFReportes();
-//echo 1;
-//echo $template->show();
 $pdf->pdf_create_reporte($paginas, "Reporte_Cargos", false, 1, true, 0, $pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));
 
 

@@ -128,7 +128,7 @@ import("clases.interfaz.Pagina");
                         import("clases.mos_acceso.mos_acceso");
                     }
                     $acceso = new mos_acceso();
-                    $data_permisos = $acceso->obtenerPermisosModulo($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros['b-id_organizacion']);                    
+                    $data_permisos = $acceso->obtenerPermisosModulo($_SESSION[CookIdUsuario],$parametros[cod_link],$parametros['b-id_organizacion']);
                     foreach ($data_permisos as $value) {
                         if ($value[nuevo] == 'S'){
                             $this->per_crear =  'S';
