@@ -782,12 +782,12 @@ function ao_multiple(){
                 "plugins": ["search", "types","checkbox"]
             }
         );
-
+/*
     $("#div-ao-form").on("select_node.jstree", function (e, data) {
         if(data.event) { 
             data.instance.select_node(data.node.children_d);
         }
-    });
+    });*/
     $("#div-ao-form").on("deselect_node.jstree", function (e, data) {
         if(data.event) { data.instance.deselect_node(data.node.children_d); }
     });
