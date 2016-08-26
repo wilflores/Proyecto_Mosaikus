@@ -592,7 +592,7 @@ function semaforo($tupla,$key)
 }       
 function semaforoPHPExcel($tupla,$key)
 { 
-  // print_r($tupla);
+   //print_r($tupla);
    $vig =  explode(',',$tupla[$key]);
    
    $edo =  $vig[0];
@@ -1095,7 +1095,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
             $dataxls[$col]= array_column($data,$col);              
          } 
         import('clases.organizacion.ArbolOrganizacional');
-//        print_r($cols);
+       // print_r($cols);
 //        print_r($dataxls);
         
         
@@ -1113,10 +1113,11 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $dataxls[$arbol_key]=$arbol;
                 unset($arbol);
             }
-            if($cols[$value]=='Vigencia'){
+            //echo $value . ' ' . (substr($value, 0, 4)) . ' ';
+            if ((substr($value, 0, 4) == 'edop')&&($cols[$value]=='Vigencia')){
                 foreach($dataxls[$value] as $nodo)
                 {
-                    $vigencia[] = $this->semaforoPHPExcel($nodo,$value);
+                    $vigencia[] = $this->semaforoPHPExcel(array($value => $nodo),$value);
                 }
                 $dataxls[$value]=$vigencia;
                 unset($vigencia);                
@@ -1124,7 +1125,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
             if(strstr($value,"estado_semaforo_p")){
                 foreach($dataxls[str_replace('estado_semaforo_','',$value)] as $nodo)
                 {
-                    $semaforo[] = $this->estado_columnaPHPExcel($nodo,$value);
+                    $semaforo[] = $this->estado_columnaPHPExcel(array($value => $nodo),$value);
                 }
                 $dataxls[$value]=$semaforo;
                 unset($semaforo);                

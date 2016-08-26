@@ -388,7 +388,7 @@ $objActSheet = $objPHPExcel->getActiveSheet();
 foreach (array_keys($columnas) as $value){
     //$nombre = $doc->cargar_nombres_columnas_xls($value);
     //echo strpos($value,"edo").'-'.strtolower($columnas[$value]);
-    if(strstr($value,"edo") && strtolower($columnas[$value])=='vigencia' ) {
+    if(strstr($value,"edo") && strtolower($columnas[$value])=='vigencia'  && (substr($value, 0, 4) == 'edop')) {
             $col_vigencia=$col;
             //echo 'col:'.$value.'-valor:'.$columnas[$value].'-colnum:'. $col_vigencia;
     }
@@ -399,6 +399,8 @@ foreach (array_keys($columnas) as $value){
     $col++;
 }
 /////PARA HACER EL detalle DE LA TABLA
+//print_r($datos);
+//exit();
 $col=0;
 foreach (array_keys($columnas) as $columna){
    //echo 'columna:'.$columna.'--';
@@ -475,7 +477,7 @@ $objActSheet = $objPHPExcel->getActiveSheet();
 //$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 $objWriter =new PHPExcel_Writer_Excel2007($objPHPExcel);
 
-
+ 
 header('Content-Type: image/png');
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Cache-Control: max-age=0');
@@ -486,7 +488,7 @@ header ('Cache-Control: cache, must-revalidate'); // HTTP/1.1
 header ('Pragma: public'); // HTTP/1.0
 header("Content-Disposition: attachment;filename=$filename");
 $objWriter->save('php://output');
-exit;            
+ exit;          
             
     ?>
 
