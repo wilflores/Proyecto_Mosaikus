@@ -1451,7 +1451,7 @@
 		
                 $items = array();
                 $sql="select * from mos_arbol_procesos
-				Where id = $id";
+				Where id = $id order by position";
                 $data = $this->dbl->query($sql, $atr);
                 if (isset($parametros[MarcarNodosP]) && (in_array($data[0][id], $parametros[MarcarNodosP])))
                      $items[0] = array(id=>$data[0][id], text=>$data[0][title], "state" => array("opened" => true,"selected" => true ));
@@ -1460,7 +1460,7 @@
                 
                 
                 $sql="select * from mos_arbol_procesos
-				Where parent_id = $id";
+				Where parent_id = $id order by position";
                 //echo $sql;
 		//$resp = mysql_query($sql);
                 $data = $this->dbl->query($sql, $atr);
