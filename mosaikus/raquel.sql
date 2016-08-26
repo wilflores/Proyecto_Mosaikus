@@ -286,4 +286,5 @@ ALTER TABLE `mos_requisitos_cursos` ADD FOREIGN KEY ( `id_requisito_cargo` ) REF
 ALTER TABLE `mos_requisitos_cursos` ADD FOREIGN KEY ( `cod_curso` ) REFERENCES `santateresa`.`mos_cursos` (
 `cod_curso`
 ) ON DELETE CASCADE ON UPDATE CASCADE ;
-
+/****** nuevo campo en mos_cursos 24/08/16*/
+ALTER TABLE mos_cursos ADD estatus INT NOT NULL DEFAULT '1';
