@@ -973,8 +973,6 @@
  
             public function buscar($parametros)
             {
-                print_r($parametros);
-
                 if (strlen($parametros['b-id_organizacion'])== 0)
                     $parametros['b-id_organizacion'] = 2;
                 if (count($this->id_org_acceso) <= 0){
