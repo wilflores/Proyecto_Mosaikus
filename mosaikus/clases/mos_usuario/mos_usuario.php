@@ -1287,10 +1287,10 @@
                           });");
                 $objResponse->addScript("$('#fecha_creacion').datetimepicker();");
                 $objResponse->addScript("$('#fecha_expi').datetimepicker();");
-                $objResponse->addScript("$.get('pages/autocompletar/personal_directo.php', function(data){
-                                $('#email').typeahead({ source:data });
-                            },'json');");
-                $objResponse->addScript('$("#email").change(function() {
+                $objResponse->addScript('$("#email").attr("disabled","true");
+                                $.get("pages/autocompletar/personal_directo.php", function(data){
+                                $("#email").typeahead({ source:data });
+                                $("#email").change(function() {
                                         var current = $("#email").typeahead("getActive");
                                         if (current) {
                                             /* Some item from your model is active!*/
@@ -1319,7 +1319,10 @@
                                             $("#apellido_materno").removeAttr("readonly");
                                             // Nothing is active so it is a new value (or maybe empty value)
                                         }
-                                    });');
+                                    });
+                                    $("#email").removeAttr("disabled");
+                            },"json");');
+                $objResponse->addScript('');
                 return $objResponse;
             }
      
