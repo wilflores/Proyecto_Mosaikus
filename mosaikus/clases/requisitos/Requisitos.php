@@ -801,7 +801,10 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                     $contenido_1["P_" . strtoupper($key)] =  $value;
                 }
 
-
+                 $contenido_1['CHECKED']='checked';
+                 $contenido_1['CHECKED_ESTATUS']='checked';
+                 $contenido_1['SELECTED_LISTADO']='';
+                 $contenido_1['SELECTED_UNICO']='';
                 $array = $this->crear_campos_dinamicos(1,null,6,14);
                     
                 $contenido_1[OTROS_CAMPOS] = $array[html];     
@@ -1018,8 +1021,24 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                 }    
             $contenido_1['NOMBRE'] = ($val["nombre"]);
             $contenido_1['TIPO'] = ($val["tipo"]);
+/*** ver el tipo de requisito actual**/
+             if($val["tipo"]=='Unico')
+                $contenido_1['SELECTED_UNICO']='selected';
+            else
+                $contenido_1['SELECTED_LISTADO']='selected';           
+/********** ver si tiene o no vigencia */
             $contenido_1['VIGENCIA'] = ($val["vigencia"]);
+            if($val["vigencia"]=='N')
+                 $contenido_1['CHECKED']='';
+            else
+                $contenido_1['CHECKED']='checked';
+
+/********** ver ESTATUS ES 1 O 0*/
             $contenido_1['ESTATUS'] = $val["estatus"];
+            if($val["estatus"]==0)
+                 $contenido_1['CHECKED_ESTATUS']='';
+            else
+                $contenido_1['CHECKED_ESTATUS']='checked';
             $contenido_1['ORDEN'] = $val["orden"];
 
                 $template = new Template();

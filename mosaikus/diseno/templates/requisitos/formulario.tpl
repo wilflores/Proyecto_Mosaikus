@@ -2,8 +2,8 @@
                                         <label for="tipo" class="col-md-4 control-label">{N_TIPO}</label>
                                         <div class="col-md-10">
                                         <select id="tipo" name="tipo" class="form-control" placeholder="{N_TIPO}" data-validation="required">
-                                          <option>Listado</option>
-                                          <option>Unico</option>
+                                          <option {SELECTED_LISTADO}>Listado</option>
+                                          <option {SELECTED_UNICO}>Unico</option>
                                         </select>
                                           <!--<input type="text" class="form-control" value="{TIPO}" id="tipo" name="tipo" placeholder="{N_TIPO}" data-validation="required"/>-->
                                       </div>                                
@@ -26,13 +26,13 @@
 <div class="form-group">
                                         <label for="vigencia" class="col-md-4 control-label">{N_VIGENCIA}</label>
                                         <div class="col-md-10">
-                                          <input type="checkbox" checked class="form-control" value="S" id="vigencia" name="vigencia" placeholder="{N_VIGENCIA}" />
+                                          <input type="checkbox" {CHECKED} class="form-control" value="S" id="vigencia" name="vigencia" placeholder="{N_VIGENCIA}" />
                                       </div>                                
                                   </div>
 <div class="form-group">
                                         <label for="estatus" class="col-md-4 control-label">{N_ESTATUS}</label>
                                         <div class="col-md-10">
-                                          <input type="checkbox" checked class="form-control" value="1" id="estatus" name="estatus" placeholder="{N_ESTATUS}"/>
+                                          <input type="checkbox" {CHECKED_ESTATUS} class="form-control" value="1" id="estatus" name="estatus" placeholder="{N_ESTATUS}"/>
                                       </div>                                
                                   </div>
 <div class="form-group">
