@@ -45,7 +45,7 @@
 <sethtmlpagefooter name="MyFooter1" value="on" />
             
             
-    <br/> 
+    
 <div id="main-content" class=" panel-container col-xs-23 ">
     <div class="content-panel panel">
         <div class="content">

@@ -289,7 +289,7 @@ class GenerarPDFReportes{
                 break;
             }
 
-        $mpdf=new mPDF('',$formato,'','',10,10,33,30, 10, 8);  
+        $mpdf=new mPDF('',$formato,'','',10,10,33,25, 5, 0);  
         $stylesheet = file_get_contents('dist/css/styles_pdf.css'); // external css
         $mpdf->WriteHTML($stylesheet,1);
         if ($piepagina) {

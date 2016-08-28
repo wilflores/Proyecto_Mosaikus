@@ -649,7 +649,8 @@
              * 
              */
             public function numeroNivelesHijos($param=array(),$num=0) {
-                $ids = implode(",", $param);
+                
+                $ids = implode(",", $param);                
                 $sql = "select id from mos_organizacion where parent_id in ($ids)";
                 $data = $this->dbl->query($sql);
                 if (count($data)>0){

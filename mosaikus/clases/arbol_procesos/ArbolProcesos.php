@@ -430,10 +430,12 @@
                 for($i=1;$i<=$niveles;$i++){
                     if ($i==1){
                         $out[titulo] .= "<th style=\"width: ".$ancho_area  . "%\" >&Aacute;rea</th>" ;                        
-                        $out[titulo] .= "<th style=\"width: ". (100  - $ancho_area) / $niveles  . "%\" >Proceso</th>" ;                        
+                        //$out[titulo] .= "<th style=\"width: ". (100  - $ancho_area) / $niveles  . "%\" >Proceso</th>" ;                        
+                        $out[titulo] .= "<th style=\"width: 30%\" >Proceso</th>" ;                        
                     }
                     else if ($i==$niveles){
-                        $out[titulo] .= "<th style=\"width: ". (100  - $ancho_area) / $niveles  . "%\" >Actividad</th>" ;   
+                        //$out[titulo] .= "<th style=\"width: ". (100  - $ancho_area) / $niveles  . "%\" >Actividad</th>" ;   
+                        $out[titulo] .= "<th style=\"width: 35%\" >Actividad</th>" ; 
                     }
                     else 
                       $out[titulo] .= "<th style=\"width: ". (100  - $ancho_area) / $niveles  . "%\" >SubProceso $i</th>" ;
