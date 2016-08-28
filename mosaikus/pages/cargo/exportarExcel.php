@@ -42,10 +42,10 @@
     $objPHPExcel->setActiveSheetIndex(0);
     $objActSheet = $objPHPExcel->getActiveSheet();
     $objActSheet->setTitle($hoja2);
-    $objActSheet->setCellValue('A4', $titulo2);
-    $objActSheet->setCellValue('A5', 'Fecha: '.date('d/m/Y'));
-    $objActSheet->mergeCells('A4:E4');
-    $objPHPExcel->getActiveSheet()->getStyle('A4:E4')->applyFromArray( $style_titulo );
+    $objActSheet->setCellValue('A1', $titulo2);
+    $objActSheet->setCellValue('A2', 'Fecha: '.date('d/m/Y'));
+    $objActSheet->mergeCells('A1:E1');
+    $objPHPExcel->getActiveSheet()->getStyle('A1:E1')->applyFromArray( $style_titulo );
 
     $style_header_resumen_head = array(
         'borders' => array(
@@ -122,18 +122,25 @@
     }
     $ao = new ArbolOrganizacional();
     $index = 7;
-    $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(70);
-    $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(100);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(40);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(40);
+    
     foreach($areas as $k => $values){
         $objActSheet->setCellValueByColumnAndRow(0,$index,str_replace('&#8594;','->',$ao->BuscaOrganizacional(array('id_organizacion' => $k))));
-
-        $value = "";
+        $objPHPExcel->getActiveSheet()->getStyle('A'.$index)->applyFromArray( $style_header_sencillo );
+        $objPHPExcel->getActiveSheet()->getStyle('A'.$index)->getAlignment()->setWrapText(true);
+        $objPHPExcel->getActiveSheet()->getStyle('A'.$index)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+        //$value = "";
         foreach ($values as $v){
-            $value .= $v . "\n";
+            //$value .= $v . "\n";
+            $objActSheet->setCellValueByColumnAndRow(1,$index,$v);
+            $objPHPExcel->getActiveSheet()->getStyle('B'.$index)->getAlignment()->setWrapText(true);        
+            $objPHPExcel->getActiveSheet()->getStyle('B'.$index)->applyFromArray( $style_header_sencillo );
+            $objPHPExcel->getActiveSheet()->getStyle('B'.$index)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+            $index++;
         }
-        $objActSheet->setCellValueByColumnAndRow(1,$index,$value);
-        $objPHPExcel->getActiveSheet()->getStyle('B'.$index)->getAlignment()->setWrapText(true);
-        $index++;
+        $objActSheet->mergeCells('A'.($index-count($values)).':'.'A'.($index-1));
+        
     }
 
     //images
@@ -144,7 +151,7 @@
     $objDrawing->setDescription('Sample image');
     $objDrawing->setWidthAndHeight(68,68);
     $objDrawing->setResizeProportional(true);
-    $objDrawing->setCoordinates('A'.($row+1));
+    $objDrawing->setCoordinates('A'.($index+1));
 
     $objDrawing2 = new PHPExcel_Worksheet_Drawing();
     $objDrawing2->setPath('diseno/images/logo_empresa/'.$_SESSION[CookIdEmpresa].'_logo_empresa_report.png');
@@ -152,7 +159,7 @@
     $objDrawing2->setDescription('Sample image');
     $objDrawing2->setWidthAndHeight(125,125);
     $objDrawing2->setResizeProportional(true);
-    $objDrawing2->setCoordinates('F1');
+    $objDrawing2->setCoordinates('D1');
 
     $objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
     $objDrawing2->setWorksheet($objPHPExcel->getActiveSheet());

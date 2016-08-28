@@ -33,7 +33,7 @@ ini_set('memory_limit', '-1');
                 $params[reg_por_pagina] = 24;
                  break;
             case 5:
-            $params[reg_por_pagina] = 22;
+            $params[reg_por_pagina] = 21;
                         break;
 
             default:
@@ -81,7 +81,7 @@ ini_set('memory_limit', '-1');
             $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 1, true, 0,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
         }
         else //if ($tabla[niveles] <= 10) 
-            $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 1, true, 1,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
+            $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 3, true, 1,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
         //else 
         //    $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 3, true, 1,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
             

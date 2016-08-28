@@ -17,7 +17,7 @@ $params['b-id_organizacion'] = $_GET['b-id_organizacion'];
 $params[cod_link] = $_GET[cod_link];
 $params[modo] = $_GET[modo];
 $pagina->cargar_acceso_nodos($params);
-$params[reg_por_pagina] = 25;
+$params[reg_por_pagina] = 30;
 $params[niveles] = 2;
 $total_registros = $pagina->ContarCargosReporte($params);
 $params[pdf_report] = '1';
@@ -25,8 +25,8 @@ $params[pdf_report] = '1';
 $template = new Template();
 $template->PATH = PATH_TO_TEMPLATES . 'cargo/';
 
-$total_paginas = $total_registros / 25;
-$resto = $total_registros % 25;
+$total_paginas = $total_registros / 30;
+$resto = $total_registros % 30;
 
 if ($resto > 0)
     $total_paginas++;

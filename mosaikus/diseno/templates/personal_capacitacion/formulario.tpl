@@ -89,7 +89,14 @@
                                         <input type="hidden" id="tamano" name="tamano" value="{TAMANO}">
                                         <input type="hidden" id="tipo_doc" name="tipo_doc" value="{TIPO_DOC}">
                                         <input type="hidden" name="MAX_FILE_SIZE" value="15000000" />
-                                        <div id="estado" style="display:none;"><img src="{PAHT_TO_IMG}loading3.gif">Cargando</div>
+                                        <div id="estado" style="display:none;">
+                                            <!--<img src="{PAHT_TO_IMG}loading3.gif">Cargando-->
+                                            <div class="progress" style="width: 250px;">
+                                                <div class="progress-bar" id="estado-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;">
+                                                  0%
+                                                </div>
+                                            </div>
+                                        </div>
                                   </div>                                
                              </div>
                              <div class="form-group" id="info_archivo_adjunto"  style="display:none;">

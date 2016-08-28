@@ -419,11 +419,11 @@
             $out[niveles] = $niveles = $parametros[niveles] = 2;
             $out[titulo] = "";
             if ($niveles == 2){
-                $ancho_area = 35;
+                $ancho_area = 50;
             }
             else $ancho_area = 30;
-            $out[titulo] .= "<th style=\"width: ".$ancho_area  . "%\" >&Aacute;rea</th>" ;
-            $out[titulo] .= "<th style=\"width: ". (100  - $ancho_area) / $niveles  . "%\" >Cargos</th>" ;
+            $out[titulo] .= "<th style=\"width: 60%\" >&Aacute;rea</th>" ;
+            $out[titulo] .= "<th style=\"width: 40%\" >Cargos</th>" ;
 
             $this->listarCargosReporte($parametros, $parametros['pag'], $reg_por_pagina);
             $data=$this->dbl->data;
@@ -994,7 +994,7 @@
                     $objResponse = new xajaxResponse();
                     $objResponse->addAssign('grid',"innerHTML",$html);
                     //$objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
-
+                    $objResponse->addScript("PanelOperator.resize();");
                     $objResponse->addScript("$('#MustraCargando').hide();");
                     return $objResponse;
                 }else{

@@ -101,7 +101,8 @@ function cargar_autocompletado(){
                 html = html + '<a href="' + i + '" id="eliminar_esp_' + i + '"><i class="icon icon-remove"></i></a>';  
                 html = html + '<input type="hidden" id="id_pers_' + i + '" name="id_pers_' + i + '" value="' + $(this).val() + '">'; 
                 html = html + '</td>' ; 
-                html = html + '<td>' + $.Rut.formatear($(this).attr('rut')) + '</td>';
+                html = html + '<td>' + ($(this).attr('rut')) + '</td>';
+                //html = html + '<td>' + $.Rut.formatear($(this).attr('rut')) + '</td>';
                 html = html + '<td>' + ($(this).attr('nom')) + ' ' + ($(this).attr('ap_p')) + ' ' + ($(this).attr('ap_m')) + '</td>';
                 html = html + '<td><span class="">'+
                                                 '    Si '+
@@ -264,14 +265,61 @@ function cargar_autocompletado(){
     }
     
     function cargar_archivo_otro(){
+        //alert(1);
         //$('#fileUploadOtro').val($('#fileUpload2').val());
         var formData = new FormData(document.getElementById("formuploadajax"));
+        //alert(2);
             //formData.append("dato", "valor"); 
             var fileInput = document.getElementById('fileUpload2');
             formData.append('fileUpload',fileInput.files[0]);
             formData.append("dato", "valor");
             $('#estado').show();
-            $.ajax({
+            var $bar = $('#estado-progress-bar');
+             $bar.width(0);
+             $bar.text("0%");
+             $.ajax({
+                url: "pages/personal_capacitacion/uploadFileOtro2.php",
+                type: "post",
+                dataType: "html",
+                data: formData,
+                cache: false,
+                contentType: false,
+	     processData: false,
+             xhr: function() {
+                    myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        myXhr.upload.addEventListener('progress', function(prog) {
+                            var value = ~~((prog.loaded / prog.total) * 100);
+                            var $bar = $('#estado-progress-bar');
+                            $bar.width(value*250/100);
+                            $bar.text(value+ "%");
+                        }, false);
+                    }
+                    return myXhr;
+                }
+            })
+                .done(function(res){
+                    //alert(res);
+                   respuesta = $.parseJSON(res);
+           //alert(respuesta);
+           //alert(respuesta[0].exito);
+                   if (respuesta[0].exito == 1) {
+                        $('#tabla_fileUpload').hide();
+                        $('#info_nombre').html(respuesta[0].info_nombre);
+                        $('#filename').val(respuesta[0].filename);
+                        $('#tamano').val(respuesta[0].tamano);
+                        $('#tipo_doc').val(respuesta[0].tipo);
+                        $('#estado_actual').val(respuesta[0].estado_actual);
+                        $('#info_archivo_adjunto').show();
+                   }
+                   else{
+                       VerMensaje('error',respuesta[0].msj);
+                       $('#fileUpload2').val('');
+                       
+                   }
+                   $('#estado').hide();
+                });
+            /* $.ajax({
                 url: "pages/personal_capacitacion/uploadFileOtro2.php",
                 type: "post",
                 dataType: "json",
@@ -290,15 +338,6 @@ function cargar_autocompletado(){
                                     $bar.width(value*250/100);
                                 }
                                 $bar.text(value*250/100 + "%");
-
-//                            // if we passed a progress function
-//                            if (progressFn && typeof progressFn == "function") {
-//                                progressFn(prog, value);
-//
-//                                // if we passed a progress element
-//                            } else if (progressFn) {
-//                                $(progressFn).val(value);
-//                            }
                         }, false);
                     }
                     return myXhr;
@@ -320,7 +359,7 @@ function cargar_autocompletado(){
                        alert(respuesta[0].msj);
                    }
                    $('#estado').hide();
-                });
+                });*/
     }
     
     function filtrar_mostrar_colums(){

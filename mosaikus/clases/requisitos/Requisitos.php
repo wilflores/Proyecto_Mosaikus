@@ -134,25 +134,6 @@
                 return $html;
             }
             */
-   /*         public function colum_admin_arbol($tupla)
-            {                
-                print_r($tupla);
-                if ($this->restricciones->id_org_acceso_explicito[$tupla[id_organizacion]][modificar] == 'S')
-                {                    
-                    $html = "<a href=\"#\" onclick=\"javascript:editarRequisitos('". $tupla[id] . "');\"  title=\"Editar Requisitos\">                            
-                                <i class=\"icon icon-edit\"></i>
-                            </a>";
-                }
-                if ($this->restricciones->id_org_acceso_explicito[$tupla[id_organizacion]][eliminar] == 'S')
-                {
-                    $html .= "<a href=\"#\" onclick=\"javascript:eliminarRequisitos('". $tupla[id] . "');\" title=\"Eliminar Requisitos\">
-                            <i class=\"icon icon-remove\"></i>
-
-                        </a>"; 
-                }
-                return $html;
-            }
-*/
  /*funcion para permisos de eliminar o editar en areas asociadas al requisito****/
             public function colum_admin_arbol($tupla)
             {        
@@ -215,15 +196,9 @@
 
              public function verRequisitos($id){
                 $atr=array();
-                $sql = "SELECT id
-,nombre
-,tipo
-,vigencia
-,estatus
-,orden
-
+                $sql = "SELECT id,nombre,tipo,vigencia,estatus,orden
                          FROM mos_requisitos 
-                         WHERE id = $id "; 
+                         WHERE id =$id"; 
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }
@@ -826,7 +801,10 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                     $contenido_1["P_" . strtoupper($key)] =  $value;
                 }
 
-
+                 $contenido_1['CHECKED']='checked';
+                 $contenido_1['CHECKED_ESTATUS']='checked';
+                 $contenido_1['SELECTED_LISTADO']='';
+                 $contenido_1['SELECTED_UNICO']='';
                 $array = $this->crear_campos_dinamicos(1,null,6,14);
                     
                 $contenido_1[OTROS_CAMPOS] = $array[html];     
@@ -1043,8 +1021,24 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                 }    
             $contenido_1['NOMBRE'] = ($val["nombre"]);
             $contenido_1['TIPO'] = ($val["tipo"]);
+/*** ver el tipo de requisito actual**/
+             if($val["tipo"]=='Unico')
+                $contenido_1['SELECTED_UNICO']='selected';
+            else
+                $contenido_1['SELECTED_LISTADO']='selected';           
+/********** ver si tiene o no vigencia */
             $contenido_1['VIGENCIA'] = ($val["vigencia"]);
+            if($val["vigencia"]=='N')
+                 $contenido_1['CHECKED']='';
+            else
+                $contenido_1['CHECKED']='checked';
+
+/********** ver ESTATUS ES 1 O 0*/
             $contenido_1['ESTATUS'] = $val["estatus"];
+            if($val["estatus"]==0)
+                 $contenido_1['CHECKED_ESTATUS']='';
+            else
+                $contenido_1['CHECKED_ESTATUS']='checked';
             $contenido_1['ORDEN'] = $val["orden"];
 
                 $template = new Template();

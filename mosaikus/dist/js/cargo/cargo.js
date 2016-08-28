@@ -86,25 +86,22 @@
         }
         array.getForm('busquedaFrm');
 
-        array.setObjeto('Cargos','buscar');
-        array.addParametro('import','clases.cargo.Cargos');
-        $('#MustraCargando').show();
-        xajax_Loading(array.getArray());
-
-        /*if ((isNaN(document.getElementById("reg_por_pag").value) == true) || (parseInt(document.getElementById("reg_por_pag").value) <= 0)){
-            array.addParametro('reg_por_pagina', 10);
-            document.getElementById("reg_por_pag").value = 10
-        }
-        else
-        {
-            array.addParametro('reg_por_pagina', document.getElementById("reg_por_pag").value);
+        if ( $("#reg_por_pag").length > 0 ) {
+            if ((isNaN(document.getElementById("reg_por_pag").value) == true) || (parseInt(document.getElementById("reg_por_pag").value) <= 0)){
+                array.addParametro('reg_por_pagina', 10);
+                document.getElementById("reg_por_pag").value = 10
+            }
+            else
+            {
+                array.addParametro('reg_por_pagina', document.getElementById("reg_por_pag").value);
+            }
         }
         array.addParametro('permiso',document.getElementById('permiso_modulo').value);
         array.addParametro('pag',pag);
         array.setObjeto('Cargos','buscar');
         array.addParametro('import','clases.cargo.Cargos');
         $('#MustraCargando').show();
-        xajax_Loading(array.getArray());*/
+        xajax_Loading(array.getArray());
     }
 
     function verCargos(id){

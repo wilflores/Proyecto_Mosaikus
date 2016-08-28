@@ -17,7 +17,7 @@
         $params[cod_link] = $_GET[cod_link];
         $params[modo] = $_GET[modo];
         $pagina->cargar_acceso_nodos($params);
-        $params[reg_por_pagina] = 21;
+        $params[reg_por_pagina] = 18;
         $params[niveles] = 2;
         $total_registros = $pagina->ContarArbolProcesosReporte($params);
         $template = new Template();
@@ -67,7 +67,7 @@
         $pdf = new GenerarPDFReportes();
         //echo 1;
         //echo $template->show();
-        $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 1, true, 0,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
+        $pdf->pdf_create_reporte($paginas, "Reporte_AO" . $val["Codigo_doc"], false, 1, true, 1,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
 
 
 ?>
