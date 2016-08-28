@@ -9,6 +9,7 @@
     <div class="form-group">
         <label for="nombres" class="col-md-4 control-label">{N_NOMBRES}</label>
         <div class="col-md-10">
+
             <input type="hidden" class="form-control" value="{ID_USUARIO}" id="id_usuario" name="id_usuario" placeholder="{N_ID_USUARIO}"  data-validation="required" />
             <input type="text" readonly class="form-control" value="{NOMBRES}" id="nombres" name="nombres" placeholder="{N_NOMBRES}" data-validation="required"/>
         </div>        

@@ -4,6 +4,10 @@
     <list default="true" id="c29a96a7-4a88-4ad3-a30c-02061a403b5e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mosaikus/clases/cargo/Cargos.php" afterPath="$PROJECT_DIR$/mosaikus/clases/cargo/Cargos.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mosaikus/clases/mos_usuario/mos_usuario.php" afterPath="$PROJECT_DIR$/mosaikus/clases/mos_usuario/mos_usuario.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mosaikus/diseno/templates/mos_usuario/configurar.tpl" afterPath="$PROJECT_DIR$/mosaikus/diseno/templates/mos_usuario/configurar.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mosaikus/pages/mos_usuario/listaPerfiles.php" afterPath="$PROJECT_DIR$/mosaikus/pages/mos_usuario/listaPerfiles.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mosaikus/sigfredo.sql" afterPath="$PROJECT_DIR$/mosaikus/sigfredo.sql" />
     </list>
     <ignored path="mosaikusapps.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -23,130 +27,7 @@
     <favorites_list name="mosaikusapps" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="NivelAcceso.php" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/mosaikus/clases/utilidades/NivelAcceso.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="352">
-              <caret line="130" column="8" selection-start-line="130" selection-start-column="8" selection-end-line="130" selection-end-column="8" />
-              <folding>
-                <marker date="1472154310243" expanded="true" signature="1719:1835" ph="SELECT cod_p... mos_parametro" />
-                <marker date="1472154310243" expanded="true" signature="2015:2083" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1472154310243" expanded="true" signature="2428:2502" ph="SELECT nombr... mos_nombres_campos" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="cargo.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mosaikus/dist/js/cargo/cargo.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2596">
-              <caret line="118" column="5" selection-start-line="118" selection-start-column="5" selection-end-line="118" selection-end-column="5" />
-              <folding>
-                <element signature="n#!!block;n#ao_multiple#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ArbolProcesos.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mosaikus/clases/arbol_procesos/ArbolProcesos.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5302">
-              <caret line="241" column="102" selection-start-line="241" selection-start-column="28" selection-end-line="241" selection-end-column="102" />
-              <folding>
-                <marker date="1472207230945" expanded="true" signature="963:1079" ph="SELECT cod_p... mos_parametro" />
-                <marker date="1472207230945" expanded="true" signature="1245:1359" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1472207230945" expanded="true" signature="1691:1811" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1472207230945" expanded="true" signature="2915:3066" ph="SELECT id ,p... " />
-                <marker date="1472207230945" expanded="true" signature="3351:3636" ph="INSERT INTO mos_arbol_procesos... " />
-                <marker date="1472207230945" expanded="true" signature="4866:5058" ph="INSERT INTO mos_log... " />
-                <marker date="1472207230945" expanded="true" signature="5341:5643" ph="UPDATE mos_a... " />
-                <marker date="1472207230945" expanded="true" signature="7207:7254" ph="select max(l... mos_arbol_procesos" />
-                <marker date="1472207230945" expanded="true" signature="10162:10302" ph="select COUNT... ${$sql_left}" />
-                <marker date="1472207230945" expanded="true" signature="13184:13369" ph="select 1 ${$... ${$sql_left}" />
-                <marker date="1472207230945" expanded="true" signature="14668:14786" ph="SELECT COUNT... mos_arbol_procesos" />
-                <marker date="1472207230945" expanded="true" signature="16077:16517" ph="SELECT id ,p... " />
-                <marker date="1472207230945" expanded="true" signature="21061:21075" ph="..." />
-                <marker date="1472207230945" expanded="true" signature="21334:21348" ph="..." />
-                <marker date="1472207230945" expanded="true" signature="30822:30828" ph=" " />
-                <marker date="1472207230945" expanded="true" signature="34760:35305" ph="..." />
-                <marker date="1472207230945" expanded="true" signature="34937:35270" ph="..." />
-                <marker date="1472207230945" expanded="true" signature="35013:35229" ph="..." />
-                <marker date="1472207230945" expanded="false" signature="35177:35183" ph=" " />
-                <marker date="1472207230945" expanded="true" signature="36647:36653" ph=" " />
-                <marker date="1472207230945" expanded="true" signature="36653:36659" ph=" " />
-                <marker date="1472207230945" expanded="true" signature="36694:36826" ph="..." />
-                <marker date="1472207230945" expanded="true" signature="40577:41122" ph="..." />
-                <marker date="1472207230945" expanded="true" signature="40754:41087" ph="..." />
-                <marker date="1472207230945" expanded="true" signature="40830:41046" ph="..." />
-                <marker date="1472207230945" expanded="false" signature="40994:41000" ph=" " />
-                <marker date="1472207230945" expanded="true" signature="52641:52834" ph="..." />
-                <marker date="1472207230945" expanded="true" signature="52671:52751" ph="..." />
-                <marker date="1472207230945" expanded="true" signature="55572:55628" ph="Select * fro... mos_arbol_procesos" />
-                <marker date="1472207230945" expanded="true" signature="58248:59039" ph="SELECT count... mos_acciones_correctivas" />
-                <marker date="1472207230945" expanded="true" signature="60546:61011" ph="SELECT IFNUL... mos_registro_item" />
-                <marker date="1472207230945" expanded="true" signature="62218:62273" ph="select * fro... mos_arbol_procesos" />
-                <marker date="1472207230945" expanded="true" signature="64803:65593" ph="SELECT count... mos_acciones_correctivas" />
-                <marker date="1472207230945" expanded="true" signature="67784:68219" ph="SELECT IFNUL... mos_registro_item" />
-                <marker date="1472207230945" expanded="true" signature="69280:69336" ph="Select * fro... mos_arbol_procesos" />
-                <marker date="1472207230945" expanded="true" signature="69910:69965" ph="select * fro... mos_arbol_procesos" />
-                <marker date="1472207230945" expanded="true" signature="70425:70481" ph="Select * fro... mos_arbol_procesos" />
-                <marker date="1472207230945" expanded="true" signature="70892:71183" ph="SELECT IFNUL... mos_registro_item" />
-                <marker date="1472207230945" expanded="true" signature="71669:71724" ph="select * fro... mos_arbol_procesos" />
-                <marker date="1472207230945" expanded="true" signature="72074:72365" ph="SELECT IFNUL... mos_registro_item" />
-                <marker date="1472207230945" expanded="true" signature="73695:73846" ph="select id as... mos_arbol_procesos" />
-                <marker date="1472207230945" expanded="true" signature="74381:74506" ph="SELECT * FRO... mos_arbol_procesos" />
-                <marker date="1472207230945" expanded="true" signature="75638:75686" ph="select * fro... mos_arbol_procesos" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="exportarExcel.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mosaikus/pages/arbol_procesos/exportarExcel.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3520">
-              <caret line="160" column="105" selection-start-line="160" selection-start-column="105" selection-end-line="160" selection-end-column="105" />
-              <folding>
-                <marker date="1472067132051" expanded="true" signature="8676:8776" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="arbol_procesos.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mosaikus/dist/js/arbol_procesos/arbol_procesos.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3454">
-              <caret line="157" column="42" selection-start-line="157" selection-start-column="42" selection-end-line="157" selection-end-column="42" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="reporte_cargos_pdf.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mosaikus/pages/cargo/reporte_cargos_pdf.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="429">
-              <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="reporte_ap_pdf.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mosaikus/pages/arbol_procesos/reporte_ap_pdf.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="462">
-              <caret line="21" column="48" selection-start-line="21" selection-start-column="48" selection-end-line="21" selection-end-column="48" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="375" />
   </component>
   <component name="FrameworkCommandLineHistory">
     <commandsHistory>
@@ -169,7 +50,6 @@
         <option value="$PROJECT_DIR$/mosaikus/clases/arbol_procesos/ArbolProcesos.php" />
         <option value="$PROJECT_DIR$/mosaikus/diseno/templates/cargo/listar_reporte_pdf.tpl" />
         <option value="$PROJECT_DIR$/mosaikus/dist/js/cargo/cargo.js" />
-        <option value="$PROJECT_DIR$/mosaikus/sigfredo.sql" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/mosaikus/clases/interfaz/Pagina.php" />
         <option value="$PROJECT_DIR$/mosaikus/clases/bd/MysqlBDP.php" />
@@ -177,6 +57,12 @@
         <option value="$PROJECT_DIR$/mosaikus/clases/utilidades/NivelAcceso.php" />
         <option value="$PROJECT_DIR$/mosaikus/pages/cargo/reporte_cargos_pdf.php" />
         <option value="$PROJECT_DIR$/mosaikus/clases/cargo/Cargos.php" />
+        <option value="$PROJECT_DIR$/mosaikus/clases/personas/Personas.php" />
+        <option value="$PROJECT_DIR$/mosaikus/clases/usuarios/Usuarios.php" />
+        <option value="$PROJECT_DIR$/mosaikus/diseno/templates/mos_usuario/configurar.tpl" />
+        <option value="$PROJECT_DIR$/mosaikus/pages/mos_usuario/listaPerfiles.php" />
+        <option value="$PROJECT_DIR$/mosaikus/clases/mos_usuario/mos_usuario.php" />
+        <option value="$PROJECT_DIR$/mosaikus/sigfredo.sql" />
       </list>
     </option>
   </component>
@@ -273,72 +159,6 @@
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mosaikusapps" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mosaikusapps" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mosaikus" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="dist" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="js" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mosaikusapps" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mosaikusapps" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mosaikus" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="dist" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="js" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cargo" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mosaikusapps" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mosaikusapps" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mosaikus" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="clases" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
     </panes>
@@ -424,18 +244,21 @@
       <workItem from="1472066757614" duration="7387000" />
       <workItem from="1472124655112" duration="5738000" />
       <workItem from="1472152955063" duration="4411000" />
-      <workItem from="1472225608839" duration="742000" />
+      <workItem from="1472225608839" duration="765000" />
+      <workItem from="1472227057674" duration="1307000" />
+      <workItem from="1472295238237" duration="3498000" />
+      <workItem from="1472384338152" duration="3047000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="65827000" />
+    <option name="totallyTimeSpent" value="73702000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17552084" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17552084" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -473,206 +296,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/mosaikus/configuracion/configuracion.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/clases/cargo/Cargos.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="22">
-          <caret line="1" column="7" selection-start-line="1" selection-start-column="7" selection-end-line="1" selection-end-column="7" />
-          <folding>
-            <element signature="n#Cargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#cargar_parametros#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#cargar_campos_activos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#cargar_placeholder#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#verCargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#codigo_siguiente#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#verCargosArbol#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#ingresarCargosArbol#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#ingresarCargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#registraTransaccionLog#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#modificarCargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#eliminarCargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#eliminarCargosArbol#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#cargar_acceso_nodos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#crear#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#guardar#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#editar#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#actualizar#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#eliminar#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#ver#0;n#Cargos#0;n#!!top" expanded="false" />
-            <marker date="1472225772051" expanded="true" signature="1120:1236" ph="SELECT cod_p... mos_parametro" />
-            <marker date="1472225772051" expanded="true" signature="1403:1460" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472225772051" expanded="true" signature="1403:1516" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472225772051" expanded="true" signature="1864:1932" ph="SELECT campo... mos_campos_activos" />
-            <marker date="1472225772051" expanded="true" signature="2290:2409" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472225772051" expanded="true" signature="2773:3278" ph="SELECT cod_c... mos_cargo" />
-            <marker date="1472225772051" expanded="true" signature="3029:3197" ph="select mos_c... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="3476:3553" ph="SELECT MAX(c... mos_cargo" />
-            <marker date="1472225772051" expanded="true" signature="3890:4042" ph="SELECT cod_c... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="4390:4588" ph="INSERT INTO mos_cargo_estrorg_arbolproc... " />
-            <marker date="1472225772051" expanded="true" signature="5815:6079" ph="INSERT INTO mos_cargo... " />
-            <marker date="1472225772051" expanded="true" signature="7302:7494" ph="INSERT INTO mos_log... " />
-            <marker date="1472225772051" expanded="true" signature="7770:8024" ph="UPDATE mos_c... " />
-            <marker date="1472225772051" expanded="true" signature="11537:11646" ph="SELECT COUNT... mos_cargo" />
-            <marker date="1472225772051" expanded="true" signature="11869:12261" ph="SELECT cod_c... mos_cargo" />
-            <marker date="1472225772051" expanded="true" signature="14549:14989" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:14990" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15110" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15150" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15154" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15208" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15263" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15264" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15276" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15321" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="15531:15680" ph="SELECT COUNT... mos_personal" />
-            <marker date="1472225772051" expanded="true" signature="19970:19984" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="20218:20232" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="20464:20478" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="20710:20724" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="28473:29018" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="28650:28983" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="28726:28942" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="28890:28896" ph=" " />
-            <marker date="1472225772051" expanded="true" signature="32673:33218" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="32850:33183" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="32926:33142" ph="..." />
-            <marker date="1472225772051" expanded="false" signature="33090:33096" ph=" " />
-            <marker date="1472225772051" expanded="true" signature="33379:33676" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="33461:33636" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="50500:50693" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="50530:50610" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="53714:54216" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/clases/interfaz/Pagina.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18172">
-          <caret line="828" column="0" selection-start-line="828" selection-start-column="0" selection-end-line="828" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/diseno/templates/cargo/verCargos.tpl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/configuracion/configuracion.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/clases/cargo/Cargos.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="22">
-          <caret line="1" column="7" selection-start-line="1" selection-start-column="7" selection-end-line="1" selection-end-column="7" />
-          <folding>
-            <element signature="n#Cargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#cargar_parametros#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#cargar_campos_activos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#cargar_placeholder#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#verCargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#codigo_siguiente#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#verCargosArbol#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#ingresarCargosArbol#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#ingresarCargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#registraTransaccionLog#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#modificarCargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#eliminarCargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#eliminarCargosArbol#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#cargar_acceso_nodos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#crear#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#guardar#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#editar#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#actualizar#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#eliminar#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#ver#0;n#Cargos#0;n#!!top" expanded="false" />
-            <marker date="1472225772051" expanded="true" signature="1120:1236" ph="SELECT cod_p... mos_parametro" />
-            <marker date="1472225772051" expanded="true" signature="1403:1460" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472225772051" expanded="true" signature="1403:1516" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472225772051" expanded="true" signature="1864:1932" ph="SELECT campo... mos_campos_activos" />
-            <marker date="1472225772051" expanded="true" signature="2290:2409" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472225772051" expanded="true" signature="2773:3278" ph="SELECT cod_c... mos_cargo" />
-            <marker date="1472225772051" expanded="true" signature="3029:3197" ph="select mos_c... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="3476:3553" ph="SELECT MAX(c... mos_cargo" />
-            <marker date="1472225772051" expanded="true" signature="3890:4042" ph="SELECT cod_c... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="4390:4588" ph="INSERT INTO mos_cargo_estrorg_arbolproc... " />
-            <marker date="1472225772051" expanded="true" signature="5815:6079" ph="INSERT INTO mos_cargo... " />
-            <marker date="1472225772051" expanded="true" signature="7302:7494" ph="INSERT INTO mos_log... " />
-            <marker date="1472225772051" expanded="true" signature="7770:8024" ph="UPDATE mos_c... " />
-            <marker date="1472225772051" expanded="true" signature="11537:11646" ph="SELECT COUNT... mos_cargo" />
-            <marker date="1472225772051" expanded="true" signature="11869:12261" ph="SELECT cod_c... mos_cargo" />
-            <marker date="1472225772051" expanded="true" signature="14549:14989" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:14990" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15110" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15150" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15154" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15208" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15263" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15264" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15276" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15321" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="15531:15680" ph="SELECT COUNT... mos_personal" />
-            <marker date="1472225772051" expanded="true" signature="19970:19984" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="20218:20232" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="20464:20478" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="20710:20724" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="28473:29018" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="28650:28983" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="28726:28942" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="28890:28896" ph=" " />
-            <marker date="1472225772051" expanded="true" signature="32673:33218" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="32850:33183" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="32926:33142" ph="..." />
-            <marker date="1472225772051" expanded="false" signature="33090:33096" ph=" " />
-            <marker date="1472225772051" expanded="true" signature="33379:33676" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="33461:33636" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="50500:50693" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="50530:50610" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="53714:54216" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/clases/interfaz/Pagina.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18216">
-          <caret line="828" column="0" selection-start-line="828" selection-start-column="0" selection-end-line="828" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/diseno/templates/cargo/verCargos.tpl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/index.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/diseno/templates/cargo/verCargos.tpl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mosaikus/clases/acciones_correctivas/AccionesCorrectivas.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="396">
@@ -684,13 +307,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2046">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/melvin.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="257">
-          <caret line="24" column="31" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="31" />
         </state>
       </provider>
     </entry>
@@ -820,32 +436,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/dist/js/funciones.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="292">
-          <caret line="1440" column="9" selection-start-line="1440" selection-start-column="9" selection-end-line="1440" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mosaikus/raquel.sql">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1276">
           <caret line="58" column="0" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/sigfredo.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="44">
-          <caret line="2" column="118" selection-start-line="2" selection-start-column="118" selection-end-line="2" selection-end-column="118" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="5" selection-start-line="0" selection-start-column="5" selection-end-line="0" selection-end-column="5" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -902,7 +496,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="462">
           <caret line="21" column="48" selection-start-line="21" selection-start-column="48" selection-end-line="21" selection-end-column="48" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -910,9 +503,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2596">
           <caret line="118" column="5" selection-start-line="118" selection-start-column="5" selection-end-line="118" selection-end-column="5" />
-          <folding>
-            <element signature="n#!!block;n#ao_multiple#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -923,165 +513,202 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/pages/arbol_procesos/exportarExcel.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3520">
-          <caret line="160" column="105" selection-start-line="160" selection-start-column="105" selection-end-line="160" selection-end-column="105" />
-          <folding>
-            <marker date="1472067132051" expanded="true" signature="8676:8776" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/dist/js/arbol_procesos/arbol_procesos.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3454">
-          <caret line="157" column="42" selection-start-line="157" selection-start-column="42" selection-end-line="157" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/clases/arbol_procesos/ArbolProcesos.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5302">
-          <caret line="241" column="102" selection-start-line="241" selection-start-column="28" selection-end-line="241" selection-end-column="102" />
-          <folding>
-            <marker date="1472207230945" expanded="true" signature="963:1079" ph="SELECT cod_p... mos_parametro" />
-            <marker date="1472207230945" expanded="true" signature="1245:1359" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472207230945" expanded="true" signature="1691:1811" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472207230945" expanded="true" signature="2915:3066" ph="SELECT id ,p... " />
-            <marker date="1472207230945" expanded="true" signature="3351:3636" ph="INSERT INTO mos_arbol_procesos... " />
-            <marker date="1472207230945" expanded="true" signature="4866:5058" ph="INSERT INTO mos_log... " />
-            <marker date="1472207230945" expanded="true" signature="5341:5643" ph="UPDATE mos_a... " />
-            <marker date="1472207230945" expanded="true" signature="7207:7254" ph="select max(l... mos_arbol_procesos" />
-            <marker date="1472207230945" expanded="true" signature="10162:10302" ph="select COUNT... ${$sql_left}" />
-            <marker date="1472207230945" expanded="true" signature="13184:13369" ph="select 1 ${$... ${$sql_left}" />
-            <marker date="1472207230945" expanded="true" signature="14668:14786" ph="SELECT COUNT... mos_arbol_procesos" />
-            <marker date="1472207230945" expanded="true" signature="16077:16517" ph="SELECT id ,p... " />
-            <marker date="1472207230945" expanded="true" signature="21061:21075" ph="..." />
-            <marker date="1472207230945" expanded="true" signature="21334:21348" ph="..." />
-            <marker date="1472207230945" expanded="true" signature="30822:30828" ph=" " />
-            <marker date="1472207230945" expanded="true" signature="34760:35305" ph="..." />
-            <marker date="1472207230945" expanded="true" signature="34937:35270" ph="..." />
-            <marker date="1472207230945" expanded="true" signature="35013:35229" ph="..." />
-            <marker date="1472207230945" expanded="false" signature="35177:35183" ph=" " />
-            <marker date="1472207230945" expanded="true" signature="36647:36653" ph=" " />
-            <marker date="1472207230945" expanded="true" signature="36653:36659" ph=" " />
-            <marker date="1472207230945" expanded="true" signature="36694:36826" ph="..." />
-            <marker date="1472207230945" expanded="true" signature="40577:41122" ph="..." />
-            <marker date="1472207230945" expanded="true" signature="40754:41087" ph="..." />
-            <marker date="1472207230945" expanded="true" signature="40830:41046" ph="..." />
-            <marker date="1472207230945" expanded="false" signature="40994:41000" ph=" " />
-            <marker date="1472207230945" expanded="true" signature="52641:52834" ph="..." />
-            <marker date="1472207230945" expanded="true" signature="52671:52751" ph="..." />
-            <marker date="1472207230945" expanded="true" signature="55572:55628" ph="Select * fro... mos_arbol_procesos" />
-            <marker date="1472207230945" expanded="true" signature="58248:59039" ph="SELECT count... mos_acciones_correctivas" />
-            <marker date="1472207230945" expanded="true" signature="60546:61011" ph="SELECT IFNUL... mos_registro_item" />
-            <marker date="1472207230945" expanded="true" signature="62218:62273" ph="select * fro... mos_arbol_procesos" />
-            <marker date="1472207230945" expanded="true" signature="64803:65593" ph="SELECT count... mos_acciones_correctivas" />
-            <marker date="1472207230945" expanded="true" signature="67784:68219" ph="SELECT IFNUL... mos_registro_item" />
-            <marker date="1472207230945" expanded="true" signature="69280:69336" ph="Select * fro... mos_arbol_procesos" />
-            <marker date="1472207230945" expanded="true" signature="69910:69965" ph="select * fro... mos_arbol_procesos" />
-            <marker date="1472207230945" expanded="true" signature="70425:70481" ph="Select * fro... mos_arbol_procesos" />
-            <marker date="1472207230945" expanded="true" signature="70892:71183" ph="SELECT IFNUL... mos_registro_item" />
-            <marker date="1472207230945" expanded="true" signature="71669:71724" ph="select * fro... mos_arbol_procesos" />
-            <marker date="1472207230945" expanded="true" signature="72074:72365" ph="SELECT IFNUL... mos_registro_item" />
-            <marker date="1472207230945" expanded="true" signature="73695:73846" ph="select id as... mos_arbol_procesos" />
-            <marker date="1472207230945" expanded="true" signature="74381:74506" ph="SELECT * FRO... mos_arbol_procesos" />
-            <marker date="1472207230945" expanded="true" signature="75638:75686" ph="select * fro... mos_arbol_procesos" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/pages/cargo/reporte_cargos_pdf.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="429">
-          <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mosaikus/clases/cargo/Cargos.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="27">
-          <caret line="974" column="13" selection-start-line="974" selection-start-column="13" selection-end-line="974" selection-end-column="13" />
-          <folding>
-            <element signature="n#Cargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#cargar_parametros#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#cargar_campos_activos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#cargar_placeholder#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#verCargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#codigo_siguiente#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#verCargosArbol#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#ingresarCargosArbol#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#ingresarCargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#registraTransaccionLog#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#modificarCargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#eliminarCargos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#eliminarCargosArbol#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#cargar_acceso_nodos#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#crear#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#guardar#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#editar#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#actualizar#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#eliminar#0;n#Cargos#0;n#!!top" expanded="false" />
-            <element signature="n#ver#0;n#Cargos#0;n#!!top" expanded="false" />
-            <marker date="1472225772051" expanded="true" signature="1120:1236" ph="SELECT cod_p... mos_parametro" />
-            <marker date="1472225772051" expanded="true" signature="1403:1460" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472225772051" expanded="true" signature="1403:1516" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472225772051" expanded="true" signature="1864:1932" ph="SELECT campo... mos_campos_activos" />
-            <marker date="1472225772051" expanded="true" signature="2290:2409" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472225772051" expanded="true" signature="2773:3278" ph="SELECT cod_c... mos_cargo" />
-            <marker date="1472225772051" expanded="true" signature="3029:3197" ph="select mos_c... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="3476:3553" ph="SELECT MAX(c... mos_cargo" />
-            <marker date="1472225772051" expanded="true" signature="3890:4042" ph="SELECT cod_c... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="4390:4588" ph="INSERT INTO mos_cargo_estrorg_arbolproc... " />
-            <marker date="1472225772051" expanded="true" signature="5815:6079" ph="INSERT INTO mos_cargo... " />
-            <marker date="1472225772051" expanded="true" signature="7302:7494" ph="INSERT INTO mos_log... " />
-            <marker date="1472225772051" expanded="true" signature="7770:8024" ph="UPDATE mos_c... " />
-            <marker date="1472225772051" expanded="true" signature="11537:11646" ph="SELECT COUNT... mos_cargo" />
-            <marker date="1472225772051" expanded="true" signature="11869:12261" ph="SELECT cod_c... mos_cargo" />
-            <marker date="1472225772051" expanded="true" signature="14549:14989" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:14990" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15110" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15150" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15154" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15208" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15263" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15264" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15276" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="14549:15321" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472225772051" expanded="true" signature="15531:15680" ph="SELECT COUNT... mos_personal" />
-            <marker date="1472225772051" expanded="true" signature="19970:19984" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="20218:20232" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="20464:20478" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="20710:20724" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="28473:29018" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="28650:28983" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="28726:28942" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="28890:28896" ph=" " />
-            <marker date="1472225772051" expanded="true" signature="32673:33218" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="32850:33183" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="32926:33142" ph="..." />
-            <marker date="1472225772051" expanded="false" signature="33090:33096" ph=" " />
-            <marker date="1472225772051" expanded="true" signature="33379:33676" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="33461:33636" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="50500:50693" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="50530:50610" ph="..." />
-            <marker date="1472225772051" expanded="true" signature="53714:54216" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
-          </folding>
+        <state relative-caret-position="330">
+          <caret line="670" column="0" selection-start-line="670" selection-start-column="0" selection-end-line="670" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/dist/js/funciones.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="292">
+          <caret line="422" column="9" selection-start-line="422" selection-start-column="9" selection-end-line="422" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/dist/js/ui.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="94">
+          <caret line="112" column="4" selection-start-line="112" selection-start-column="4" selection-end-line="112" selection-end-column="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/mosaikus/clases/utilidades/NivelAcceso.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="130" column="8" selection-start-line="130" selection-start-column="8" selection-end-line="130" selection-end-column="8" />
+        <state relative-caret-position="154">
+          <caret line="140" column="34" selection-start-line="140" selection-start-column="34" selection-end-line="140" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/clases/arbol_procesos/ArbolProcesos.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="803">
+          <caret line="241" column="102" selection-start-line="241" selection-start-column="28" selection-end-line="241" selection-end-column="102" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/pages/arbol_procesos/exportarExcel.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="803">
+          <caret line="160" column="105" selection-start-line="160" selection-start-column="105" selection-end-line="160" selection-end-column="105" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/dist/js/arbol_procesos/arbol_procesos.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="834">
+          <caret line="157" column="42" selection-start-line="157" selection-start-column="42" selection-end-line="157" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/pages/cargo/reporte_cargos_pdf.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="748">
+          <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/clases/personas/Personas.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3317">
+          <caret line="2048" column="42" selection-start-line="2048" selection-start-column="42" selection-end-line="2048" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/dist/js/usuarios/usuarios.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="123" column="12" selection-start-line="123" selection-start-column="9" selection-end-line="123" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/clases/usuarios/Usuarios.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="335">
+          <caret line="298" column="12" selection-start-line="298" selection-start-column="12" selection-end-line="298" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/dist/js/personas/personas.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5918">
+          <caret line="269" column="42" selection-start-line="269" selection-start-column="36" selection-end-line="269" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/diseno/templates/mos_usuario/formulario.tpl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="275">
+          <caret line="57" column="133" selection-start-line="57" selection-start-column="133" selection-end-line="57" selection-end-column="133" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/dist/js/mos_usuario/mos_usuario.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="217" column="34" selection-start-line="217" selection-start-column="13" selection-end-line="217" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/diseno/templates/mos_usuario/configurar.tpl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="13" column="67" selection-start-line="13" selection-start-column="67" selection-end-line="13" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/pages/mos_usuario/listaPerfiles.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="275">
+          <caret line="60" column="40" selection-start-line="60" selection-start-column="40" selection-end-line="60" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/clases/mos_usuario/mos_usuario.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="379">
+          <caret line="1697" column="26" selection-start-line="1697" selection-start-column="26" selection-end-line="1697" selection-end-column="26" />
           <folding>
-            <marker date="1472154310243" expanded="true" signature="1719:1835" ph="SELECT cod_p... mos_parametro" />
-            <marker date="1472154310243" expanded="true" signature="2015:2083" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472154310243" expanded="true" signature="2428:2502" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1472386353136" expanded="true" signature="4817:4933" ph="SELECT cod_p... mos_parametro" />
+            <marker date="1472386353136" expanded="true" signature="5113:5226" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1472386353136" expanded="true" signature="5583:5689" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1472386353136" expanded="true" signature="6045:6164" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1472386353136" expanded="true" signature="6516:6585" ph="SELECT id, i... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="6799:6889" ph="SELECT id, i... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="7102:7764" ph="SELECT id_us... mos_usuario" />
+            <marker date="1472386353136" expanded="true" signature="8005:8174" ph="SELECT id, i... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="8829:9166" ph="SELECT mue.i... mos_usuario_estructura" />
+            <marker date="1472386353136" expanded="true" signature="9482:10008" ph="INSERT INTO mos_usuario... " />
+            <marker date="1472386353136" expanded="true" signature="11313:11505" ph="INSERT INTO mos_log... " />
+            <marker date="1472386353136" expanded="true" signature="12089:12585" ph="UPDATE mos_u... " />
+            <marker date="1472386353136" expanded="true" signature="14717:14933" ph="UPDATE mos_u... " />
+            <marker date="1472386353136" expanded="true" signature="15903:16339" ph="SELECT id_em... mos_adm_empresas" />
+            <marker date="1472386353136" expanded="true" signature="16846:17034" ph="UPDATE mos_u... " />
+            <marker date="1472386353136" expanded="true" signature="17940:18051" ph="SELECT COUNT... mos_usuario" />
+            <marker date="1472386353136" expanded="true" signature="22105:23238" ph="SELECT id_us... mos_usuario" />
+            <marker date="1472386353136" expanded="true" signature="22723:22864" ph="SELECT COUNT... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="22915:23042" ph="SELECT COUNT... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="50953:51196" ph="SELECT COUNT... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="52031:52359" ph="SELECT muf.i... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="53367:53617" ph="SELECT COUNT... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="54452:54801" ph="SELECT muf.i... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="57712:57726" ph="..." />
+            <marker date="1472386353136" expanded="true" signature="58011:58025" ph="..." />
+            <marker date="1472386353136" expanded="true" signature="70079:70624" ph="..." />
+            <marker date="1472386353136" expanded="true" signature="70256:70589" ph="..." />
+            <marker date="1472386353136" expanded="true" signature="70332:70548" ph="..." />
+            <marker date="1472386353136" expanded="false" signature="70496:70502" ph=" " />
+            <marker date="1472386353136" expanded="true" signature="72510:72591" ph="SELECT cod_p... mos_perfil" />
+            <marker date="1472386353136" expanded="true" signature="72808:72896" ph="SELECT cod_p... mos_perfil_portal" />
+            <marker date="1472386353136" expanded="true" signature="99538:99590" ph="SELECT * FRO... mos_perfil" />
+            <marker date="1472386353136" expanded="true" signature="100323:100411" ph="SELECT cod_p... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="100617:100743" ph="SELECT id_es... mos_usuario_estructura" />
+            <marker date="1472386353136" expanded="true" signature="100947:101073" ph="SELECT id_es... mos_usuario_estructura" />
+            <marker date="1472386353136" expanded="true" signature="101233:101292" ph="SELECT * FRO... mos_perfil_portal" />
+            <marker date="1472386353136" expanded="true" signature="101769:101871" ph="SELECT cod_p... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="102065:102354" ph="SELECT DISTI... mos_usuario_estructura" />
+            <marker date="1472386353136" expanded="true" signature="102624:102697" ph="DELETE FROM " />
+            <marker date="1472386353136" expanded="true" signature="104906:105107" ph="INSERT INTO mos_usuario_estructura... " />
+            <marker date="1472386353136" expanded="true" signature="105748:105949" ph="INSERT INTO mos_usuario_estructura... " />
+            <marker date="1472386353136" expanded="true" signature="106582:106789" ph="INSERT INTO mos_usuario_filial... " />
+            <marker date="1472386353136" expanded="true" signature="107416:107630" ph="INSERT INTO mos_usuario_filial... " />
+            <marker date="1472386353136" expanded="true" signature="108192:108244" ph="SELECT * FRO... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="108828:108936" ph="SELECT id_or... mos_personal" />
+            <marker date="1472386353136" expanded="true" signature="110076:110165" ph="SELECT * FRO... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="110649:110745" ph="SELECT * FRO... mos_usuario_filial" />
+            <marker date="1472386353136" expanded="true" signature="115012:115093" ph="select * fro... mos_organizacion" />
+            <marker date="1472386353136" expanded="true" signature="125230:125274" ph="SELECT id,id... mos_idiomas" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/melvin.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="168" column="11" selection-start-line="164" selection-start-column="0" selection-end-line="168" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="5" selection-start-line="0" selection-start-column="5" selection-end-line="0" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/sigfredo.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="5" column="20" selection-start-line="5" selection-start-column="20" selection-end-line="5" selection-end-column="20" />
+          <folding />
         </state>
       </provider>
     </entry>

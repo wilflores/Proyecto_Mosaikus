@@ -163,7 +163,19 @@
                 $this->operacion($sql, $atr);
                 return $this->dbl->data;
             }
-            
+
+            public function is_super_admin($id_usuario){
+                $perfiles = $this->verusuario_filial($id_usuario);
+                $super_admin = false;
+                foreach($perfiles as $p){
+                    if($p['cod_perfil'] == 1){
+                        $super_admin = true;
+                        break;
+                    }
+                }
+                return $super_admin;
+            }
+
             public function verusuario_estructura($id_usuario){
                 $atr = array();
                 $sql = "SELECT mue.id, mue.id_usuario_filial, mue.id_estructura,mue.id_usuario, mue.cod_perfil
@@ -610,7 +622,8 @@
                 $objResponse->addScript('ao_multiple();');
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
-                          });");  return $objResponse;                                
+                          });");
+                return $objResponse;
             }
 
             public function configurarPerfilPortal($parametros){                
@@ -692,7 +705,8 @@
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
-                          });");  return $objResponse;                
+                          });");
+                return $objResponse;
                 
             }
             
@@ -750,7 +764,8 @@
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
-                          });");  return $objResponse;                
+                          });");
+                return $objResponse;
                 
             }
  
@@ -1391,9 +1406,9 @@
                 }
                 foreach ( $this->placeholder as $key => $value) {
                     $contenido_1["P_" . strtoupper($key)] =  $value;
-                }    
-             
-                            $contenido_1['ID_USUARIO'] = $val["id_usuario"];
+                }
+            $val_aux = $this->vermos_usuario($_SESSION[CookIdUsuario]);
+            $contenido_1['ID_USUARIO'] = $val["id_usuario"];
             $contenido_1['NOMBRES'] = ($val["nombres"]);
             $contenido_1['APELLIDO_PATERNO'] = ($val["apellido_paterno"]);
             $contenido_1['APELLIDO_MATERNO'] = ($val["apellido_materno"]);
@@ -1401,6 +1416,7 @@
             $contenido_1['FECHA_CREACION'] = ($val["fecha_creacion"]);
             $contenido_1['FECHA_EXPI'] = ($val["fecha_expi"]);
             $contenido_1['VIGENCIA'] = ($val["vigencia"]);
+
             $contenido_1['SUPER_USUARIO'] = ($val["super_usuario"]);
             $contenido_1['EMAIL'] = ($val["email"]);
             $contenido_1['PASSWORD_1'] = ($val["password_1"]);
@@ -1409,7 +1425,7 @@
             $contenido_1['SUPER_USUARIO'] = $val["super_usuario"] == 'S' ? 'checked="checked"' : '';
             $contenido_1['CHECKED_VIGENCIA'] = $val["vigencia"] == 'S' ? 'checked="checked"' : '';
             $contenido_1['RECIBE_NOTIFICACIONES'] = $val["recibe_notificaciones"] == 'S' ? 'checked="checked"' : '';
-            $val_aux = $this->vermos_usuario($_SESSION[CookIdUsuario]);
+
             $contenido_1['READ_SUPER_USUARIO'] = $val_aux["super_usuario"] == 'S' ? '' : 'disabled="disabled"';
             //print_r($contenido_1);
                 $template = new Template();
@@ -1675,12 +1691,20 @@ $objResponse->addScript("$('#fecha_expi').datetimepicker();");
             
             
     public function MuestraPerfiles(){
+        $is_super_admin = $this->is_super_admin($_SESSION['CookIdUsuario']);
         $sql="SELECT * FROM mos_perfil ORDER BY descripcion_perfil";
         $data = $this->dbl->query($sql, $atr);
         $cabecera_padre = "<ul>";
         $padre_final = "";
         foreach ($data as $arrP) {
-            $cuerpo .= "<li id=\"phtml_".$arrP[cod_perfil]."\"><a href=\"#\">".($arrP[descripcion_perfil])."</a></li>";
+            if($arrP[cod_perfil] == 1){
+               if($is_super_admin){
+                   $cuerpo .= "<li id=\"phtml_".$arrP[cod_perfil]."\"><a href=\"#\">".($arrP[descripcion_perfil])."</a></li>";
+               }
+            }else{
+                $cuerpo .= "<li id=\"phtml_".$arrP[cod_perfil]."\"><a href=\"#\">".($arrP[descripcion_perfil])."</a></li>";
+            }
+
         }
         $pie_padre = "</ul>";
         return $cabecera_padre.$cuerpo.$pie_padre;

@@ -654,6 +654,7 @@
                 
                 $grid = $this->verListaCargos($parametros);
                 $contenido['MODO'] = $parametros['modo'];
+                $contenido['COD_LINK'] = $parametros['cod_link'];
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['SORDER'] = $parametros['sorder'];
                 $contenido['MOSTRAR_COL'] = $parametros['mostrar-col'];
