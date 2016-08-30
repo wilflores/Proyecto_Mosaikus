@@ -1631,3 +1631,6 @@ CREATE TRIGGER `carga_mos_historico_registro_persona_upd` BEFORE UPDATE ON `mos_
 			END IF;
 END;
 ;;
+
+-- Se ejecuta SQL para que cargue la tabla de historico
+ update mos_registro_formulario set Nombre  = Nombre where tipo = 6;
