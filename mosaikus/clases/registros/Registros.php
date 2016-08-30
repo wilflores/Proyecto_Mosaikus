@@ -1199,18 +1199,24 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                 $sql_left .= " LEFT JOIN(select t1.idRegistro
                                 , t1.Nombre as nom_detalle_aux
-                                ,p.id_organizacion
-                                ,p.id_personal,c.descripcion cargo                                
+                                ,c.id_organizacion
+                                ,p.id_personal,c.cargo
+                                ,p.id_organizacion id_organizacion_act
+                                ,cargo.descripcion cargo_act                               
                                 ,CONCAT(initcap(p.nombres), ' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle
                                 from mos_registro_formulario t1
                                 inner join mos_personal p on p.cod_emp = CAST(t1.Nombre AS UNSIGNED)
-                                LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo
-                                where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
+                                inner join  mos_cargo cargo on p.cod_cargo = cargo.cod_cargo
+                                
+                                inner JOIN mos_historico_registro_persona c ON c.id_unico = t1.id_unico and c.idRegistro = t1.idRegistro
+                                where t1.id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
                                 $sql_col_left .= ",p$k.nom_detalle p$k"
-                                        . ",p$k.id_personal id_personal_p$k"
                                         . ",p$k.id_organizacion id_organizacion_p$k"
-                                        . ",p$k.cargo cargo_p$k";
-                                $this->funciones["id_organizacion_p$k"] = 'BuscaOrganizacional';  
+                                        . ",p$k.cargo cargo_p$k"
+                                        . ",p$k.id_organizacion_act id_organizacion_p_act$k"
+                                        . ",p$k.cargo_act cargo_act_p$k";
+                                $this->funciones["id_organizacion_p$k"] = 'BuscaOrganizacional';
+                                $this->funciones["id_organizacion_p_act$k"] = 'BuscaOrganizacional';
 //                            }   
 //                            else{
 //                                $sql_left .= " LEFT JOIN(select t1.idRegistro
@@ -2203,9 +2209,10 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                         $personal->cargar_campos_activos();
                                 }
                                 /*Columnas del ID, area y cargo de la persona*/
-                                array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_personal], ENT_QUOTES, "UTF-8"))));   
                                 array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion], ENT_QUOTES, "UTF-8")))); 
                                 array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo], ENT_QUOTES, "UTF-8"))));                                
+                                array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion]." Actual", ENT_QUOTES, "UTF-8")))); 
+                                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo]." Actual", ENT_QUOTES, "UTF-8"))));                                
                                 //$k++;$k++;$k++;
                             break;
                         case '10':
@@ -2246,18 +2253,6 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $func= array('funcion'=> 'colum_admin');
 
                 $columna_funcion = 0;
-                /*if (strrpos($parametros['permiso'], '1') > 0){
-                    
-                    $columna_funcion = 12;
-                }
-                if ($parametros['permiso'][1] == "1")
-                    array_push($func,array('nombre'=> 'verRegistros','imagen'=> "<img style='cursor:pointer' src='diseno/images/find.png' title='Ver Registros'>"));
-                
-                if($_SESSION[CookM] == 'S')//if ($parametros['permiso'][2] == "1")
-                    array_push($func,array('nombre'=> 'editarRegistros','imagen'=> "<i style='cursor:pointer'  class=\"icon icon-edit\"  title='Editar Registros'></i>"));
-                if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
-                    array_push($func,array('nombre'=> 'eliminarRegistros','imagen'=> "<i style='cursor:pointer' class=\"icon icon-remove\"  title='Eliminar Registros'></i>"));
-               */
                 $config=array(array("width"=>"5%", "ValorEtiqueta"=>"<div style='width:50px;'>&nbsp;</div>"));
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
                 $array_columns =  explode('-', $parametros['mostrar-col']);                
@@ -2497,6 +2492,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
             }
             
             public function verListaRegistrosReporte($parametros){
+                
                 $grid= "";
                 $grid= new DataGrid();
                 
@@ -2584,9 +2580,10 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                         $personal->cargar_campos_activos();
                                 }
                                 /*Columnas del ID, area y cargo de la persona*/
-                                array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_personal], ENT_QUOTES, "UTF-8"))));   
                                 array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion], ENT_QUOTES, "UTF-8")))); 
                                 array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo], ENT_QUOTES, "UTF-8"))));                                
+                                array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion]." Actual", ENT_QUOTES, "UTF-8")))); 
+                                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo]." Actual", ENT_QUOTES, "UTF-8"))));                                
                                 //$k++;$k++;$k++;
 
                             break;
@@ -2899,20 +2896,20 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                   
                             </div>';
                         $k++;
+//                        $parametros['mostrar-col'] .= "-$k";
+//                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+//
+//                                          <label >
+//                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+//                                          ID ' . $value[Nombre] . ' </label>
+//
+//                                </div>';
+//                        $k++;
                         $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
                                           <label >
-                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-                                          ID ' . $value[Nombre] . ' </label>
-
-                                </div>';
-                        $k++;
-                        $parametros['mostrar-col'] .= "-$k";
-                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
-
-                                          <label >
-                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                              <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
                                           Área ' . $value[Nombre] . ' </label>
 
                                 </div>';
@@ -2921,8 +2918,26 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
                                           <label >
-                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                              <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
                                           Cargo ' . $value[Nombre] . ' </label>
+
+                                </div>';
+                        $k++;
+                        //$parametros['mostrar-col'] .= "-$k";
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                          Área ' . $value[Nombre] . ' Actual </label>
+
+                                </div>';
+                        $k++;
+                        //$parametros['mostrar-col'] .= "-$k";
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                          Cargo ' . $value[Nombre] . ' Actual </label>
 
                                 </div>';
                         $k++;
@@ -3295,16 +3310,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                   
                             </div>';
                         $k++;
-                        $parametros['mostrar-col'] .= "-$k";
-                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
-
-                                          <label >
-                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-                                          ID ' . $value[Nombre] . ' </label>
-
-                                </div>';
-                        $k++;
-                        $parametros['mostrar-col'] .= "-$k";
+                       $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
                                           <label >
@@ -3322,6 +3328,25 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                 </div>';
                         $k++;
+                        //$parametros['mostrar-col'] .= "-$k";
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                          Área ' . $value[Nombre] . ' Actual </label>
+
+                                </div>';
+                        $k++;
+                        //$parametros['mostrar-col'] .= "-$k";
+                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
+
+                                          <label >
+                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                          Cargo ' . $value[Nombre] . ' Actual </label>
+
+                                </div>';
+                        $k++;
+                        
                     }
                     else{
                         $parametros['mostrar-col'] .= "-$k";
@@ -3728,7 +3753,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                     $this->cargar_acceso_nodos($parametros);                    
                                 }
                                 $html .= '<div class="col-md-11">                                              
-                                                      <select name="campo_' . $i . '" id="campo_' . $i . '" data-validation="required">
+                                                      <select name="campo_' . $i . '" id="campo_' . $i . '" data-validation="required" onchange="AreaCargoPorPersona(' . $i . ')">
                                                         <option selected="" value="">-- Seleccione --</option>';
                                 $html .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(id_personal, ' - ',CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
@@ -3835,6 +3860,19 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     $html .= '<input id="valores_' . $i . '" type="hidden" value="' . $value[valores] . '" name="valores_' . $i . '">';
                     $html .= '<input id="id_atributo_' . $i . '" type="hidden" value="' . $value[id_unico] . '" name="id_atributo_' . $i . '">';
                     $html .= '</div>';
+                    if ($value[tipo]=='6'){
+                        $html .= '<div class="form-group">'
+                                . '<label for="idRegistro" class="col-md-4 control-label">' . $this->nombres_columnas[id_organizacion] . '</label>';                                
+                        $html .= '<div class="col-md-11">';
+                        $html .= '<input disabled type="text" class="form-control" name="campo_area_' . $i . '" id="campo_area_' . $i . '">';
+                        $html .= '</div></div>';                            
+                        $html .= '<div class="form-group">'
+                                . '<label for="idRegistro" class="col-md-4 control-label">' . $this->nombres_columnas[cargo] . '</label>';                                
+                        $html .= '<div class="col-md-11">';
+                        $html .= '<input disabled type="text" class="form-control" name="campo_cargo_' . $i . '" id="campo_cargo_' . $i . '">';
+                        $html .= '</div></div>';                            
+                    }
+                    
                     $i++;
                 }
                     if($campos_arbol_o != '')
@@ -4160,7 +4198,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                     $this->cargar_acceso_nodos($parametros);                    
                                 }
                                 $html .= '<div class="col-md-10">                                              
-                                                      <select name="campo_' . $i . '" id="campo_' . $i . '" data-validation="required">
+                                                      <select name="campo_' . $i . '" id="campo_' . $i . '" data-validation="required" onchange="AreaCargoPorPersonaEdit('.$value[idRegistro].','.$value[id_unico].',' . $i . ')">
                                                         <option selected="" value="">-- Seleccione --</option>';
                                 $html .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(id_personal, ' - ',CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))  nombres
@@ -4361,6 +4399,34 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     if (strlen($value[idRegistro]) == 0)
                         $html .= '<input id="id_unico_campo_new_' . $i . '" type="hidden" value="' . $value[id_unico] . '" name="id_unico_campo_new_' . $i . '">';
                     $html .= '</div>';
+                    if ($value[tipo]=='6'){
+                        if(!class_exists('Personas')){
+                            import("clases.personas.Personas");
+                        }
+                        $sql = "select * from mos_historico_registro_persona where idRegistro=$value[idRegistro] and id_unico=$value[id_unico] and id_persona=$value[valor]";
+                        $registros = $this->dbl->query($sql, $atr);
+                        //print_r($registros);
+                        if(sizeof($registros)>0){
+                            $valp = $registros[0];
+                        }
+                        else {
+                            $personal = new Personas();  
+                            $valp = $personal->verPersonas($value[valor]);
+                        }
+                        
+                       // echo 'value='.$value[Nombre];
+                        $html .= '<div class="form-group">'
+                                . '<label for="idRegistro" class="col-md-4 control-label">' . $this->nombres_columnas[id_organizacion] . '</label>';                                
+                        $html .= '<div class="col-md-11">';
+                        $html .= '<input disabled type="text" class="form-control" value="'.$valp[organizacion].'" name="campo_area_' . $i . '" id="campo_area_' . $i . '">';
+                        $html .= '</div></div>';                            
+                        $html .= '<div class="form-group">'
+                                . '<label for="idRegistro" class="col-md-4 control-label">' . $this->nombres_columnas[cargo] . '</label>';                                
+                        $html .= '<div class="col-md-11">';
+                        $html .= '<input disabled type="text" class="form-control"  value="'.$valp[cargo].'" name="campo_cargo_' . $i . '" id="campo_cargo_' . $i . '">';
+                        $html .= '</div></div>';                            
+                    }
+                    
                     $i++;
                 }
                     if($campos_arbol_o != '')
@@ -4388,7 +4454,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $contenido_1['PAGINA_VOLVER'] = "listarRegistros.php";
                 $contenido_1['DESC_OPERACION'] = "Guardar";
                 $contenido_1['OPC'] = "upd";
-                //echo $val["idRegistro"];
+                //print_r ($val);
                 $contenido_1['ID'] = $val["idRegistro"];
 
                 $template->setVars($contenido_1);
@@ -4896,7 +4962,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
             
  
             public function actualizar($parametros)
-            {
+            { //print_r($parametros);
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $objResponse = new xajaxResponse();
@@ -5003,6 +5069,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                     if (isset($parametros["id_unico_campo_new_$i"]))
                                         $params['nuevo'] = 1;
                                     else $params['nuevo'] = 0;
+                                    // print_r($params);
                                     $this->modificarRegistrosCampoDinamico($params);
                                     
                                 }
@@ -5246,5 +5313,40 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
             $objResponse->addAssign('col-md-10-' . $parametros['i'] . '',"innerHTML",$combo);
             return $objResponse;
             }             
-            
- }?>
+              public function CargarAreaCargoPorPersona($parametros)
+            {  //print_r($parametros);
+                if(!class_exists('Personas')){
+                    import("clases.personas.Personas");
+                }
+                $personal = new Personas();  
+                $val = $personal->verPersonas($parametros[persona]);
+                //print_r($val);die;
+                $grid = $this->verListaRegistrosReporte($parametros);                
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('campo_cargo_'.$parametros[i],"value",$val[cargo]);
+                $objResponse->addAssign('campo_area_'.$parametros[i],"value",$val[organizacion]);
+                return $objResponse;                
+            }           
+              public function CargarAreaCargoPorPersonaEdit($parametros)
+            {  //print_r($parametros);
+                if(!class_exists('Personas')){
+                    import("clases.personas.Personas");
+                }
+                $sql = "select * from mos_historico_registro_persona where idRegistro=$parametros[idRegistro] and id_unico=$parametros[id_unico] and id_persona=$parametros[persona]";
+                $registros = $this->dbl->query($sql, $atr);
+                //print_r($registros);
+                if(sizeof($registros)>0){
+                    $val = $registros[0];
+                }
+                else {
+                    $personal = new Personas();  
+                    $val = $personal->verPersonas($parametros[persona]);
+                }
+                //print_r($val);die;
+                $grid = $this->verListaRegistrosReporte($parametros);                
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('campo_cargo_'.$parametros[i],"value",$val[cargo]);
+                $objResponse->addAssign('campo_area_'.$parametros[i],"value",$val[organizacion]);
+                return $objResponse;                
+            }  
+            }?>
