@@ -6,7 +6,7 @@
 -- TRIGGER Para actualizar mos_usuario cuando se modifique mos_personal
 DROP TRIGGER IF EXISTS `actualiza_mos_personal_mos_usuario`;
 DELIMITER ;;
-CREATE TRIGGER `actualiza_mos_personal_mos_usuario` AFTER UPDATE ON `mos_personal` FOR EACH ROW UPDATE `mos_usuario` set nombres=NEW.nombres, apellido_paterno=NEW.apellido_paterno, apellido_materno=NEW.apellido_materno,email=NEW.email WHERE email=OLD.email;
+CREATE TRIGGER `actualiza_mos_personal_mos_usuario` AFTER UPDATE ON `mos_personal` FOR EACH ROW UPDATE `mos_usuario` set nombres=NEW.nombres, apellido_paterno=NEW.apellido_paterno, apellido_materno=NEW.apellido_materno,email=NEW.email, cedula = NEW.id_personal WHERE email=OLD.email;
 ;;
 DELIMITER ;
 
