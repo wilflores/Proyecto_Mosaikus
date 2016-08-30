@@ -1135,7 +1135,7 @@
            
            $nivel_acceso = $this->dbl->query($sql);
            $nivel_acceso = $nivel_acceso[0][level] < 1 ? 1 : $nivel_acceso[0][level];
-           $sql = "Select id FROM mos_organizacion WHERE id IN (". implode(',', array_keys($this->id_org_acceso)) . ") AND level = $nivel_acceso";
+           $sql = "Select id FROM mos_organizacion WHERE id IN (". implode(',', array_keys($this->id_org_acceso)) . ") AND level = $nivel_acceso ORDER BY position";
            $data = $this->dbl->query($sql);
            if (count($data)==0) return array();
             $data_hijo = '';
@@ -1172,7 +1172,7 @@
                 $items[0] = array(id=>$data[0][id], text=>$data[0][title], "state" => array("opened" => true ), "type"=> strlen($data[0][area_espejo])>0?'area_espejo':'default');
                 
                 $sql="select * from mos_organizacion
-				Where parent_id = $id";
+				Where parent_id = $id ORDER BY position";
                 //echo $sql;
 		//$resp = mysql_query($sql);
                 $data = $this->dbl->query($sql, $atr);
