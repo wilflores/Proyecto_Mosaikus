@@ -4743,16 +4743,39 @@ echo $Consulta3;
                 $validator = new FormValidator();
                 $tiene_arbol=0;
                 $tiene_cargo=0;
+                $tiene_persona=0;
+                $tiene_proceso=0;
+
                 for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
                     if (isset($parametros["nombre_din_$i"])){                                
                         if (($parametros["tipo_din_$i"] == "11")){//cuento cuantos arboles organizacionales hay
                             $tiene_arbol++; 
                         }
-                        if (($parametros["tipo_din_$i"] == "14")){//verifico si hay 
+                        if (($parametros["tipo_din_$i"] == "14")){//verifico si hay  cargos
                             $tiene_cargo++; 
+                        }
+                        if (($parametros["tipo_din_$i"] == "6")){//verifico si hay personas
+                            $tiene_persona++; 
+                        }
+                        if (($parametros["tipo_din_$i"] == "12")){//verifico si hay procesos
+                            $tiene_proceso++; 
                         }
                     }
                 }  
+                //echo 'persona='.$tiene_persona." otros:".$tiene_arbol.'-'.$tiene_cargo.'-'.$tiene_proceso;
+               // die;
+                //validamos si tiene Persona y no debe tener arboles ni cargo
+                if($tiene_persona>=1){
+                    if(($tiene_arbol>0) || ($tiene_cargo>0) || ($tiene_proceso>0)){
+                        $objResponse->addScriptCall('VerMensaje','error','Al tener un campo tipo "Persona", No se puede permitir campos "Cargo, arbol Organizacional o Arbol de Procesos"');
+                        $objResponse->addScript("$('#MustraCargando').hide();"); 
+                        $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                        $( '#btn-guardar' ).prop( 'disabled', false );
+                        $('#btn-guardar-not' ).html('Guardar y Notificar');
+                        $( '#btn-guardar-not' ).prop( 'disabled', false );");                        
+                        return $objResponse;
+                    }
+                }
                 //validamos 1 solo arbol Org y si hay campo Cargo
                 if($tiene_cargo>=1){
                     if($tiene_arbol<1){
@@ -5387,6 +5410,7 @@ echo $Consulta3;
                 
                 //$ids = array('7','8','9','1','2','3','5','6','10');
                 //$desc = array('Seleccion Simple','Seleccion Multiple','Combo','Texto','Numerico','Fecha','Rut','Persona','Semáforo');
+
                 foreach ($data as $value) {                          
                     $i++;
                     //echo $i;
@@ -5490,13 +5514,16 @@ echo $Consulta3;
                         
                         
                         $item = $item. '</tr>' ;                    
+                        //$("#id_unico_del").val($("#id_unico_del").val() + $("#id_unico_din_"+id).val() + ",");
                         $js .= '$("#eliminar_esp_'. $i .'").click(function(e){ 
                                     e.preventDefault();
-                                    var id = $(this).attr("href");  
+                                    var id = $(this).attr("href");
+                                    //alert("href:"+$(this).attr("href"));
                                     $("#id_unico_del").val($("#id_unico_del").val() + $("#id_unico_din_"+id).val() + ",");
                                     $("tr-esp-'. $i .'").remove();
                                     var parent = $(this).parents().parents().get(0);
                                         $(parent).remove();
+                                    //alert("id_unico="+$("#id_unico_del").val());
                             });';
                         $js .= '$("#ico_cmb_din_'. $i .'").click(function(e){ 
                                     e.preventDefault();
@@ -5603,7 +5630,7 @@ echo $Consulta3;
                                               });$js");
                 
                 //echo $_SESSION[ParamAdic];
-                $objResponse->addScript("$js");
+               // $objResponse->addScript("$js");
                 $objResponse->addScript("$jswf");
                 $objResponse->addScript("$js_din");
                 $objResponse->addScript($js_cambiar_archivos);
@@ -5613,7 +5640,7 @@ echo $Consulta3;
      
  
             public function actualizar($parametros)
-            {   //print_r($parametros);
+            {   print_r($parametros);
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $objResponse = new xajaxResponse();
@@ -5624,16 +5651,39 @@ echo $Consulta3;
                 $validator = new FormValidator();
                 $tiene_arbol=0;
                 $tiene_cargo=0;
+                $tiene_persona=0;
+                $tiene_proceso=0;
+
                 for($i=1;$i <= $parametros[num_items_esp] * 1; $i++){                              
                     if (isset($parametros["nombre_din_$i"])){                                
                         if (($parametros["tipo_din_$i"] == "11")){//cuento cuantos arboles organizacionales hay
                             $tiene_arbol++; 
                         }
-                        if (($parametros["tipo_din_$i"] == "14")){//verifico si hay 
+                        if (($parametros["tipo_din_$i"] == "14")){//verifico si hay  cargos
                             $tiene_cargo++; 
+                        }
+                        if (($parametros["tipo_din_$i"] == "6")){//verifico si hay personas
+                            $tiene_persona++; 
+                        }
+                        if (($parametros["tipo_din_$i"] == "12")){//verifico si hay procesos
+                            $tiene_proceso++; 
                         }
                     }
                 }  
+                //echo 'persona='.$tiene_persona." otros:".$tiene_arbol.'-'.$tiene_cargo.'-'.$tiene_proceso;
+               // die;
+                //validamos si tiene Persona y no debe tener arboles ni cargo
+                if($tiene_persona>=1){
+                    if(($tiene_arbol>0) || ($tiene_cargo>0) || ($tiene_proceso>0)){
+                        $objResponse->addScriptCall('VerMensaje','error','Al tener un campo tipo "Persona", No se puede permitir campos "Cargo, arbol Organizacional o Arbol de Procesos"');
+                        $objResponse->addScript("$('#MustraCargando').hide();"); 
+                        $objResponse->addScript("$('#btn-guardar' ).html('Guardar');
+                        $( '#btn-guardar' ).prop( 'disabled', false );
+                        $('#btn-guardar-not' ).html('Guardar y Notificar');
+                        $( '#btn-guardar-not' ).prop( 'disabled', false );");                        
+                        return $objResponse;
+                    }
+                }
                 //validamos 1 solo arbol Org y si hay campo Cargo
                 //echo $parametros['observacion_vigencia'];
                 if($tiene_cargo>=1){
@@ -5830,6 +5880,7 @@ echo $Consulta3;
                             $parametros[id_unico_del] = substr($parametros[id_unico_del], 0, strlen($parametros[id_unico_del]) - 1);
                             $sql = "DELETE FROM mos_documentos_datos_formulario WHERE id_unico IN ($parametros[id_unico_del]) "
                                 . " AND NOT id_unico IN (SELECT id_unico FROM mos_registro_formulario WHERE IDDoc = $parametros[id]) ";                               
+                            echo $sql;
                             $this->dbl->insert_update($sql);
                         }
 
