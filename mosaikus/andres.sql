@@ -1634,3 +1634,13 @@ END;
 
 -- Se ejecuta SQL para que cargue la tabla de historico
  update mos_registro_formulario set Nombre  = Nombre where tipo = 6;
+
+/***********30/08/2016*******/
+DROP TRIGGER IF EXISTS `carga_mos_historico_registro_persona_del`;
+DELIMITER ;
+CREATE TRIGGER `carga_mos_historico_registro_persona_del` BEFORE DELETE ON `mos_registro_formulario` FOR EACH ROW BEGIN
+			IF(OLD.tipo='6') THEN
+					delete from mos_historico_registro_persona 
+					where idRegistro = OLD.idRegistro and  id_unico = OLD.id_unico;
+			END IF;
+END;
