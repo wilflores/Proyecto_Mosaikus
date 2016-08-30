@@ -1599,10 +1599,10 @@ CREATE TRIGGER `carga_mos_historico_registro_persona_ins` AFTER INSERT ON `mos_r
 			END IF;
 END;
 
+;;
 
-
-DROP TRIGGER IF EXISTS `carga_mos_historico_registro_persona_upd`;
-DELIMITER ;
+DROP TRIGGER IF EXISTS `carga_mos_historico_registro_persona_upd`;;
+DELIMITER ;;
 CREATE TRIGGER `carga_mos_historico_registro_persona_upd` BEFORE UPDATE ON `mos_registro_formulario` FOR EACH ROW BEGIN
 			IF(NEW.tipo='6') THEN
 				IF EXISTS (select * from mos_historico_registro_persona where id_persona<>NEW.Nombre and idRegistro = NEW.idRegistro and id_unico = NEW.id_unico) THEN					
@@ -1630,3 +1630,4 @@ CREATE TRIGGER `carga_mos_historico_registro_persona_upd` BEFORE UPDATE ON `mos_
 				END IF;
 			END IF;
 END;
+;;
