@@ -285,10 +285,22 @@
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);                    
                     /*Carga Acceso segun el arbol*/
-                    
-                    $sql = "UPDATE mos_documentos_codigo_correlativo SET                            
+                    $tipo_correlativo = 1;
+                    switch ($tipo_correlativo) {
+                        case 2:
+                            $sql = "UPDATE mos_documentos_codigo_correlativo SET                            
                                     correlativo = correlativo + 1
-                            WHERE  id_organizacion = $atr[id_organizacion] AND tipo = $atr[tipo]";      
+                            WHERE  id_organizacion = $atr[id_organizacion] AND tipo = $atr[tipo]"; 
+
+                            break;
+
+                        default:
+                            $sql = "UPDATE mos_documentos_codigo SET                            
+                                    correlativo = correlativo + 1
+                            WHERE  id_organizacion = $atr[id_organizacion] "; 
+                            break;
+                    }
+                         
                     
                     $this->dbl->insert_update($sql);
 //                    $nuevo = "Id Organizacion: \'$atr[id_organizacion]\', Codigo: \'$atr[codigo]\', Bloqueo Codigo: \'$atr[bloqueo_codigo]\', Bloqueo Version: \'$atr[bloqueo_version]\', Correlativo: \'$atr[correlativo]\', ";
