@@ -355,8 +355,8 @@
                     }
                     if (strlen($atr[valor])>0)
                         $sql_where .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
-                                 if (strlen($atr["b-id_organizacion"])>0)
-                        $sql_where .= " AND id_organizacion = '". $atr["b-id_organizacion"] . "'";
+                    //if (strlen($atr["b-id_organizacion"])>0)
+                    //    $sql_where .= " AND id_organizacion = '". $atr["b-id_organizacion"] . "'";
                     if (strlen($atr["b-codigo"])>0)
                         $sql_where .= " AND upper(codigo) like '%" . strtoupper($atr["b-codigo"]) . "%'";
                     if (strlen($atr["b-bloqueo_codigo"])>0)
@@ -366,6 +366,10 @@
                     if (strlen($atr["b-correlativo"])>0)
                         $sql_where .= " AND correlativo = '". $atr["b-correlativo"] . "'";
 
+                    if ((strlen($atr["b-id_organizacion"])>0)){                             
+                        $id_org = ($atr["b-id_organizacion"]);
+                        $sql_where .= " AND id_organizacion IN (". $id_org . ")";
+                    }
                     if (count($this->id_org_acceso_explicito) <= 0){
                         $this->cargar_acceso_nodos_explicito($atr);                    
                     }
