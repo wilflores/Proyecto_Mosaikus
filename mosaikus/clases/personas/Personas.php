@@ -123,12 +123,14 @@
                             ,verifica_eficacia
                             ,valida_acc_co
                            , impresion_cc
+                           , org.title organizacion
                          FROM mos_personal p
                         LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo left join
                         (select cod_emp,
                                 GROUP_CONCAT(id_organizacion) id_organizacion_resp
                          from mos_responsable_area
-                         group by cod_emp) resp on p.cod_emp = resp.cod_emp
+                         group by cod_emp) resp on p.cod_emp = resp.cod_emp inner join
+                         mos_organizacion org on p.id_organizacion = org.id
                          WHERE p.cod_emp = $id "; 
                 //echo $sql;
                 $this->operacion($sql, $atr);

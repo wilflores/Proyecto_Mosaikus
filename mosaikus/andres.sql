@@ -1564,3 +1564,83 @@ DELIMITER ;
 
 /*******25/08/2016*********/
 ALTER TABLE `mos_documentos_relacionados` DROP FOREIGN KEY `fk_iddoc_doc_relacionado`;
+
+
+/***********26/08/2016*******/
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'cargo', 'Cargo', '9','Cargo',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'cargo', 'Posição', '9','Posição',2);
+
+DROP TABLE IF EXISTS `mos_historico_registro_persona`;
+CREATE TABLE `mos_historico_registro_persona` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `idRegistro` int(11) DEFAULT NULL,
+  `id_unico` int(11) DEFAULT NULL,
+  `id_persona` int(11) DEFAULT NULL,
+  `cod_cargo` int(11) DEFAULT NULL,
+  `cargo` varchar(100) DEFAULT NULL,
+  `id_organizacion` int(11) DEFAULT NULL,
+  `organizacion` varchar(150) DEFAULT NULL,
+  `fecha_registro` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+
+DROP TRIGGER IF EXISTS `carga_mos_historico_registro_persona_ins`;
+DELIMITER ;;
+CREATE TRIGGER `carga_mos_historico_registro_persona_ins` AFTER INSERT ON `mos_registro_formulario` FOR EACH ROW BEGIN
+/*guarda historico de la promocion de los cargos*/
+			IF(NEW.tipo='6') THEN
+        INSERT into mos_historico_registro_persona (idRegistro,id_unico,id_persona,cod_cargo,cargo,id_organizacion,organizacion) 
+				SELECT NEW.idRegistro,NEW.id_unico, p.cod_emp ,p.cod_cargo ,c.descripcion cargo, id_organizacion, org.title organizacion
+				FROM mos_personal p LEFT JOIN mos_cargo c 
+				ON c.cod_cargo = p.cod_cargo inner join
+				mos_organizacion org on p.id_organizacion = org.id
+				WHERE p.cod_emp = NEW.Nombre;			
+			END IF;
+END;
+
+;;
+
+DROP TRIGGER IF EXISTS `carga_mos_historico_registro_persona_upd`;;
+DELIMITER ;;
+CREATE TRIGGER `carga_mos_historico_registro_persona_upd` BEFORE UPDATE ON `mos_registro_formulario` FOR EACH ROW BEGIN
+			IF(NEW.tipo='6') THEN
+				IF EXISTS (select * from mos_historico_registro_persona where id_persona<>NEW.Nombre and idRegistro = NEW.idRegistro and id_unico = NEW.id_unico) THEN					
+					update mos_historico_registro_persona 
+					set id_persona = NEW.Nombre
+					where idRegistro = NEW.idRegistro and  id_unico = NEW.id_unico;
+
+					update mos_historico_registro_persona h INNER JOIN mos_personal p 
+								on h.id_persona = p.cod_emp inner JOIN mos_cargo c 
+								ON c.cod_cargo = p.cod_cargo inner join mos_organizacion org 
+								on p.id_organizacion = org.id
+					set h.cod_cargo = p.cod_cargo,
+							h.cargo = c.descripcion,
+							h.id_organizacion = p.id_organizacion,
+							h.organizacion = org.title,
+							h.fecha_registro = now()
+					where h.idRegistro = NEW.idRegistro and  h.id_unico = NEW.id_unico;
+				ELSE
+					INSERT into mos_historico_registro_persona (idRegistro,id_unico,id_persona,cod_cargo,cargo,id_organizacion,organizacion) 
+					SELECT NEW.idRegistro,NEW.id_unico, p.cod_emp ,p.cod_cargo ,c.descripcion cargo, id_organizacion, org.title organizacion
+					FROM mos_personal p LEFT JOIN mos_cargo c 
+					ON c.cod_cargo = p.cod_cargo inner join
+					mos_organizacion org on p.id_organizacion = org.id
+					WHERE p.cod_emp = NEW.Nombre;
+				END IF;
+			END IF;
+END;
+;;
+
+-- Se ejecuta SQL para que cargue la tabla de historico
+ update mos_registro_formulario set Nombre  = Nombre where tipo = 6;
+
+/***********30/08/2016*******/
+DROP TRIGGER IF EXISTS `carga_mos_historico_registro_persona_del`;
+DELIMITER ;
+CREATE TRIGGER `carga_mos_historico_registro_persona_del` BEFORE DELETE ON `mos_registro_formulario` FOR EACH ROW BEGIN
+			IF(OLD.tipo='6') THEN
+					delete from mos_historico_registro_persona 
+					where idRegistro = OLD.idRegistro and  id_unico = OLD.id_unico;
+			END IF;
+END;

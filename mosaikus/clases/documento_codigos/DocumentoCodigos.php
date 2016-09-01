@@ -164,7 +164,7 @@
                         ,bloqueo_codigo
                         ,bloqueo_version
                         ,correlativo
-
+                        ,activo
                          FROM mos_documentos_codigo 
                          WHERE id = $id "; 
                 $this->operacion($sql, $atr);
@@ -173,17 +173,24 @@
             
             public function verDocumentoCodigosArea($id){
                 //$atr = $this->dbl->corregir_parametros($atr);
-                $sql = "SELECT id
-                        ,id_organizacion
-                        ,codigo
-                        ,bloqueo_codigo
-                        ,bloqueo_version
-                        ,correlativo
-
-                         FROM mos_documentos_codigo 
-                         WHERE id_organizacion = $id "; 
-                $this->operacion($sql, $atr);
-                return $this->dbl->data[0];
+                $sql = "SELECT dc.id
+                        ,dc.id_organizacion
+                        ,dc.codigo
+                        ,dc.bloqueo_codigo
+                        ,dc.bloqueo_version
+                        ,dc.correlativo
+                        ,dc.activo
+                        ,parent_id
+                         FROM mos_documentos_codigo dc 
+                         INNER JOIN mos_organizacion o ON o.id = dc.id_organizacion
+                         WHERE dc.id_organizacion = $id "; 
+                //$this->operacion($sql, $atr);
+                $data_temp = $this->dbl->query($sql);
+                if ($data_temp[0][activo] == 'S')
+                    return $data_temp[0];
+                if ($data_temp[0][parent_id] == '1')
+                    return $data_temp[0];
+                return $this->verDocumentoCodigosArea($data_temp[0][parent_id]);
             }
             public function ingresarDocumentoCodigos($atr){
                 try {
@@ -255,6 +262,7 @@
                     
                     $sql = "UPDATE mos_documentos_codigo SET                            
                                     codigo = '$atr[codigo]',bloqueo_codigo = '$atr[bloqueo_codigo]',bloqueo_version = '$atr[bloqueo_version]'
+                                    ,activo = '$atr[activo]'
                             WHERE  id = $atr[id]";      
                     
                     $this->dbl->insert_update($sql);
@@ -277,10 +285,22 @@
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);                    
                     /*Carga Acceso segun el arbol*/
-                    
-                    $sql = "UPDATE mos_documentos_codigo_correlativo SET                            
+                    $tipo_correlativo = 1;
+                    switch ($tipo_correlativo) {
+                        case 2:
+                            $sql = "UPDATE mos_documentos_codigo_correlativo SET                            
                                     correlativo = correlativo + 1
-                            WHERE  id_organizacion = $atr[id_organizacion] AND tipo = $atr[tipo]";      
+                            WHERE  id_organizacion = $atr[id_organizacion] AND tipo = $atr[tipo]"; 
+
+                            break;
+
+                        default:
+                            $sql = "UPDATE mos_documentos_codigo SET                            
+                                    correlativo = correlativo + 1
+                            WHERE  id_organizacion = $atr[id_organizacion] "; 
+                            break;
+                    }
+                         
                     
                     $this->dbl->insert_update($sql);
 //                    $nuevo = "Id Organizacion: \'$atr[id_organizacion]\', Codigo: \'$atr[codigo]\', Bloqueo Codigo: \'$atr[bloqueo_codigo]\', Bloqueo Version: \'$atr[bloqueo_version]\', Correlativo: \'$atr[correlativo]\', ";
@@ -317,16 +337,14 @@
                         $this->cargar_acceso_nodos($atr);
                     }*/
                     
-                    $sql = "SELECT COUNT(*) total_registros
-                         FROM mos_documentos_codigo 
-                         WHERE 1 = 1 ";
+                    $sql_where = '';
                     if ((strlen($atr["b-id_organizacion"])>0)){                             
                         //$id_org = $this->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
                         $id_org = ($atr["b-id_organizacion"]);
-                        $sql .= " AND id_organizacion IN (". $id_org . ")";
+                        $sql_where .= " AND id_organizacion IN (". $id_org . ")";
                     }
                     if (strlen($atr['b-filtro-sencillo'])>0){
-                        $sql .= " AND (upper(codigo) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
+                        $sql_where .= " AND (upper(codigo) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
 //                        $sql .= " OR (1 = 1";
 //                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);                                                  
 //                        foreach ($nombre_supervisor as $supervisor_aux) {
@@ -336,26 +354,36 @@
 //                        $sql .= " OR (upper(c.descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
                     }
                     if (strlen($atr[valor])>0)
-                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
-                                 if (strlen($atr["b-id_organizacion"])>0)
-                        $sql .= " AND id_organizacion = '". $atr["b-id_organizacion"] . "'";
+                        $sql_where .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";      
+                    //if (strlen($atr["b-id_organizacion"])>0)
+                    //    $sql_where .= " AND id_organizacion = '". $atr["b-id_organizacion"] . "'";
                     if (strlen($atr["b-codigo"])>0)
-                        $sql .= " AND upper(codigo) like '%" . strtoupper($atr["b-codigo"]) . "%'";
+                        $sql_where .= " AND upper(codigo) like '%" . strtoupper($atr["b-codigo"]) . "%'";
                     if (strlen($atr["b-bloqueo_codigo"])>0)
-                        $sql .= " AND upper(bloqueo_codigo) like '%" . strtoupper($atr["b-bloqueo_codigo"]) . "%'";
+                        $sql_where .= " AND upper(bloqueo_codigo) like '%" . strtoupper($atr["b-bloqueo_codigo"]) . "%'";
                     if (strlen($atr["b-bloqueo_version"])>0)
-                        $sql .= " AND upper(bloqueo_version) like '%" . strtoupper($atr["b-bloqueo_version"]) . "%'";
+                        $sql_where .= " AND upper(bloqueo_version) like '%" . strtoupper($atr["b-bloqueo_version"]) . "%'";
                     if (strlen($atr["b-correlativo"])>0)
-                        $sql .= " AND correlativo = '". $atr["b-correlativo"] . "'";
+                        $sql_where .= " AND correlativo = '". $atr["b-correlativo"] . "'";
 
+                    if ((strlen($atr["b-id_organizacion"])>0)){                             
+                        $id_org = ($atr["b-id_organizacion"]);
+                        $sql_where .= " AND id_organizacion IN (". $id_org . ")";
+                    }
                     if (count($this->id_org_acceso_explicito) <= 0){
                         $this->cargar_acceso_nodos_explicito($atr);                    
                     }
                     //print_r($this->id_org_acceso_explicito);
                     //if (count($this->id_org_acceso)>0)
                     {                            
-                        $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso_explicito)) . ")";
+                        $sql_where .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso_explicito)) . ")";
                     }
+                    
+                    
+                    $sql = "SELECT COUNT(*) total_registros
+                         FROM mos_documentos_codigo 
+                         WHERE 1 = 1 $sql_where";
+                    
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];   
             
@@ -365,39 +393,12 @@
                                 ,bloqueo_codigo
                                 ,bloqueo_version
                                 ,correlativo
+                                ,activo
                                      $sql_col_left
                             FROM mos_documentos_codigo dc $sql_left
                                 inner join mos_organizacion o on o.id = dc.id_organizacion
-                            WHERE 1 = 1 ";
-                    if ((strlen($atr["b-id_organizacion"])>0)){                             
-                        //$id_org = $this->BuscaOrgNivelHijos($atr["b-id_organizacion"]);
-                        $id_org = ($atr["b-id_organizacion"]);
-                        $sql .= " AND id_organizacion IN (". $id_org . ")";
-                    }
-                    if (strlen($atr['b-filtro-sencillo'])>0){
-                        $sql .= " AND (upper(codigo) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
-//                        $sql .= " OR (1 = 1";
-//                        $nombre_supervisor = explode(' ', $atr["b-filtro-sencillo"]);                                                  
-//                        foreach ($nombre_supervisor as $supervisor_aux) {
-//                           $sql .= " AND (upper(concat(nombres, ' ', apellido_paterno, ' ' , apellido_materno)) like '%" . strtoupper($supervisor_aux) . "%') ";
-//                        } 
-//                        $sql .= " ) ";
-//                        $sql .= " OR (upper(c.descripcion) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
-                    }
-                    if (strlen($atr[valor])>0)
-                        $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";                    
-            if (strlen($atr["b-codigo"])>0)
-                        $sql .= " AND upper(codigo) like '%" . strtoupper($atr["b-codigo"]) . "%'";
-            if (strlen($atr["b-bloqueo_codigo"])>0)
-                        $sql .= " AND upper(bloqueo_codigo) like '%" . strtoupper($atr["b-bloqueo_codigo"]) . "%'";
-            if (strlen($atr["b-bloqueo_version"])>0)
-                        $sql .= " AND upper(bloqueo_version) like '%" . strtoupper($atr["b-bloqueo_version"]) . "%'";
-             if (strlen($atr["b-correlativo"])>0)
-                        $sql .= " AND correlativo = '". $atr["b-correlativo"] . "'";
-                    //if (count($this->id_org_acceso)>0)
-                    {                            
-                        $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso_explicito)) . ")";
-                    }
+                            WHERE 1 = 1 $sql_where";
+                    
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //echo $sql;
@@ -468,7 +469,8 @@
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[codigo], "codigo", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[bloqueo_codigo], "bloqueo_codigo", $parametros)),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[bloqueo_version], "bloqueo_version", $parametros)),
-               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[correlativo], "correlativo", $parametros))
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[correlativo], "correlativo", $parametros)),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[activo], "activo", $parametros))
                 );
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
@@ -501,6 +503,7 @@
                 for($i=0;$i<count($config_col);$i++){
                     switch ($i) {                                             
                         case 1:
+                        case 0:
                         //case 2:
                         //case 3:
                         //case 4:
@@ -607,7 +610,7 @@
                 if ($parametros['corder'] == null) $parametros['corder']="codigo";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="0-1-2-3-4"; 
+                    $parametros['mostrar-col']="0-1-2-3-4-6"; 
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */               
@@ -743,23 +746,39 @@
  */
             
             public function codigo_sugerido($parametros){
+                //variable temporal para definir que correlativo suguiere el sistema
+                $tipo_codigo_sugerido = 1;//1 => Codigo por area sin tomar en cuenta el tipo de documento, 2 => codigo con area y tipo de documento
+                
                 $val = $this->verDocumentoCodigosArea($parametros[id_organizacion]);                    
-                $sql = "select correlativo from mos_documentos_codigo_correlativo where id_organizacion = " .$parametros[id_organizacion] . " AND tipo = $parametros[tipo]"; 
-                $data_correlativo = $this->dbl->query($sql);
-                if (count($data_correlativo)>0){
-                    $correlativo = $data_correlativo[0][correlativo];
-                }
-                else{
-                    $sql = "insert into mos_documentos_codigo_correlativo(id_organizacion, tipo) values (".$parametros[id_organizacion] . ",$parametros[tipo])";
-                    $this->dbl->insert_update($sql);
-                    $correlativo = 1;
-                }
-                $sql = "select codigo from mos_documentos_tipos where id = $parametros[tipo]";
-                $data_tipo = $this->dbl->query($sql);
+                switch ($tipo_codigo_sugerido) {
+                    case 2:
+                        $parametros[id_organizacion] = $val[id_organizacion];
+                        $sql = "select correlativo from mos_documentos_codigo_correlativo where id_organizacion = " .$parametros[id_organizacion] . " AND tipo = $parametros[tipo]"; 
+                        $data_correlativo = $this->dbl->query($sql);
+                        if (count($data_correlativo)>0){
+                            $correlativo = $data_correlativo[0][correlativo];
+                        }
+                        else{
+                            $sql = "insert into mos_documentos_codigo_correlativo(id_organizacion, tipo) values (".$parametros[id_organizacion] . ",$parametros[tipo])";
+                            $this->dbl->insert_update($sql);
+                            $correlativo = 1;
+                        }
+                        $sql = "select codigo from mos_documentos_tipos where id = $parametros[tipo]";
+                        $data_tipo = $this->dbl->query($sql);
+                        $val[codigo] = $val["codigo"] . '_' . $data_tipo[0][codigo] . '_' . str_pad($correlativo, 3, "0", STR_PAD_LEFT);
+                        $val[id_organizacion] = $parametros[id_organizacion];
+                        $val[tipo] = $parametros[tipo];
+                        break;
 
-                $val[codigo] = $val["codigo"] . '_' . $data_tipo[0][codigo] . '_' . str_pad($correlativo, 3, "0", STR_PAD_LEFT);
-                $val[id_organizacion] = $parametros[id_organizacion];
-                $val[tipo] = $parametros[tipo];
+                    default:
+                        $val[codigo] = $val["codigo"] . '_' . str_pad($val[correlativo], 4, "0", STR_PAD_LEFT);
+                        //$val[id_organizacion] = $parametros[id_organizacion];
+                        $val[tipo] = $parametros[tipo];
+                        break;
+                }
+                
+
+                
                 
                 return $val;
             }
@@ -794,7 +813,7 @@
                          $objResponse->addScript("$('#version').removeAttr('readonly');");
                     }
                     
-                    $objResponse->addScript("$('#nodo_area').val('".$data[0][id]."');");
+                    $objResponse->addScript("$('#nodo_area').val('".$val[id_organizacion]."');");
                     
                 }
                 //+print_r($data);
@@ -875,6 +894,7 @@
                 $contenido_1['CORRELATIVO'] = $val["correlativo"];
                 $contenido_1[CHECKED_BLOQUEO_CODIGO] = $val["bloqueo_codigo"] == 'S' ? 'checked="checked"' : '';
                 $contenido_1[CHECKED_BLOQUEO_VERSION] = $val["bloqueo_version"] == 'S' ? 'checked="checked"' : '';
+                $contenido_1[CHECKED_ACTIVO] = $val["activo"] == 'S' ? 'checked="checked"' : '';
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'documento_codigos/';
@@ -930,6 +950,7 @@
                 }else{
                     if (!isset($parametros[bloqueo_codigo])) $parametros[bloqueo_codigo] = 'N';
                     if (!isset($parametros[bloqueo_version])) $parametros[bloqueo_version] = 'N';
+                    if (!isset($parametros[activo])) $parametros[activo] = 'N';
                     $respuesta = $this->modificarDocumentoCodigos($parametros);
 
                     if (preg_match("/ha sido actualizado con exito/",$respuesta ) == true) {

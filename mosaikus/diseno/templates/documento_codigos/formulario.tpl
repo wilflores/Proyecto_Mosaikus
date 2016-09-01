@@ -30,6 +30,14 @@
                                                 <input type="checkbox" name="bloqueo_version" id="bloqueo_version" value="S" {CHECKED_BLOQUEO_VERSION}>   &nbsp;                                                                
                                             </label>
                                         </div>
+</div>
+                                        <div class="form-group">
+                                        <label for="bloqueo_version" class="col-md-4 control-label">{N_ACTIVO}</label>
+                                        <div class="col-md-14">      
+                                            <label class="checkbox-inline" style="">
+                                                <input type="checkbox" name="activo" id="activo" value="S" {CHECKED_ACTIVO}>   &nbsp;                                                                
+                                            </label>
+                                        </div>
                                             <!--
                                         <div class="col-md-10">
                                           <input type="text" class="form-control" value="{BLOQUEO_VERSION}" id="bloqueo_version" name="bloqueo_version" placeholder="{N_BLOQUEO_VERSION}" data-validation="required"/>

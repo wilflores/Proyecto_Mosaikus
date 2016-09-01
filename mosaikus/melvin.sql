@@ -1298,3 +1298,19 @@ DELIMITER ;
 /*FIN*/
 
 /**/
+
+-- 30-08-2016 Ajuste en codigos sugerido por el Sistema
+ALTER TABLE `mos_documentos_codigo`
+ADD COLUMN `activo`  varchar(1) NULL DEFAULT 'N' AFTER `correlativo`;
+
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'activo', 'Vigente', '26','Vigente',1);
+INSERT INTO mos_nombres_campos (nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'activo', 'Validade', '26','Validade',2);
+
+UPDATE `mos_nombres_campos` SET `texto`='Se' WHERE (`modulo`='100' and nombre_campo = 'si');
+UPDATE `mos_nombres_campos` SET `texto`='Não' WHERE (`modulo`='100' and nombre_campo = 'no');
+UPDATE `mos_nombres_campos` SET `texto`='Recibe Notificaciones de Correo Electrónico' WHERE (`modulo`='21' and nombre_campo = 'recibe_notificaciones');
+UPDATE `mos_nombres_campos` SET `texto`='Email', `placeholder`='Email' WHERE (`modulo`='21' and nombre_campo = 'email');
+UPDATE `mos_nombres_link_idiomas` SET `nombre_link`='Gestor de Formulários' WHERE (`cod_link`='87') AND (`id_idioma`='2');
+UPDATE `mos_nombres_link_portal_idiomas` SET `nombre_link`='Mestre de Documentos' WHERE (`cod_link`='14') AND (`id_idioma`='2');
+UPDATE `mos_nombres_link_portal_idiomas` SET `nombre_link`='Mestre de Registros' WHERE (`cod_link`='16') AND (`id_idioma`='2');
+

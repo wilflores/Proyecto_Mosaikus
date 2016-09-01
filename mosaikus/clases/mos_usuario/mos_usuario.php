@@ -287,7 +287,7 @@
                                 passwordDB
                                 FROM
                                 mos_adm_empresas 
-                                where id_empresa=11';
+                                ';
                     //QUITAR LA VALIDACION DE ID_EMPRESA=11
                     $data = $pagina->query($Consulta, array()); 
                     //print_r($data);

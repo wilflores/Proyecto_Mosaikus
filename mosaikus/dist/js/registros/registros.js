@@ -431,6 +431,7 @@ function r_marcar_desmarcar_checked_columns(checked){
             }
         }
     }
+    
     function crearActualizacionRegistro(id){
             array = new XArray();
             array.setObjeto('Registros','crear_actualizacion');
@@ -447,3 +448,26 @@ function r_marcar_desmarcar_checked_columns(checked){
     //window.open('pages/' +  document.getElementById("modulo_actual").value + '/exportarExcel.php?campo='+document.getElementById("campo").value + '&valor=' + document.getElementById("valor").value + '&corder=' + document.getElementById("corder").value + '&sorder=' + document.getElementById("sorder").value,null,'toolbar=no, location=no, menubar=no, width=600,height=400');    
     window.open('pages/registros/exportarphpexcel.php?'+params,'_blank');
     }
+    
+    function AreaCargoPorPersona(i){
+        array = new XArray();
+        array.setObjeto('Registros','CargarAreaCargoPorPersona');
+        array.addParametro('i',i);
+        array.addParametro('persona',document.getElementById('campo_'+i).value);
+        array.addParametro('modo',document.getElementById('modo').value);
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
+        array.addParametro('import','clases.registros.Registros');
+        xajax_Loading(array.getArray());        
+    }
+    function AreaCargoPorPersonaEdit(idRegistro,id_unico,i){
+        array = new XArray();
+        array.setObjeto('Registros','CargarAreaCargoPorPersonaEdit');
+        array.addParametro('idRegistro',idRegistro);
+        array.addParametro('id_unico',id_unico);
+        array.addParametro('i',i);
+        array.addParametro('persona',document.getElementById('campo_'+i).value);
+        array.addParametro('modo',document.getElementById('modo').value);
+        array.addParametro('cod_link',document.getElementById('cod_link').value);
+        array.addParametro('import','clases.registros.Registros');
+        xajax_Loading(array.getArray());        
+    }    

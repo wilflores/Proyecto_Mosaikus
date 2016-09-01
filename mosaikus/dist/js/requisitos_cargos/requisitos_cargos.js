@@ -125,12 +125,16 @@
     }
 
     /******** funcion para mostrarselect de formulario**/
-    function CargaComboForm(id_requisito_item){
+    function CargaComboForm(id_requisito_item,opc){
         var id_it=$(id_requisito_item).val();
     //alert('valor '+id_it);
         //if(id_requisito_item.checked){
         if($(id_requisito_item).is(":checked")){
             $('#formulario_doc_'+id_it).show();
+            if(opc==1){
+                $('#combos_form_'+id_it).show();
+                $('#valores_form_'+id_it).show();
+            }
             $('#form_'+id_it).attr("data-validation", "required");
            //  $('#form_'+id_it).show();
             
@@ -144,8 +148,9 @@
         }
         
     /*********** funcion para mostrar parametros de acurdo al formulario seleccionado */
-   function CargaComboParametros(id_formulario,id_requisito_item,tipo,vigencia){
+   function CargaComboParametros(id_formulario,id_requisito_item,tipo,vigencia,id_req_form){
     array = new XArray();
+
    $('#combos_form_'+id_it).hide();
     var id_form=$(id_formulario).val();
     var id_it=id_requisito_item;
@@ -157,6 +162,7 @@
        // alert('escoge capacitacion');
         array.setObjeto('RequisitosCargos','GuardarRequisitoCapacitacion');
         array.addParametro('id_capacitacion',capacitacion[1]);
+        array.addParametro('nuevo',id_req_form);//si es 0 es para crear   
         array.addParametro('id_req_item',id_it);
         array.addParametro('tipo_req',tipo);
         array.addParametro('vigencia_req',vigencia);
@@ -165,6 +171,7 @@
     else{
         array.setObjeto('RequisitosCargos','Comboparametros');
         array.addParametro('id_form',id_form);
+        array.addParametro('nuevo',id_req_form);//si es 0 es para crear         
         array.addParametro('id_req_item',id_it);
         array.addParametro('tipo_req',tipo);
         array.addParametro('vigencia_req',vigencia);

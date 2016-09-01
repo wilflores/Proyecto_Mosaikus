@@ -7,7 +7,7 @@
     }
 
     function filtrar_mostrar_colums(){
-        var colums = '1-2-3-4-';
+        var colums = '1-';
          $('.checkbox-mos-col').each(function() {
                 if (this.checked){
                     colums = colums + this.value + '-';
