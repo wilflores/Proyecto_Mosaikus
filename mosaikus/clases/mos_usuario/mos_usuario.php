@@ -49,8 +49,11 @@
                         }
                     } 
                 }
-            }            
+            }
 
+            /**
+             * @param $tupla
+             */
             public function columna_accion($tupla)
             {
                 $html = "&nbsp;";
@@ -67,9 +70,11 @@
                                 </a>';
                     }
                     if($this->per_editar == 'S'){
-                        $html .= '<a onclick="javascript:configurarmos_usuario(\''.$tupla[id_usuario].'\' );">
+                        if($this->is_super_admin($_SESSION['CookIdUsuario'])){
+                            $html .= '<a onclick="javascript:configurarmos_usuario(\'' . $tupla[id_usuario] . '\' );">
                                     <i style="cursor:pointer" class="icon icon-more"  title="Configurar Perfiles" style="cursor:pointer"></i>
                                 </a>';
+                        }
                         if($tupla[perfil_portal] > 0){
                             $html .= '<a onclick="javascript:perfil_portal(\''.$tupla[id_usuario].'\' );">
                                         <i style="cursor:pointer" class="icon-app-mode icon-app-mode-portal"  title="Administrar Perfiles Portal" style="cursor:pointer"></i>
@@ -491,7 +496,7 @@
                     array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[cedula], "cedula", $parametros)),
                     array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[recibe_notificaciones], "recibe_notificaciones", $parametros)),
                     array( "width"=>"10%","ValorEtiqueta"=>link_titulos("Perfil Especialista", "perfil_especialista", $parametros)),
-                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos("Perfil Portal", "perfil_portal", $parametros))                    
+                    array( "width"=>"10%","ValorEtiqueta"=>link_titulos("Perfil Portal", "perfil_portal", $parametros))
                 );
 
                 $k = 1;
@@ -1463,8 +1468,13 @@
                 $objResponse->addScript("$.validate({
                             lang: 'es'  
                           });");$objResponse->addScript("$('#fecha_creacion').datetimepicker();");
-$objResponse->addScript("$('#fecha_expi').datetimepicker();");
-  return $objResponse;
+                $objResponse->addScript("$('#fecha_expi').datetimepicker();");
+                $objResponse->addScript('$("#apellido_paterno").attr("readonly","true");
+                                         $("#apellido_materno").attr("readonly","true");
+                                         $("#cedula").attr("readonly","true");
+                                         $("#nombres").attr("readonly","true");
+                                         $("#email").attr("readonly","true");');
+                return $objResponse;
             }
      
  
