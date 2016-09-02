@@ -635,14 +635,16 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                 . '<label class="col-md-4 control-label" control-label">FAMILIAS:</label></div>';
                 $cont=0;
                 foreach ($columnas_fam as $value) {
-                         if($id_registro!= null){//para editar
-                             $primera_opc= '<option selected="" value="'.$data_params[$cont][id_item].'">'.$data_params[$cont][descripcion_item].'</option>';
-                             $condicion="and id<>".$data_params[$cont][id_item];
-                         }
-                        else{// un nuevo*/
-                            $primera_opc=' <option selected="" value="">-- Seleccione --</option>';
-                            $condicion="";
-                        }
+                    $condicion="";
+                    $primera_opc=' <option selected="" value="">-- Seleccione --</option>';
+                   if($id_registro!= null && isset($data_params[$cont][id_item])){//para editar
+                        $primera_opc= '<option selected="" value="'.$data_params[$cont][id_item].'">'.$data_params[$cont][descripcion_item].'</option>';
+                        $condicion="and id<>".$data_params[$cont][id_item];
+                    }
+                    if($id_registro== null){// un nuevo*/
+                        $primera_opc=' <option selected="" value="">-- Seleccione --</option>';
+                        $condicion="";
+                    }
                     $nombre_campos .= "campo_".$value[id].",";
 //construir los select dinamicos para el formulario de requisitos
                             $html .= '<div class="form-group">'
