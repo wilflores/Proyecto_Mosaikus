@@ -907,12 +907,19 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             }
                             else
                                 $reg =  explode(',',$atr[Nombre]);
+//                            $sql = "select valor from mos_registro_item where tipo='14' and idRegistro=$atr[idRegistro] and id_unico= $atr[id_unico] ";
+//                            $this->operacion($sql, $atr);
+//                            $cargos = $this->dbl->data;
+//                            $sql = "select valor from mos_registro_item where tipo='11' and idRegistro=$atr[idRegistro]";
+//                            $this->operacion($sql, $atr);
+//                            $org = $this->dbl->data;
                         }
                         else
                            if($atr[tipo]=='14') 
                                $reg=$atr[Nombre]; 
                            else
-                               $reg[]=$atr[Nombre];                         
+                               $reg[]=$atr[Nombre];
+                           
                         $respuesta = $this->dbl->delete("mos_registro_item", "idRegistro = " . $atr[idRegistro]. " and id_unico = " . $atr[id_unico]. " AND tipo ='".$atr[tipo]."'");  
                         foreach ($reg as $value){
                         $sql = "INSERT INTO mos_registro_item(IDDoc,idRegistro,valor,tipo,id_unico)
@@ -1270,12 +1277,16 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                         else if ($value[tipo]== '14'){
                             if($registros_x_pagina==100000){
+//                                $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','; ')";
+//                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), ' ', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',','; ')";
                                 $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','; ')";
-                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), ' ', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',','; ')";
+                                $campo_cargo_perso=" personas ";
                             }
                             else{
+//                                $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','<br>')";
+//                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), '&nbsp;', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),'&nbsp;', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',','<br>')";
                                 $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','<br>')";
-                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), '&nbsp;', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),'&nbsp;', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',','<br>')";
+                                $campo_cargo_perso="replace(personas,',','<br>')";
                             }
                             $sql_left .= " LEFT JOIN(select t1.idRegistro, $campo_cargo as nom_detalle 
                             from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
@@ -1283,15 +1294,22 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
                             //$clave= array_search(11, $this->parametros);
                             //echo $clave;
+//                            $sql_left .= "LEFT JOIN
+//                            (select 
+//                            t1.idRegistro, 
+//                            $campo_cargo_perso cargo_perso
+//                            from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
+//                            inner join mos_registro_item ao on ao.idRegistro = t1.idRegistro and ao.tipo = 11
+//                            inner JOIN mos_personal p on p.cod_cargo = t1.valor and p.id_organizacion = ao.valor
+//                            where t1.id_unico = $value[id_unico] 
+//                            group by t1.idRegistro) pn$k ON pn$k.idRegistro = r.idRegistro";
                             $sql_left .= "LEFT JOIN
-                            (select 
+                            (select distinct
                             t1.idRegistro, 
                             $campo_cargo_perso cargo_perso
-                            from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
-                            inner join mos_registro_item ao on ao.idRegistro = t1.idRegistro and ao.tipo = 11
-                            inner JOIN mos_personal p on p.cod_cargo = t1.valor and p.id_organizacion = ao.valor
+                            from mos_registro_item t1 inner join mos_historico_registro_cargo cargo on t1.id_unico = cargo.id_unico
                             where t1.id_unico = $value[id_unico] 
-                            group by t1.idRegistro) pn$k ON pn$k.idRegistro = r.idRegistro";
+                            ) pn$k ON pn$k.idRegistro = r.idRegistro";
                             $sql_col_left .= ",pn$k.cargo_perso pn$k ";
                             
                         }
@@ -2105,6 +2123,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         $atr = $this->dbl->corregir_parametros($atr);
                         $respuesta = $this->dbl->delete("mos_registro", "idRegistro = " . $atr[id]);
                         $respuesta = $this->dbl->delete("mos_registro_formulario", "idRegistro = " . $atr[id]);
+                        $respuesta = $this->dbl->delete("mos_historico_registro_cargo", "idRegistro = " . $atr[id]);
                         $respuesta = $this->dbl->delete("mos_registro_item", "idRegistro = " . $atr[id]);
                         $nuevo = "idRegistro: \'$atr[id]\'";
                         $this->registraTransaccionLog(9,$nuevo,'', '');
@@ -2237,7 +2256,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         case '14':
                                 $ancho = 5;                                                            
                                 array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
-                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro('Personas en Cargo', "pn$k", $parametros,'r_link_titulos')));            
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro($value[Nombre].' Personal', "pn$k", $parametros,'r_link_titulos')));            
                                 //$k++;
                                 break;
                             
@@ -2896,15 +2915,6 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                   
                             </div>';
                         $k++;
-//                        $parametros['mostrar-col'] .= "-$k";
-//                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
-//
-//                                          <label >
-//                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-//                                          ID ' . $value[Nombre] . ' </label>
-//
-//                                </div>';
-//                        $k++;
                         $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
@@ -3999,7 +4009,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     }
                      
                     $respuesta = $this->ingresarRegistros($parametros,$archivo);
-                  
+                    $si_hay_cargo=array();
                     //if (preg_match("/ha sido ingresado con exito/",$respuesta ) == true) {
                     if (strlen($respuesta ) < 10 ) {
                         for ($i = 1; $i <= 20; $i++) {
@@ -4024,8 +4034,9 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 }
                                 else
                                 {
-                                    //$params[id_documento] = $id_documento;
-                                    //$params[nombre] = $parametros["nombre_$i"];
+                                    if ($parametros["tipo_dato_$i"] == '14') {
+                                        $si_hay_cargo[]=$parametros["id_atributo_$i"];                                    
+                                    }
                                     $params[tipo] = $parametros["tipo_dato_$i"];
                                     //$params[validacion] = $parametros["validacion_$i"];
                                     //$params[valores] = $parametros["valores_$i"];   
@@ -4044,7 +4055,30 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 }
                             }
                         }
-                        
+                        //PARA GUARDAR EL HISTORICO DE PERSONAS EN ESOS CARGOS Y ORG
+                        if (sizeof($si_hay_cargo)>0) {
+                           // print_r($si_hay_cargo);
+                            foreach ($si_hay_cargo as $valores){
+                                $sql = "SELECT
+                                        GROUP_CONCAT(CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))) nombre
+                                        FROM
+                                        mos_personal p
+                                        WHERE
+                                        p.id_organizacion in (".$parametros["nodosreg"].")  AND
+                                        p.cod_cargo in (SELECT
+                                                        valor 
+                                                        FROM
+                                                        mos_registro_item
+                                                        WHERE id_unico = ".$valores." AND idRegistro = ".$respuesta." AND tipo = 14) ";    
+                                $this->operacion($sql, $atr);
+                                $personas = $this->dbl->data[0];                                
+                                $sql ="insert into mos_historico_registro_cargo (idRegistro,id_unico,personas)".
+                                        " values (".$respuesta.",".$valores.",'".$personas[nombre]."');";
+                                $this->dbl->insert_update($sql);
+                            }
+                            //echo $cargos.'0';
+                            //$parametros["nodosreg"];
+                        }
                         try{
                             unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($parametros['filename']));
                         } catch (Exception $ex) {
@@ -4962,7 +4996,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
             
  
             public function actualizar($parametros)
-            { //print_r($parametros);
+            { //print_r($parametros);die;
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $objResponse = new xajaxResponse();
@@ -5028,7 +5062,10 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     if (1 == 1)
                     {
                         $nuevo = '';
+                        
+                        //SACAMOS EL REGISTRO ACTUAL DE CARGOS Y ORG SI LOS TIENE
                         for ($i = 1; $i <= 20; $i++) {
+                            
                             if (isset($parametros['nombre_' . $i]) == true){
                                 if ($parametros["tipo_dato_$i"] == '8'){
                                     $valor_actual_aux = '';
@@ -5051,8 +5088,30 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 }
                                 else
                                 {
-                                    //$params[id_documento] = $id_documento;
-                                    //$params[nombre] = $parametros["nombre_$i"];
+                                    if ($parametros["tipo_dato_$i"] == '14') {
+                                        $cargos_act = array();
+                                        $cargos_ant = array();
+                                        $org_act = array();
+                                        $org_ant=array();
+                                        $id_unico=$parametros["id_atributo_$i"];
+                                        $cargos_act = $parametros["campo_$i"];
+                                        $org_act = explode(',',$parametros["nodosreg"]);
+                                        $sql = "select valor from mos_registro_item where tipo='14' and idRegistro=$parametros[id] and id_unico=". $parametros["id_atributo_$i"];
+                                        $this->operacion($sql, $atr);
+                                        foreach ($this->dbl->data as $valores){
+                                             $cargos_ant[] =$valores[valor];
+                                        }
+                                        $sql = "select valor from mos_registro_item where tipo='11' and idRegistro=$parametros[id]";
+                                        $this->operacion($sql, $atr);
+                                        foreach ($this->dbl->data as $valores){
+                                             $org_ant[] =$valores[valor];
+                                        }
+                                        $dif_cargo = (array_merge(array_diff($cargos_act, $cargos_ant), array_diff($cargos_ant, $cargos_act)));
+                                        $dif_org = (array_merge(array_diff($org_act, $org_ant), array_diff($org_ant, $org_act)));
+                                        //echo 'cargo:'.sizeof($dif_cargo);
+                                       // echo 'org:'.sizeof($dif_org);
+                                       // print_r(array_diff($org_act, $org_ant));                                        
+                                    }
                                     $params[tipo] = $parametros["tipo_dato_$i"];
                                     //$params[validacion] = $parametros["validacion_$i"];
                                     //$params[valores] = $parametros["valores_$i"];    
@@ -5071,11 +5130,33 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                     else $params['nuevo'] = 0;
                                     // print_r($params);
                                     $this->modificarRegistrosCampoDinamico($params);
-                                    
+                                    // si tiene cambios en nuevos cargos tipo 14
+                                    //print_r($cargos_act); 
+                                    //CORREGIR QUE GUARDA EN HISTORI EL ID UNICO DE ORG
+                                    if ((sizeof($dif_cargo)>0 || sizeof($dif_org)>0) && $params[tipo] == '14'){
+                                        $sql ="delete from mos_historico_registro_cargo 
+                                               where idRegistro = ".$parametros[id]." and  id_unico =". $params[id_unico];
+                                       // echo $sql;
+                                        $this->dbl->insert_update($sql);           
+                                        $sql = "SELECT
+                                                GROUP_CONCAT(CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))) nombre
+                                                FROM
+                                                mos_personal p
+                                                WHERE
+                                                p.id_organizacion in (".$parametros["nodosreg"].")  AND
+                                                p.cod_cargo IN (". implode(',', array_keys($cargos_act)) . ") ";    
+                                        $this->operacion($sql, $atr);
+                                        //echo $sql;
+                                        $personas = $this->dbl->data[0];                                
+                                        $sql ="insert into mos_historico_registro_cargo (idRegistro,id_unico,personas)".
+                                                " values (".$parametros[id].",".$params[id_unico].",'".$personas[nombre]."');";
+                                        $this->dbl->insert_update($sql);                                        
+                                    }
                                 }
                                 $nuevo .= " " . $parametros["nombre_$i"] . ": \'" . $params[Nombre] . "\'";
                             }
                         }
+                        
                         //$nuevo = "IdRegistro: \'".$this->dbl->data[0][0]."\', IDDoc: \'$_SESSION[IDDoc]\', Identificacion: \'$atr[identificacion]\',  Id Usuario: \'$atr[id_usuario]\', Descripcion: \'$atr[descripcion]\', ContentType: \'$atr[contentType]\', Id Procesos: \'$atr[id_procesos]\', Id Organizacion: \'$atr[id_organizacion]\', ";
                         $this->registraTransaccionLog(8,$nuevo,'', '');
                         $objResponse->addScriptCall("MostrarContenidoAux");

@@ -5640,7 +5640,7 @@ echo $Consulta3;
      
  
             public function actualizar($parametros)
-            {   print_r($parametros);
+            {   //print_r($parametros);
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $objResponse = new xajaxResponse();
