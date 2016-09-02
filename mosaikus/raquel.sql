@@ -290,3 +290,6 @@ ALTER TABLE `mos_requisitos_cursos` ADD FOREIGN KEY ( `cod_curso` ) REFERENCES `
 ALTER TABLE mos_cursos ADD estatus INT NOT NULL DEFAULT '1';
 /**** cambios en tabla mos_cursos 26/08/16***/
 ALTER TABLE `mos_cursos` CHANGE `estatus` `aplica_vigencia` CHAR( 1 ) NOT NULL DEFAULT 'S';
+/******** cambios en campo del modulo requisito cargo 01/09/2016***/
+UPDATE `santateresa`.`mos_nombres_campos` SET `nombre_campo`='id_requisito',`texto` = 'Requisito',
+`placeholder` = 'Requisito' WHERE `mos_nombres_campos`.`nombre_campo` ='id_requisito_items';

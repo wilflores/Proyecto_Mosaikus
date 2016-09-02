@@ -211,44 +211,52 @@
                         $this->restricciones->cargar_acceso_nodos($atr);
                     }*/
                     
-                    $sql = "SELECT COUNT(*) FROM mos_cargo mc
+                    $sql = "SELECT COUNT(*) total_registros FROM mos_cargo mc
 INNER JOIN mos_cargo_estrorg_arbolproc mco ON mc.cod_cargo = mco.cod_cargo
 INNER JOIN mos_organizacion mo ON mo.id = mco.id
                          WHERE 1 = 1 ";
                      if (strlen($atr['b-filtro-sencillo'])>0){
-                        $sql .= " AND ((upper(descrip_cargo) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
+                        $sql .= " AND ((upper(mc.descripcion) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
                     
-                        $sql .= " OR (upper(descrip_area) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
+                        $sql .= " OR (upper(mo.title) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
                     }
                     if (strlen($atr[valor])>0)
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
                                  if (strlen($atr["b-id_cargo"])>0)
-                        $sql .= " AND descrip_cargo = '". $atr["b-id_cargo"] . "'";
+                        $sql .= " AND mc.descripcion = '". $atr["b-id_cargo"] . "'";
              if (strlen($atr["b-id_area"])>0)
-                        $sql .= " AND descrip_area = '". $atr["b-id_area"] . "'";
+                        $sql .= " AND mo.title = '". $atr["b-id_area"] . "'";
 
+                    /*FILTRO PARA EL ARBOL ORGANIZACIONAL*/
+                    $filtro_ao='';
+                    if ((strlen($atr["b-id_organizacion"])>0)){ // filtro para el arbol organizacional
+                        $id_org = ($atr["b-id_organizacion"]);
+                        $filtro_ao= " and mco.id in (". $id_org . ") ";
+                    }// 
                     $total_registros = $this->dbl->query($sql, $atr);
-                    $this->total_registros = $total_registros[0][total_registros];   
+                    $this->total_registros = $total_registros[0][total_registros];
+
             
                     $sql = "SELECT mco.id id_area,mc.cod_cargo cod_cargo, mo.title descrip_area,mc.descripcion descrip_cargo $sql_col_left
 FROM mos_cargo mc
 INNER JOIN mos_cargo_estrorg_arbolproc mco ON mc.cod_cargo = mco.cod_cargo
-INNER JOIN mos_organizacion mo ON mo.id = mco.id $sql_left";
+INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $filtro_ao";
                     if (strlen($atr['b-filtro-sencillo'])>0){
-                        $sql .= " AND ((upper(descrip_cargo) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
+                        $sql .= " AND ((upper(mc.descripcion) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
                     
-                        $sql .= " OR (upper(descrip_area) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
+                        $sql .= " OR (upper(mo.title) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
                     }
                     if (strlen($atr[valor])>0)
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
-                                 if (strlen($atr["b-id_cargo"])>0)
-                        $sql .= " AND descrip_cargo = '". $atr["b-id_cargo"] . "'";
-             if (strlen($atr["b-id_area"])>0)
-                        $sql .= " AND descrip_area = '". $atr["b-id_area"] . "'";
+                                 
+                    if (strlen($atr["b-id_cargo"])>0)
+                        $sql .= " AND mc.descripcion = '". $atr["b-id_cargo"] . "'";
+                   if (strlen($atr["b-id_area"])>0)
+                        $sql .= " AND mo.title = '". $atr["b-id_area"] . "'";
 
                     $sql .= " order by mc.$atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
-                    //echo $sql;
+                 //   echo $sql;
                     $this->operacion($sql, $atr);
              }
              public function eliminarRequisitosCargos($atr){
@@ -282,7 +290,7 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id $sql_left";
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
                 }
-
+                //print_r($this->nombres_columnas);
                 $grid->SetConfiguracionMSKS("tblRequisitosCargos", "");
                 $config_col=array(
                     
@@ -295,10 +303,10 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id $sql_left";
                         $this->cargar_parametros();
                 }*/
                 $k = 1;
-                foreach ($this->parametros as $value) {                    
+               /* foreach ($this->parametros as $value) {                    
                     array_push($config_col,array( "width"=>"5%","ValorEtiqueta"=>link_titulos(($value[espanol]), "p$k", $parametros)));
                     $k++;
-                }
+                }*/
 
                 $func= array();
 
@@ -339,6 +347,10 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id $sql_left";
                             break;
                     }
                 }
+                    /*Carga Acceso segun el arbol*/
+               /* if (count($this->restricciones->id_org_acceso_explicito) <= 0){
+                    $this->restricciones->cargar_acceso_nodos_explicito($parametros);
+                } */
                 $grid->setParent($this);
                 $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
                 $grid->setFuncion("id_area", "colum_admin");
@@ -413,13 +425,13 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id $sql_left";
  
             public function indexRequisitosCargos($parametros)
             {
+                //print_r($parametros);
                 $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
                 import('clases.utilidades.NivelAcceso');
                 $this->restricciones = new NivelAcceso();
-                $this->restricciones->cargar_permisos($parametros);
                 if ($parametros['corder'] == null) $parametros['corder']="cod_cargo";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc"; 
                 if ($parametros['mostrar-col'] == null) 
@@ -441,7 +453,16 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id $sql_left";
                             </div>';
                     $k++;
                 }
+            /*ARBOL ORGANIZACIONAL*/
+                import('clases.organizacion.ArbolOrganizacional');
+                $this->arbol = new ArbolOrganizacional();
+
                 $this->restricciones->cargar_permisos($parametros);
+                $this->restricciones->cargar_acceso_nodos_explicito($parametros);
+
+                $contenido[DIV_ARBOL_ORGANIZACIONAL] =  $this->arbol->jstree_ao(0,$parametros);
+                /*FIN ARBOL ORGANIZACIONAL*/
+
                 $grid = $this->verListaRequisitosCargos($parametros);
                 $contenido['CORDER'] = $parametros['corder'];
                 $contenido['MODO'] = $parametros['modo'];
@@ -500,7 +521,7 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id $sql_left";
                 $objResponse->addScript('PanelOperator.initPanels("");
                         ScrollBar.initScroll();
                         init_filtro_rapido();
-                        init_filtro_ao_simple();');
+                        init_filtro_ao_multiple();');
                 return $objResponse;
             }
 

@@ -507,6 +507,7 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                 $config=array();
                 //$config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
+               // echo "total registros ".$this->total_registros;
                 $array_columns =  explode('-', $parametros['mostrar-col']);
                 for($i=0;$i<count($config_col);$i++){
                     switch ($i) {                                             
@@ -677,7 +678,7 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                 if ($parametros['corder'] == null) $parametros['corder']="orden";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc";//ordenar ascendente por orden 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="0-1-2-3-6"; 
+                    $parametros['mostrar-col']="0-1-2-3-6-"; 
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */  
