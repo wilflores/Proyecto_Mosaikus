@@ -1646,7 +1646,17 @@ CREATE TRIGGER `carga_mos_historico_registro_persona_del` BEFORE DELETE ON `mos_
 			END IF;
 END;
 /***********2/09/2016*******/
-DROP TRIGGER IF EXISTS `carga_mos_historico_registro_persona_upd`;;
+DROP TABLE IF EXISTS `mos_historico_registro_cargo`;
+CREATE TABLE `mos_historico_registro_cargo` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `idRegistro` int(11) DEFAULT NULL,
+  `id_unico` int(11) DEFAULT NULL,
+  `personas` text,
+  `fecha_registro` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
+
+DROP TRIGGER IF EXISTS `carga_mos_historico_registro_persona_upd`;
 DELIMITER ;;
 CREATE TRIGGER `carga_mos_historico_registro_persona_upd` BEFORE UPDATE ON `mos_registro_formulario` FOR EACH ROW BEGIN
 			IF(NEW.tipo='6') THEN
@@ -1677,14 +1687,6 @@ CREATE TRIGGER `carga_mos_historico_registro_persona_upd` BEFORE UPDATE ON `mos_
 				END IF;
 			END IF;
 END;
+;;
 
-DROP TABLE IF EXISTS `mos_historico_registro_cargo`;
-CREATE TABLE `mos_historico_registro_cargo` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `idRegistro` int(11) DEFAULT NULL,
-  `id_unico` int(11) DEFAULT NULL,
-  `personas` text,
-  `fecha_registro` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
 
