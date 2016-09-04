@@ -30,6 +30,13 @@ session_name('mosaikus');
                 //print $contenido2;
                 $version = "HOJA_VIDA";
                 $Codigo = $Ext2 = "";
+                header("Content-type: application/pdf");
+                $content_disposition = "Content-disposition: filename=\"".$NombreDoc."\"";
+                //echo $content_disposition;
+                //exit();
+                header($content_disposition);
+                echo $contenido2;
+                exit();
                 $carpeta =  $pagina->encryt->Decrypt_Text($_SESSION[BaseDato]);
                 $documento = new visualizador_documentos($carpeta, $NombreDoc, $Codigo, $version, $Ext2, $contenido2);
                 if ((isset($_GET[des]))&&($_GET[des] == '1')){
