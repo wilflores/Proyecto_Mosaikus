@@ -293,3 +293,11 @@ ALTER TABLE `mos_cursos` CHANGE `estatus` `aplica_vigencia` CHAR( 1 ) NOT NULL D
 /******** cambios en campo del modulo requisito cargo 01/09/2016***/
 UPDATE `santateresa`.`mos_nombres_campos` SET `nombre_campo`='id_requisito',`texto` = 'Requisito',
 `placeholder` = 'Requisito' WHERE `mos_nombres_campos`.`nombre_campo` ='id_requisito_items';
+
+/* cambiar nombre a opcion menu 02-09-16*/
+UPDATE `santateresa`.`mos_nombres_link_idiomas` SET `nombre_link` = 'Matriz de Competencias' WHERE `mos_nombres_link_idiomas`.`cod_link` =61 AND `mos_nombres_link_idiomas`.`id_idioma` =1;
+
+UPDATE `santateresa`.`mos_link` SET `nombre_link` = 'Matriz de Competencias' WHERE `mos_link`.`cod_link` =61;
+UPDATE `santateresa`.`mos_nombres_link_idiomas` SET `nombre_link` = 'Matriz de Competências' WHERE `mos_nombres_link_idiomas`.`cod_link` =61 AND `mos_nombres_link_idiomas`.`id_idioma` =2;
+/********** enlace menu al metodo matriz (en construccion) 03-09-16**/
+UPDATE `santateresa`.`mos_link` SET `descripcion` = 'RequisitosCargos-indexMatrizCompetencia-clases.requisitos_cargos.RequisitosCargos' WHERE `mos_link`.`cod_link` =61;
