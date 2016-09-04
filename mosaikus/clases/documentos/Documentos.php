@@ -519,6 +519,29 @@ echo $Consulta3;
                 $this->operacion($sql, $atr);
                 return $this->dbl->data[0];
             }
+            
+            /**
+             * Retorna la tupla del documentos a visualizar
+             * @param int $id identificador del documento
+             * @return array 
+             */
+            public function verDocumentoFuenteSinArchivo($id){
+                $atr=array();
+                $sql = "SELECT                             
+                            doc_fisico
+                            ,contentType
+                            ,Codigo_doc
+                            ,nombre_doc
+                            ,version
+                            ,IDDoc
+                            ,formulario
+                         FROM mos_documentos 
+                         WHERE IDDoc = $id "; 
+                //echo $sql;
+                $this->operacion($sql, $atr);
+                return $this->dbl->data[0];
+            }
+            
              public function ListarCamposIndexadosDoc($id){
                 $atr=array();
                 $sql = "SELECT
@@ -543,6 +566,26 @@ echo $Consulta3;
                 $sql = "SELECT                             
                             doc_visualiza
                             ,contentType_visualiza                            
+                            ,nom_visualiza
+                            ,IDDoc
+                            ,formulario
+                         FROM mos_documentos 
+                         WHERE IDDoc = $id "; 
+                //echo $sql;
+                $this->operacion($sql, $atr);
+                return $this->dbl->data[0];
+            }
+            
+            /**
+             * Retorna la tupla del documentos a visualizar
+             * @param int $id identificador del documento
+             * @return array 
+             */
+            public function verDocumentoPDFSinArchivo($id){
+                $atr=array();
+                $sql = "SELECT                             
+                            
+                            contentType_visualiza                            
                             ,nom_visualiza
                             ,IDDoc
                             ,formulario
@@ -4277,7 +4320,7 @@ echo $Consulta3;
 
 //                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
 //                $template->setTemplate("formulario");
-                $contenido_1['TITULO_FORMULARIO'] = "Formulario Crear";
+                $contenido_1['TITULO_FORMULARIO'] = "Crear";
                 $contenido_1['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Documentos";
                 $contenido_1['PAGINA_VOLVER'] = "listarDocumentos.php";
                 $contenido_1['DESC_OPERACION'] = "Guardar";
@@ -5586,7 +5629,7 @@ echo $Consulta3;
                 //$template->PATH = PATH_TO_TEMPLATES.'interfaz/';
                 //$template->setTemplate("formulario");
 
-                $contenido_1['TITULO_FORMULARIO'] = "Formulario Editar";
+                $contenido_1['TITULO_FORMULARIO'] = "Editar";
                 $contenido_1['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Documentos";
                 $contenido_1['PAGINA_VOLVER'] = "listarDocumentos.php";
                 $contenido_1['DESC_OPERACION'] = "Guardar";
@@ -6073,21 +6116,22 @@ echo $Consulta3;
             public function ver_visualiza($parametros)
             {
                 $objResponse = new xajaxResponse();
-                $archivo_aux = $this->verDocumentoPDF($parametros[id]);
-                $contenido2 = $archivo_aux[doc_visualiza];
+                $archivo_aux = $this->verDocumentoPDFSinArchivo($parametros[id]);
+                $contenido2 = $archivo_aux[contentType_visualiza];
                 $http = (isset($_SERVER['HTTPS'])) ? 'https' : 'http';
                 $iframe = '';
                 if (strlen($contenido2)>0){
                     
-                    $html = "<a target=\"_blank\" title=\"Ver Documento PDF\"  href=\"pages/documentos/descargar_archivo_pdf.php?id=$archivo_aux[IDDoc]&token=" . md5($archivo_aux[IDDoc]) ."&des=1\">
+                    $ruta_doc = "pages/documentos/descargar_archivo_pdf.php?id=$archivo_aux[IDDoc]&token=" . md5($archivo_aux[IDDoc]) ."&des=1";
+                    $html = "<a target=\"_blank\" title=\"Ver Documento\"  href=\"$ruta_doc\">
                             
-                            <i class=\"icon icon-download\"></i>
+                            <i class=\"icon icon-view-document\"></i>
                         </a>";                
-               
+                    
                     $titulo_doc = $archivo_aux[nom_visualiza];
             
                     
-                    
+                    /*
                     $sql = "SELECT extension FROM mos_extensiones WHERE extension = '$archivo_aux[contentType_visualiza]' OR contentType = '$archivo_aux[contentType_visualiza]'";
                     $total_registros = $this->dbl->query($sql, $atr);
                     $Ext2 = $total_registros[0][extension];
@@ -6103,9 +6147,9 @@ echo $Consulta3;
                     $Codigo = $Ext2 = "";
                     $carpeta =  $this->encryt->Decrypt_Text($_SESSION[BaseDato]);
                     $documento = new visualizador_documentos($carpeta, $NombreDoc, $Codigo, $version, $Ext2, $contenido2);
-
-                    $ruta_doc = $documento->ActivarDocumento();
-                    $titulo_doc = $documento->getNombreArchivo();
+                    */
+                    //$ruta_doc = $documento->ActivarDocumento();
+                    //$titulo_doc = $documento->getNombreArchivo();
                     $iframe = '<iframe id="iframe-vis" src="'.$ruta_doc.'" style="height:90%;width:100%;min-height:600px;" frameborder="0"></iframe>';
                     $accion = "Visualizó documento PDF";
                     $this->registraTransaccionLog(89,$accion,'', $parametros[id]);                    
@@ -6113,6 +6157,7 @@ echo $Consulta3;
                 else{
                     $archivo_aux = $this->verDocumentoFuente($parametros[id]);
                     $sql = "SELECT extension FROM mos_extensiones WHERE extension = '$archivo_aux[contentType]' OR contentType = '$archivo_aux[contentType]'";
+                    //echo $sql;
                     $total_registros = $this->dbl->query($sql, array());
                     $Ext2 = $total_registros[0][extension];  
                     $NombreDoc = $archivo_aux[nombre_doc];
