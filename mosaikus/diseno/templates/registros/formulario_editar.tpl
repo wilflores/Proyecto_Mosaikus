@@ -17,7 +17,7 @@
                                     <div class="col-md-10">
                                         <p class="form-control-static" >
                                             <!--<img src="{PAHT_TO_IMG}adjunto.png">-->
-                                            <input type="text" class="form-control" readonly="readonly" style="display: inline;" id="info_nombre" name="info_nombre" value="{NOMBRE_DOC}">
+                                            <input type="text" class="form-control" readonly="readonly" style="display: inline;" id="info_nombre" name="info_nombre" value="{CORRELATIVO}-{NOMBRE_DOC}">
                                             <!--<span id="info_nombre" style="display:inline;">{TXT_OTRO_METODO}&nbsp;</span>-->                                            
                                         </p>                      
                                   </div>         

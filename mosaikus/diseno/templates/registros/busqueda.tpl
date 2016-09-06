@@ -12,9 +12,9 @@
                             </div>-->
 
 <div class="form-group">
-                                  <label>{N_IDENTIFICACION}</label>
+                                  <label>{N_CORRELATIVO}</label>
                                   
-                                    <input type="text" class="form-control" id="b-identificacion" name="b-identificacion" placeholder="{N_IDENTIFICACION}" />
+                                    <input type="text" class="form-control" id="b-correlativo" name="b-correlativo" placeholder="{N_CORRELATIVO}" />
                                                                 
                             </div>
 <!--<div class="form-group">
