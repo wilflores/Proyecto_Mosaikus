@@ -542,7 +542,10 @@ public function setData2($cssclass, $data, $funciones=array(), $colbotones=-1,$n
                                     $valor=$this->valorColumna($key,$fila);
                                 else
                                     if(strpos($this->valorColumna($key,$fila), '.')===false)
-                                            $valor=number_format($this->valorColumna($key,$fila),0,'','');
+                                            if(substr($this->valorColumna($key,$fila), 0,1)=='0')
+                                                $valor=$this->valorColumna($key,$fila);
+                                            else
+                                                $valor=number_format($this->valorColumna($key,$fila),0,'','');
                                     else
                                         $valor=number_format($this->valorColumna($key,$fila),2,',','.');
                                 $this->datos.="<td $atributos align='" . $this->aligns[$col] . "'>". utf8_decode($valor)."</td>\n";
