@@ -385,6 +385,7 @@
                             ,id_procesos
                             ,id_organizacion
                             ,idRegistro_original
+                            ,correlativo
                          FROM mos_registro 
                          WHERE idRegistro = $id "; 
                 $this->operacion($sql, $atr);
@@ -793,17 +794,23 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
         }
             
             public function ingresarRegistros($atr,$archivo){
-               // print_r($atr);
+                print_r($atr);
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);//,version,correlativo,id_procesos,id_organizacion
                     $atr[doc_fisico] = $archivo;
                     if($atr['r-id-original'] == '') 
                         $atr['idRegistro_original']='NULL' ;
                     else
-                        $atr['idRegistro_original']=$atr['r-id-original'] ;
-                    $sql = "INSERT INTO mos_registro(IDDoc,identificacion,id_usuario,descripcion, idRegistro_original,doc_fisico,contentType)
+                        $atr['idRegistro_original']=$atr['r-id-original'];
+                    $sql ="select correlativo from mos_registro where correlativo='$atr[correlativo]]' and IDDoc=$_SESSION[IDDoc]";
+                    $this->operacion($sql, $atr);
+                    $correlativo = $this->dbl->data[0][0];
+                    if ($correlativo!=''){
+                       $atr[correlativo]= str_pad(intval(($correlativo)+1),  5, "0", STR_PAD_LEFT);
+                    } 
+                    $sql = "INSERT INTO mos_registro(IDDoc,identificacion,id_usuario,descripcion, idRegistro_original,doc_fisico,contentType, correlativo)
                             VALUES(
-                                $_SESSION[IDDoc],'$atr[identificacion]',$atr[id_usuario],'$atr[descripcion]',$atr[idRegistro_original],'$atr[doc_fisico]','$atr[contentType]'
+                                $_SESSION[IDDoc],'$atr[identificacion]',$atr[id_usuario],'$atr[descripcion]',$atr[idRegistro_original],'$atr[doc_fisico]','$atr[contentType]','$atr[correlativo]'
                                 )";//,$atr[version],$atr[correlativo],$atr[id_procesos],$atr[id_organizacion]
                     //echo $sql;
                     $this->dbl->insert_update($sql);
@@ -822,14 +829,12 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 				where (idRegistro_original = ".$atr[idRegistro_original].") AND 
                                 (idRegistro <> ".$idregistro." );";
                         $this->dbl->insert_update($sql);
-                       // echo $sql;
                     }
                     else{
                         $sql = "update mos_registro
 				set idRegistro_original = ".$idregistro."
 				where idRegistro = ".$idregistro." ;";
                         $this->dbl->insert_update($sql);
-
                     }
                      // echo $sql;
                     $nuevo = "IdRegistro: \'".$idregistro."\', IDDoc: \'$_SESSION[IDDoc]\', Identificacion: \'$atr[identificacion]\',  Id Usuario: \'$atr[id_usuario]\', Descripcion: \'$atr[descripcion]\', ContentType: \'$atr[contentType]\', Id Procesos: \'$atr[id_procesos]\', Id Organizacion: \'$atr[id_organizacion]\', ";
@@ -1308,6 +1313,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             t1.idRegistro, 
                             $campo_cargo_perso cargo_perso
                             from mos_registro_item t1 inner join mos_historico_registro_cargo cargo on t1.id_unico = cargo.id_unico
+                            and t1.idRegistro = cargo.idRegistro
                             where t1.id_unico = $value[id_unico] 
                             ) pn$k ON pn$k.idRegistro = r.idRegistro";
                             $sql_col_left .= ",pn$k.cargo_perso pn$k ";
@@ -1405,12 +1411,12 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         $sql .= " AND idRegistro = '". $atr["b-idRegistro"] . "'";
                     if (strlen($atr["b-IDDoc"])>0)
                         $sql .= " AND IDDoc = '". $atr["b-IDDoc"] . "'";
-                    if (strlen($atr["b-identificacion"])>0)
-                        $sql .= " AND upper(identificacion) like '%" . strtoupper($atr["b-identificacion"]) . "%'";
+//                    if (strlen($atr["b-identificacion"])>0)
+//                        $sql .= " AND upper(identificacion) like '%" . strtoupper($atr["b-identificacion"]) . "%'";
                     if (strlen($atr["b-version"])>0)
                         $sql .= " AND version = '". $atr["b-version"] . "'";
                     if (strlen($atr["b-correlativo"])>0)
-                        $sql .= " AND correlativo = '". $atr["b-correlativo"] . "'";
+                        $sql .= " AND correlativo like '%" . strtoupper($atr["b-correlativo"]) . "%'";
                     if (strlen($atr["b-id_usuario"])>0)
                         $sql .= " AND id_usuario = '". $atr["b-id_usuario"] . "'";
                     if (strlen($atr["b-descripcion"])>0)
@@ -1558,7 +1564,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
             
                     $sql = "SELECT r.idRegistro
                                     ,d.Codigo_doc
-                                    ,r.identificacion
+                                    -- ,r.identificacion 
+                                    ,r.correlativo                                    
                                     -- ,version
                                     -- ,correlativo
                                     -- ,id_usuario
@@ -1606,12 +1613,12 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         $sql .= " AND idRegistro = '". $atr["b-idRegistro"] . "'";
                     if (strlen($atr["b-IDDoc"])>0)
                         $sql .= " AND IDDoc = '". $atr["b-IDDoc"] . "'";
-                    if (strlen($atr["b-identificacion"])>0)
-                        $sql .= " AND upper(identificacion) like '%" . strtoupper($atr["b-identificacion"]) . "%'";
+//                    if (strlen($atr["b-identificacion"])>0)
+//                        $sql .= " AND upper(identificacion) like '%" . strtoupper($atr["b-identificacion"]) . "%'";
                     if (strlen($atr["b-version"])>0)
                         $sql .= " AND version = '". $atr["b-version"] . "'";
                     if (strlen($atr["b-correlativo"])>0)
-                        $sql .= " AND correlativo = '". $atr["b-correlativo"] . "'";
+                        $sql .= " AND correlativo like '%" . strtoupper($atr["b-correlativo"]) . "%'";
                     if (strlen($atr["b-id_usuario"])>0)
                         $sql .= " AND id_usuario = '". $atr["b-id_usuario"] . "'";
                     if (strlen($atr["b-descripcion"])>0)
@@ -2157,7 +2164,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                    
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[idRegistro], "idRegistro", $parametros,'r_link_titulos')),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[IDDoc], "IDDoc", $parametros,'r_link_titulos')),
-               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[identificacion], "identificacion", $parametros,'r_link_titulos')),
+               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[correlativo], "correlativo", $parametros,'r_link_titulos')),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[correlativo], "correlativo", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_usuario], "id_usuario", $parametros)),
@@ -2338,7 +2345,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                    
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[idRegistro], "idRegistro", $parametros,'r_link_titulos')),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[IDDoc], "IDDoc", $parametros,'r_link_titulos')),
-               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[identificacion], "identificacion", $parametros,'r_link_titulos')),
+               //array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[identificacion], "identificacion", $parametros,'r_link_titulos')),
+               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[correlativo], "correlativo", $parametros,'r_link_titulos')),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[correlativo], "correlativo", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_usuario], "id_usuario", $parametros)),
@@ -2531,7 +2539,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                    
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[idRegistro], "idRegistro", $parametros,'r_link_titulos')),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[IDDoc], "IDDoc", $parametros,'r_link_titulos')),
-               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[identificacion], "identificacion", $parametros,'r_link_titulos')),
+               //array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[identificacion], "identificacion", $parametros,'r_link_titulos')),
+               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[correlativo], "correlativo", $parametros,'r_link_titulos')),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[correlativo], "correlativo", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_usuario], "id_usuario", $parametros)),
@@ -2712,7 +2721,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                  
          array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[idRegistro], ENT_QUOTES, "UTF-8")),
          array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[IDDoc], ENT_QUOTES, "UTF-8")),
-         array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[identificacion], ENT_QUOTES, "UTF-8")),
+         //array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[identificacion], ENT_QUOTES, "UTF-8")),
+         array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[correlativo], ENT_QUOTES, "UTF-8")),           
          //array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[version], ENT_QUOTES, "UTF-8")),
          //array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[correlativo], ENT_QUOTES, "UTF-8")),
          //array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[id_usuario], ENT_QUOTES, "UTF-8")),
@@ -2846,7 +2856,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
-                if ($parametros['corder'] == null) $parametros['corder']="idRegistro";
+                if ($parametros['corder'] == null) $parametros['corder']="correlativo";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
                     $parametros['mostrar-col']="2-4"; 
@@ -3897,11 +3907,15 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'registros/';
                 $template->setTemplate("formulario_1");
+                $sql ="select LPAD((IFNULL(max(correlativo),0)  +1),8,0) correlativo from mos_registro where  IDDoc=$_SESSION[IDDoc]";
+                $this->operacion($sql, $atr);
+                $correlativo = $this->dbl->data[0][0];
                // print_r($contenido_1);
 //                $contenido['CAMPOS'] = $template->show();
 //
 //                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
 //                $template->setTemplate("formulario");
+                $contenido_1['CORRELATIVO'] = $correlativo;
                 $contenido_1['TITULO_FORMULARIO'] = "Crear&nbsp;Registros";
                 $contenido_1['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Registros";
                 $contenido_1['PAGINA_VOLVER'] = "listarRegistros.php";
