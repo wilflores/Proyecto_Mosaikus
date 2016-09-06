@@ -76,6 +76,8 @@
     function nuevo_RequisitosCargos(){
             array = new XArray();
             array.setObjeto('RequisitosCargos','crear');
+            array.addParametro('modo',document.getElementById('modo').value);            
+            array.addParametro('cod_link',document.getElementById('cod_link').value); 
             array.addParametro('import','clases.requisitos_cargos.RequisitosCargos');
             xajax_Loading(array.getArray());
     }
@@ -112,6 +114,8 @@
                 array.setObjeto('RequisitosCargos','guardar');
             else
                 array.setObjeto('RequisitosCargos','actualizar');
+            array.addParametro('modo',document.getElementById('modo').value);
+            array.addParametro('cod_link',document.getElementById('cod_link').value); 
             array.addParametro('permiso',document.getElementById('permiso_modulo').value);
             array.getForm('idFormulario');
             array.addParametro('import','clases.requisitos_cargos.RequisitosCargos');

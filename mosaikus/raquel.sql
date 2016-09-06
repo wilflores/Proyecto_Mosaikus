@@ -296,7 +296,6 @@ UPDATE `santateresa`.`mos_nombres_campos` SET `nombre_campo`='id_requisito',`tex
 
 /* cambiar nombre a opcion menu 02-09-16*/
 UPDATE `santateresa`.`mos_nombres_link_idiomas` SET `nombre_link` = 'Matriz de Competencias' WHERE `mos_nombres_link_idiomas`.`cod_link` =61 AND `mos_nombres_link_idiomas`.`id_idioma` =1;
-
 UPDATE `santateresa`.`mos_link` SET `nombre_link` = 'Matriz de Competencias' WHERE `mos_link`.`cod_link` =61;
 UPDATE `santateresa`.`mos_nombres_link_idiomas` SET `nombre_link` = 'Matriz de Competências' WHERE `mos_nombres_link_idiomas`.`cod_link` =61 AND `mos_nombres_link_idiomas`.`id_idioma` =2;
 /********** enlace menu al metodo matriz (en construccion) 03-09-16**/
