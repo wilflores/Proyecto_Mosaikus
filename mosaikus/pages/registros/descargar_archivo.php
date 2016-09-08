@@ -20,7 +20,7 @@ session_name('mosaikus');
                 $total_registros = $pagina->dbl->query($sql, $atr);
                 $Ext2 = $total_registros[0][extension];
                 $NombreDoc = $archivo_aux[identificacion].'.'.$Ext2;
-                $NombreDoc = $archivo_aux['descripcion'];
+                $NombreDoc = $pagina->nombre_archivo_fuente($archivo_aux);// $archivo_aux['descripcion'];
                 //echo $NombreDoc;
                 $contenido2 = $archivo_aux[doc_fisico];
                 //header("Content-type: application/pdf");

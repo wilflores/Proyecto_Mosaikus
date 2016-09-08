@@ -373,6 +373,7 @@
                             ,contentType    
                             ,idRegistro
                             ,descripcion
+                            ,correlativo
                          FROM mos_registro 
                          WHERE idRegistro = $id ";  
                 //echo $sql;
@@ -3924,7 +3925,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'registros/';
                 $template->setTemplate("formulario_1");
-                $sql ="select LPAD((IFNULL(max(correlativo),0)  +1),8,0) correlativo from mos_registro where  IDDoc=$_SESSION[IDDoc]";
+                $sql ="select LPAD((IFNULL(max(correlativo),0)  +1),5,0) correlativo from mos_registro where  IDDoc=$_SESSION[IDDoc]";
                 $this->operacion($sql, $atr);
                 $correlativo = $this->dbl->data[0][0];
                // print_r($contenido_1);
@@ -4126,7 +4127,12 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 return $objResponse;
             }
      
- 
+            public function nombre_archivo_fuente($tupla)
+            {
+                return substr($tupla['descripcion'], 0, strpos($tupla['descripcion'], '-')).'-'.$tupla['correlativo'].'.pdf';
+            }
+
+
             public function editar($parametros)
             {
                 if(!class_exists('Template')){
@@ -4147,7 +4153,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 foreach ( $this->placeholder as $key => $value) {
                     $contenido_1["P_" . strtoupper($key)] =  $value;
                 }
-                $contenido_1[NOMBRE_DOC] = $val["descripcion"];
+                $contenido_1[NOMBRE_DOC] = $this->nombre_archivo_fuente($val);//$val["descripcion"];
                 $contenido_1['IDREGISTRO'] = $val["idRegistro"];
                 $contenido_1['IDDOC'] = $val["IDDoc"];
                 $contenido_1['IDENTIFICACION'] = ($val["identificacion"]);
@@ -5302,7 +5308,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     
                     $html = "<a target=\"_blank\" title=\"Ver Documento PDF\"  href=\"pages/registros/descargar_archivo.php?id=$archivo_aux[idRegistro]&token=" . md5($archivo_aux[idRegistro]) ."&des=1\">
                             
-                            <i class=\"icon icon-download\"></i>
+                            <i class=\"icon icon-view-document\"></i>
                         </a>";                
                                                                                   
                     $sql = "SELECT extension FROM mos_extensiones WHERE extension = '$archivo_aux[contentType]' OR contentType = '$archivo_aux[contentType]'";
@@ -5317,6 +5323,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                     $ruta_doc = $documento->ActivarDocumento();
                     $titulo_doc = $documento->getNombreArchivo();
+                    $ruta_doc = "pages/registros/descargar_archivo.php?id=$archivo_aux[idRegistro]&token=" . md5($archivo_aux[idRegistro]) ."&des=1";
+                    $titulo_doc = substr($this->nombre_archivo_fuente($archivo_aux), 0, strlen($this->nombre_archivo_fuente($archivo_aux)) - 4);
                 }
                 
                 $http = (isset($_SERVER['HTTPS'])) ? 'https' : 'http';
