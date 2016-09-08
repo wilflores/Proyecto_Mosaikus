@@ -10,21 +10,21 @@
         </table>
     </div>
     <div class="row">
-        <dl class="col-xs-6">
-            <dt>{N_DESCRICION} </dt>
+        <!--<dl class="col-xs-6">
+            <dt>{NA_DESCRICION} </dt>
             <dd> {TIPO}</dd>
 
-        </dl>
+        </dl>-->
         <dl class="col-xs-6">
             <dt>{N_ACCION}</dt>
             <dd> {ACCION}</dd>
         </dl>
         <dl class="col-xs-6">
-            <dt>{N_ELABORO} </dt>
+            <dt>{N_ID_RESPONSABLE} </dt>
             <dd> {RESPONSABLE}</dd>
         </dl>
         <dl class="col-xs-6">
-            <dt>{N_FECHA}</dt>
+            <dt>{N_FECHA_ACORDADA}</dt>
             <dd> {FECHA_ACORDADA}</dd>
         </dl>
     </div>
@@ -38,9 +38,9 @@
             </thead>
             <thead>
             <tr>
-                <th style="width: 20%;">{NA_TIPO}</th>
-                <th style="width: 60%">{NA_ACCION}</th>
-                <th style="width: 20%">{NA_FECHA_EJECUTADA}</th>
+                <th style="width: 20%;">{N_TIPO}</th>
+                <th style="width: 60%">{N_ACCION_EJECUTADA}</th>
+                <th style="width: 20%">{N_FECHA_REALIZADA}</th>
             </tr>
             </thead>
             <tbody>

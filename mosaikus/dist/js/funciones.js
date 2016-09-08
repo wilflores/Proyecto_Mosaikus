@@ -1525,6 +1525,14 @@ function getForm (frm){
     //PanelOperator.showDetail('');    
     }
     
+    function WFAccionesACPopup(id){
+        array = new XArray();
+        array.setObjeto('AccionesAC','WFAccionesAC');
+        array.addParametro('id',id);
+        array.addParametro('import','clases.acciones_ac.AccionesAC');
+        xajax_Loading(array.getArray());
+    }
+    
     function verListaDistribucionPopup(id){
         array = new XArray();
         array.setObjeto('ListaDistribucionDoc','editar');
