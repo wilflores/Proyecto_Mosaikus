@@ -1693,3 +1693,4 @@ END;
 INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'id_organizacion_act', 'Organizacion Actual', '1', 'Organizacion Actual',1);
 INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'cargo_act', 'Cargo Actual', '1', 'Cargo Actual',1);
 
+ADD COLUMN `correlativo`  varchar(5) NULL AFTER `id_organizacion`;
