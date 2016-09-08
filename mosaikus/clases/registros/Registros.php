@@ -258,23 +258,31 @@
                 }
                 
                 $columnas['Codigo_doc']=$this->nombres_columnas[IDDoc];
-                $columnas['identificacion']=$this->nombres_columnas[identificacion];
+                $columnas['correlativo']=$this->nombres_columnas[correlativo];
                 $k=1;
                 //print_r($this->parametros);
                 foreach ($this->parametros as $value) {   
                     switch ($value[tipo]) {
                         case '6':
+                                
                                 if (count($personal->nombres_columnas) <= 0){
                                     $personal->cargar_nombres_columnas();
                                 }
                                 if (count($personal->campos_activos) <= 0){
                                         $personal->cargar_campos_activos();
                                 }
+                                //print_r($personal->nombres_columnas);die;
                                 /*Columnas del ID, area y cargo de la persona*/
+                               // print_r($personal->nombres_columnas);
                                 $columnas["p$k"]= $value[Nombre];
-                                $columnas[id_personal."_p$k"]= $personal->nombres_columnas[id_personal];
+                               // $columnas[id_personal."_p$k"]= $personal->nombres_columnas[id_personal];
                                 $columnas[id_organizacion."_p$k"]= $personal->nombres_columnas[id_organizacion];
                                 $columnas[cargo."_p$k"]= $personal->nombres_columnas[cod_cargo];
+                                $columnas[id_organizacion_act."_p$k"]= $personal->nombres_columnas[id_organizacion_act];
+                                $columnas[cargo_act."_p$k"]= $personal->nombres_columnas[cargo_act];
+//                                        . ",p$k.id_organizacion_act id_organizacion_p_act$k"
+//                                        . ",p$k.cargo_act cargo_act_p$k";
+
                                 //$k++;$k++;$k++;
                             break;
                         case '11':
@@ -794,7 +802,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
         }
             
             public function ingresarRegistros($atr,$archivo){
-                print_r($atr);
+               // print_r($atr);
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);//,version,correlativo,id_procesos,id_organizacion
                     $atr[doc_fisico] = $archivo;
@@ -1125,6 +1133,15 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $dataxls[$arbol_key]=$arbol;
                 unset($arbol);
             }
+            if(strstr($value,"id_organizacion_act_p")){
+                $arbol_key=$value;
+                foreach($dataxls[$value] as $nodo)
+                {
+                    $arbol[] = str_replace('&#8594;','->',$ao->BuscaOrganizacional(array('id_organizacion' => $nodo)));
+                }
+                $dataxls[$arbol_key]=$arbol;
+                unset($arbol);
+            }
             //echo $value . ' ' . (substr($value, 0, 4)) . ' ';
             if ((substr($value, 0, 4) == 'edop')&&($cols[$value]=='Vigencia')){
                 foreach($dataxls[$value] as $nodo)
@@ -1225,7 +1242,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 $sql_col_left .= ",p$k.nom_detalle p$k"
                                         . ",p$k.id_organizacion id_organizacion_p$k"
                                         . ",p$k.cargo cargo_p$k"
-                                        . ",p$k.id_organizacion_act id_organizacion_p_act$k"
+                                        . ",p$k.id_organizacion_act id_organizacion_act_p$k"
                                         . ",p$k.cargo_act cargo_act_p$k";
                                 $this->funciones["id_organizacion_p$k"] = 'BuscaOrganizacional';
                                 $this->funciones["id_organizacion_p_act$k"] = 'BuscaOrganizacional';
@@ -1779,38 +1796,41 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             /*Filtro acceso segun el nodo*/
                             $sql_filtro_acceso .= " AND p$k.id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
                             $this->colummas_arbol[] = "id_organizacion_p$k";
-                            //echo $sql_filtro_acceso;
-//                            if ($registros_x_pagina == 100000){
-//                                if (count($personal->campos_activos) <= 0){
-//                                    $personal->cargar_campos_activos();
-//                                }
 
+//                            $sql_left .= " LEFT JOIN(select t1.idRegistro
+//                                , t1.Nombre as nom_detalle_aux
+//                                ,p.id_organizacion
+//                                ,p.id_personal,c.descripcion cargo                                
+//                                ,CONCAT(initcap(p.nombres), ' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle
+//                                from mos_registro_formulario t1
+//                                inner join mos_personal p on p.cod_emp = CAST(t1.Nombre AS UNSIGNED)
+//                                LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo
+//                                where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
+//                                $sql_col_left .= ",p$k.nom_detalle p$k"
+//                                        . ",p$k.id_personal id_personal_p$k"
+//                                        . ",p$k.id_organizacion id_organizacion_p$k"
+//                                        . ",p$k.cargo cargo_p$k";
                                 $sql_left .= " LEFT JOIN(select t1.idRegistro
                                 , t1.Nombre as nom_detalle_aux
-                                ,p.id_organizacion
-                                ,p.id_personal,c.descripcion cargo                                
+                                ,c.id_organizacion
+                                ,p.id_personal,c.cargo
+                                ,p.id_organizacion id_organizacion_act
+                                ,cargo.descripcion cargo_act                               
                                 ,CONCAT(initcap(p.nombres), ' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle
                                 from mos_registro_formulario t1
                                 inner join mos_personal p on p.cod_emp = CAST(t1.Nombre AS UNSIGNED)
-                                LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo
-                                where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
+                                inner join  mos_cargo cargo on p.cod_cargo = cargo.cod_cargo
+                                
+                                inner JOIN mos_historico_registro_persona c ON c.id_unico = t1.id_unico and c.idRegistro = t1.idRegistro
+                                where t1.id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
                                 $sql_col_left .= ",p$k.nom_detalle p$k"
-                                        . ",p$k.id_personal id_personal_p$k"
                                         . ",p$k.id_organizacion id_organizacion_p$k"
-                                        . ",p$k.cargo cargo_p$k";
+                                        . ",p$k.cargo cargo_p$k"
+                                        . ",p$k.id_organizacion_act id_organizacion_act_p$k"
+                                        . ",p$k.cargo_act cargo_act_p$k";
+                            
                                 $this->funciones["id_organizacion_p$k"] = 'BuscaOrganizacional';  
-//                            }   
-//                            else{
-//                                $sql_left .= " LEFT JOIN(select t1.idRegistro
-//                                , t1.Nombre as nom_detalle_aux
-//                                , p.id_organizacion
-//                                ,CONCAT(initcap(p.nombres), ' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle
-//                                -- ,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle 
-//                                from mos_registro_formulario t1
-//                                inner join mos_personal p on p.cod_emp = CAST(t1.Nombre AS UNSIGNED)
-//                                where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
-//                                $sql_col_left .= ",p$k.nom_detalle p$k ";
-//                            }
+                                $this->funciones["id_organizacion_p_act$k"] = 'BuscaOrganizacional';
                             
                         }
                         else if ($value[tipo]== '10'){
@@ -1853,27 +1873,24 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         else if ($value[tipo]== '14'){
                             if($registros_x_pagina==100000){
                                 $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','; ')";
-                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), ' ', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',',' \n ')";
+                                $campo_cargo_perso=" personas ";
                             }
                             else{
                                 $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','<br>')";
-                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), '&nbsp;', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),'&nbsp;', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',','<br>')";
+                                $campo_cargo_perso="replace(personas,',','<br>')";
                             }
                             $sql_left .= " LEFT JOIN(select t1.idRegistro, $campo_cargo as nom_detalle 
                             from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
                             where id_unico= $value[id_unico] group by t1.idRegistro) AS p$k ON p$k.idRegistro = r.idRegistro "; 
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
-                            //$clave= array_search(11, $this->parametros);
-                            //echo $clave;
                             $sql_left .= "LEFT JOIN
-                            (select 
+                            (select distinct
                             t1.idRegistro, 
                             $campo_cargo_perso cargo_perso
-                            from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
-                            inner join mos_registro_item ao on ao.idRegistro = t1.idRegistro and ao.tipo = 11
-                            inner JOIN mos_personal p on p.cod_cargo = t1.valor and p.id_organizacion = ao.valor
+                            from mos_registro_item t1 inner join mos_historico_registro_cargo cargo on t1.id_unico = cargo.id_unico
+                            and t1.idRegistro = cargo.idRegistro
                             where t1.id_unico = $value[id_unico] 
-                            group by t1.idRegistro) pn$k ON pn$k.idRegistro = r.idRegistro";
+                            ) pn$k ON pn$k.idRegistro = r.idRegistro";
                             $sql_col_left .= ",pn$k.cargo_perso pn$k ";
                             
                         }
@@ -1936,7 +1953,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
             
                     $sql = "SELECT r.idRegistro
                                     ,d.Codigo_doc 
-                                    ,r.identificacion
+                                    ,r.correlativo
                                     ,1 doc_fisico
                                     ,r.contentType
                                      ,d.actualizacion_activa
@@ -2117,7 +2134,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     $sql .= " order by 1,2 ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                    //print_r($atr);
-                    //echo $sql;
+                  //  echo $sql;die;
                     $this->operacion($sql, $atr);
                     return $this->dbl->data;
              }
