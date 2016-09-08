@@ -1689,4 +1689,7 @@ CREATE TRIGGER `carga_mos_historico_registro_persona_upd` BEFORE UPDATE ON `mos_
 END;
 ;;
 
+/***********7/09/2016*******/
+INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'id_organizacion_act', 'Organizacion Actual', '1', 'Organizacion Actual',1);
+INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'cargo_act', 'Cargo Actual', '1', 'Cargo Actual',1);
 
