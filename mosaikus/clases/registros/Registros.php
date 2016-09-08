@@ -258,23 +258,31 @@
                 }
                 
                 $columnas['Codigo_doc']=$this->nombres_columnas[IDDoc];
-                $columnas['identificacion']=$this->nombres_columnas[identificacion];
+                $columnas['correlativo']=$this->nombres_columnas[correlativo];
                 $k=1;
                 //print_r($this->parametros);
                 foreach ($this->parametros as $value) {   
                     switch ($value[tipo]) {
                         case '6':
+                                
                                 if (count($personal->nombres_columnas) <= 0){
                                     $personal->cargar_nombres_columnas();
                                 }
                                 if (count($personal->campos_activos) <= 0){
                                         $personal->cargar_campos_activos();
                                 }
+                                //print_r($personal->nombres_columnas);die;
                                 /*Columnas del ID, area y cargo de la persona*/
+                               // print_r($personal->nombres_columnas);
                                 $columnas["p$k"]= $value[Nombre];
-                                $columnas[id_personal."_p$k"]= $personal->nombres_columnas[id_personal];
+                               // $columnas[id_personal."_p$k"]= $personal->nombres_columnas[id_personal];
                                 $columnas[id_organizacion."_p$k"]= $personal->nombres_columnas[id_organizacion];
                                 $columnas[cargo."_p$k"]= $personal->nombres_columnas[cod_cargo];
+                                $columnas[id_organizacion_act."_p$k"]= $personal->nombres_columnas[id_organizacion_act];
+                                $columnas[cargo_act."_p$k"]= $personal->nombres_columnas[cargo_act];
+//                                        . ",p$k.id_organizacion_act id_organizacion_p_act$k"
+//                                        . ",p$k.cargo_act cargo_act_p$k";
+
                                 //$k++;$k++;$k++;
                             break;
                         case '11':
@@ -365,6 +373,7 @@
                             ,contentType    
                             ,idRegistro
                             ,descripcion
+                            ,correlativo
                          FROM mos_registro 
                          WHERE idRegistro = $id ";  
                 //echo $sql;
@@ -385,6 +394,7 @@
                             ,id_procesos
                             ,id_organizacion
                             ,idRegistro_original
+                            ,correlativo
                          FROM mos_registro 
                          WHERE idRegistro = $id "; 
                 $this->operacion($sql, $atr);
@@ -800,10 +810,16 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     if($atr['r-id-original'] == '') 
                         $atr['idRegistro_original']='NULL' ;
                     else
-                        $atr['idRegistro_original']=$atr['r-id-original'] ;
-                    $sql = "INSERT INTO mos_registro(IDDoc,identificacion,id_usuario,descripcion, idRegistro_original,doc_fisico,contentType)
+                        $atr['idRegistro_original']=$atr['r-id-original'];
+                    $sql ="select correlativo from mos_registro where correlativo='$atr[correlativo]]' and IDDoc=$_SESSION[IDDoc]";
+                    $this->operacion($sql, $atr);
+                    $correlativo = $this->dbl->data[0][0];
+                    if ($correlativo!=''){
+                       $atr[correlativo]= str_pad(intval(($correlativo)+1),  5, "0", STR_PAD_LEFT);
+                    } 
+                    $sql = "INSERT INTO mos_registro(IDDoc,identificacion,id_usuario,descripcion, idRegistro_original,doc_fisico,contentType, correlativo)
                             VALUES(
-                                $_SESSION[IDDoc],'$atr[identificacion]',$atr[id_usuario],'$atr[descripcion]',$atr[idRegistro_original],'$atr[doc_fisico]','$atr[contentType]'
+                                $_SESSION[IDDoc],'$atr[identificacion]',$atr[id_usuario],'$atr[descripcion]',$atr[idRegistro_original],'$atr[doc_fisico]','$atr[contentType]','$atr[correlativo]'
                                 )";//,$atr[version],$atr[correlativo],$atr[id_procesos],$atr[id_organizacion]
                     //echo $sql;
                     $this->dbl->insert_update($sql);
@@ -822,14 +838,12 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 				where (idRegistro_original = ".$atr[idRegistro_original].") AND 
                                 (idRegistro <> ".$idregistro." );";
                         $this->dbl->insert_update($sql);
-                       // echo $sql;
                     }
                     else{
                         $sql = "update mos_registro
 				set idRegistro_original = ".$idregistro."
 				where idRegistro = ".$idregistro." ;";
                         $this->dbl->insert_update($sql);
-
                     }
                      // echo $sql;
                     $nuevo = "IdRegistro: \'".$idregistro."\', IDDoc: \'$_SESSION[IDDoc]\', Identificacion: \'$atr[identificacion]\',  Id Usuario: \'$atr[id_usuario]\', Descripcion: \'$atr[descripcion]\', ContentType: \'$atr[contentType]\', Id Procesos: \'$atr[id_procesos]\', Id Organizacion: \'$atr[id_organizacion]\', ";
@@ -907,12 +921,19 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             }
                             else
                                 $reg =  explode(',',$atr[Nombre]);
+//                            $sql = "select valor from mos_registro_item where tipo='14' and idRegistro=$atr[idRegistro] and id_unico= $atr[id_unico] ";
+//                            $this->operacion($sql, $atr);
+//                            $cargos = $this->dbl->data;
+//                            $sql = "select valor from mos_registro_item where tipo='11' and idRegistro=$atr[idRegistro]";
+//                            $this->operacion($sql, $atr);
+//                            $org = $this->dbl->data;
                         }
                         else
                            if($atr[tipo]=='14') 
                                $reg=$atr[Nombre]; 
                            else
-                               $reg[]=$atr[Nombre];                         
+                               $reg[]=$atr[Nombre];
+                           
                         $respuesta = $this->dbl->delete("mos_registro_item", "idRegistro = " . $atr[idRegistro]. " and id_unico = " . $atr[id_unico]. " AND tipo ='".$atr[tipo]."'");  
                         foreach ($reg as $value){
                         $sql = "INSERT INTO mos_registro_item(IDDoc,idRegistro,valor,tipo,id_unico)
@@ -1113,6 +1134,15 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $dataxls[$arbol_key]=$arbol;
                 unset($arbol);
             }
+            if(strstr($value,"id_organizacion_act_p")){
+                $arbol_key=$value;
+                foreach($dataxls[$value] as $nodo)
+                {
+                    $arbol[] = str_replace('&#8594;','->',$ao->BuscaOrganizacional(array('id_organizacion' => $nodo)));
+                }
+                $dataxls[$arbol_key]=$arbol;
+                unset($arbol);
+            }
             //echo $value . ' ' . (substr($value, 0, 4)) . ' ';
             if ((substr($value, 0, 4) == 'edop')&&($cols[$value]=='Vigencia')){
                 foreach($dataxls[$value] as $nodo)
@@ -1213,7 +1243,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 $sql_col_left .= ",p$k.nom_detalle p$k"
                                         . ",p$k.id_organizacion id_organizacion_p$k"
                                         . ",p$k.cargo cargo_p$k"
-                                        . ",p$k.id_organizacion_act id_organizacion_p_act$k"
+                                        . ",p$k.id_organizacion_act id_organizacion_act_p$k"
                                         . ",p$k.cargo_act cargo_act_p$k";
                                 $this->funciones["id_organizacion_p$k"] = 'BuscaOrganizacional';
                                 $this->funciones["id_organizacion_p_act$k"] = 'BuscaOrganizacional';
@@ -1270,12 +1300,16 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                         else if ($value[tipo]== '14'){
                             if($registros_x_pagina==100000){
+//                                $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','; ')";
+//                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), ' ', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',','; ')";
                                 $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','; ')";
-                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), ' ', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',','; ')";
+                                $campo_cargo_perso=" personas ";
                             }
                             else{
+//                                $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','<br>')";
+//                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), '&nbsp;', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),'&nbsp;', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',','<br>')";
                                 $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','<br>')";
-                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), '&nbsp;', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),'&nbsp;', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',','<br>')";
+                                $campo_cargo_perso="replace(personas,',','<br>')";
                             }
                             $sql_left .= " LEFT JOIN(select t1.idRegistro, $campo_cargo as nom_detalle 
                             from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
@@ -1283,15 +1317,23 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
                             //$clave= array_search(11, $this->parametros);
                             //echo $clave;
+//                            $sql_left .= "LEFT JOIN
+//                            (select 
+//                            t1.idRegistro, 
+//                            $campo_cargo_perso cargo_perso
+//                            from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
+//                            inner join mos_registro_item ao on ao.idRegistro = t1.idRegistro and ao.tipo = 11
+//                            inner JOIN mos_personal p on p.cod_cargo = t1.valor and p.id_organizacion = ao.valor
+//                            where t1.id_unico = $value[id_unico] 
+//                            group by t1.idRegistro) pn$k ON pn$k.idRegistro = r.idRegistro";
                             $sql_left .= "LEFT JOIN
-                            (select 
+                            (select distinct
                             t1.idRegistro, 
                             $campo_cargo_perso cargo_perso
-                            from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
-                            inner join mos_registro_item ao on ao.idRegistro = t1.idRegistro and ao.tipo = 11
-                            inner JOIN mos_personal p on p.cod_cargo = t1.valor and p.id_organizacion = ao.valor
+                            from mos_registro_item t1 inner join mos_historico_registro_cargo cargo on t1.id_unico = cargo.id_unico
+                            and t1.idRegistro = cargo.idRegistro
                             where t1.id_unico = $value[id_unico] 
-                            group by t1.idRegistro) pn$k ON pn$k.idRegistro = r.idRegistro";
+                            ) pn$k ON pn$k.idRegistro = r.idRegistro";
                             $sql_col_left .= ",pn$k.cargo_perso pn$k ";
                             
                         }
@@ -1387,12 +1429,12 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         $sql .= " AND idRegistro = '". $atr["b-idRegistro"] . "'";
                     if (strlen($atr["b-IDDoc"])>0)
                         $sql .= " AND IDDoc = '". $atr["b-IDDoc"] . "'";
-                    if (strlen($atr["b-identificacion"])>0)
-                        $sql .= " AND upper(identificacion) like '%" . strtoupper($atr["b-identificacion"]) . "%'";
+//                    if (strlen($atr["b-identificacion"])>0)
+//                        $sql .= " AND upper(identificacion) like '%" . strtoupper($atr["b-identificacion"]) . "%'";
                     if (strlen($atr["b-version"])>0)
                         $sql .= " AND version = '". $atr["b-version"] . "'";
                     if (strlen($atr["b-correlativo"])>0)
-                        $sql .= " AND correlativo = '". $atr["b-correlativo"] . "'";
+                        $sql .= " AND correlativo like '%" . strtoupper($atr["b-correlativo"]) . "%'";
                     if (strlen($atr["b-id_usuario"])>0)
                         $sql .= " AND id_usuario = '". $atr["b-id_usuario"] . "'";
                     if (strlen($atr["b-descripcion"])>0)
@@ -1540,7 +1582,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
             
                     $sql = "SELECT r.idRegistro
                                     ,d.Codigo_doc
-                                    ,r.identificacion
+                                    -- ,r.identificacion 
+                                    ,r.correlativo                                    
                                     -- ,version
                                     -- ,correlativo
                                     -- ,id_usuario
@@ -1588,12 +1631,12 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         $sql .= " AND idRegistro = '". $atr["b-idRegistro"] . "'";
                     if (strlen($atr["b-IDDoc"])>0)
                         $sql .= " AND IDDoc = '". $atr["b-IDDoc"] . "'";
-                    if (strlen($atr["b-identificacion"])>0)
-                        $sql .= " AND upper(identificacion) like '%" . strtoupper($atr["b-identificacion"]) . "%'";
+//                    if (strlen($atr["b-identificacion"])>0)
+//                        $sql .= " AND upper(identificacion) like '%" . strtoupper($atr["b-identificacion"]) . "%'";
                     if (strlen($atr["b-version"])>0)
                         $sql .= " AND version = '". $atr["b-version"] . "'";
                     if (strlen($atr["b-correlativo"])>0)
-                        $sql .= " AND correlativo = '". $atr["b-correlativo"] . "'";
+                        $sql .= " AND correlativo like '%" . strtoupper($atr["b-correlativo"]) . "%'";
                     if (strlen($atr["b-id_usuario"])>0)
                         $sql .= " AND id_usuario = '". $atr["b-id_usuario"] . "'";
                     if (strlen($atr["b-descripcion"])>0)
@@ -1754,38 +1797,41 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                             /*Filtro acceso segun el nodo*/
                             $sql_filtro_acceso .= " AND p$k.id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")";
                             $this->colummas_arbol[] = "id_organizacion_p$k";
-                            //echo $sql_filtro_acceso;
-//                            if ($registros_x_pagina == 100000){
-//                                if (count($personal->campos_activos) <= 0){
-//                                    $personal->cargar_campos_activos();
-//                                }
 
+//                            $sql_left .= " LEFT JOIN(select t1.idRegistro
+//                                , t1.Nombre as nom_detalle_aux
+//                                ,p.id_organizacion
+//                                ,p.id_personal,c.descripcion cargo                                
+//                                ,CONCAT(initcap(p.nombres), ' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle
+//                                from mos_registro_formulario t1
+//                                inner join mos_personal p on p.cod_emp = CAST(t1.Nombre AS UNSIGNED)
+//                                LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo
+//                                where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
+//                                $sql_col_left .= ",p$k.nom_detalle p$k"
+//                                        . ",p$k.id_personal id_personal_p$k"
+//                                        . ",p$k.id_organizacion id_organizacion_p$k"
+//                                        . ",p$k.cargo cargo_p$k";
                                 $sql_left .= " LEFT JOIN(select t1.idRegistro
                                 , t1.Nombre as nom_detalle_aux
-                                ,p.id_organizacion
-                                ,p.id_personal,c.descripcion cargo                                
+                                ,c.id_organizacion
+                                ,p.id_personal,c.cargo
+                                ,p.id_organizacion id_organizacion_act
+                                ,cargo.descripcion cargo_act                               
                                 ,CONCAT(initcap(p.nombres), ' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle
                                 from mos_registro_formulario t1
                                 inner join mos_personal p on p.cod_emp = CAST(t1.Nombre AS UNSIGNED)
-                                LEFT JOIN mos_cargo c ON c.cod_cargo = p.cod_cargo
-                                where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
+                                inner join  mos_cargo cargo on p.cod_cargo = cargo.cod_cargo
+                                
+                                inner JOIN mos_historico_registro_persona c ON c.id_unico = t1.id_unico and c.idRegistro = t1.idRegistro
+                                where t1.id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
                                 $sql_col_left .= ",p$k.nom_detalle p$k"
-                                        . ",p$k.id_personal id_personal_p$k"
                                         . ",p$k.id_organizacion id_organizacion_p$k"
-                                        . ",p$k.cargo cargo_p$k";
+                                        . ",p$k.cargo cargo_p$k"
+                                        . ",p$k.id_organizacion_act id_organizacion_act_p$k"
+                                        . ",p$k.cargo_act cargo_act_p$k";
+                            
                                 $this->funciones["id_organizacion_p$k"] = 'BuscaOrganizacional';  
-//                            }   
-//                            else{
-//                                $sql_left .= " LEFT JOIN(select t1.idRegistro
-//                                , t1.Nombre as nom_detalle_aux
-//                                , p.id_organizacion
-//                                ,CONCAT(initcap(p.nombres), ' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle
-//                                -- ,CONCAT(CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2)))) as nom_detalle 
-//                                from mos_registro_formulario t1
-//                                inner join mos_personal p on p.cod_emp = CAST(t1.Nombre AS UNSIGNED)
-//                                where id_unico= $value[id_unico] ) AS p$k ON p$k.idRegistro = r.idRegistro"; 
-//                                $sql_col_left .= ",p$k.nom_detalle p$k ";
-//                            }
+                                $this->funciones["id_organizacion_p_act$k"] = 'BuscaOrganizacional';
                             
                         }
                         else if ($value[tipo]== '10'){
@@ -1828,27 +1874,24 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         else if ($value[tipo]== '14'){
                             if($registros_x_pagina==100000){
                                 $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','; ')";
-                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), ' ', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',',' \n ')";
+                                $campo_cargo_perso=" personas ";
                             }
                             else{
                                 $campo_cargo="replace(GROUP_CONCAT(cargo.descripcion),',','<br>')";
-                                $campo_cargo_perso="replace(GROUP_CONCAT(CONCAT(initcap(nombres), '&nbsp;', CONCAT(UPPER(LEFT(apellido_paterno, 1)), LOWER(SUBSTRING(apellido_paterno, 2))),'&nbsp;', CONCAT(UPPER(LEFT(apellido_materno, 1)), LOWER(SUBSTRING(apellido_materno, 2))))),',','<br>')";
+                                $campo_cargo_perso="replace(personas,',','<br>')";
                             }
                             $sql_left .= " LEFT JOIN(select t1.idRegistro, $campo_cargo as nom_detalle 
                             from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
                             where id_unico= $value[id_unico] group by t1.idRegistro) AS p$k ON p$k.idRegistro = r.idRegistro "; 
                             $sql_col_left .= ",p$k.nom_detalle p$k ";
-                            //$clave= array_search(11, $this->parametros);
-                            //echo $clave;
                             $sql_left .= "LEFT JOIN
-                            (select 
+                            (select distinct
                             t1.idRegistro, 
                             $campo_cargo_perso cargo_perso
-                            from mos_registro_item t1 inner join mos_cargo cargo on t1.valor = cargo.cod_cargo
-                            inner join mos_registro_item ao on ao.idRegistro = t1.idRegistro and ao.tipo = 11
-                            inner JOIN mos_personal p on p.cod_cargo = t1.valor and p.id_organizacion = ao.valor
+                            from mos_registro_item t1 inner join mos_historico_registro_cargo cargo on t1.id_unico = cargo.id_unico
+                            and t1.idRegistro = cargo.idRegistro
                             where t1.id_unico = $value[id_unico] 
-                            group by t1.idRegistro) pn$k ON pn$k.idRegistro = r.idRegistro";
+                            ) pn$k ON pn$k.idRegistro = r.idRegistro";
                             $sql_col_left .= ",pn$k.cargo_perso pn$k ";
                             
                         }
@@ -1911,7 +1954,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
             
                     $sql = "SELECT r.idRegistro
                                     ,d.Codigo_doc 
-                                    ,r.identificacion
+                                    ,r.correlativo
                                     ,1 doc_fisico
                                     ,r.contentType
                                      ,d.actualizacion_activa
@@ -2092,7 +2135,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     $sql .= " order by 1,2 ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                    //print_r($atr);
-                    //echo $sql;
+                  //  echo $sql;die;
                     $this->operacion($sql, $atr);
                     return $this->dbl->data;
              }
@@ -2105,6 +2148,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         $atr = $this->dbl->corregir_parametros($atr);
                         $respuesta = $this->dbl->delete("mos_registro", "idRegistro = " . $atr[id]);
                         $respuesta = $this->dbl->delete("mos_registro_formulario", "idRegistro = " . $atr[id]);
+                        $respuesta = $this->dbl->delete("mos_historico_registro_cargo", "idRegistro = " . $atr[id]);
                         $respuesta = $this->dbl->delete("mos_registro_item", "idRegistro = " . $atr[id]);
                         $nuevo = "idRegistro: \'$atr[id]\'";
                         $this->registraTransaccionLog(9,$nuevo,'', '');
@@ -2138,7 +2182,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                    
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[idRegistro], "idRegistro", $parametros,'r_link_titulos')),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[IDDoc], "IDDoc", $parametros,'r_link_titulos')),
-               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[identificacion], "identificacion", $parametros,'r_link_titulos')),
+               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[correlativo], "correlativo", $parametros,'r_link_titulos')),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[correlativo], "correlativo", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_usuario], "id_usuario", $parametros)),
@@ -2237,7 +2281,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         case '14':
                                 $ancho = 5;                                                            
                                 array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro(($value[Nombre]), "p$k", $parametros,'r_link_titulos')));    
-                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro('Personas en Cargo', "pn$k", $parametros,'r_link_titulos')));            
+                                array_push($config_col,array( "width"=>"$ancho%","ValorEtiqueta"=>link_titulos_otro($value[Nombre].' Personal', "pn$k", $parametros,'r_link_titulos')));            
                                 //$k++;
                                 break;
                             
@@ -2319,7 +2363,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                    
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[idRegistro], "idRegistro", $parametros,'r_link_titulos')),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[IDDoc], "IDDoc", $parametros,'r_link_titulos')),
-               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[identificacion], "identificacion", $parametros,'r_link_titulos')),
+               //array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[identificacion], "identificacion", $parametros,'r_link_titulos')),
+               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[correlativo], "correlativo", $parametros,'r_link_titulos')),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[correlativo], "correlativo", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_usuario], "id_usuario", $parametros)),
@@ -2512,7 +2557,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                    
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[idRegistro], "idRegistro", $parametros,'r_link_titulos')),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[IDDoc], "IDDoc", $parametros,'r_link_titulos')),
-               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[identificacion], "identificacion", $parametros,'r_link_titulos')),
+               //array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[identificacion], "identificacion", $parametros,'r_link_titulos')),
+               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[correlativo], "correlativo", $parametros,'r_link_titulos')),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[correlativo], "correlativo", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_usuario], "id_usuario", $parametros)),
@@ -2693,7 +2739,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                  
          array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[idRegistro], ENT_QUOTES, "UTF-8")),
          array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[IDDoc], ENT_QUOTES, "UTF-8")),
-         array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[identificacion], ENT_QUOTES, "UTF-8")),
+         //array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[identificacion], ENT_QUOTES, "UTF-8")),
+         array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[correlativo], ENT_QUOTES, "UTF-8")),           
          //array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[version], ENT_QUOTES, "UTF-8")),
          //array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[correlativo], ENT_QUOTES, "UTF-8")),
          //array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[id_usuario], ENT_QUOTES, "UTF-8")),
@@ -2827,7 +2874,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
-                if ($parametros['corder'] == null) $parametros['corder']="idRegistro";
+                if ($parametros['corder'] == null) $parametros['corder']="correlativo";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
                     $parametros['mostrar-col']="2-4"; 
@@ -2896,15 +2943,6 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                   
                             </div>';
                         $k++;
-//                        $parametros['mostrar-col'] .= "-$k";
-//                        $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
-//
-//                                          <label >
-//                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-//                                          ID ' . $value[Nombre] . ' </label>
-//
-//                                </div>';
-//                        $k++;
                         $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
@@ -3887,11 +3925,15 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'registros/';
                 $template->setTemplate("formulario_1");
+                $sql ="select LPAD((IFNULL(max(correlativo),0)  +1),5,0) correlativo from mos_registro where  IDDoc=$_SESSION[IDDoc]";
+                $this->operacion($sql, $atr);
+                $correlativo = $this->dbl->data[0][0];
                // print_r($contenido_1);
 //                $contenido['CAMPOS'] = $template->show();
 //
 //                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
 //                $template->setTemplate("formulario");
+                $contenido_1['CORRELATIVO'] = $correlativo;
                 $contenido_1['TITULO_FORMULARIO'] = "Crear&nbsp;Registros";
                 $contenido_1['TITULO_VOLVER'] = "Volver&nbsp;a&nbsp;Listado&nbsp;de&nbsp;Registros";
                 $contenido_1['PAGINA_VOLVER'] = "listarRegistros.php";
@@ -3999,7 +4041,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     }
                      
                     $respuesta = $this->ingresarRegistros($parametros,$archivo);
-                  
+                    $si_hay_cargo=array();
                     //if (preg_match("/ha sido ingresado con exito/",$respuesta ) == true) {
                     if (strlen($respuesta ) < 10 ) {
                         for ($i = 1; $i <= 20; $i++) {
@@ -4024,8 +4066,9 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 }
                                 else
                                 {
-                                    //$params[id_documento] = $id_documento;
-                                    //$params[nombre] = $parametros["nombre_$i"];
+                                    if ($parametros["tipo_dato_$i"] == '14') {
+                                        $si_hay_cargo[]=$parametros["id_atributo_$i"];                                    
+                                    }
                                     $params[tipo] = $parametros["tipo_dato_$i"];
                                     //$params[validacion] = $parametros["validacion_$i"];
                                     //$params[valores] = $parametros["valores_$i"];   
@@ -4044,7 +4087,30 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 }
                             }
                         }
-                        
+                        //PARA GUARDAR EL HISTORICO DE PERSONAS EN ESOS CARGOS Y ORG
+                        if (sizeof($si_hay_cargo)>0) {
+                           // print_r($si_hay_cargo);
+                            foreach ($si_hay_cargo as $valores){
+                                $sql = "SELECT
+                                        GROUP_CONCAT(CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))) nombre
+                                        FROM
+                                        mos_personal p
+                                        WHERE
+                                        p.id_organizacion in (".$parametros["nodosreg"].")  AND
+                                        p.cod_cargo in (SELECT
+                                                        valor 
+                                                        FROM
+                                                        mos_registro_item
+                                                        WHERE id_unico = ".$valores." AND idRegistro = ".$respuesta." AND tipo = 14) ";    
+                                $this->operacion($sql, $atr);
+                                $personas = $this->dbl->data[0];                                
+                                $sql ="insert into mos_historico_registro_cargo (idRegistro,id_unico,personas)".
+                                        " values (".$respuesta.",".$valores.",'".$personas[nombre]."');";
+                                $this->dbl->insert_update($sql);
+                            }
+                            //echo $cargos.'0';
+                            //$parametros["nodosreg"];
+                        }
                         try{
                             unlink(APPLICATION_DOWNLOADS. 'temp/' . CambiaSinAcento($parametros['filename']));
                         } catch (Exception $ex) {
@@ -4061,7 +4127,12 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 return $objResponse;
             }
      
- 
+            public function nombre_archivo_fuente($tupla)
+            {
+                return substr($tupla['descripcion'], 0, strpos($tupla['descripcion'], '-')).'-'.$tupla['correlativo'].'.pdf';
+            }
+
+
             public function editar($parametros)
             {
                 if(!class_exists('Template')){
@@ -4082,7 +4153,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                 foreach ( $this->placeholder as $key => $value) {
                     $contenido_1["P_" . strtoupper($key)] =  $value;
                 }
-                $contenido_1[NOMBRE_DOC] = $val["descripcion"];
+                $contenido_1[NOMBRE_DOC] = $this->nombre_archivo_fuente($val);//$val["descripcion"];
                 $contenido_1['IDREGISTRO'] = $val["idRegistro"];
                 $contenido_1['IDDOC'] = $val["IDDoc"];
                 $contenido_1['IDENTIFICACION'] = ($val["identificacion"]);
@@ -4962,7 +5033,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
             
  
             public function actualizar($parametros)
-            { //print_r($parametros);
+            { //print_r($parametros);die;
                 session_name("$GLOBALS[SESSION]");
                 session_start();
                 $objResponse = new xajaxResponse();
@@ -5028,7 +5099,10 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     if (1 == 1)
                     {
                         $nuevo = '';
+                        
+                        //SACAMOS EL REGISTRO ACTUAL DE CARGOS Y ORG SI LOS TIENE
                         for ($i = 1; $i <= 20; $i++) {
+                            
                             if (isset($parametros['nombre_' . $i]) == true){
                                 if ($parametros["tipo_dato_$i"] == '8'){
                                     $valor_actual_aux = '';
@@ -5051,8 +5125,30 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 }
                                 else
                                 {
-                                    //$params[id_documento] = $id_documento;
-                                    //$params[nombre] = $parametros["nombre_$i"];
+                                    if ($parametros["tipo_dato_$i"] == '14') {
+                                        $cargos_act = array();
+                                        $cargos_ant = array();
+                                        $org_act = array();
+                                        $org_ant=array();
+                                        $id_unico=$parametros["id_atributo_$i"];
+                                        $cargos_act = $parametros["campo_$i"];
+                                        $org_act = explode(',',$parametros["nodosreg"]);
+                                        $sql = "select valor from mos_registro_item where tipo='14' and idRegistro=$parametros[id] and id_unico=". $parametros["id_atributo_$i"];
+                                        $this->operacion($sql, $atr);
+                                        foreach ($this->dbl->data as $valores){
+                                             $cargos_ant[] =$valores[valor];
+                                        }
+                                        $sql = "select valor from mos_registro_item where tipo='11' and idRegistro=$parametros[id]";
+                                        $this->operacion($sql, $atr);
+                                        foreach ($this->dbl->data as $valores){
+                                             $org_ant[] =$valores[valor];
+                                        }
+                                        $dif_cargo = (array_merge(array_diff($cargos_act, $cargos_ant), array_diff($cargos_ant, $cargos_act)));
+                                        $dif_org = (array_merge(array_diff($org_act, $org_ant), array_diff($org_ant, $org_act)));
+                                        //echo 'cargo:'.sizeof($dif_cargo);
+                                       // echo 'org:'.sizeof($dif_org);
+                                       // print_r(array_diff($org_act, $org_ant));                                        
+                                    }
                                     $params[tipo] = $parametros["tipo_dato_$i"];
                                     //$params[validacion] = $parametros["validacion_$i"];
                                     //$params[valores] = $parametros["valores_$i"];    
@@ -5071,11 +5167,33 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                     else $params['nuevo'] = 0;
                                     // print_r($params);
                                     $this->modificarRegistrosCampoDinamico($params);
-                                    
+                                    // si tiene cambios en nuevos cargos tipo 14
+                                    //print_r($cargos_act); 
+                                    //CORREGIR QUE GUARDA EN HISTORI EL ID UNICO DE ORG
+                                    if ((sizeof($dif_cargo)>0 || sizeof($dif_org)>0) && $params[tipo] == '14'){
+                                        $sql ="delete from mos_historico_registro_cargo 
+                                               where idRegistro = ".$parametros[id]." and  id_unico =". $params[id_unico];
+                                       // echo $sql;
+                                        $this->dbl->insert_update($sql);           
+                                        $sql = "SELECT
+                                                GROUP_CONCAT(CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))))) nombre
+                                                FROM
+                                                mos_personal p
+                                                WHERE
+                                                p.id_organizacion in (".$parametros["nodosreg"].")  AND
+                                                p.cod_cargo IN (". implode(',', array_keys($cargos_act)) . ") ";    
+                                        $this->operacion($sql, $atr);
+                                        //echo $sql;
+                                        $personas = $this->dbl->data[0];                                
+                                        $sql ="insert into mos_historico_registro_cargo (idRegistro,id_unico,personas)".
+                                                " values (".$parametros[id].",".$params[id_unico].",'".$personas[nombre]."');";
+                                        $this->dbl->insert_update($sql);                                        
+                                    }
                                 }
                                 $nuevo .= " " . $parametros["nombre_$i"] . ": \'" . $params[Nombre] . "\'";
                             }
                         }
+                        
                         //$nuevo = "IdRegistro: \'".$this->dbl->data[0][0]."\', IDDoc: \'$_SESSION[IDDoc]\', Identificacion: \'$atr[identificacion]\',  Id Usuario: \'$atr[id_usuario]\', Descripcion: \'$atr[descripcion]\', ContentType: \'$atr[contentType]\', Id Procesos: \'$atr[id_procesos]\', Id Organizacion: \'$atr[id_organizacion]\', ";
                         $this->registraTransaccionLog(8,$nuevo,'', '');
                         $objResponse->addScriptCall("MostrarContenidoAux");
@@ -5190,7 +5308,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     
                     $html = "<a target=\"_blank\" title=\"Ver Documento PDF\"  href=\"pages/registros/descargar_archivo.php?id=$archivo_aux[idRegistro]&token=" . md5($archivo_aux[idRegistro]) ."&des=1\">
                             
-                            <i class=\"icon icon-download\"></i>
+                            <i class=\"icon icon-view-document\"></i>
                         </a>";                
                                                                                   
                     $sql = "SELECT extension FROM mos_extensiones WHERE extension = '$archivo_aux[contentType]' OR contentType = '$archivo_aux[contentType]'";
@@ -5205,6 +5323,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                     $ruta_doc = $documento->ActivarDocumento();
                     $titulo_doc = $documento->getNombreArchivo();
+                    $ruta_doc = "pages/registros/descargar_archivo.php?id=$archivo_aux[idRegistro]&token=" . md5($archivo_aux[idRegistro]) ."&des=1";
+                    $titulo_doc = substr($this->nombre_archivo_fuente($archivo_aux), 0, strlen($this->nombre_archivo_fuente($archivo_aux)) - 4);
                 }
                 
                 $http = (isset($_SERVER['HTTPS'])) ? 'https' : 'http';

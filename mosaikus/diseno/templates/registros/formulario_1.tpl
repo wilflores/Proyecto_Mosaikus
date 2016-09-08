@@ -12,9 +12,9 @@
                 </div>
                 <div class="row">
                 <div class="col-xs-24">
-                            <div class="form-group" id="r-tabla_fileUpload"  style="{CSS_TABLA_FILEUPLOAD}">
+                            <div  class="form-group" id="r-tabla_fileUpload"  style="{CSS_TABLA_FILEUPLOAD}">
                                     <label for="archivo" class="col-md-4 control-label">{N_DOC_FISICO}</label>
-                                    <div class="col-md-10">
+                                    <div class="col-md-10" >
                                         <input type="file" value="{ARCHIVO}" accept="application/pdf" id="r-fileUpload2" name="fileUpload2" onchange="cargar_archivo_reg();" data-validation="required"/>
                                         <input type="hidden" id="r-estado_actual" name="estado_actual">
                                         <input type="hidden" id="r-filename" name="filename" value="{FILENAME}">
@@ -37,10 +37,11 @@
                                     <label for="archivo" class="col-md-4 control-label">{N_DOC_FISICO}</label>
                                     <div class="col-md-10">
                                         <p class="form-control-static">
-                                            <!--<img src="{PAHT_TO_IMG}adjunto.png">-->
+                                            <!--<img src="{PAHT_TO_IMG}adjunto.png">-->                                            
                                             <input type="text" readonly="readonly" onkeypress="return false;" style="display: inline;width: 80px;" class="form-control" value="{CODIGO_DOC}" id="r-Codigo_doc" name="Codigo_doc" placeholder="{N_CODIGO_DOC}" data-validation="required"/>
                                             -
-                                            <input type="text" style="display: inline;width: 220px;" class="form-control" value="{NOMBRE_DOC}" id="r-nombre_doc" name="nombre_doc" placeholder="{N_NOMBRE_DOC}" data-validation="required"/>
+                                            <input type="text" style="display: none;width: 220px;" class="form-control" value="{NOMBRE_DOC}" id="r-nombre_doc" name="nombre_doc" placeholder="{N_NOMBRE_DOC}" data-validation="required"/>
+                                            <input type="text" readonly="readonly" onkeypress="return false;" style="display: inline;width: 220px;" class="form-control" value="{CORRELATIVO}" id="correlativo" name="correlativo" placeholder="{N_CORRELATIVO}" data-validation="required"/>
                                             .pdf
                                             <input type="hidden" class="form-control" style="width: 250px;display: inline;" id="r-info_nombre" readonly="readonly">
                                             <!--<span id="info_nombre" style="display:inline;">{TXT_OTRO_METODO}&nbsp;</span>-->

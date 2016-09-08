@@ -468,7 +468,10 @@ function cargar_autocompletado(){
         document.getElementById('tabla_fileUpload').style.display = '';
         document.getElementById('estado_actual').value = '';
         document.getElementById('filename').value = '';
-        
+        $('#nombre_doc').val(respuesta[0].nombre_doc);
+                        $('#version').val(respuesta[0].version_doc);
+        if ($('#nombre_doc').val() == $('#descripcion').val())
+            $('#descripcion').val('');
     }
     
     function cargar_archivo_otro(){
@@ -526,6 +529,8 @@ function cargar_autocompletado(){
                         $('#Codigo_doc').val(respuesta[0].codigo_doc);
                         $('#nombre_doc').val(respuesta[0].nombre_doc);
                         $('#version').val(respuesta[0].version_doc);
+                        if ($('#descripcion').val() == '')
+                            $('#descripcion').val(respuesta[0].nombre_doc);
                         validar_codigo_version();
                    }
                    else{

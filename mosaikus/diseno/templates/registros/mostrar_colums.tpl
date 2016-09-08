@@ -17,7 +17,7 @@
                                        
                                       <label >
                                           <input type="checkbox" name="SelectAcc" id="SelectAcc" value="2" class="r-checkbox-mos-col" checked="checked">   &nbsp;
-                                      {N_IDENTIFICACION}</label>
+                                      {N_CORRELATIVO}</label>
                                   
                             </div><!--<div class="checkbox">
                                   <label for="SelectAcc" class="col-md-9 control-label">{N_VERSION}</label>

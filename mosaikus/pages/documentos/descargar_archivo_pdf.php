@@ -32,13 +32,55 @@ session_name('mosaikus');
                 //print $contenido2;
                 $version = "HOJA_VIDA";
                 $Codigo = $Ext2 = "";
-                $carpeta =  $pagina->encryt->Decrypt_Text($_SESSION[BaseDato]);
-                $documento = new visualizador_documentos($carpeta, $NombreDoc, $Codigo, $version, $Ext2, $contenido2);
-                if ((isset($_GET[des]))&&($_GET[des] == '1')){
-                    $documento->DescargarDocumento();
+                $carpeta =  ((isset($_GET[cc]))&&($_GET[cc] == '1')) ? $pagina->encryt->Decrypt_Text($_SESSION[BaseDato])."/temp_cc" : $pagina->encryt->Decrypt_Text($_SESSION[BaseDato]);
+                
+                if ((isset($_GET[cc]))&&($_GET[cc] == '1')){
+                    
+                    $documento = new visualizador_documentos($carpeta, $NombreDoc, $Codigo, $version, $Ext2, $contenido2);
+                    $documento->ActivarDocumento();
+                    
+                    $template = new Template();
+                    $template->PATH = PATH_TO_TEMPLATES.'documentos/';
+
+                    //$contenido_1[TABLA] = $tabla[tabla];
+                    $contenido_1['HOME'] = HOME;
+                    //$contenido_1[FECHA] = date('d/m/Y');
+                    //$contenido_1['N_PAG'] = '{PAGENO}/{nbpg}';
+                    $contenido_1[ID_EMPRESA] = $_SESSION[CookIdEmpresa];
+                    $template->setTemplate("portada_documentos");     
+                    $template->setVars($contenido_1);                    
+                    $paginas[] = ($template->show());
+                    //echo $template->show();
+                    $string = "";
+                    require("clases/GenerarPDFReportes.php");
+                    $pdf = new GenerarPDFReportes();
+                    //echo 1;
+                    //echo $template->show();
+                    $ruta_portada = $pdf->pdf_create_reporte_portada($paginas, "portada" . $documento->nombre_archivo, false, 1, true, 0,$pagina->encryt->Decrypt_Text($_SESSION[BaseDato]));     
+
+                    
+                    include 'clases/PDFMerger/PDFMerger.php';
+
+                    $pdf = new PDFMerger;
+
+                    $pdf->addPDF($ruta_portada)//, '1, 3, 4')
+                            //->addPDF('66.pdf')//, '1-2')
+                            ->addPDF("downloads/tmp_doc/".$documento->nombre_carpeta."/".$documento->nombre_archivo, 'all')
+                            ->merge('file', 'salida.pdf');
                 }
+                //else if ((isset($_GET[des]))&&($_GET[des] == '1')){
+                //    $documento->DescargarDocumento();
+                //}
                 else {
-                    $documento->VisualizaDocumento();
+                    header("Content-type: application/pdf");
+                    $content_disposition = "Content-disposition: filename=\"".$NombreDoc."\"";
+                    //echo $content_disposition;
+                    //exit();
+                    header($content_disposition);
+                    echo $contenido2;
+                    exit();
+                    //$documento->VisualizaDocumento();
+                    
                 }
                 
                  

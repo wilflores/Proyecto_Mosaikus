@@ -10,3 +10,4 @@
                                     <input type="text" class="form-control" id="b-id_area" name="b-id_area" placeholder="{N_ID_AREA}"/>
                                                              
                             </div>
+  <input type="hidden" id="b-id_organizacion" name="b-id_organizacion"/>

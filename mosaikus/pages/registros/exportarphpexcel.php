@@ -315,9 +315,8 @@ $objActSheet->mergeCells('A1:E1');
 $objPHPExcel->getActiveSheet()->getStyle('A1:E1')->applyFromArray( $style_titulo ); //
 $columnas = $reg->cargar_nombres_columnas_xls();
 $datos = $reg->exportarPHPExcelDatosBD($_GET,$columnas);
-
 //print_r($columnas);
-//print_r($datos);
+//print_r($datos);die;
 ///////////////////////////////////////////////////////////////////////////
 ///////////////TABLA SIN ESTILOS PARA LA DINAMICA//////////////////////////////////////
 /////PARA HACER EL ENCABEZADO DE LA TABLA
@@ -402,10 +401,12 @@ foreach (array_keys($columnas) as $value){
 //print_r($datos);
 //exit();
 $col=0;
+//print_r($datos);
+//AJUSTAR COLUMNAS
 foreach (array_keys($columnas) as $columna){
    //echo 'columna:'.$columna.'--';
     $row = 6;
-   // print_r($datos[$columna]);
+    //echo($columna)."\n";
     foreach ($datos[$columna] as $value){
       // echo ($value).'-';
         if(($col_vigencia && $col==$col_vigencia)||(strstr($columna,"estado_semaforo"))){
@@ -427,6 +428,8 @@ foreach (array_keys($columnas) as $columna){
         else {
             $objActSheet->setCellValueByColumnAndRow($col,$row, $value);
             $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            if($columna=='correlativo')
+                $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->getNumberFormat()->setFormatCode('00000');
             $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
             $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->getAlignment()->setWrapText(true);
             $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->applyFromArray( $style_header_sencillo ); // give style to header        
@@ -436,7 +439,7 @@ foreach (array_keys($columnas) as $columna){
     //echo $col.'<br>'." \n" ;
     $col++;
 }
-
+//die;
 ////PARA LAS IMAGENES 
 $objPHPExcel->setActiveSheetIndex(1); 
 $objDrawing = new PHPExcel_Worksheet_Drawing();

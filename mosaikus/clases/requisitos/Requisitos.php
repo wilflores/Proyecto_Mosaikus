@@ -204,7 +204,7 @@
             }
             public function ingresarRequisitos($atr){
                 try {
-                    
+                    //print_r($atr);
                     $atr = $this->dbl->corregir_parametros($atr);
                     import('clases.utilidades.NivelAcceso');
                     $this->restricciones = new NivelAcceso();
@@ -368,10 +368,32 @@
                   /*  if (count($this->restricciones->id_org_acceso) <= 0){
                         $this->restricciones->cargar_acceso_nodos($atr);
                     }*/
+                    if (count($this->restricciones->id_org_acceso_explicito) <= 0){
+                        $this->restricciones->cargar_acceso_nodos_explicito($atr);
+                    } 
+
+
+                    if (count($this->restricciones->id_org_acceso_explicito)>0){                            
+                        $acceso_areas = " AND id_area IN (". implode(',', array_keys($this->restricciones->id_org_acceso_explicito)) . ")";
+                    }
+                       
+                    /*FILTRO PARA EL ARBOL ORGANIZACIONAL*/
+                    $filtro_ao='';
+                    if ((strlen($atr["b-id_organizacion"])>0)){ // filtro para el arbol organizacional
+                        $id_org = ($atr["b-id_organizacion"]);
+                        $acceso_areas= " and id_area in (". $id_org . ") ";
+                   }                    
                     
                     $sql = "SELECT COUNT(*) total_registros
                          FROM mos_requisitos 
-                         WHERE 1 = 1 ";
+                         AS mr
+INNER JOIN (
+
+SELECT id_requisito, GROUP_CONCAT( DISTINCT id_area ) arbol_organizacional
+FROM mos_requisitos_organizacion where 1=1
+ $acceso_areas GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
+                            WHERE 1 = 1 ";
+
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND ((upper(id) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
                         $sql .= " OR (upper(nombre) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
@@ -388,25 +410,17 @@
                         $sql .= " AND estatus = '". $atr["b-estatus"] . "'";
              if (strlen($atr["b-orden"])>0)
                         $sql .= " AND orden = '". $atr["b-orden"] . "'";
-
-                   /* if (count($this->restricciones->id_org_acceso)>0){                            
-                        $sql .= " AND id_organizacion IN (". implode(',', array_keys($this->restricciones->id_org_acceso)) . ")";
-                    }*/
+//echo $sql; 
                     $total_registros = $this->dbl->query($sql, $atr);
-                    $this->total_registros = $total_registros[0][total_registros];   
-                    /*FILTRO PARA EL ARBOL ORGANIZACIONAL*/
-                    $filtro_ao='';
-                    if ((strlen($atr["b-id_organizacion"])>0)){ // filtro para el arbol organizacional
-                        $id_org = ($atr["b-id_organizacion"]);
-                        $filtro_ao= " where id_area in (". $id_org . ") ";
-                   }//REVISAR LA CONSULTA PORQUE NO FUNCIONA
+                    $this->total_registros = $total_registros[0][total_registros];
+                    
                     $sql = "SELECT id, nombre, tipo, vigencia, estatus, orden, arbol_organizacional id_area $sql_col_left
 FROM mos_requisitos AS mr
 INNER JOIN (
 
 SELECT id_requisito, GROUP_CONCAT( DISTINCT id_area ) arbol_organizacional
-FROM mos_requisitos_organizacion
-$filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
+FROM mos_requisitos_organizacion where 1=1
+ $acceso_areas GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                             WHERE 1 = 1 ";
                     if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND ((upper(id) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
@@ -429,6 +443,7 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //echo $sql;
+
                     $this->operacion($sql, $atr);
              }
              public function eliminarRequisitos($atr){
@@ -507,6 +522,7 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                 $config=array();
                 //$config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
+               // echo "total registros ".$this->total_registros;
                 $array_columns =  explode('-', $parametros['mostrar-col']);
                 for($i=0;$i<count($config_col);$i++){
                     switch ($i) {                                             
@@ -634,14 +650,16 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                 . '<label class="col-md-4 control-label" control-label">FAMILIAS:</label></div>';
                 $cont=0;
                 foreach ($columnas_fam as $value) {
-                         if($id_registro!= null){//para editar
-                             $primera_opc= '<option selected="" value="'.$data_params[$cont][id_item].'">'.$data_params[$cont][descripcion_item].'</option>';
-                             $condicion="and id<>".$data_params[$cont][id_item];
-                         }
-                        else{// un nuevo*/
-                            $primera_opc=' <option selected="" value="">-- Seleccione --</option>';
-                            $condicion="";
-                        }
+                    $condicion="";
+                    $primera_opc=' <option selected="" value="">-- Seleccione --</option>';
+                   if($id_registro!= null && isset($data_params[$cont][id_item])){//para editar
+                        $primera_opc= '<option selected="" value="'.$data_params[$cont][id_item].'">'.$data_params[$cont][descripcion_item].'</option>';
+                        $condicion="and id<>".$data_params[$cont][id_item];
+                    }
+                    if($id_registro== null){// un nuevo*/
+                        $primera_opc=' <option selected="" value="">-- Seleccione --</option>';
+                        $condicion="";
+                    }
                     $nombre_campos .= "campo_".$value[id].",";
 //construir los select dinamicos para el formulario de requisitos
                             $html .= '<div class="form-group">'
@@ -677,7 +695,7 @@ $filtro_ao GROUP BY id_requisito) AS mro ON mro.id_requisito = mr.id  $sql_left
                 if ($parametros['corder'] == null) $parametros['corder']="orden";
                 if ($parametros['sorder'] == null) $parametros['sorder']="asc";//ordenar ascendente por orden 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="0-1-2-3-6"; 
+                    $parametros['mostrar-col']="0-1-2-3-6-"; 
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */  
