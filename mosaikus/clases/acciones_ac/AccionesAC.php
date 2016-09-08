@@ -53,7 +53,42 @@
                 
             }
 
+            private function obtener_id_mos_personal($id_usuario){
+                $sql = "SELECT mp.cod_emp from mos_personal mp, 
+                                       mos_usuario mu 
+                        WHERE  mu.id_usuario ='" . $id_usuario . "' 
+                        AND    mp.email = mu.email";
+                $cod_emp =  $this->dbl->query($sql, array());
+                return count($cod_emp) > 0 ? $cod_emp[0][cod_emp] : 0;
+            }
 
+            private function ver_terceros($id_usuario)
+            {
+                $sql = "SELECT count(*) as valido 
+                        FROM mos_usuario_filial muf, mos_perfil mp 
+                        WHERE muf.id_usuario = $id_usuario
+                        AND   mp.cod_perfil = muf.cod_perfil
+                        AND   mp.visualizar_terceros ='S'";
+                $this->operacion($sql, array());
+                $resultado = $this->dbl->data;
+                return $resultado[0][valido];
+            }
+
+            private function obtener_areas_responsable($cod_emp)
+            {
+                $sql = "SELECT id_organizacion from mos_responsable_area WHERE cod_emp='" . $cod_emp . "'";
+                $areas =  $this->dbl->query($sql, array());
+                if(count($areas)){
+                    $output = "";
+                    foreach ($areas as $area) {
+                        $output .= $area[id_organizacion] . ",";
+                    }
+                    return substr($output,0,strlen($output)-1);
+                }else{
+                    return null;
+                }
+
+            }
      
 
              public function verAccionesAC($id){
@@ -324,7 +359,9 @@
                         $sql_col_left .= ",p$k.nom_detalle p$k ";
                         $k++;
                     }*/
-                    
+                    $cod_emp = $this->obtener_id_mos_personal($_SESSION['CookIdUsuario']);
+                    $areas = $this->ver_terceros($_SESSION['CookIdUsuario']) ? $this->obtener_areas_responsable($cod_emp) : null;
+
                     $sql_where = '';
                     if (strlen($atr[valor])>0)
                         $sql_where .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
@@ -354,6 +391,11 @@
                     }
                     if (strlen($atr["b-id_responsable"])>0)
                         $sql_where .= " AND id_responsable = '". $atr["b-id_responsable"] . "'";
+
+                    $sql_where .= " AND (id_responsable = '". $cod_emp . "' AND id_validador ='" . $cod_emp ."')";
+                    if($areas)
+                        $sql_where .= " or (per.id_organizacion IN (".$areas."))";
+
                     /*
                      if (isset($parametros[id_ac])){
                     $_SESSION[id_ac] = $parametros[id_ac];
@@ -421,7 +463,7 @@
                             INNER JOIN mos_personal per on per.cod_emp = acco.id_responsable
                             $sql_left
                             WHERE 1 = 1 $sql_where";
-                    
+
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //echo $sql;
@@ -861,13 +903,13 @@
                                     });
                                     PanelOperator.initPanels('');
                                         ScrollBar.initScroll();
-/*
+
                                     $('.ver-reporte').on('click', function (event) {
                                         event.preventDefault();
                                         var id = $(this).attr('tok');
-                                        verAccionesCorrectivas(id);*/
-                                        /*window.open('pages/acciones_correctivas/reporte_ac_pdf.php?id='+id,'_blank');*/
-                                    /*});*/");
+                                        
+                                        verDetalle(id);
+                                    });");
                 return $objResponse;
             }
          
@@ -1739,38 +1781,81 @@
          
  
      public function ver($parametros)
-            {
-                if(!class_exists('Template')){
-                    import("clases.interfaz.Template");
-                }
+     {
+         if(!class_exists('Template')){
+             import("clases.interfaz.Template");
+         }
 
-                $val = $this->verAccionesAC($parametros[id]);
+         if (count($this->nombres_columnas) <= 0){
+             $this->cargar_nombres_columnas();
+         }
+         foreach ( $this->nombres_columnas as $key => $value) {
+             $contenido_1["N_" . strtoupper($key)] =  $value;
+         }
 
-                            $contenido_1['TIPO'] = $val["tipo"];
-            $contenido_1['ACCION'] = ($val["accion"]);
-            $contenido_1['FECHA_ACORDADA'] = ($val["fecha_acordada"]);
-            $contenido_1['FECHA_REALIZADA'] = ($val["fecha_realizada"]);
-            $contenido_1['ID_RESPONSABLE'] = $val["id_responsable"];
-            $contenido_1['ID_AC'] = $val["id_ac"];
-            $contenido_1['ID_CORRECION'] = $val["id_correcion"];
-;
+         if (count($this->nombres_columnas_ac) <= 0){
+             $this->cargar_nombres_columnas_acciones();
+         }
+
+         foreach ( $this->nombres_columnas_ac as $key => $value) {
+             $contenido_1["NA_" . strtoupper($key)] =  $value;
+         }
+
+         $val = $this->verAccionesAC($parametros[id]);
+         $contenido_1['TIPO'] = $val["tipo_desc"];
+         $contenido_1['ACCION'] = ($val["accion"]);
+         $contenido_1['FECHA_ACORDADA'] = ($val["fecha_acordada"]);
+         $contenido_1['FECHA_REALIZADA'] = ($val["fecha_realizada"]);
+         $contenido_1['ID_RESPONSABLE'] = $val["id_responsable"];
+         $contenido_1['RESPONSABLE'] = $val["responsable"];
+         $contenido_1['ID_AC'] = $val["id_ac"];
+         $contenido_1['ID_CORRECION'] = $val["id_correcion"];
+
+         import('clases.acciones_trazabildiad.AccionesTrazavilidad');
+         $ac = new AccionesTrazavilidad();
+         $parametros['b-id_accion'] = $parametros[id];
+         $parametros[corder] = 'fecha_evi';
+         $parametros[sorder] = '';
+         $ac->listarAccionesTrazavilidad($parametros,1,10000);
+         $data=$ac->dbl->data;
+         $trazabilidad = "";
+         foreach($data as $d)
+         {
+             $trazabilidad .= "<td>". $d[tipo] ."</td>";
+             $trazabilidad .= "<td>". $d[observacion] ."</td>";
+             $trazabilidad .= "<td>". $d[fecha_evi_a] ."</td>";
+         }
+         $contenido_1['TABLA_TRAZA'] = $trazabilidad;
+         $template = new Template();
+         $template->PATH = PATH_TO_TEMPLATES.'acciones_ac/';
+         $template->setTemplate("verAccionesAC");
+         $template->setVars($contenido_1);
+         $contenido['DATOS'] = $template->show();
+         $contenido['TITULO'] = "Datos de la AccionesAC";
 
 
-                $template = new Template();
-                $template->PATH = PATH_TO_TEMPLATES.'acciones_ac/';
-                $template->setTemplate("verAccionesAC");
-                $template->setVars($contenido_1);
-                $contenido['DATOS'] = $template->show();
-                $contenido['TITULO'] = "Datos de la AccionesAC";
+         $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
+         $template->setTemplate("ver");
 
-                $template->PATH = PATH_TO_TEMPLATES.'interfaz/';
-                $template->setTemplate("ver");
+         $template->setVars($contenido);
+         $this->contenido['CONTENIDO']  = $template->show();
+         $this->asigna_contenido($this->contenido);
+         $html =  $template->show();
+         $objResponse = new xajaxResponse();
+         $objResponse->addAssign('detail-content',"innerHTML",$html);
+         $objResponse->addScript("$('.close-detail').click(function (event) {
+                        event.preventDefault();
+                        PanelOperator.hideDetail('');
+                    })
 
-                $template->setVars($contenido);
-                $this->contenido['CONTENIDO']  = $template->show();
-                $this->asigna_contenido($this->contenido);
-
-                return $template->show();
-            }
+                    $('.detail-show').click(function (event) {
+                        event.preventDefault();
+                        PanelOperator.showDetail('');
+                        PanelOperator.hideSearch('');
+                    });");
+         $objResponse->addScript("PanelOperator.showDetail('');");
+         $objResponse->addScript("PanelOperator.resize();");
+         return $objResponse;
+     }
      
  }?>

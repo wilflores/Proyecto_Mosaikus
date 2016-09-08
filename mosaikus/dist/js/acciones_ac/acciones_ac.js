@@ -168,6 +168,8 @@ function RechazarWF(estado,id){
         xajax_Loading(array.getArray());
     }
 
+
+
     function verAccionesAC(id){
         var src = 'pages/' +  document.getElementById("modulo_actual").value + '/verAccionesAC.php?id='+id;
         $('a#ver_ficha_trabajador').fancybox({
@@ -224,4 +226,13 @@ function RechazarWF(estado,id){
          verPagina($('#pag_actual').val(),1);
          $('#myModal-Mostrar-Colums').modal('hide');
          
+    }
+
+    function verDetalle(id)
+    {
+        array = new XArray();
+        array.setObjeto('AccionesAC','ver');
+        array.addParametro('id',id);
+        array.addParametro('import','clases.acciones_ac.AccionesAC');
+        xajax_Loading(array.getArray());
     }

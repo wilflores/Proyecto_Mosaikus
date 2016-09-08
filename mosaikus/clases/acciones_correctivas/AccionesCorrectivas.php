@@ -4920,6 +4920,44 @@
                         
                         $objResponse->addScriptCall("MostrarContenido");
                         $objResponse->addScriptCall('VerMensaje','exito',"La Acción Correctiva '$parametros[descripcion]' ha sido ingresado con exito");
+
+                        //notificacion
+                        if($parametros['notificar']=='si') {
+
+                            $sql = "SELECT mp.email as email,  concat(mp.nombres,' ',mp.apellido_paterno ) as nombres
+                                    FROM   mos_personal mp,
+                                           mos_acciones_correctivas mac,
+                                           mos_acciones_ac_co maco,
+                                           mos_usuario mu
+                                    WHERE  mac.id = ". $parametros[id] ."
+                                    AND    maco.id_ac = mac.id
+                                    AND    mp.cod_emp = maco.id_validador
+                                    AND    mu.email = mp.email 
+                                    AND    mu.recibe_notificaciones='S'
+                                    ORDER BY maco.id limit 1";
+                            $resultado =  $this->dbl->query($sql, array());
+                            $email = count($resultado) > 0 && $resultado[0][email] != null ? trim($resultado[0][email]) : null;
+
+                            if($email){
+                                $ut_tool = new ut_Tool();
+                                //SE ENVIA EL CORREO
+                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $email, 'nombres'=>$resultado[0][nombres])), "Acción Pendiente de Validación", "Sr(a). Se le informa que tiene una Acción Correctiva Pendiente de su Validación.");
+
+                                import('clases.notificaciones.Notificaciones');
+                                $noti = new Notificaciones();
+                                $atr[cuerpo] .= "Sr(a). Se le informa que tiene una Acción Correctiva Pendiente de su Validación.";
+                                $atr[funcion] = "verTrazavilidadAccion(" . $parametros[id] . ");";
+
+                                $atr[modulo] = 'TRAZABILIDAD_ACCION';
+                                $atr[asunto] = 'Acción Pendiente de Validación';
+                                $atr[email] = $email != null ? $email : "";
+                                $atr[id_entidad] = $parametros[id];
+                                $mensaje = $noti->ingresarNotificaciones($atr);
+                            }
+
+
+
+                        }
                     }
                     else
                         $objResponse->addScriptCall('VerMensaje','error',$respuesta);

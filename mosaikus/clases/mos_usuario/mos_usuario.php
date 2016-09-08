@@ -1476,7 +1476,6 @@
                                          $("#email").attr("readonly","true");');
                 return $objResponse;
             }
-     
  
             public function actualizar($parametros)
             {

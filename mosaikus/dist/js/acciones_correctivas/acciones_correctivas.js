@@ -527,7 +527,7 @@ function init_filtrar(){
         xajax_Loading(array.getArray());
     }
 
-    function verAccionesCorrectivas(id){    
+    function verAccionesCorrectivas(id){
         array = new XArray();
         array.setObjeto('AccionesCorrectivas','ver');
         array.addParametro('id',id);
