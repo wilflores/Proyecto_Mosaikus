@@ -430,6 +430,11 @@ foreach (array_keys($columnas) as $columna){
             $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
             if($columna=='correlativo')
                 $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->getNumberFormat()->setFormatCode('00000');
+            if(strstr($columna,"id_organizacion_hist"))
+                $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setWidth(30);
+            elseif(strstr($columna,"id_organizacion_act"))
+                $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setWidth(40);
+            else
             $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
             $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->getAlignment()->setWrapText(true);
             $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->applyFromArray( $style_header_sencillo ); // give style to header        
