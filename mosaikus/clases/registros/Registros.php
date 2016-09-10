@@ -2246,7 +2246,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion_hist], ENT_QUOTES, "UTF-8")))); 
                                 array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo], ENT_QUOTES, "UTF-8"))));                                
                                 array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion_act], ENT_QUOTES, "UTF-8")))); 
-                                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo_act], ENT_QUOTES, "UTF-8"))));                                
+                                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cargo_act], ENT_QUOTES, "UTF-8"))));                                
                                 //$k++;$k++;$k++;
                             break;
                         case '10':
@@ -2619,7 +2619,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion_hist], ENT_QUOTES, "UTF-8")))); 
                                 array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo], ENT_QUOTES, "UTF-8"))));                                
                                 array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion_act], ENT_QUOTES, "UTF-8")))); 
-                                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo_act], ENT_QUOTES, "UTF-8"))));                                
+                                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cargo_act], ENT_QUOTES, "UTF-8"))));                                
                                 //$k++;$k++;$k++;
 
                             break;
