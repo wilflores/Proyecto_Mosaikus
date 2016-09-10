@@ -421,6 +421,9 @@ foreach (array_keys($columnas) as $columna){
                 case 'J': 
                     $estilo=$style_header_semaforo_verde;
                     break;
+                default:
+                    $estilo=$style_header_semaforo_verde;
+                    break;
            }
            $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->applyFromArray( $estilo ); // give style to header
            $objPHPExcel->getActiveSheet()->getStyleByColumnAndRow($col,$row)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
