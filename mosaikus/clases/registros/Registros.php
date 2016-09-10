@@ -2972,7 +2972,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                           <label >
                                               <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-                                           ' . $personal->nombres_columnas[cod_cargo_act] . ' </label>
+                                           ' . $personal->nombres_columnas[cargo_act] . ' </label>
 
                                 </div>';
                         $k++;
@@ -3384,7 +3384,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                           <label >
                                               <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-                                           ' . $personal->nombres_columnas[cod_cargo_act] . '  </label>
+                                           ' . $personal->nombres_columnas[cargo_act] . '  </label>
 
                                 </div>';
                         $k++;
