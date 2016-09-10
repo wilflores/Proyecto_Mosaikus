@@ -2548,7 +2548,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[idRegistro], "idRegistro", $parametros,'r_link_titulos')),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[IDDoc], "IDDoc", $parametros,'r_link_titulos')),
                //array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[identificacion], "identificacion", $parametros,'r_link_titulos')),
-               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[correlativo], "correlativo", $parametros,'r_link_titulos')),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[correlativo], "correlativo", $parametros,'r_link_titulos')),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[correlativo], "correlativo", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_usuario], "id_usuario", $parametros)),
