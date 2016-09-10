@@ -2172,7 +2172,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                    
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[idRegistro], "idRegistro", $parametros,'r_link_titulos')),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[IDDoc], "IDDoc", $parametros,'r_link_titulos')),
-               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[correlativo], "correlativo", $parametros,'r_link_titulos')),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[correlativo], "correlativo", $parametros,'r_link_titulos')),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[correlativo], "correlativo", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_usuario], "id_usuario", $parametros)),
@@ -2245,8 +2245,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                 /*Columnas del ID, area y cargo de la persona*/
                                 array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion_hist], ENT_QUOTES, "UTF-8")))); 
                                 array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo], ENT_QUOTES, "UTF-8"))));                                
-                                array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion]." Actual", ENT_QUOTES, "UTF-8")))); 
-                                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo]." Actual", ENT_QUOTES, "UTF-8"))));                                
+                                array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion_act], ENT_QUOTES, "UTF-8")))); 
+                                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo_act], ENT_QUOTES, "UTF-8"))));                                
                                 //$k++;$k++;$k++;
                             break;
                         case '10':
@@ -2354,7 +2354,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[idRegistro], "idRegistro", $parametros,'r_link_titulos')),
                array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[IDDoc], "IDDoc", $parametros,'r_link_titulos')),
                //array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[identificacion], "identificacion", $parametros,'r_link_titulos')),
-               array( "width"=>"15%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[correlativo], "correlativo", $parametros,'r_link_titulos')),
+               array( "width"=>"10%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[correlativo], "correlativo", $parametros,'r_link_titulos')),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[version], "version", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[correlativo], "correlativo", $parametros)),
                //array( "width"=>"10%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id_usuario], "id_usuario", $parametros)),
@@ -2616,10 +2616,10 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                         $personal->cargar_campos_activos();
                                 }
                                 /*Columnas del ID, area y cargo de la persona*/
-                                array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion], ENT_QUOTES, "UTF-8")))); 
+                                array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion_hist], ENT_QUOTES, "UTF-8")))); 
                                 array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo], ENT_QUOTES, "UTF-8"))));                                
-                                array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion]." Actual", ENT_QUOTES, "UTF-8")))); 
-                                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo]." Actual", ENT_QUOTES, "UTF-8"))));                                
+                                array_push($config_col,array( "width"=>"15%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[id_organizacion_act], ENT_QUOTES, "UTF-8")))); 
+                                array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>(htmlentities($personal->nombres_columnas[cod_cargo_act], ENT_QUOTES, "UTF-8"))));                                
                                 //$k++;$k++;$k++;
 
                             break;
@@ -2924,6 +2924,13 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         
                     }
                     else if ($value[tipo] == 6){
+                        if(!class_exists('Personas')){
+                            import("clases.personas.Personas");
+                        }
+                        $personal = new Personas();
+                        if (count($personal->nombres_columnas) <= 0){
+                            $personal->cargar_nombres_columnas();
+                        }                                
                         $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
                                        
@@ -2938,7 +2945,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                           <label >
                                               <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-                                          Área ' . $value[Nombre] . ' </label>
+                                           ' . $personal->nombres_columnas[id_organizacion_hist] . ' </label>
 
                                 </div>';
                         $k++;
@@ -2947,7 +2954,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                           <label >
                                               <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-                                          Cargo ' . $value[Nombre] . ' </label>
+                                           ' . $personal->nombres_columnas[cod_cargo] . ' </label>
 
                                 </div>';
                         $k++;
@@ -2956,7 +2963,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                           <label >
                                               <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-                                          Área ' . $value[Nombre] . ' Actual </label>
+                                           ' . $personal->nombres_columnas[id_organizacion_act] . ' </label>
 
                                 </div>';
                         $k++;
@@ -2965,7 +2972,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                           <label >
                                               <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-                                          Cargo ' . $value[Nombre] . ' Actual </label>
+                                           ' . $personal->nombres_columnas[cod_cargo_act] . ' </label>
 
                                 </div>';
                         $k++;
@@ -3329,6 +3336,13 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                     }
 
                     else if ($value[tipo] == 6){
+                        if(!class_exists('Personas')){
+                            import("clases.personas.Personas");
+                        }
+                        $personal = new Personas();
+                        if (count($personal->nombres_columnas) <= 0){
+                            $personal->cargar_nombres_columnas();
+                        }                                
                         $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
                                        
@@ -3338,12 +3352,12 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                                   
                             </div>';
                         $k++;
-                       $parametros['mostrar-col'] .= "-$k";
+                        $parametros['mostrar-col'] .= "-$k";
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
                                           <label >
-                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-                                          Área ' . $value[Nombre] . ' </label>
+                                              <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                           ' . $personal->nombres_columnas[id_organizacion_hist] . ' </label>
 
                                 </div>';
                         $k++;
@@ -3351,8 +3365,8 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
                         $contenido[PARAMETROS_OTROS] .= '<div class="checkbox">
 
                                           <label >
-                                              <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-                                          Cargo ' . $value[Nombre] . ' </label>
+                                              <input checked="checked" type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
+                                           ' . $personal->nombres_columnas[cod_cargo] . ' </label>
 
                                 </div>';
                         $k++;
@@ -3361,7 +3375,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                           <label >
                                               <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-                                          Área ' . $value[Nombre] . ' Actual </label>
+                                           ' . $personal->nombres_columnas[id_organizacion_act] . '  </label>
 
                                 </div>';
                         $k++;
@@ -3370,7 +3384,7 @@ function BuscaOrganizacional($tupla,$key='id_organizacion')
 
                                           <label >
                                               <input type="checkbox" name="SelectAcc" id="SelectAcc" value="' . $k . '" class="r-checkbox-mos-col" >   &nbsp;
-                                          Cargo ' . $value[Nombre] . ' Actual </label>
+                                           ' . $personal->nombres_columnas[cod_cargo_act] . '  </label>
 
                                 </div>';
                         $k++;
