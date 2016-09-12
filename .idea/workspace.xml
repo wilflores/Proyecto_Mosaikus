@@ -5,10 +5,7 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mosaikus/clases/acciones_ac/AccionesAC.php" afterPath="$PROJECT_DIR$/mosaikus/clases/acciones_ac/AccionesAC.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mosaikus/clases/acciones_correctivas/AccionesCorrectivas.php" afterPath="$PROJECT_DIR$/mosaikus/clases/acciones_correctivas/AccionesCorrectivas.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mosaikus/clases/mos_usuario/mos_usuario.php" afterPath="$PROJECT_DIR$/mosaikus/clases/mos_usuario/mos_usuario.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mosaikus/diseno/templates/acciones_ac/verAccionesAC.tpl" afterPath="$PROJECT_DIR$/mosaikus/diseno/templates/acciones_ac/verAccionesAC.tpl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mosaikus/dist/js/acciones_ac/acciones_ac.js" afterPath="$PROJECT_DIR$/mosaikus/dist/js/acciones_ac/acciones_ac.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mosaikus/dist/js/acciones_correctivas/acciones_correctivas.js" afterPath="$PROJECT_DIR$/mosaikus/dist/js/acciones_correctivas/acciones_correctivas.js" />
     </list>
     <ignored path="mosaikusapps.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -29,393 +26,349 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="mos_usuario.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mosaikus/clases/mos_usuario/mos_usuario.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="168" column="40" selection-start-line="164" selection-start-column="16" selection-end-line="168" selection-end-column="40" />
-              <folding>
-                <marker date="1472770019582" expanded="true" signature="4979:5095" ph="SELECT cod_p... mos_parametro" />
-                <marker date="1472770019582" expanded="true" signature="5275:5388" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1472770019582" expanded="true" signature="5745:5851" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1472770019582" expanded="true" signature="6207:6326" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1472770019582" expanded="true" signature="6678:6747" ph="SELECT id, i... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="6961:7051" ph="SELECT id, i... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="7264:7926" ph="SELECT id_us... mos_usuario" />
-                <marker date="1472770019582" expanded="true" signature="8167:8336" ph="SELECT id, i... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="8991:9328" ph="SELECT mue.i... mos_usuario_estructura" />
-                <marker date="1472770019582" expanded="true" signature="9644:10170" ph="INSERT INTO mos_usuario... " />
-                <marker date="1472770019582" expanded="true" signature="11475:11667" ph="INSERT INTO mos_log... " />
-                <marker date="1472770019582" expanded="true" signature="12251:12747" ph="UPDATE mos_u... " />
-                <marker date="1472770019582" expanded="true" signature="14879:15095" ph="UPDATE mos_u... " />
-                <marker date="1472770019582" expanded="true" signature="16065:16448" ph="SELECT id_em... mos_adm_empresas" />
-                <marker date="1472770019582" expanded="true" signature="16065:16482" ph="SELECT id_em... mos_adm_empresas" />
-                <marker date="1472770019582" expanded="true" signature="16989:17177" ph="UPDATE mos_u... " />
-                <marker date="1472770019582" expanded="true" signature="18083:18194" ph="SELECT COUNT... mos_usuario" />
-                <marker date="1472770019582" expanded="true" signature="22248:23381" ph="SELECT id_us... mos_usuario" />
-                <marker date="1472770019582" expanded="true" signature="22866:23007" ph="SELECT COUNT... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="23058:23185" ph="SELECT COUNT... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="51076:51319" ph="SELECT COUNT... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="52154:52482" ph="SELECT muf.i... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="53490:53740" ph="SELECT COUNT... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="54575:54924" ph="SELECT muf.i... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="57835:57849" ph="..." />
-                <marker date="1472770019582" expanded="true" signature="58134:58148" ph="..." />
-                <marker date="1472770019582" expanded="true" signature="70202:70747" ph="..." />
-                <marker date="1472770019582" expanded="true" signature="70379:70712" ph="..." />
-                <marker date="1472770019582" expanded="true" signature="70455:70671" ph="..." />
-                <marker date="1472770019582" expanded="false" signature="70619:70625" ph=" " />
-                <marker date="1472770019582" expanded="true" signature="72633:72714" ph="SELECT cod_p... mos_perfil" />
-                <marker date="1472770019582" expanded="true" signature="72931:73019" ph="SELECT cod_p... mos_perfil_portal" />
-                <marker date="1472770019582" expanded="true" signature="100277:100329" ph="SELECT * FRO... mos_perfil" />
-                <marker date="1472770019582" expanded="true" signature="101062:101150" ph="SELECT cod_p... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="101356:101482" ph="SELECT id_es... mos_usuario_estructura" />
-                <marker date="1472770019582" expanded="true" signature="101686:101812" ph="SELECT id_es... mos_usuario_estructura" />
-                <marker date="1472770019582" expanded="true" signature="101972:102031" ph="SELECT * FRO... mos_perfil_portal" />
-                <marker date="1472770019582" expanded="true" signature="102508:102610" ph="SELECT cod_p... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="102804:103093" ph="SELECT DISTI... mos_usuario_estructura" />
-                <marker date="1472770019582" expanded="true" signature="103363:103436" ph="DELETE FROM " />
-                <marker date="1472770019582" expanded="true" signature="105645:105846" ph="INSERT INTO mos_usuario_estructura... " />
-                <marker date="1472770019582" expanded="true" signature="106487:106688" ph="INSERT INTO mos_usuario_estructura... " />
-                <marker date="1472770019582" expanded="true" signature="107321:107528" ph="INSERT INTO mos_usuario_filial... " />
-                <marker date="1472770019582" expanded="true" signature="108155:108369" ph="INSERT INTO mos_usuario_filial... " />
-                <marker date="1472770019582" expanded="true" signature="108931:108983" ph="SELECT * FRO... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="109567:109675" ph="SELECT id_or... mos_personal" />
-                <marker date="1472770019582" expanded="true" signature="110815:110904" ph="SELECT * FRO... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="111388:111484" ph="SELECT * FRO... mos_usuario_filial" />
-                <marker date="1472770019582" expanded="true" signature="115751:115832" ph="select * fro... mos_organizacion" />
-                <marker date="1472770019582" expanded="true" signature="125969:126013" ph="SELECT id,id... mos_idiomas" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="AccionesAC.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mosaikus/clases/acciones_ac/AccionesAC.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="634">
-              <caret line="151" column="46" selection-start-line="151" selection-start-column="46" selection-end-line="151" selection-end-column="46" />
+            <state relative-caret-position="-506">
+              <caret line="1504" column="78" selection-start-line="1504" selection-start-column="78" selection-end-line="1504" selection-end-column="78" />
               <folding>
-                <marker date="1473275658620" expanded="true" signature="1063:1179" ph="SELECT cod_p... mos_parametro" />
-                <marker date="1473275658620" expanded="true" signature="1359:1452" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1473275658620" expanded="true" signature="1833:1919" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1473275658620" expanded="true" signature="2290:2382" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1473275658620" expanded="true" signature="2755:2898" ph="SELECT id fr... mos_personal" />
-                <marker date="1473275658620" expanded="true" signature="2755:2918" ph="SELECT id fr... mos_personal" />
-                <marker date="1473275658620" expanded="true" signature="2755:2970" ph="SELECT mp.co... mos_personal" />
-                <marker date="1473275658620" expanded="true" signature="3214:3356" ph="SELECT cod_p... mos_usuario_filial" />
-                <marker date="1473275658620" expanded="true" signature="3214:3462" ph="SELECT count... mos_usuario_filial" />
-                <marker date="1473275658620" expanded="true" signature="3214:3486" ph="SELECT count... mos_usuario_filial" />
-                <marker date="1473275658620" expanded="true" signature="3749:3828" ph="SELECT id_or... mos_responsable_area" />
-                <marker date="1473275658620" expanded="true" signature="3749:3829" ph="SELECT id_or... mos_responsable_area" />
-                <marker date="1473275658620" expanded="true" signature="3749:3830" ph="SELECT id_or... mos_responsable_area" />
-                <marker date="1473275658620" expanded="true" signature="4464:6553" ph="SELECT acco.... mos_acciones_ac_co" />
-                <marker date="1473275658620" expanded="true" signature="6062:6262" ph="SELECT mos_n... mos_nombres_campos" />
-                <marker date="1473275658620" expanded="true" signature="7715:8123" ph="INSERT INTO mos_acciones_ac_co... " />
-                <marker date="1473275658620" expanded="true" signature="8963:9008" ph="SELECT MAX(i... mos_acciones_ac_co" />
-                <marker date="1473275658620" expanded="true" signature="9909:10119" ph="INSERT INTO mos_log... " />
-                <marker date="1473275658620" expanded="true" signature="10661:11047" ph="UPDATE mos_a... " />
-                <marker date="1473275658620" expanded="true" signature="12773:13163" ph="UPDATE mos_a... " />
-                <marker date="1473275658620" expanded="true" signature="18594:20517" ph="SELECT acco.... mos_acciones_ac_co" />
-                <marker date="1473275658620" expanded="true" signature="25544:25663" ph="SELECT COUNT... mos_acciones_ac_co" />
-                <marker date="1473275658620" expanded="true" signature="25895:28673" ph="SELECT acco.... mos_acciones_ac_co" />
-                <marker date="1473275658620" expanded="true" signature="27856:28055" ph="SELECT mos_n... mos_nombres_campos" />
-                <marker date="1473275658620" expanded="true" signature="29262:29429" ph="SELECT COUNT... mos_acciones_evidencia" />
-                <marker date="1473275658620" expanded="true" signature="33559:33569" ph="..." />
-                <marker date="1473275658620" expanded="true" signature="33571:33577" ph=" " />
-                <marker date="1473275658620" expanded="true" signature="47330:47875" ph="..." />
-                <marker date="1473275658620" expanded="true" signature="47507:47840" ph="..." />
-                <marker date="1473275658620" expanded="true" signature="47583:47799" ph="..." />
-                <marker date="1473275658620" expanded="false" signature="47747:47753" ph=" " />
-                <marker date="1473275658620" expanded="true" signature="50009:50218" ph="SELECT id, d... mos_tipo_ac" />
-                <marker date="1473275658620" expanded="true" signature="50457:50921" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473275658620" expanded="true" signature="61005:61257" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473275658620" expanded="true" signature="61345:61635" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473275658620" expanded="true" signature="66815:67415" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473275658620" expanded="true" signature="67632:68195" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473275658620" expanded="true" signature="77293:77545" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473275658620" expanded="true" signature="77633:77923" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473275658620" expanded="false" signature="84034:84040" ph=" " />
-                <marker date="1473275658620" expanded="false" signature="84247:84253" ph=" " />
-                <marker date="1473275658620" expanded="true" signature="84531:84537" ph=" " />
-                <marker date="1473275658620" expanded="true" signature="89028:89122" ph="DELETE FROM " />
-                <marker date="1473275658620" expanded="true" signature="92879:92953" ph="update mos_a... " />
-                <marker date="1473275658620" expanded="true" signature="94155:95360" ph="select mos_p... mos_acciones_ac_co" />
+                <marker date="1473439035653" expanded="true" signature="1063:1179" ph="SELECT cod_p... mos_parametro" />
+                <marker date="1473439035653" expanded="true" signature="1359:1452" ph="SELECT nombr... mos_nombres_campos" />
+                <marker date="1473439035653" expanded="true" signature="1833:1919" ph="SELECT nombr... mos_nombres_campos" />
+                <marker date="1473439035653" expanded="true" signature="2290:2382" ph="SELECT nombr... mos_nombres_campos" />
+                <marker date="1473439035653" expanded="true" signature="2755:2898" ph="SELECT id fr... mos_personal" />
+                <marker date="1473439035653" expanded="true" signature="2755:2918" ph="SELECT id fr... mos_personal" />
+                <marker date="1473439035653" expanded="true" signature="2755:2970" ph="SELECT mp.co... mos_personal" />
+                <marker date="1473439035653" expanded="true" signature="3214:3356" ph="SELECT cod_p... mos_usuario_filial" />
+                <marker date="1473439035653" expanded="true" signature="3214:3462" ph="SELECT count... mos_usuario_filial" />
+                <marker date="1473439035653" expanded="true" signature="3214:3486" ph="SELECT count... mos_usuario_filial" />
+                <marker date="1473439035653" expanded="true" signature="3749:3828" ph="SELECT id_or... mos_responsable_area" />
+                <marker date="1473439035653" expanded="true" signature="3749:3829" ph="SELECT id_or... mos_responsable_area" />
+                <marker date="1473439035653" expanded="true" signature="3749:3830" ph="SELECT id_or... mos_responsable_area" />
+                <marker date="1473439035653" expanded="true" signature="4464:6831" ph="SELECT acco.... mos_acciones_ac_co" />
+                <marker date="1473439035653" expanded="true" signature="6077:6277" ph="SELECT mos_n... mos_nombres_campos" />
+                <marker date="1473439035653" expanded="true" signature="7994:8402" ph="INSERT INTO mos_acciones_ac_co... " />
+                <marker date="1473439035653" expanded="true" signature="9242:9287" ph="SELECT MAX(i... mos_acciones_ac_co" />
+                <marker date="1473439035653" expanded="true" signature="10188:10398" ph="INSERT INTO mos_log... " />
+                <marker date="1473439035653" expanded="true" signature="10940:11326" ph="UPDATE mos_a... " />
+                <marker date="1473439035653" expanded="true" signature="13052:13442" ph="UPDATE mos_a... " />
+                <marker date="1473439035653" expanded="true" signature="18873:20796" ph="SELECT acco.... mos_acciones_ac_co" />
+                <marker date="1473439035653" expanded="true" signature="26016:26135" ph="SELECT COUNT... mos_acciones_ac_co" />
+                <marker date="1473439035653" expanded="true" signature="26367:29145" ph="SELECT acco.... mos_acciones_ac_co" />
+                <marker date="1473439035653" expanded="true" signature="28328:28527" ph="SELECT mos_n... mos_nombres_campos" />
+                <marker date="1473439035653" expanded="true" signature="29734:29901" ph="SELECT COUNT... mos_acciones_evidencia" />
+                <marker date="1473439035653" expanded="true" signature="34031:34041" ph="..." />
+                <marker date="1473439035653" expanded="true" signature="34043:34049" ph=" " />
+                <marker date="1473439035653" expanded="true" signature="47802:48347" ph="..." />
+                <marker date="1473439035653" expanded="true" signature="47979:48312" ph="..." />
+                <marker date="1473439035653" expanded="true" signature="48055:48271" ph="..." />
+                <marker date="1473439035653" expanded="false" signature="48219:48225" ph=" " />
+                <marker date="1473439035653" expanded="true" signature="50481:50690" ph="SELECT id, d... mos_tipo_ac" />
+                <marker date="1473439035653" expanded="true" signature="50929:51393" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473439035653" expanded="true" signature="61477:61729" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473439035653" expanded="true" signature="61817:62107" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473439035653" expanded="true" signature="67287:67887" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473439035653" expanded="true" signature="68104:68667" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473439035653" expanded="true" signature="77765:78017" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473439035653" expanded="true" signature="78105:78395" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473439035653" expanded="false" signature="84506:84512" ph=" " />
+                <marker date="1473439035653" expanded="false" signature="84719:84725" ph=" " />
+                <marker date="1473439035653" expanded="true" signature="85003:85009" ph=" " />
+                <marker date="1473439035653" expanded="true" signature="89500:89594" ph="DELETE FROM " />
+                <marker date="1473439035653" expanded="true" signature="93351:93425" ph="update mos_a... " />
+                <marker date="1473439035653" expanded="true" signature="94627:95832" ph="select mos_p... mos_acciones_ac_co" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ut_Tool.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mosaikus/clases/utilidades/ut_Tool.php">
+      <file leaf-file-name="NivelAcceso.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/mosaikus/clases/utilidades/NivelAcceso.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="269">
-              <caret line="1015" column="18" selection-start-line="1015" selection-start-column="13" selection-end-line="1015" selection-end-column="18" />
+            <state relative-caret-position="1914">
+              <caret line="87" column="53" selection-start-line="87" selection-start-column="30" selection-end-line="87" selection-end-column="53" />
               <folding>
-                <marker date="1472067132013" expanded="true" signature="15982:16126" ph="..." />
-                <marker date="1472067132013" expanded="true" signature="16400:16459" ph="..." />
+                <marker date="1472154310243" expanded="true" signature="1719:1835" ph="SELECT cod_p... mos_parametro" />
+                <marker date="1472154310243" expanded="true" signature="2015:2083" ph="SELECT nombr... mos_nombres_campos" />
+                <marker date="1472154310243" expanded="true" signature="2428:2502" ph="SELECT nombr... mos_nombres_campos" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AccionesTrazavilidad.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mosaikus/clases/acciones_trazabildiad/AccionesTrazavilidad.php">
+      <file leaf-file-name="Cargos.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/mosaikus/clases/cargo/Cargos.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="23672">
+              <caret line="1076" column="92" selection-start-line="1076" selection-start-column="46" selection-end-line="1076" selection-end-column="92" />
+              <folding>
+                <marker date="1472387760815" expanded="true" signature="1120:1236" ph="SELECT cod_p... mos_parametro" />
+                <marker date="1472387760815" expanded="true" signature="1403:1516" ph="SELECT nombr... mos_nombres_campos" />
+                <marker date="1472387760815" expanded="true" signature="1864:1932" ph="SELECT campo... mos_campos_activos" />
+                <marker date="1472387760815" expanded="true" signature="2290:2409" ph="SELECT nombr... mos_nombres_campos" />
+                <marker date="1472387760815" expanded="true" signature="2773:3278" ph="SELECT cod_c... mos_cargo" />
+                <marker date="1472387760815" expanded="true" signature="3029:3197" ph="select mos_c... mos_cargo_estrorg_arbolproc" />
+                <marker date="1472387760815" expanded="true" signature="3476:3553" ph="SELECT MAX(c... mos_cargo" />
+                <marker date="1472387760815" expanded="true" signature="3890:4042" ph="SELECT cod_c... mos_cargo_estrorg_arbolproc" />
+                <marker date="1472387760815" expanded="true" signature="4390:4588" ph="INSERT INTO mos_cargo_estrorg_arbolproc... " />
+                <marker date="1472387760815" expanded="true" signature="5815:6079" ph="INSERT INTO mos_cargo... " />
+                <marker date="1472387760815" expanded="true" signature="7302:7494" ph="INSERT INTO mos_log... " />
+                <marker date="1472387760815" expanded="true" signature="7770:8024" ph="UPDATE mos_c... " />
+                <marker date="1472387760815" expanded="true" signature="11537:11646" ph="SELECT COUNT... mos_cargo" />
+                <marker date="1472387760815" expanded="true" signature="11869:12261" ph="SELECT cod_c... mos_cargo" />
+                <marker date="1472387760815" expanded="true" signature="14549:15264" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
+                <marker date="1472387760815" expanded="true" signature="15531:15680" ph="SELECT COUNT... mos_personal" />
+                <marker date="1472387760815" expanded="true" signature="20464:20478" ph="..." />
+                <marker date="1472387760815" expanded="true" signature="20710:20724" ph="..." />
+                <marker date="1472387760815" expanded="true" signature="23177:23187" ph="..." />
+                <marker date="1472387760815" expanded="true" signature="23191:23199" ph="Á" />
+                <marker date="1472387760815" expanded="true" signature="23252:23262" ph="..." />
+                <marker date="1472387760815" expanded="true" signature="28420:28965" ph="..." />
+                <marker date="1472387760815" expanded="true" signature="28597:28930" ph="..." />
+                <marker date="1472387760815" expanded="true" signature="28673:28889" ph="..." />
+                <marker date="1472387760815" expanded="false" signature="28837:28843" ph=" " />
+                <marker date="1472387760815" expanded="true" signature="32620:33165" ph="..." />
+                <marker date="1472387760815" expanded="true" signature="32797:33130" ph="..." />
+                <marker date="1472387760815" expanded="true" signature="32873:33089" ph="..." />
+                <marker date="1472387760815" expanded="false" signature="33037:33043" ph=" " />
+                <marker date="1472387760815" expanded="true" signature="50513:50706" ph="..." />
+                <marker date="1472387760815" expanded="true" signature="50543:50623" ph="..." />
+                <marker date="1472387760815" expanded="true" signature="53798:54300" ph="SELECT count... mos_cargo_estrorg_arbolproc" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Documentos.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/mosaikus/clases/documentos/Documentos.php">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="22">
-              <caret line="731" column="43" selection-start-line="731" selection-start-column="42" selection-end-line="731" selection-end-column="43" />
+              <caret line="1070" column="40" selection-start-line="1070" selection-start-column="40" selection-end-line="1070" selection-end-column="40" />
               <folding>
-                <marker date="1470662805356" expanded="true" signature="1170:1286" ph="SELECT cod_p... mos_parametro" />
-                <marker date="1470662805356" expanded="true" signature="1466:1534" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1470662805356" expanded="true" signature="1879:1953" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1470662805356" expanded="true" signature="4320:4499" ph="SELECT id ,i... mos_acciones_trazabilidad" />
-                <marker date="1470662805356" expanded="true" signature="5734:6006" ph="INSERT INTO mos_acciones_trazabilidad... " />
-                <marker date="1470662805356" expanded="true" signature="6353:6405" ph="SELECT MAX(i... mos_acciones_trazabilidad" />
-                <marker date="1470662805356" expanded="true" signature="7584:7793" ph="INSERT INTO mos_log... " />
-                <marker date="1470662805356" expanded="true" signature="9069:9346" ph="UPDATE mos_a... " />
-                <marker date="1470662805356" expanded="true" signature="12088:12213" ph="SELECT COUNT... mos_acciones_trazabilidad" />
-                <marker date="1470662805356" expanded="true" signature="14474:15260" ph="SELECT id ,i... mos_acciones_trazabilidad" />
-                <marker date="1470662805356" expanded="true" signature="27726:28271" ph="..." />
-                <marker date="1470662805356" expanded="true" signature="27903:28236" ph="..." />
-                <marker date="1470662805356" expanded="true" signature="27979:28195" ph="..." />
-                <marker date="1470662805356" expanded="false" signature="28143:28149" ph=" " />
+                <marker date="1473345939316" expanded="true" signature="3936:4028" ph="select * fro... mos_documentos_estrorg_arbolproc" />
+                <marker date="1473345939316" expanded="true" signature="5240:5332" ph="select * fro... mos_documentos_estrorg_arbolproc" />
+                <marker date="1473345939316" expanded="true" signature="7851:7921" ph="select count... mos_registro" />
+                <marker date="1473345939316" expanded="true" signature="9245:9315" ph="select count... mos_registro" />
+                <marker date="1473345939316" expanded="true" signature="18372:18485" ph="select min(l... mos_organizacion" />
+                <marker date="1473345939316" expanded="true" signature="18924:19059" ph="SELECT cod_p... mos_parametro" />
+                <marker date="1473345939316" expanded="true" signature="19247:19365" ph="SELECT nombr... mos_nombres_campos" />
+                <marker date="1473345939316" expanded="true" signature="19734:19878" ph="SELECT nombr... mos_nombres_campos" />
+                <marker date="1473345939316" expanded="true" signature="22812:22930" ph="SELECT nombr... mos_nombres_campos" />
+                <marker date="1473345939316" expanded="true" signature="23286:27443" ph="select mos_p... mos_personal" />
+                <marker date="1473345939316" expanded="true" signature="24001:27263" ph="SELECT case mos_documentos" />
+                <marker date="1473345939316" expanded="true" signature="27714:28107" ph="SELECT doc_f... mos_documentos" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="verAccionesAC.tpl" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/mosaikus/diseno/templates/acciones_ac/verAccionesAC.tpl">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="924">
-              <caret line="42" column="58" selection-start-line="42" selection-start-column="58" selection-end-line="42" selection-end-column="58" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="acciones_correctivas.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mosaikus/dist/js/acciones_correctivas/acciones_correctivas.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="9526">
-              <caret line="433" column="62" selection-start-line="433" selection-start-column="55" selection-end-line="433" selection-end-column="62" />
-              <folding>
-                <marker date="1473266053024" expanded="true" signature="17632:17645" ph="..." />
-                <marker date="1473266053024" expanded="true" signature="19292:19329" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AccionesCorrectivas.php" pinned="false" current-in-tab="false">
+      <file leaf-file-name="AccionesCorrectivas.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mosaikus/clases/acciones_correctivas/AccionesCorrectivas.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
-              <caret line="4946" column="51" selection-start-line="4946" selection-start-column="51" selection-end-line="4946" selection-end-column="51" />
+            <state relative-caret-position="264">
+              <caret line="12" column="49" selection-start-line="12" selection-start-column="49" selection-end-line="12" selection-end-column="49" />
               <folding>
-                <marker date="1473345776235" expanded="true" signature="1281:1403" ph="SELECT cod_p... mos_parametro" />
-                <marker date="1473345776235" expanded="true" signature="1582:1695" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1473345776235" expanded="true" signature="2053:2159" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1473345776235" expanded="true" signature="2507:2619" ph="SELECT nombr... mos_nombres_campos" />
-                <marker date="1473345776235" expanded="true" signature="7937:11725" ph="SELECT ac.id... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="10983:11160" ph="SELECT mos_n... mos_nombres_campos" />
-                <marker date="1473345776235" expanded="true" signature="13554:14307" ph="INSERT INTO mos_acciones_correctivas... " />
-                <marker date="1473345776235" expanded="true" signature="14483:14534" ph="SELECT MAX(i... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="16589:16799" ph="INSERT INTO mos_log... " />
-                <marker date="1473345776235" expanded="true" signature="34961:35110" ph="UPDATE mos_a... " />
-                <marker date="1473345776235" expanded="true" signature="36766:36991" ph="DELETE FROM " />
-                <marker date="1473345776235" expanded="true" signature="36903:36990" ph="SELECT id_ac... mos_acciones_trazabilidad" />
-                <marker date="1473345776235" expanded="true" signature="44220:44369" ph="UPDATE mos_a... " />
-                <marker date="1473345776235" expanded="true" signature="57698:57823" ph="SELECT COUNT... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="58056:62616" ph="SELECT ac.id... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="58151:58366" ph="SELECT mos_n... mos_nombres_campos" />
-                <marker date="1473345776235" expanded="true" signature="66980:67139" ph="SELECT COUNT... mos_acciones_ac_co" />
-                <marker date="1473345776235" expanded="true" signature="69179:69328" ph="select id as... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="81258:81268" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="81270:81276" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="88338:88348" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="88350:88356" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="88491:88501" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="88503:88509" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="92445:98424" ph="SELECT aacco... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="92583:92652" ph="select count... mos_acciones_evidencia" />
-                <marker date="1473345776235" expanded="true" signature="95383:95460" ph="select count... mos_acciones_evidencia" />
-                <marker date="1473345776235" expanded="true" signature="106174:106186" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="106203:106209" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="110129:110141" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="110162:110168" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="121917:121942" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="127030:133009" ph="SELECT aacco... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="127168:127237" ph="select count... mos_acciones_evidencia" />
-                <marker date="1473345776235" expanded="true" signature="129968:130045" ph="select count... mos_acciones_evidencia" />
-                <marker date="1473345776235" expanded="true" signature="138499:138511" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="138528:138534" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="142454:142466" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="142487:142493" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="147262:147281" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="149576:149908" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="149628:149867" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="149792:149798" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="150753:151119" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="150807:151076" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="150974:150980" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="151486:151821" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="151538:151780" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="151685:151691" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="159544:159902" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="159596:159861" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="159762:159768" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="160173:160532" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="160225:160491" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="160391:160397" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="160804:161168" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="160856:161127" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="161022:161028" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="161414:161775" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="161466:161734" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="161631:161637" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="161963:162427" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="162670:162881" ph="SELECT id, d... mos_origen_ac" />
-                <marker date="1473345776235" expanded="true" signature="170677:170746" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="171065:172002" ph="SELECT ${$va... mos_acciones_correctivas_foto_sem" />
-                <marker date="1473345776235" expanded="true" signature="173790:174789" ph="SELECT ${$va... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="177287:177356" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="177746:178699" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
-                <marker date="1473345776235" expanded="true" signature="183759:183828" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="184147:185265" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
-                <marker date="1473345776235" expanded="true" signature="190800:190869" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="192696:193640" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
-                <marker date="1473345776235" expanded="true" signature="195183:196146" ph="SELECT ${$va... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="198654:198723" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="199796:200739" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
-                <marker date="1473345776235" expanded="true" signature="202283:203248" ph="SELECT ${$va... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="207896:207965" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="208314:209257" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
-                <marker date="1473345776235" expanded="true" signature="214851:214920" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="216656:217590" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
-                <marker date="1473345776235" expanded="true" signature="219027:219998" ph="SELECT 2 id_... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="223153:223222" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="224958:225892" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
-                <marker date="1473345776235" expanded="true" signature="227329:228300" ph="SELECT 2 id_... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="231451:231520" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="232501:233436" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
-                <marker date="1473345776235" expanded="true" signature="234874:235830" ph="SELECT 2 id_... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="238994:239063" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="239412:240340" ph="SELECT 2 id_... mos_acciones_correctivas_foto_sem" />
-                <marker date="1473345776235" expanded="true" signature="242128:243118" ph="SELECT 2 id_... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="246296:246365" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="246714:247824" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
-                <marker date="1473345776235" expanded="true" signature="257039:257140" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="257387:258421" ph="SELECT ${$va... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="258622:259031" ph="SELECT temp.... ${$sql}" />
-                <marker date="1473345776235" expanded="true" signature="261444:261547" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="261875:262979" ph="SELECT ${$va... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="263204:263637" ph="SELECT temp.... ${$sql}" />
-                <marker date="1473345776235" expanded="true" signature="265864:265965" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="266252:267391" ph="SELECT ${$va... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="267616:268049" ph="SELECT temp.... ${$sql}" />
-                <marker date="1473345776235" expanded="true" signature="272629:272718" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="272945:273877" ph="SELECT ${$va... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="274066:274459" ph="SELECT temp.... ${$sql}" />
-                <marker date="1473345776235" expanded="true" signature="277995:278084" ph="Select * fro... mos_organizacion" />
-                <marker date="1473345776235" expanded="true" signature="278311:279334" ph="SELECT ${$va... mos_acciones_correctivas" />
-                <marker date="1473345776235" expanded="true" signature="279523:279916" ph="SELECT temp.... ${$sql}" />
-                <marker date="1473345776235" expanded="true" signature="282948:283280" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="283000:283239" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="283164:283170" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="284125:284491" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="284179:284448" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="284346:284352" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="284858:285193" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="284910:285152" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="285057:285063" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="285718:286076" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="285770:286035" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="285935:285941" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="286349:286681" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="286401:286640" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="286548:286554" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="286940:287292" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="286992:287251" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="287157:287163" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="287559:287919" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="287611:287878" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="287776:287782" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="288188:288549" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="288240:288508" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="288405:288411" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="288814:289174" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="288866:289133" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="289031:289037" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="289436:289801" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="289488:289760" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="289654:289660" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="290074:290430" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="290126:290389" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="290292:290298" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="290718:291076" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="290770:291035" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="290936:290942" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="291349:291708" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="291401:291667" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="291567:291573" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="291975:292339" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="292027:292298" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="292193:292199" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="292585:292946" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="292637:292905" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="292802:292808" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="293134:293598" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="293841:294052" ph="SELECT id, d... mos_origen_ac" />
-                <marker date="1473345776235" expanded="true" signature="303980:304049" ph="SELECT campo... mos_campos_activos" />
-                <marker date="1473345776235" expanded="true" signature="305611:305833" ph="SELECT id, d... mos_tipo_ac" />
-                <marker date="1473345776235" expanded="true" signature="306080:306492" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="306739:307137" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="308141:308561" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="308797:309008" ph="SELECT id, d... mos_origen_ac" />
-                <marker date="1473345776235" expanded="true" signature="309255:309675" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="309937:310189" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="310277:310567" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="311285:311437" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="311536:311987" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="312242:312389" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="312482:312915" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="322459:322466" ph="SELECT nvl(m... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="322459:323207" ph="SELECT nvl(m... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="325569:325711" ph="select id as... mos_arbol_procesos" />
-                <marker date="1473345776235" expanded="true" signature="333205:333476" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="333564:333872" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="334338:334842" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="335112:335585" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="335841:336052" ph="SELECT id, d... mos_origen_ac" />
-                <marker date="1473345776235" expanded="true" signature="336318:336822" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="337623:337775" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="337932:338355" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="338522:339042" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="339327:339474" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="339567:340055" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="342312:342534" ph="SELECT id, d... mos_tipo_ac" />
-                <marker date="1473345776235" expanded="true" signature="342781:343193" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="345903:346125" ph="SELECT id, d... mos_tipo_ac" />
-                <marker date="1473345776235" expanded="true" signature="347475:347887" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="348696:349108" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="356254:356758" ph="SELECT cod_e... mos_personal" />
-                <marker date="1473345776235" expanded="true" signature="357666:357816" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="357700:357816" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="358231:358375" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="358265:358375" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="362543:362566" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="362626:362632" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="382353:382359" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="382452:382458" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="382552:382558" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="382646:382652" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="382724:382747" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="382816:382822" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="383317:383323" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="384023:384029" ph=" " />
-                <marker date="1473345776235" expanded="true" signature="384641:384855" ph="..." />
-                <marker date="1473345776235" expanded="true" signature="384722:384848" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="1281:1403" ph="SELECT cod_p... mos_parametro" />
+                <marker date="1473440450908" expanded="true" signature="1582:1695" ph="SELECT nombr... mos_nombres_campos" />
+                <marker date="1473440450908" expanded="true" signature="2053:2159" ph="SELECT nombr... mos_nombres_campos" />
+                <marker date="1473440450908" expanded="true" signature="2507:2619" ph="SELECT nombr... mos_nombres_campos" />
+                <marker date="1473440450908" expanded="true" signature="7937:11725" ph="SELECT ac.id... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="10983:11160" ph="SELECT mos_n... mos_nombres_campos" />
+                <marker date="1473440450908" expanded="true" signature="13554:14307" ph="INSERT INTO mos_acciones_correctivas... " />
+                <marker date="1473440450908" expanded="true" signature="14483:14534" ph="SELECT MAX(i... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="16589:16799" ph="INSERT INTO mos_log... " />
+                <marker date="1473440450908" expanded="true" signature="34961:35110" ph="UPDATE mos_a... " />
+                <marker date="1473440450908" expanded="true" signature="36766:36991" ph="DELETE FROM " />
+                <marker date="1473440450908" expanded="true" signature="36903:36990" ph="SELECT id_ac... mos_acciones_trazabilidad" />
+                <marker date="1473440450908" expanded="true" signature="44220:44369" ph="UPDATE mos_a... " />
+                <marker date="1473440450908" expanded="true" signature="57698:57823" ph="SELECT COUNT... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="58056:62616" ph="SELECT ac.id... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="58151:58366" ph="SELECT mos_n... mos_nombres_campos" />
+                <marker date="1473440450908" expanded="true" signature="66980:67139" ph="SELECT COUNT... mos_acciones_ac_co" />
+                <marker date="1473440450908" expanded="true" signature="69179:69328" ph="select id as... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="81258:81268" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="81270:81276" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="88338:88348" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="88350:88356" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="88491:88501" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="88503:88509" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="92445:98424" ph="SELECT aacco... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="92583:92652" ph="select count... mos_acciones_evidencia" />
+                <marker date="1473440450908" expanded="true" signature="95383:95460" ph="select count... mos_acciones_evidencia" />
+                <marker date="1473440450908" expanded="true" signature="106174:106186" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="106203:106209" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="110129:110141" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="110162:110168" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="121917:121942" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="127030:133009" ph="SELECT aacco... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="127168:127237" ph="select count... mos_acciones_evidencia" />
+                <marker date="1473440450908" expanded="true" signature="129968:130045" ph="select count... mos_acciones_evidencia" />
+                <marker date="1473440450908" expanded="true" signature="138499:138511" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="138528:138534" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="142454:142466" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="142487:142493" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="147262:147281" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="149576:149908" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="149628:149867" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="149792:149798" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="150753:151119" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="150807:151076" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="150974:150980" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="151486:151821" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="151538:151780" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="151685:151691" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="159544:159902" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="159596:159861" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="159762:159768" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="160173:160532" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="160225:160491" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="160391:160397" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="160804:161168" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="160856:161127" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="161022:161028" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="161414:161775" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="161466:161734" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="161631:161637" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="161963:162427" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="162670:162881" ph="SELECT id, d... mos_origen_ac" />
+                <marker date="1473440450908" expanded="true" signature="170677:170746" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="171065:172002" ph="SELECT ${$va... mos_acciones_correctivas_foto_sem" />
+                <marker date="1473440450908" expanded="true" signature="173790:174789" ph="SELECT ${$va... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="177287:177356" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="177746:178699" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
+                <marker date="1473440450908" expanded="true" signature="183759:183828" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="184147:185265" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
+                <marker date="1473440450908" expanded="true" signature="190800:190869" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="192696:193640" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
+                <marker date="1473440450908" expanded="true" signature="195183:196146" ph="SELECT ${$va... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="198654:198723" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="199796:200739" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
+                <marker date="1473440450908" expanded="true" signature="202283:203248" ph="SELECT ${$va... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="207896:207965" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="208314:209257" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
+                <marker date="1473440450908" expanded="true" signature="214851:214920" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="216656:217590" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
+                <marker date="1473440450908" expanded="true" signature="219027:219998" ph="SELECT 2 id_... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="223153:223222" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="224958:225892" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
+                <marker date="1473440450908" expanded="true" signature="227329:228300" ph="SELECT 2 id_... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="231451:231520" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="232501:233436" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
+                <marker date="1473440450908" expanded="true" signature="234874:235830" ph="SELECT 2 id_... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="238994:239063" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="239412:240340" ph="SELECT 2 id_... mos_acciones_correctivas_foto_sem" />
+                <marker date="1473440450908" expanded="true" signature="242128:243118" ph="SELECT 2 id_... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="246296:246365" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="246714:247824" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
+                <marker date="1473440450908" expanded="true" signature="257039:257140" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="257387:258421" ph="SELECT ${$va... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="258622:259031" ph="SELECT temp.... ${$sql}" />
+                <marker date="1473440450908" expanded="true" signature="261444:261547" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="261875:262979" ph="SELECT ${$va... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="263204:263637" ph="SELECT temp.... ${$sql}" />
+                <marker date="1473440450908" expanded="true" signature="265864:265965" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="266252:267391" ph="SELECT ${$va... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="267616:268049" ph="SELECT temp.... ${$sql}" />
+                <marker date="1473440450908" expanded="true" signature="272629:272718" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="272945:273877" ph="SELECT ${$va... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="274066:274459" ph="SELECT temp.... ${$sql}" />
+                <marker date="1473440450908" expanded="true" signature="277995:278084" ph="Select * fro... mos_organizacion" />
+                <marker date="1473440450908" expanded="true" signature="278311:279334" ph="SELECT ${$va... mos_acciones_correctivas" />
+                <marker date="1473440450908" expanded="true" signature="279523:279916" ph="SELECT temp.... ${$sql}" />
+                <marker date="1473440450908" expanded="true" signature="282948:283280" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="283000:283239" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="283164:283170" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="284125:284491" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="284179:284448" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="284346:284352" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="284858:285193" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="284910:285152" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="285057:285063" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="285718:286076" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="285770:286035" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="285935:285941" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="286349:286681" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="286401:286640" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="286548:286554" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="286940:287292" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="286992:287251" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="287157:287163" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="287559:287919" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="287611:287878" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="287776:287782" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="288188:288549" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="288240:288508" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="288405:288411" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="288814:289174" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="288866:289133" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="289031:289037" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="289436:289801" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="289488:289760" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="289654:289660" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="290074:290430" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="290126:290389" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="290292:290298" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="290718:291076" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="290770:291035" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="290936:290942" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="291349:291708" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="291401:291667" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="291567:291573" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="291975:292339" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="292027:292298" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="292193:292199" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="292585:292946" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="292637:292905" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="292802:292808" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="293134:293598" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="293841:294052" ph="SELECT id, d... mos_origen_ac" />
+                <marker date="1473440450908" expanded="true" signature="303980:304049" ph="SELECT campo... mos_campos_activos" />
+                <marker date="1473440450908" expanded="true" signature="305611:305833" ph="SELECT id, d... mos_tipo_ac" />
+                <marker date="1473440450908" expanded="true" signature="306080:306492" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="306739:307137" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="308141:308561" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="308797:309008" ph="SELECT id, d... mos_origen_ac" />
+                <marker date="1473440450908" expanded="true" signature="309255:309675" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="309937:310189" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="310277:310567" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="311285:311437" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="311536:311987" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="312242:312389" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="312482:312915" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="323248:323390" ph="select id as... mos_arbol_procesos" />
+                <marker date="1473440450908" expanded="true" signature="330884:331155" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="331243:331551" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="332017:332521" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="332791:333264" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="333520:333731" ph="SELECT id, d... mos_origen_ac" />
+                <marker date="1473440450908" expanded="true" signature="333997:334501" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="335302:335454" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="335611:336034" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="336201:336721" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="337006:337153" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="337246:337734" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="339991:340213" ph="SELECT id, d... mos_tipo_ac" />
+                <marker date="1473440450908" expanded="true" signature="340460:340872" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="343582:343804" ph="SELECT id, d... mos_tipo_ac" />
+                <marker date="1473440450908" expanded="true" signature="345154:345566" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="346375:346787" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="353933:354437" ph="SELECT cod_e... mos_personal" />
+                <marker date="1473440450908" expanded="true" signature="355345:355495" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="355379:355495" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="355910:356054" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="355944:356054" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="360222:360245" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="360305:360311" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="380032:380038" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="380131:380137" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="380231:380237" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="380325:380331" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="380403:380426" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="380495:380501" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="380996:381002" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="381702:381708" ph=" " />
+                <marker date="1473440450908" expanded="true" signature="382320:382534" ph="..." />
+                <marker date="1473440450908" expanded="true" signature="382401:382527" ph="..." />
               </folding>
             </state>
           </provider>
@@ -460,9 +413,10 @@
         <option value="$PROJECT_DIR$/mosaikus/dist/js/acciones_correctivas/acciones_correctivas.js" />
         <option value="$PROJECT_DIR$/mosaikus/diseno/templates/acciones_ac/verTrazabilidad.tpl" />
         <option value="$PROJECT_DIR$/mosaikus/dist/js/acciones_ac/acciones_ac.js" />
+        <option value="$PROJECT_DIR$/mosaikus/melvin.sql" />
         <option value="$PROJECT_DIR$/mosaikus/clases/acciones_ac/AccionesAC.php" />
-        <option value="$PROJECT_DIR$/mosaikus/diseno/templates/acciones_ac/verAccionesAC.tpl" />
         <option value="$PROJECT_DIR$/mosaikus/clases/acciones_correctivas/AccionesCorrectivas.php" />
+        <option value="$PROJECT_DIR$/mosaikus/diseno/templates/acciones_ac/verAccionesAC.tpl" />
       </list>
     </option>
   </component>
@@ -507,8 +461,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -573,11 +525,7 @@
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="dist" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="js" />
+              <option name="myItemId" value="diseno" />
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
           </PATH>
@@ -595,11 +543,33 @@
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="dist" />
+              <option name="myItemId" value="diseno" />
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="js" />
+              <option name="myItemId" value="templates" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mosaikusapps" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mosaikusapps" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mosaikus" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="diseno" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="templates" />
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -621,7 +591,7 @@
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="diseno" />
+              <option name="myItemId" value="clases" />
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
           </PATH>
@@ -639,46 +609,22 @@
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="diseno" />
+              <option name="myItemId" value="clases" />
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="templates" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mosaikusapps" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mosaikusapps" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mosaikus" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="diseno" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="templates" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="acciones_ac" />
+              <option name="myItemId" value="documentos" />
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../sales" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="js-jscs-nodeInterpreter" value="C:\Program Files\nodejs\node.exe" />
   </component>
@@ -768,12 +714,16 @@
       <workItem from="1473086800856" duration="1554000" />
       <workItem from="1473172386748" duration="1207000" />
       <workItem from="1473262126572" duration="13343000" />
-      <workItem from="1473343867360" duration="1924000" />
+      <workItem from="1473343867360" duration="2317000" />
+      <workItem from="1473349727380" duration="3534000" />
+      <workItem from="1473433145989" duration="6925000" />
+      <workItem from="1473537482470" duration="33000" />
+      <workItem from="1473683203364" duration="375000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="98865000" />
+    <option name="totallyTimeSpent" value="110125000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
@@ -817,13 +767,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/mosaikus/clases/bd/Mysql.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-896">
-          <caret line="134" column="18" selection-start-line="134" selection-start-column="18" selection-end-line="134" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mosaikus/clases/organizacion/ArbolOrganizacional.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="269">
@@ -887,13 +830,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/andres.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="33946">
-          <caret line="1543" column="40" selection-start-line="1330" selection-start-column="0" selection-end-line="1562" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mosaikus/pages/autocompletar/repuestos.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="396">
@@ -929,13 +865,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/clases/cargo/Cargos.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="670" column="0" selection-start-line="670" selection-start-column="0" selection-end-line="670" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mosaikus/dist/js/funciones.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="292">
@@ -947,13 +876,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="94">
           <caret line="112" column="4" selection-start-line="112" selection-start-column="4" selection-end-line="112" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/clases/utilidades/NivelAcceso.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="154">
-          <caret line="140" column="34" selection-start-line="140" selection-start-column="34" selection-end-line="140" selection-end-column="34" />
         </state>
       </provider>
     </entry>
@@ -1027,13 +949,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/melvin.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="168" column="11" selection-start-line="164" selection-start-column="0" selection-end-line="168" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1081,69 +996,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="506">
           <caret line="23" column="10" selection-start-line="23" selection-start-column="10" selection-end-line="23" selection-end-column="10" />
-          <folding>
-            <marker date="1470662806016" expanded="true" signature="737:767" ph="..." />
-            <marker date="1470662806016" expanded="true" signature="1320:1350" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/clases/mos_usuario/mos_usuario.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="168" column="40" selection-start-line="164" selection-start-column="16" selection-end-line="168" selection-end-column="40" />
-          <folding>
-            <marker date="1472770019582" expanded="true" signature="4979:5095" ph="SELECT cod_p... mos_parametro" />
-            <marker date="1472770019582" expanded="true" signature="5275:5388" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472770019582" expanded="true" signature="5745:5851" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472770019582" expanded="true" signature="6207:6326" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472770019582" expanded="true" signature="6678:6747" ph="SELECT id, i... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="6961:7051" ph="SELECT id, i... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="7264:7926" ph="SELECT id_us... mos_usuario" />
-            <marker date="1472770019582" expanded="true" signature="8167:8336" ph="SELECT id, i... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="8991:9328" ph="SELECT mue.i... mos_usuario_estructura" />
-            <marker date="1472770019582" expanded="true" signature="9644:10170" ph="INSERT INTO mos_usuario... " />
-            <marker date="1472770019582" expanded="true" signature="11475:11667" ph="INSERT INTO mos_log... " />
-            <marker date="1472770019582" expanded="true" signature="12251:12747" ph="UPDATE mos_u... " />
-            <marker date="1472770019582" expanded="true" signature="14879:15095" ph="UPDATE mos_u... " />
-            <marker date="1472770019582" expanded="true" signature="16065:16448" ph="SELECT id_em... mos_adm_empresas" />
-            <marker date="1472770019582" expanded="true" signature="16065:16482" ph="SELECT id_em... mos_adm_empresas" />
-            <marker date="1472770019582" expanded="true" signature="16989:17177" ph="UPDATE mos_u... " />
-            <marker date="1472770019582" expanded="true" signature="18083:18194" ph="SELECT COUNT... mos_usuario" />
-            <marker date="1472770019582" expanded="true" signature="22248:23381" ph="SELECT id_us... mos_usuario" />
-            <marker date="1472770019582" expanded="true" signature="22866:23007" ph="SELECT COUNT... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="23058:23185" ph="SELECT COUNT... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="51076:51319" ph="SELECT COUNT... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="52154:52482" ph="SELECT muf.i... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="53490:53740" ph="SELECT COUNT... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="54575:54924" ph="SELECT muf.i... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="57835:57849" ph="..." />
-            <marker date="1472770019582" expanded="true" signature="58134:58148" ph="..." />
-            <marker date="1472770019582" expanded="true" signature="70202:70747" ph="..." />
-            <marker date="1472770019582" expanded="true" signature="70379:70712" ph="..." />
-            <marker date="1472770019582" expanded="true" signature="70455:70671" ph="..." />
-            <marker date="1472770019582" expanded="false" signature="70619:70625" ph=" " />
-            <marker date="1472770019582" expanded="true" signature="72633:72714" ph="SELECT cod_p... mos_perfil" />
-            <marker date="1472770019582" expanded="true" signature="72931:73019" ph="SELECT cod_p... mos_perfil_portal" />
-            <marker date="1472770019582" expanded="true" signature="100277:100329" ph="SELECT * FRO... mos_perfil" />
-            <marker date="1472770019582" expanded="true" signature="101062:101150" ph="SELECT cod_p... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="101356:101482" ph="SELECT id_es... mos_usuario_estructura" />
-            <marker date="1472770019582" expanded="true" signature="101686:101812" ph="SELECT id_es... mos_usuario_estructura" />
-            <marker date="1472770019582" expanded="true" signature="101972:102031" ph="SELECT * FRO... mos_perfil_portal" />
-            <marker date="1472770019582" expanded="true" signature="102508:102610" ph="SELECT cod_p... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="102804:103093" ph="SELECT DISTI... mos_usuario_estructura" />
-            <marker date="1472770019582" expanded="true" signature="103363:103436" ph="DELETE FROM " />
-            <marker date="1472770019582" expanded="true" signature="105645:105846" ph="INSERT INTO mos_usuario_estructura... " />
-            <marker date="1472770019582" expanded="true" signature="106487:106688" ph="INSERT INTO mos_usuario_estructura... " />
-            <marker date="1472770019582" expanded="true" signature="107321:107528" ph="INSERT INTO mos_usuario_filial... " />
-            <marker date="1472770019582" expanded="true" signature="108155:108369" ph="INSERT INTO mos_usuario_filial... " />
-            <marker date="1472770019582" expanded="true" signature="108931:108983" ph="SELECT * FRO... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="109567:109675" ph="SELECT id_or... mos_personal" />
-            <marker date="1472770019582" expanded="true" signature="110815:110904" ph="SELECT * FRO... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="111388:111484" ph="SELECT * FRO... mos_usuario_filial" />
-            <marker date="1472770019582" expanded="true" signature="115751:115832" ph="select * fro... mos_organizacion" />
-            <marker date="1472770019582" expanded="true" signature="125969:126013" ph="SELECT id,id... mos_idiomas" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1166,45 +1018,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-10806">
           <caret line="228" column="28" selection-start-line="228" selection-start-column="28" selection-end-line="228" selection-end-column="28" />
-          <folding>
-            <marker date="1470859570955" expanded="true" signature="1411:1527" ph="SELECT cod_p... mos_parametro" />
-            <marker date="1470859570955" expanded="true" signature="1707:1821" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1470859570955" expanded="true" signature="2166:2286" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1470859570955" expanded="true" signature="7548:7702" ph="UPDATE mos_n... " />
-            <marker date="1470859570955" expanded="true" signature="8263:8738" ph="SELECT id ,D... mos_notificaciones" />
-            <marker date="1470859570955" expanded="true" signature="9071:9252" ph="UPDATE mos_n... " />
-            <marker date="1470859570955" expanded="true" signature="9513:9963" ph="SELECT id ,D... mos_notificaciones" />
-            <marker date="1470859570955" expanded="true" signature="10204:10364" ph="SELECT id ,f... mos_notificaciones" />
-            <marker date="1470859570955" expanded="true" signature="10805:11088" ph="INSERT INTO mos_notificaciones... " />
-            <marker date="1470859570955" expanded="true" signature="11392:11437" ph="SELECT MAX(i... mos_notificaciones" />
-            <marker date="1470859570955" expanded="true" signature="12528:12737" ph="INSERT INTO mos_log... " />
-            <marker date="1470859570955" expanded="true" signature="13094:13375" ph="UPDATE mos_n... " />
-            <marker date="1470859570955" expanded="true" signature="15955:16073" ph="SELECT COUNT... mos_notificaciones" />
-            <marker date="1470859570955" expanded="true" signature="18271:18497" ph="SELECT id ,f... mos_notificaciones" />
-            <marker date="1470859570955" expanded="true" signature="20833:20984" ph="SELECT COUNT... mos_notificaciones" />
-            <marker date="1470859570955" expanded="true" signature="22729:25729" ph="SELECT id ,f... id" />
-            <marker date="1470859570955" expanded="true" signature="23120:23149" ph="/*SUB QUERY " />
-            <marker date="1470859570955" expanded="true" signature="23182:24616" ph="SELECT id ,D... mos_notificaciones" />
-            <marker date="1470859570955" expanded="true" signature="23785:23988" ph="SELECT mos_n... mos_nombres_campos" />
-            <marker date="1470859570955" expanded="true" signature="24036:24230" ph="SELECT mos_n... mos_nombres_campos" />
-            <marker date="1470859570955" expanded="true" signature="24691:25500" ph="SELECT mos_n... mos_notificaciones" />
-            <marker date="1470859570955" expanded="true" signature="25563:25596" ph="/*FIN SUB QU... " />
-            <marker date="1470859570955" expanded="true" signature="42152:42697" ph="..." />
-            <marker date="1470859570955" expanded="true" signature="42329:42662" ph="..." />
-            <marker date="1470859570955" expanded="true" signature="42405:42621" ph="..." />
-            <marker date="1470859570955" expanded="false" signature="42569:42575" ph=" " />
-            <marker date="1470859570955" expanded="true" signature="47078:47623" ph="..." />
-            <marker date="1470859570955" expanded="true" signature="47255:47588" ph="..." />
-            <marker date="1470859570955" expanded="true" signature="47331:47547" ph="..." />
-            <marker date="1470859570955" expanded="false" signature="47495:47501" ph=" " />
-            <marker date="1470859570955" expanded="true" signature="62880:62909" ph="..." />
-            <marker date="1470859570955" expanded="true" signature="62910:63229" ph="..." />
-            <marker date="1470859570955" expanded="true" signature="62975:63128" ph="..." />
-            <marker date="1470859570955" expanded="true" signature="63129:63223" ph="..." />
-            <marker date="1470859570955" expanded="false" signature="63214:63220" ph="..." />
-            <marker date="1470859570955" expanded="true" signature="63423:63429" ph=" " />
-            <marker date="1470859570955" expanded="true" signature="65473:65479" ph=" " />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1212,570 +1025,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="9526">
           <caret line="433" column="62" selection-start-line="433" selection-start-column="55" selection-end-line="433" selection-end-column="62" />
-          <folding>
-            <marker date="1473266053024" expanded="true" signature="17632:17645" ph="..." />
-            <marker date="1473266053024" expanded="true" signature="19292:19329" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/clases/utilidades/ut_Tool.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="1015" column="18" selection-start-line="1015" selection-start-column="13" selection-end-line="1015" selection-end-column="18" />
-          <folding>
-            <marker date="1472067132013" expanded="true" signature="15982:16126" ph="..." />
-            <marker date="1472067132013" expanded="true" signature="16400:16459" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/clases/acciones_correctivas/AccionesCorrectivas.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="4946" column="51" selection-start-line="4946" selection-start-column="51" selection-end-line="4946" selection-end-column="51" />
-          <folding>
-            <marker date="1473345776235" expanded="true" signature="1281:1403" ph="SELECT cod_p... mos_parametro" />
-            <marker date="1473345776235" expanded="true" signature="1582:1695" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1473345776235" expanded="true" signature="2053:2159" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1473345776235" expanded="true" signature="2507:2619" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1473345776235" expanded="true" signature="7937:11725" ph="SELECT ac.id... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="10983:11160" ph="SELECT mos_n... mos_nombres_campos" />
-            <marker date="1473345776235" expanded="true" signature="13554:14307" ph="INSERT INTO mos_acciones_correctivas... " />
-            <marker date="1473345776235" expanded="true" signature="14483:14534" ph="SELECT MAX(i... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="16589:16799" ph="INSERT INTO mos_log... " />
-            <marker date="1473345776235" expanded="true" signature="34961:35110" ph="UPDATE mos_a... " />
-            <marker date="1473345776235" expanded="true" signature="36766:36991" ph="DELETE FROM " />
-            <marker date="1473345776235" expanded="true" signature="36903:36990" ph="SELECT id_ac... mos_acciones_trazabilidad" />
-            <marker date="1473345776235" expanded="true" signature="44220:44369" ph="UPDATE mos_a... " />
-            <marker date="1473345776235" expanded="true" signature="57698:57823" ph="SELECT COUNT... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="58056:62616" ph="SELECT ac.id... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="58151:58366" ph="SELECT mos_n... mos_nombres_campos" />
-            <marker date="1473345776235" expanded="true" signature="66980:67139" ph="SELECT COUNT... mos_acciones_ac_co" />
-            <marker date="1473345776235" expanded="true" signature="69179:69328" ph="select id as... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="81258:81268" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="81270:81276" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="88338:88348" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="88350:88356" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="88491:88501" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="88503:88509" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="92445:98424" ph="SELECT aacco... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="92583:92652" ph="select count... mos_acciones_evidencia" />
-            <marker date="1473345776235" expanded="true" signature="95383:95460" ph="select count... mos_acciones_evidencia" />
-            <marker date="1473345776235" expanded="true" signature="106174:106186" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="106203:106209" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="110129:110141" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="110162:110168" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="121917:121942" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="127030:133009" ph="SELECT aacco... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="127168:127237" ph="select count... mos_acciones_evidencia" />
-            <marker date="1473345776235" expanded="true" signature="129968:130045" ph="select count... mos_acciones_evidencia" />
-            <marker date="1473345776235" expanded="true" signature="138499:138511" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="138528:138534" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="142454:142466" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="142487:142493" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="147262:147281" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="149576:149908" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="149628:149867" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="149792:149798" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="150753:151119" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="150807:151076" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="150974:150980" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="151486:151821" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="151538:151780" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="151685:151691" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="159544:159902" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="159596:159861" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="159762:159768" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="160173:160532" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="160225:160491" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="160391:160397" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="160804:161168" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="160856:161127" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="161022:161028" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="161414:161775" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="161466:161734" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="161631:161637" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="161963:162427" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="162670:162881" ph="SELECT id, d... mos_origen_ac" />
-            <marker date="1473345776235" expanded="true" signature="170677:170746" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="171065:172002" ph="SELECT ${$va... mos_acciones_correctivas_foto_sem" />
-            <marker date="1473345776235" expanded="true" signature="173790:174789" ph="SELECT ${$va... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="177287:177356" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="177746:178699" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
-            <marker date="1473345776235" expanded="true" signature="183759:183828" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="184147:185265" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
-            <marker date="1473345776235" expanded="true" signature="190800:190869" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="192696:193640" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
-            <marker date="1473345776235" expanded="true" signature="195183:196146" ph="SELECT ${$va... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="198654:198723" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="199796:200739" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
-            <marker date="1473345776235" expanded="true" signature="202283:203248" ph="SELECT ${$va... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="207896:207965" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="208314:209257" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
-            <marker date="1473345776235" expanded="true" signature="214851:214920" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="216656:217590" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
-            <marker date="1473345776235" expanded="true" signature="219027:219998" ph="SELECT 2 id_... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="223153:223222" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="224958:225892" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
-            <marker date="1473345776235" expanded="true" signature="227329:228300" ph="SELECT 2 id_... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="231451:231520" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="232501:233436" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
-            <marker date="1473345776235" expanded="true" signature="234874:235830" ph="SELECT 2 id_... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="238994:239063" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="239412:240340" ph="SELECT 2 id_... mos_acciones_correctivas_foto_sem" />
-            <marker date="1473345776235" expanded="true" signature="242128:243118" ph="SELECT 2 id_... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="246296:246365" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="246714:247824" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
-            <marker date="1473345776235" expanded="true" signature="257039:257140" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="257387:258421" ph="SELECT ${$va... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="258622:259031" ph="SELECT temp.... ${$sql}" />
-            <marker date="1473345776235" expanded="true" signature="261444:261547" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="261875:262979" ph="SELECT ${$va... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="263204:263637" ph="SELECT temp.... ${$sql}" />
-            <marker date="1473345776235" expanded="true" signature="265864:265965" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="266252:267391" ph="SELECT ${$va... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="267616:268049" ph="SELECT temp.... ${$sql}" />
-            <marker date="1473345776235" expanded="true" signature="272629:272718" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="272945:273877" ph="SELECT ${$va... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="274066:274459" ph="SELECT temp.... ${$sql}" />
-            <marker date="1473345776235" expanded="true" signature="277995:278084" ph="Select * fro... mos_organizacion" />
-            <marker date="1473345776235" expanded="true" signature="278311:279334" ph="SELECT ${$va... mos_acciones_correctivas" />
-            <marker date="1473345776235" expanded="true" signature="279523:279916" ph="SELECT temp.... ${$sql}" />
-            <marker date="1473345776235" expanded="true" signature="282948:283280" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="283000:283239" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="283164:283170" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="284125:284491" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="284179:284448" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="284346:284352" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="284858:285193" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="284910:285152" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="285057:285063" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="285718:286076" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="285770:286035" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="285935:285941" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="286349:286681" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="286401:286640" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="286548:286554" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="286940:287292" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="286992:287251" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="287157:287163" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="287559:287919" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="287611:287878" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="287776:287782" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="288188:288549" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="288240:288508" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="288405:288411" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="288814:289174" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="288866:289133" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="289031:289037" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="289436:289801" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="289488:289760" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="289654:289660" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="290074:290430" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="290126:290389" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="290292:290298" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="290718:291076" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="290770:291035" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="290936:290942" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="291349:291708" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="291401:291667" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="291567:291573" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="291975:292339" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="292027:292298" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="292193:292199" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="292585:292946" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="292637:292905" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="292802:292808" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="293134:293598" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="293841:294052" ph="SELECT id, d... mos_origen_ac" />
-            <marker date="1473345776235" expanded="true" signature="303980:304049" ph="SELECT campo... mos_campos_activos" />
-            <marker date="1473345776235" expanded="true" signature="305611:305833" ph="SELECT id, d... mos_tipo_ac" />
-            <marker date="1473345776235" expanded="true" signature="306080:306492" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="306739:307137" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="308141:308561" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="308797:309008" ph="SELECT id, d... mos_origen_ac" />
-            <marker date="1473345776235" expanded="true" signature="309255:309675" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="309937:310189" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="310277:310567" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="311285:311437" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="311536:311987" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="312242:312389" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="312482:312915" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="322459:322466" ph="SELECT nvl(m... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="322459:323207" ph="SELECT nvl(m... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="325569:325711" ph="select id as... mos_arbol_procesos" />
-            <marker date="1473345776235" expanded="true" signature="333205:333476" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="333564:333872" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="334338:334842" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="335112:335585" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="335841:336052" ph="SELECT id, d... mos_origen_ac" />
-            <marker date="1473345776235" expanded="true" signature="336318:336822" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="337623:337775" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="337932:338355" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="338522:339042" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="339327:339474" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="339567:340055" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="342312:342534" ph="SELECT id, d... mos_tipo_ac" />
-            <marker date="1473345776235" expanded="true" signature="342781:343193" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="345903:346125" ph="SELECT id, d... mos_tipo_ac" />
-            <marker date="1473345776235" expanded="true" signature="347475:347887" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="348696:349108" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="356254:356758" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473345776235" expanded="true" signature="357666:357816" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="357700:357816" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="358231:358375" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="358265:358375" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="362543:362566" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="362626:362632" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="382353:382359" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="382452:382458" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="382552:382558" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="382646:382652" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="382724:382747" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="382816:382822" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="383317:383323" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="384023:384029" ph=" " />
-            <marker date="1473345776235" expanded="true" signature="384641:384855" ph="..." />
-            <marker date="1473345776235" expanded="true" signature="384722:384848" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/clases/documentos/Documentos.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="22">
-          <caret line="491" column="83" selection-start-line="491" selection-start-column="83" selection-end-line="491" selection-end-column="83" />
-          <folding>
-            <marker date="1472739801363" expanded="true" signature="3936:4028" ph="select * fro... mos_documentos_estrorg_arbolproc" />
-            <marker date="1472739801363" expanded="true" signature="5240:5332" ph="select * fro... mos_documentos_estrorg_arbolproc" />
-            <marker date="1472739801363" expanded="true" signature="7851:7921" ph="select count... mos_registro" />
-            <marker date="1472739801363" expanded="true" signature="9245:9315" ph="select count... mos_registro" />
-            <marker date="1472739801363" expanded="true" signature="18372:18485" ph="select min(l... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="18924:19059" ph="SELECT cod_p... mos_parametro" />
-            <marker date="1472739801363" expanded="true" signature="19247:19365" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472739801363" expanded="true" signature="19734:19878" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472739801363" expanded="true" signature="22812:22930" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1472739801363" expanded="true" signature="23286:27443" ph="select mos_p... mos_personal" />
-            <marker date="1472739801363" expanded="true" signature="24001:27263" ph="SELECT case mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="27714:28107" ph="SELECT doc_f... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="28362:28994" ph="SELECT form.... mos_documentos_datos_formulario" />
-            <marker date="1472739801363" expanded="true" signature="29244:29604" ph="SELECT doc_v... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="29846:30123" ph="SELECT id ,n... mos_documentos_anexos" />
-            <marker date="1472739801363" expanded="true" signature="30397:30886" ph="SELECT mos_d... mos_documentos_relacionados" />
-            <marker date="1472739801363" expanded="false" signature="31820:31839" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="31840:32048" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="31932:32015" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="32238:36082" ph="SELECT d.IDD... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="35704:35812" ph="select IDDoc... mos_documento_revision" />
-            <marker date="1472739801363" expanded="true" signature="35887:36011" ph="select IDDoc... mos_documentos_estrorg_arbolproc" />
-            <marker date="1472739801363" expanded="true" signature="36365:36565" ph="SELECT ifnul... mos_documento_revision" />
-            <marker date="1472739801363" expanded="true" signature="39761:39853" ph="select * fro... mos_documentos_estrorg_arbolproc" />
-            <marker date="1472739801363" expanded="true" signature="41077:41169" ph="select * fro... mos_documentos_estrorg_arbolproc" />
-            <marker date="1472739801363" expanded="true" signature="42501:42653" ph="select id as... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="44212:44304" ph="select * fro... mos_documentos_estrorg_arbolproc" />
-            <marker date="1472739801363" expanded="true" signature="46849:46936" ph="select count... mos_registro" />
-            <marker date="1472739801363" expanded="true" signature="48215:48302" ph="select count... mos_registro" />
-            <marker date="1472739801363" expanded="true" signature="49597:49667" ph="select count... mos_registro" />
-            <marker date="1472739801363" expanded="true" signature="62605:63695" ph="SELECT CONCA... mos_personal" />
-            <marker date="1472739801363" expanded="true" signature="63986:64947" ph="SELECT cargo... mos_documentos_cargos" />
-            <marker date="1472739801363" expanded="true" signature="65190:65360" ph="SELECT IDDoc... mos_documentos_estrorg_arbolproc" />
-            <marker date="1472739801363" expanded="true" signature="65555:65633" ph="SELECT MAX(I... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="66085:66319" ph="INSERT INTO mos_documentos_estrorg_arbolproc... " />
-            <marker date="1472739801363" expanded="true" signature="67107:67353" ph="INSERT INTO mos_documentos_datos_formulario... " />
-            <marker date="1472739801363" expanded="true" signature="67470:67568" ph="SELECT MAX(i... mos_documentos_datos_formulario" />
-            <marker date="1472739801363" expanded="true" signature="69477:69585" ph="UPDATE mos_d... " />
-            <marker date="1472739801363" expanded="true" signature="70489:70803" ph="INSERT INTO mos_parametro_modulos... " />
-            <marker date="1472739801363" expanded="true" signature="72717:72887" ph="SELECT COUNT... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="76183:77578" ph="INSERT INTO mos_documentos... " />
-            <marker date="1472739801363" expanded="true" signature="81197:82208" ph="INSERT INTO mos_documentos... " />
-            <marker date="1472739801363" expanded="true" signature="81631:82208" ph="SELECT ${$at... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="82954:83214" ph="UPDATE mos_d... " />
-            <marker date="1472739801363" expanded="true" signature="83344:83433" ph="UPDATE mos_d... " />
-            <marker date="1472739801363" expanded="true" signature="83608:83759" ph="update mos_d... " />
-            <marker date="1472739801363" expanded="true" signature="83856:83983" ph="update mos_d... " />
-            <marker date="1472739801363" expanded="true" signature="84100:84338" ph="Insert Into mos_documentos_estrorg_arbolproc... " />
-            <marker date="1472739801363" expanded="true" signature="84207:84338" ph="Select ${$at... mos_documentos_estrorg_arbolproc" />
-            <marker date="1472739801363" expanded="true" signature="84430:84828" ph="INSERT INTO mos_parametro_modulos... " />
-            <marker date="1472739801363" expanded="true" signature="84569:84828" ph="SELECT cod_c... mos_parametro_modulos" />
-            <marker date="1472739801363" expanded="true" signature="84931:85041" ph="UPDATE mos_d... " />
-            <marker date="1472739801363" expanded="true" signature="85134:85225" ph="UPDATE mos_r... " />
-            <marker date="1472739801363" expanded="true" signature="85318:85420" ph="UPDATE mos_r... " />
-            <marker date="1472739801363" expanded="true" signature="85513:85609" ph="UPDATE mos_r... " />
-            <marker date="1472739801363" expanded="true" signature="87841:87987" ph="insert into mos_documento_revision... " />
-            <marker date="1472739801363" expanded="true" signature="89959:90148" ph="INSERT INTO mos_correos_temporales... " />
-            <marker date="1472739801363" expanded="true" signature="90457:90666" ph="INSERT INTO mos_log... " />
-            <marker date="1472739801363" expanded="true" signature="90961:91008" ph="delete from " />
-            <marker date="1472739801363" expanded="true" signature="91365:91491" ph="insert into mos_documentos_cargos... " />
-            <marker date="1472739801363" expanded="true" signature="91935:91988" ph="delete from " />
-            <marker date="1472739801363" expanded="true" signature="92369:92509" ph="insert into mos_documentos_relacionados... " />
-            <marker date="1472739801363" expanded="true" signature="98066:99149" ph="UPDATE mos_d... " />
-            <marker date="1472739801363" expanded="true" signature="102282:102431" ph="select id as... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="103450:103849" ph="SELECT d.IDD... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="103927:104631" ph="SELECT d.IDD... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="104275:104400" ph="select IDDoc... mos_documentos_relacionados" />
-            <marker date="1472739801363" expanded="true" signature="110911:111491" ph="SELECT disti... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="111107:111442" ph="SELECT id FR... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="111233:111413" ph="select id_or... mos_responsable_area" />
-            <marker date="1472739801363" expanded="true" signature="111536:111709" ph="select id_or... mos_responsable_area" />
-            <marker date="1472739801363" expanded="true" signature="111777:111920" ph="SELECT disti... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="115264:116003" ph="SELECT COUNT... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="115733:115841" ph="select IDDoc... mos_documento_revision" />
-            <marker date="1472739801363" expanded="true" signature="129732:134522" ph="SELECT d.IDD... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="132072:132312" ph="SELECT mos_n... mos_nombres_campos" />
-            <marker date="1472739801363" expanded="true" signature="132352:132595" ph="SELECT mos_n... mos_nombres_campos" />
-            <marker date="1472739801363" expanded="true" signature="133952:134060" ph="select IDDoc... mos_documento_revision" />
-            <marker date="1472739801363" expanded="true" signature="134136:134265" ph="select IDDoc... mos_documentos_estrorg_arbolproc" />
-            <marker date="1472739801363" expanded="true" signature="152426:153006" ph="SELECT disti... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="152622:152957" ph="SELECT id FR... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="152748:152928" ph="select id_or... mos_responsable_area" />
-            <marker date="1472739801363" expanded="true" signature="153051:153224" ph="select id_or... mos_responsable_area" />
-            <marker date="1472739801363" expanded="true" signature="153292:153435" ph="SELECT disti... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="156232:160871" ph="SELECT ifnul... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="158885:158993" ph="select IDDoc... mos_documento_revision" />
-            <marker date="1472739801363" expanded="true" signature="159069:159169" ph="select IDDoc... mos_documentos_estrorg_arbolproc" />
-            <marker date="1472739801363" expanded="true" signature="159242:159853" ph="SELECT repla... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="159981:160618" ph="SELECT repla... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="174818:175513" ph="SELECT Nombr... mos_documentos_datos_formulario" />
-            <marker date="1472739801363" expanded="true" signature="175102:175205" ph="SELECT count... mos_registro_formulario" />
-            <marker date="1472739801363" expanded="true" signature="175246:175343" ph="SELECT count... mos_registro_item" />
-            <marker date="1472739801363" expanded="true" signature="177373:177555" ph="SELECT COUNT... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="177830:177983" ph="SELECT COUNT... mos_registro" />
-            <marker date="1472739801363" expanded="true" signature="180996:181083" ph="Select Max(I... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="181467:181520" ph="delete from " />
-            <marker date="1472739801363" expanded="true" signature="181633:181804" ph="Update mos_d... " />
-            <marker date="1472739801363" expanded="true" signature="181904:182014" ph="UPDATE mos_d... " />
-            <marker date="1472739801363" expanded="true" signature="182123:182218" ph="UPDATE mos_r... " />
-            <marker date="1472739801363" expanded="true" signature="182327:182433" ph="UPDATE mos_r... " />
-            <marker date="1472739801363" expanded="true" signature="182542:182642" ph="UPDATE mos_r... " />
-            <marker date="1472739801363" expanded="true" signature="183795:184215" ph="UPDATE mos_d... " />
-            <marker date="1472739801363" expanded="true" signature="187015:187026" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="187028:187034" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="198267:198277" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="198279:198285" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="204959:204973" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="205226:205240" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="223440:223567" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="223856:224242" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="223952:224173" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="224098:224104" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="225774:225823" ph="SELECT id, d... mos_documentos_tipos" />
-            <marker date="1472739801363" expanded="true" signature="226096:226453" ph="SELECT cod_e... mos_personal" />
-            <marker date="1472739801363" expanded="true" signature="226706:227064" ph="SELECT cod_e... mos_personal" />
-            <marker date="1472739801363" expanded="true" signature="227316:227673" ph="SELECT cod_e... mos_personal" />
-            <marker date="1472739801363" expanded="true" signature="227995:228250" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="228123:228250" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="229735:229843" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="229898:229904" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="229934:230042" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="236355:236488" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="236466:236474" ph="ú" />
-            <marker date="1472739801363" expanded="true" signature="236568:236695" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="237741:238046" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="237827:238006" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="239011:239325" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="239063:239284" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="239209:239215" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="240722:240771" ph="SELECT id, d... mos_documentos_tipos" />
-            <marker date="1472739801363" expanded="true" signature="241044:241509" ph="SELECT cod_e... mos_personal" />
-            <marker date="1472739801363" expanded="true" signature="241762:242228" ph="SELECT cod_e... mos_personal" />
-            <marker date="1472739801363" expanded="true" signature="242480:242945" ph="SELECT cod_e... mos_personal" />
-            <marker date="1472739801363" expanded="true" signature="243562:243670" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="243725:243731" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="243761:243869" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="254427:254560" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="254538:254546" ph="ú" />
-            <marker date="1472739801363" expanded="true" signature="254640:254767" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="255813:256118" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="255899:256078" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="257341:257655" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="257393:257614" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="257539:257545" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="259035:259084" ph="SELECT id, d... mos_documentos_tipos" />
-            <marker date="1472739801363" expanded="true" signature="259357:259822" ph="SELECT cod_e... mos_personal" />
-            <marker date="1472739801363" expanded="true" signature="260075:260541" ph="SELECT cod_e... mos_personal" />
-            <marker date="1472739801363" expanded="true" signature="260793:261258" ph="SELECT cod_e... mos_personal" />
-            <marker date="1472739801363" expanded="true" signature="261960:262068" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="262123:262129" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="262159:262267" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="273821:273870" ph="SELECT id, d... mos_documentos_tipos" />
-            <marker date="1472739801363" expanded="true" signature="274983:276274" ph="SELECT wf.id... mos_workflow_documentos" />
-            <marker date="1472739801363" expanded="true" signature="276360:277731" ph="SELECT wf.id... mos_workflow_documentos" />
-            <marker date="1472739801363" expanded="true" signature="287934:288409" ph="SELECT cod_e... mos_personal" />
-            <marker date="1472739801363" expanded="true" signature="289045:289871" ph="SELECT d.IDD... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="298937:300606" ph="SELECT wf.id... mos_workflow_documentos" />
-            <marker date="1472739801363" expanded="true" signature="300758:301952" ph="SELECT wf.id... mos_workflow_documentos" />
-            <marker date="1472739801363" expanded="true" signature="302883:303866" ph="SELECT d.IDD... mos_documentos" />
-            <marker date="1472739801363" expanded="true" signature="318658:318664" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="318969:318975" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="319188:319194" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="323644:324204" ph="INSERT INTO mos_documentos_formulario_items... " />
-            <marker date="1472739801363" expanded="true" signature="323779:324204" ph="SELECT ${$id... mos_documentos_formulario_items_temp" />
-            <marker date="1472739801363" expanded="true" signature="339878:339927" ph="SELECT id, d... mos_documentos_tipos" />
-            <marker date="1472739801363" expanded="true" signature="343851:345361" ph="SELECT wf.id... mos_workflow_documentos" />
-            <marker date="1472739801363" expanded="true" signature="345447:347069" ph="SELECT wf.id... mos_workflow_documentos" />
-            <marker date="1472739801363" expanded="true" signature="350520:351342" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="350711:351174" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="350792:351111" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="350929:350945" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="351244:351261" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="351445:352210" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="351633:352029" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="351714:351966" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="351807:351823" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="352106:352123" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="354343:354754" ph="INSERT INTO mos_documentos_formulario_items_temp... " />
-            <marker date="1472739801363" expanded="true" signature="354512:354754" ph="SELECT fk_id... mos_documentos_formulario_items" />
-            <marker date="1472739801363" expanded="true" signature="354871:355278" ph="SELECT descr... mos_documentos_formulario_items_temp" />
-            <marker date="1472739801363" expanded="true" signature="380275:380283" ph="ó" />
-            <marker date="1472739801363" expanded="true" signature="380487:380493" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="380607:380613" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="382506:382512" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="382821:382827" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="383035:383041" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="386869:387093" ph="DELETE FROM " />
-            <marker date="1472739801363" expanded="true" signature="387018:387077" ph="SELECT id_un... mos_registro_formulario" />
-            <marker date="1472739801363" expanded="true" signature="388838:389398" ph="INSERT INTO mos_documentos_formulario_items... " />
-            <marker date="1472739801363" expanded="true" signature="388973:389398" ph="SELECT ${$id... mos_documentos_formulario_items_temp" />
-            <marker date="1472739801363" expanded="true" signature="390631:391199" ph="INSERT INTO mos_documentos_formulario_items... " />
-            <marker date="1472739801363" expanded="true" signature="390766:391199" ph="SELECT ${$pa... mos_documentos_formulario_items_temp" />
-            <marker date="1472739801363" expanded="true" signature="391364:392051" ph="update mos_d... " />
-            <marker date="1472739801363" expanded="true" signature="392216:392762" ph="delete from " />
-            <marker date="1472739801363" expanded="true" signature="392317:392576" ph="select fk_id... mos_documentos_formulario_items_temp" />
-            <marker date="1472739801363" expanded="true" signature="392631:392761" ph="SELECT count... mos_registro_item" />
-            <marker date="1472739801363" expanded="true" signature="394010:394228" ph="SELECT count... mos_documentos_relacionados" />
-            <marker date="1472739801363" expanded="true" signature="396800:396928" ph="SELECT exten... mos_extensiones" />
-            <marker date="1472739801363" expanded="true" signature="397750:398224" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="397788:398203" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="397854:397940" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="397984:397996" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="397997:398179" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="398105:398128" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="400082:400230" ph="SELECT exten... mos_extensiones" />
-            <marker date="1472739801363" expanded="true" signature="401554:401682" ph="SELECT exten... mos_extensiones" />
-            <marker date="1472739801363" expanded="true" signature="403393:403610" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="403484:403603" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="405131:405347" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="405251:405255" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="405628:405861" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="405748:405752" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="409620:409628" ph="ó" />
-            <marker date="1472739801363" expanded="true" signature="410426:410662" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="413225:413373" ph="SELECT exten... mos_extensiones" />
-            <marker date="1472739801363" expanded="true" signature="414524:414652" ph="SELECT exten... mos_extensiones" />
-            <marker date="1472739801363" expanded="true" signature="416162:416379" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="416253:416372" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="416455:416468" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="416497:417273" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="416535:417267" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="416592:416605" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="416606:417246" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="416677:416689" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="416690:417073" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="417507:417635" ph="SELECT exten... mos_extensiones" />
-            <marker date="1472739801363" expanded="true" signature="418482:418495" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="418524:418845" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="418561:418825" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="418604:418617" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="418618:418802" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="418730:418752" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="432718:432752" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="432876:432910" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="433118:433152" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="433233:433267" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="437860:437866" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="438074:438080" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="438703:438712" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="445541:445547" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="445773:445779" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="446000:446006" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="448358:448625" ph="SELECT GROUP... mos_personal" />
-            <marker date="1472739801363" expanded="true" signature="449083:450590" ph="SELECT wf.id... mos_workflow_documentos" />
-            <marker date="1472739801363" expanded="true" signature="450626:451433" ph="SELECT mos_p... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="450805:451061" ph="SELECT min(m... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="451952:452425" ph="SELECT wf.id... mos_workflow_documentos" />
-            <marker date="1472739801363" expanded="true" signature="454663:454896" ph="SELECT wf.id... mos_workflow_documentos" />
-            <marker date="1472739801363" expanded="true" signature="455250:456208" ph="SELECT mos_p... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="455438:455765" ph="SELECT min(m... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="455687:455762" ph="select paren... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="456130:456205" ph="select paren... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="456853:457969" ph="SELECT mos_p... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="457053:457453" ph="SELECT min(m... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="457322:457450" ph="select paren... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="457374:457449" ph="select paren... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="457838:457966" ph="select paren... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="457890:457965" ph="select paren... mos_organizacion" />
-            <marker date="1472739801363" expanded="true" signature="458554:459039" ph="SELECT wf.id... mos_workflow_documentos" />
-            <marker date="1472739801363" expanded="true" signature="461241:461522" ph="SELECT wf.id... mos_workflow_documentos" />
-            <marker date="1472739801363" expanded="true" signature="462430:462473" ph="select DISTI... ${$sql}" />
-            <marker date="1472739801363" expanded="true" signature="462974:463114" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="465178:465852" ph="SELECT DISTI... mos_cargo_estrorg_arbolproc" />
-            <marker date="1472739801363" expanded="true" signature="465538:465617" ph="select cod_c... mos_documentos_cargos" />
-            <marker date="1472739801363" expanded="true" signature="466348:466503" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="468186:468731" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="468363:468696" ph="..." />
-            <marker date="1472739801363" expanded="true" signature="468439:468655" ph="..." />
-            <marker date="1472739801363" expanded="false" signature="468603:468609" ph=" " />
-            <marker date="1472739801363" expanded="true" signature="476149:476273" ph="SELECT COUNT... mos_log" />
-            <marker date="1472739801363" expanded="true" signature="477475:478907" ph="SELECT id ,f... id" />
-            <marker date="1472739801363" expanded="true" signature="477779:477808" ph="/*SUB QUERY " />
-            <marker date="1472739801363" expanded="true" signature="477841:478726" ph="SELECT log.i... mos_log" />
-            <marker date="1472739801363" expanded="true" signature="478789:478822" ph="/*FIN SUB QU... " />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/clases/acciones_ac/AccionesAC.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="634">
-          <caret line="151" column="46" selection-start-line="151" selection-start-column="46" selection-end-line="151" selection-end-column="46" />
-          <folding>
-            <marker date="1473275658620" expanded="true" signature="1063:1179" ph="SELECT cod_p... mos_parametro" />
-            <marker date="1473275658620" expanded="true" signature="1359:1452" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1473275658620" expanded="true" signature="1833:1919" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1473275658620" expanded="true" signature="2290:2382" ph="SELECT nombr... mos_nombres_campos" />
-            <marker date="1473275658620" expanded="true" signature="2755:2898" ph="SELECT id fr... mos_personal" />
-            <marker date="1473275658620" expanded="true" signature="2755:2918" ph="SELECT id fr... mos_personal" />
-            <marker date="1473275658620" expanded="true" signature="2755:2970" ph="SELECT mp.co... mos_personal" />
-            <marker date="1473275658620" expanded="true" signature="3214:3356" ph="SELECT cod_p... mos_usuario_filial" />
-            <marker date="1473275658620" expanded="true" signature="3214:3462" ph="SELECT count... mos_usuario_filial" />
-            <marker date="1473275658620" expanded="true" signature="3214:3486" ph="SELECT count... mos_usuario_filial" />
-            <marker date="1473275658620" expanded="true" signature="3749:3828" ph="SELECT id_or... mos_responsable_area" />
-            <marker date="1473275658620" expanded="true" signature="3749:3829" ph="SELECT id_or... mos_responsable_area" />
-            <marker date="1473275658620" expanded="true" signature="3749:3830" ph="SELECT id_or... mos_responsable_area" />
-            <marker date="1473275658620" expanded="true" signature="4464:6553" ph="SELECT acco.... mos_acciones_ac_co" />
-            <marker date="1473275658620" expanded="true" signature="6062:6262" ph="SELECT mos_n... mos_nombres_campos" />
-            <marker date="1473275658620" expanded="true" signature="7715:8123" ph="INSERT INTO mos_acciones_ac_co... " />
-            <marker date="1473275658620" expanded="true" signature="8963:9008" ph="SELECT MAX(i... mos_acciones_ac_co" />
-            <marker date="1473275658620" expanded="true" signature="9909:10119" ph="INSERT INTO mos_log... " />
-            <marker date="1473275658620" expanded="true" signature="10661:11047" ph="UPDATE mos_a... " />
-            <marker date="1473275658620" expanded="true" signature="12773:13163" ph="UPDATE mos_a... " />
-            <marker date="1473275658620" expanded="true" signature="18594:20517" ph="SELECT acco.... mos_acciones_ac_co" />
-            <marker date="1473275658620" expanded="true" signature="25544:25663" ph="SELECT COUNT... mos_acciones_ac_co" />
-            <marker date="1473275658620" expanded="true" signature="25895:28673" ph="SELECT acco.... mos_acciones_ac_co" />
-            <marker date="1473275658620" expanded="true" signature="27856:28055" ph="SELECT mos_n... mos_nombres_campos" />
-            <marker date="1473275658620" expanded="true" signature="29262:29429" ph="SELECT COUNT... mos_acciones_evidencia" />
-            <marker date="1473275658620" expanded="true" signature="33559:33569" ph="..." />
-            <marker date="1473275658620" expanded="true" signature="33571:33577" ph=" " />
-            <marker date="1473275658620" expanded="true" signature="47330:47875" ph="..." />
-            <marker date="1473275658620" expanded="true" signature="47507:47840" ph="..." />
-            <marker date="1473275658620" expanded="true" signature="47583:47799" ph="..." />
-            <marker date="1473275658620" expanded="false" signature="47747:47753" ph=" " />
-            <marker date="1473275658620" expanded="true" signature="50009:50218" ph="SELECT id, d... mos_tipo_ac" />
-            <marker date="1473275658620" expanded="true" signature="50457:50921" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473275658620" expanded="true" signature="61005:61257" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473275658620" expanded="true" signature="61345:61635" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473275658620" expanded="true" signature="66815:67415" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473275658620" expanded="true" signature="67632:68195" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473275658620" expanded="true" signature="77293:77545" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473275658620" expanded="true" signature="77633:77923" ph="SELECT cod_e... mos_personal" />
-            <marker date="1473275658620" expanded="false" signature="84034:84040" ph=" " />
-            <marker date="1473275658620" expanded="false" signature="84247:84253" ph=" " />
-            <marker date="1473275658620" expanded="true" signature="84531:84537" ph=" " />
-            <marker date="1473275658620" expanded="true" signature="89028:89122" ph="DELETE FROM " />
-            <marker date="1473275658620" expanded="true" signature="92879:92953" ph="update mos_a... " />
-            <marker date="1473275658620" expanded="true" signature="94155:95360" ph="select mos_p... mos_acciones_ac_co" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1783,15 +1032,155 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-4266">
           <caret line="10" column="20" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/clases/mos_usuario/mos_usuario.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="269">
+          <caret line="580" column="41" selection-start-line="580" selection-start-column="40" selection-end-line="580" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/clases/cargo/Cargos.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="23672">
+          <caret line="1076" column="92" selection-start-line="1076" selection-start-column="46" selection-end-line="1076" selection-end-column="92" />
           <folding>
-            <marker date="1473273222472" expanded="true" signature="5156:5193" ph="..." />
+            <marker date="1472387760815" expanded="true" signature="1120:1236" ph="SELECT cod_p... mos_parametro" />
+            <marker date="1472387760815" expanded="true" signature="1403:1516" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1472387760815" expanded="true" signature="1864:1932" ph="SELECT campo... mos_campos_activos" />
+            <marker date="1472387760815" expanded="true" signature="2290:2409" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1472387760815" expanded="true" signature="2773:3278" ph="SELECT cod_c... mos_cargo" />
+            <marker date="1472387760815" expanded="true" signature="3029:3197" ph="select mos_c... mos_cargo_estrorg_arbolproc" />
+            <marker date="1472387760815" expanded="true" signature="3476:3553" ph="SELECT MAX(c... mos_cargo" />
+            <marker date="1472387760815" expanded="true" signature="3890:4042" ph="SELECT cod_c... mos_cargo_estrorg_arbolproc" />
+            <marker date="1472387760815" expanded="true" signature="4390:4588" ph="INSERT INTO mos_cargo_estrorg_arbolproc... " />
+            <marker date="1472387760815" expanded="true" signature="5815:6079" ph="INSERT INTO mos_cargo... " />
+            <marker date="1472387760815" expanded="true" signature="7302:7494" ph="INSERT INTO mos_log... " />
+            <marker date="1472387760815" expanded="true" signature="7770:8024" ph="UPDATE mos_c... " />
+            <marker date="1472387760815" expanded="true" signature="11537:11646" ph="SELECT COUNT... mos_cargo" />
+            <marker date="1472387760815" expanded="true" signature="11869:12261" ph="SELECT cod_c... mos_cargo" />
+            <marker date="1472387760815" expanded="true" signature="14549:15264" ph="SELECT 1, mc... mos_cargo_estrorg_arbolproc" />
+            <marker date="1472387760815" expanded="true" signature="15531:15680" ph="SELECT COUNT... mos_personal" />
+            <marker date="1472387760815" expanded="true" signature="20464:20478" ph="..." />
+            <marker date="1472387760815" expanded="true" signature="20710:20724" ph="..." />
+            <marker date="1472387760815" expanded="true" signature="23177:23187" ph="..." />
+            <marker date="1472387760815" expanded="true" signature="23191:23199" ph="Á" />
+            <marker date="1472387760815" expanded="true" signature="23252:23262" ph="..." />
+            <marker date="1472387760815" expanded="true" signature="28420:28965" ph="..." />
+            <marker date="1472387760815" expanded="true" signature="28597:28930" ph="..." />
+            <marker date="1472387760815" expanded="true" signature="28673:28889" ph="..." />
+            <marker date="1472387760815" expanded="false" signature="28837:28843" ph=" " />
+            <marker date="1472387760815" expanded="true" signature="32620:33165" ph="..." />
+            <marker date="1472387760815" expanded="true" signature="32797:33130" ph="..." />
+            <marker date="1472387760815" expanded="true" signature="32873:33089" ph="..." />
+            <marker date="1472387760815" expanded="false" signature="33037:33043" ph=" " />
+            <marker date="1472387760815" expanded="true" signature="50513:50706" ph="..." />
+            <marker date="1472387760815" expanded="true" signature="50543:50623" ph="..." />
+            <marker date="1472387760815" expanded="true" signature="53798:54300" ph="SELECT count... mos_cargo_estrorg_arbolproc" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/clases/utilidades/NivelAcceso.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1914">
+          <caret line="87" column="53" selection-start-line="87" selection-start-column="30" selection-end-line="87" selection-end-column="53" />
+          <folding>
+            <marker date="1472154310243" expanded="true" signature="1719:1835" ph="SELECT cod_p... mos_parametro" />
+            <marker date="1472154310243" expanded="true" signature="2015:2083" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1472154310243" expanded="true" signature="2428:2502" ph="SELECT nombr... mos_nombres_campos" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/melvin.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1364">
+          <caret line="164" column="0" selection-start-line="164" selection-start-column="0" selection-end-line="168" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/andres.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1760">
+          <caret line="7" column="24" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/diseno/templates/acciones_correctivas/listar.tpl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3300">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/diseno/templates/acciones_ac/verAccionesAC.tpl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="308">
+          <caret line="14" column="67" selection-start-line="14" selection-start-column="67" selection-end-line="14" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/clases/acciones_ac/AccionesAC.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-506">
+          <caret line="1504" column="78" selection-start-line="1504" selection-start-column="78" selection-end-line="1504" selection-end-column="78" />
+          <folding>
+            <marker date="1473439035653" expanded="true" signature="1063:1179" ph="SELECT cod_p... mos_parametro" />
+            <marker date="1473439035653" expanded="true" signature="1359:1452" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1473439035653" expanded="true" signature="1833:1919" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1473439035653" expanded="true" signature="2290:2382" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1473439035653" expanded="true" signature="2755:2898" ph="SELECT id fr... mos_personal" />
+            <marker date="1473439035653" expanded="true" signature="2755:2918" ph="SELECT id fr... mos_personal" />
+            <marker date="1473439035653" expanded="true" signature="2755:2970" ph="SELECT mp.co... mos_personal" />
+            <marker date="1473439035653" expanded="true" signature="3214:3356" ph="SELECT cod_p... mos_usuario_filial" />
+            <marker date="1473439035653" expanded="true" signature="3214:3462" ph="SELECT count... mos_usuario_filial" />
+            <marker date="1473439035653" expanded="true" signature="3214:3486" ph="SELECT count... mos_usuario_filial" />
+            <marker date="1473439035653" expanded="true" signature="3749:3828" ph="SELECT id_or... mos_responsable_area" />
+            <marker date="1473439035653" expanded="true" signature="3749:3829" ph="SELECT id_or... mos_responsable_area" />
+            <marker date="1473439035653" expanded="true" signature="3749:3830" ph="SELECT id_or... mos_responsable_area" />
+            <marker date="1473439035653" expanded="true" signature="4464:6831" ph="SELECT acco.... mos_acciones_ac_co" />
+            <marker date="1473439035653" expanded="true" signature="6077:6277" ph="SELECT mos_n... mos_nombres_campos" />
+            <marker date="1473439035653" expanded="true" signature="7994:8402" ph="INSERT INTO mos_acciones_ac_co... " />
+            <marker date="1473439035653" expanded="true" signature="9242:9287" ph="SELECT MAX(i... mos_acciones_ac_co" />
+            <marker date="1473439035653" expanded="true" signature="10188:10398" ph="INSERT INTO mos_log... " />
+            <marker date="1473439035653" expanded="true" signature="10940:11326" ph="UPDATE mos_a... " />
+            <marker date="1473439035653" expanded="true" signature="13052:13442" ph="UPDATE mos_a... " />
+            <marker date="1473439035653" expanded="true" signature="18873:20796" ph="SELECT acco.... mos_acciones_ac_co" />
+            <marker date="1473439035653" expanded="true" signature="26016:26135" ph="SELECT COUNT... mos_acciones_ac_co" />
+            <marker date="1473439035653" expanded="true" signature="26367:29145" ph="SELECT acco.... mos_acciones_ac_co" />
+            <marker date="1473439035653" expanded="true" signature="28328:28527" ph="SELECT mos_n... mos_nombres_campos" />
+            <marker date="1473439035653" expanded="true" signature="29734:29901" ph="SELECT COUNT... mos_acciones_evidencia" />
+            <marker date="1473439035653" expanded="true" signature="34031:34041" ph="..." />
+            <marker date="1473439035653" expanded="true" signature="34043:34049" ph=" " />
+            <marker date="1473439035653" expanded="true" signature="47802:48347" ph="..." />
+            <marker date="1473439035653" expanded="true" signature="47979:48312" ph="..." />
+            <marker date="1473439035653" expanded="true" signature="48055:48271" ph="..." />
+            <marker date="1473439035653" expanded="false" signature="48219:48225" ph=" " />
+            <marker date="1473439035653" expanded="true" signature="50481:50690" ph="SELECT id, d... mos_tipo_ac" />
+            <marker date="1473439035653" expanded="true" signature="50929:51393" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473439035653" expanded="true" signature="61477:61729" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473439035653" expanded="true" signature="61817:62107" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473439035653" expanded="true" signature="67287:67887" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473439035653" expanded="true" signature="68104:68667" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473439035653" expanded="true" signature="77765:78017" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473439035653" expanded="true" signature="78105:78395" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473439035653" expanded="false" signature="84506:84512" ph=" " />
+            <marker date="1473439035653" expanded="false" signature="84719:84725" ph=" " />
+            <marker date="1473439035653" expanded="true" signature="85003:85009" ph=" " />
+            <marker date="1473439035653" expanded="true" signature="89500:89594" ph="DELETE FROM " />
+            <marker date="1473439035653" expanded="true" signature="93351:93425" ph="update mos_a... " />
+            <marker date="1473439035653" expanded="true" signature="94627:95832" ph="select mos_p... mos_acciones_ac_co" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/mosaikus/clases/acciones_trazabildiad/AccionesTrazavilidad.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="22">
+        <state relative-caret-position="803">
           <caret line="731" column="43" selection-start-line="731" selection-start-column="42" selection-end-line="731" selection-end-column="43" />
           <folding>
             <marker date="1470662805356" expanded="true" signature="1170:1286" ph="SELECT cod_p... mos_parametro" />
@@ -1812,11 +1201,245 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mosaikus/diseno/templates/acciones_ac/verAccionesAC.tpl">
+    <entry file="file://$PROJECT_DIR$/mosaikus/clases/utilidades/ut_Tool.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="924">
-          <caret line="42" column="58" selection-start-line="42" selection-start-column="58" selection-end-line="42" selection-end-column="58" />
-          <folding />
+        <state relative-caret-position="803">
+          <caret line="1015" column="18" selection-start-line="1015" selection-start-column="13" selection-end-line="1015" selection-end-column="18" />
+          <folding>
+            <marker date="1472067132013" expanded="true" signature="15982:16126" ph="..." />
+            <marker date="1472067132013" expanded="true" signature="16400:16459" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/clases/documentos/Documentos.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22">
+          <caret line="1070" column="40" selection-start-line="1070" selection-start-column="40" selection-end-line="1070" selection-end-column="40" />
+          <folding>
+            <marker date="1473345939316" expanded="true" signature="3936:4028" ph="select * fro... mos_documentos_estrorg_arbolproc" />
+            <marker date="1473345939316" expanded="true" signature="5240:5332" ph="select * fro... mos_documentos_estrorg_arbolproc" />
+            <marker date="1473345939316" expanded="true" signature="7851:7921" ph="select count... mos_registro" />
+            <marker date="1473345939316" expanded="true" signature="9245:9315" ph="select count... mos_registro" />
+            <marker date="1473345939316" expanded="true" signature="18372:18485" ph="select min(l... mos_organizacion" />
+            <marker date="1473345939316" expanded="true" signature="18924:19059" ph="SELECT cod_p... mos_parametro" />
+            <marker date="1473345939316" expanded="true" signature="19247:19365" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1473345939316" expanded="true" signature="19734:19878" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1473345939316" expanded="true" signature="22812:22930" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1473345939316" expanded="true" signature="23286:27443" ph="select mos_p... mos_personal" />
+            <marker date="1473345939316" expanded="true" signature="24001:27263" ph="SELECT case mos_documentos" />
+            <marker date="1473345939316" expanded="true" signature="27714:28107" ph="SELECT doc_f... mos_documentos" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mosaikus/clases/acciones_correctivas/AccionesCorrectivas.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="12" column="49" selection-start-line="12" selection-start-column="49" selection-end-line="12" selection-end-column="49" />
+          <folding>
+            <marker date="1473440450908" expanded="true" signature="1281:1403" ph="SELECT cod_p... mos_parametro" />
+            <marker date="1473440450908" expanded="true" signature="1582:1695" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1473440450908" expanded="true" signature="2053:2159" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1473440450908" expanded="true" signature="2507:2619" ph="SELECT nombr... mos_nombres_campos" />
+            <marker date="1473440450908" expanded="true" signature="7937:11725" ph="SELECT ac.id... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="10983:11160" ph="SELECT mos_n... mos_nombres_campos" />
+            <marker date="1473440450908" expanded="true" signature="13554:14307" ph="INSERT INTO mos_acciones_correctivas... " />
+            <marker date="1473440450908" expanded="true" signature="14483:14534" ph="SELECT MAX(i... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="16589:16799" ph="INSERT INTO mos_log... " />
+            <marker date="1473440450908" expanded="true" signature="34961:35110" ph="UPDATE mos_a... " />
+            <marker date="1473440450908" expanded="true" signature="36766:36991" ph="DELETE FROM " />
+            <marker date="1473440450908" expanded="true" signature="36903:36990" ph="SELECT id_ac... mos_acciones_trazabilidad" />
+            <marker date="1473440450908" expanded="true" signature="44220:44369" ph="UPDATE mos_a... " />
+            <marker date="1473440450908" expanded="true" signature="57698:57823" ph="SELECT COUNT... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="58056:62616" ph="SELECT ac.id... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="58151:58366" ph="SELECT mos_n... mos_nombres_campos" />
+            <marker date="1473440450908" expanded="true" signature="66980:67139" ph="SELECT COUNT... mos_acciones_ac_co" />
+            <marker date="1473440450908" expanded="true" signature="69179:69328" ph="select id as... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="81258:81268" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="81270:81276" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="88338:88348" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="88350:88356" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="88491:88501" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="88503:88509" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="92445:98424" ph="SELECT aacco... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="92583:92652" ph="select count... mos_acciones_evidencia" />
+            <marker date="1473440450908" expanded="true" signature="95383:95460" ph="select count... mos_acciones_evidencia" />
+            <marker date="1473440450908" expanded="true" signature="106174:106186" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="106203:106209" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="110129:110141" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="110162:110168" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="121917:121942" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="127030:133009" ph="SELECT aacco... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="127168:127237" ph="select count... mos_acciones_evidencia" />
+            <marker date="1473440450908" expanded="true" signature="129968:130045" ph="select count... mos_acciones_evidencia" />
+            <marker date="1473440450908" expanded="true" signature="138499:138511" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="138528:138534" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="142454:142466" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="142487:142493" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="147262:147281" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="149576:149908" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="149628:149867" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="149792:149798" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="150753:151119" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="150807:151076" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="150974:150980" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="151486:151821" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="151538:151780" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="151685:151691" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="159544:159902" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="159596:159861" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="159762:159768" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="160173:160532" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="160225:160491" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="160391:160397" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="160804:161168" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="160856:161127" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="161022:161028" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="161414:161775" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="161466:161734" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="161631:161637" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="161963:162427" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="162670:162881" ph="SELECT id, d... mos_origen_ac" />
+            <marker date="1473440450908" expanded="true" signature="170677:170746" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="171065:172002" ph="SELECT ${$va... mos_acciones_correctivas_foto_sem" />
+            <marker date="1473440450908" expanded="true" signature="173790:174789" ph="SELECT ${$va... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="177287:177356" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="177746:178699" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
+            <marker date="1473440450908" expanded="true" signature="183759:183828" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="184147:185265" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
+            <marker date="1473440450908" expanded="true" signature="190800:190869" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="192696:193640" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
+            <marker date="1473440450908" expanded="true" signature="195183:196146" ph="SELECT ${$va... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="198654:198723" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="199796:200739" ph="SELECT ${$va... mos_acciones_correctivas_foto_mes" />
+            <marker date="1473440450908" expanded="true" signature="202283:203248" ph="SELECT ${$va... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="207896:207965" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="208314:209257" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
+            <marker date="1473440450908" expanded="true" signature="214851:214920" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="216656:217590" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
+            <marker date="1473440450908" expanded="true" signature="219027:219998" ph="SELECT 2 id_... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="223153:223222" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="224958:225892" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
+            <marker date="1473440450908" expanded="true" signature="227329:228300" ph="SELECT 2 id_... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="231451:231520" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="232501:233436" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
+            <marker date="1473440450908" expanded="true" signature="234874:235830" ph="SELECT 2 id_... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="238994:239063" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="239412:240340" ph="SELECT 2 id_... mos_acciones_correctivas_foto_sem" />
+            <marker date="1473440450908" expanded="true" signature="242128:243118" ph="SELECT 2 id_... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="246296:246365" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="246714:247824" ph="SELECT 2 id_... mos_acciones_correctivas_foto_mes" />
+            <marker date="1473440450908" expanded="true" signature="257039:257140" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="257387:258421" ph="SELECT ${$va... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="258622:259031" ph="SELECT temp.... ${$sql}" />
+            <marker date="1473440450908" expanded="true" signature="261444:261547" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="261875:262979" ph="SELECT ${$va... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="263204:263637" ph="SELECT temp.... ${$sql}" />
+            <marker date="1473440450908" expanded="true" signature="265864:265965" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="266252:267391" ph="SELECT ${$va... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="267616:268049" ph="SELECT temp.... ${$sql}" />
+            <marker date="1473440450908" expanded="true" signature="272629:272718" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="272945:273877" ph="SELECT ${$va... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="274066:274459" ph="SELECT temp.... ${$sql}" />
+            <marker date="1473440450908" expanded="true" signature="277995:278084" ph="Select * fro... mos_organizacion" />
+            <marker date="1473440450908" expanded="true" signature="278311:279334" ph="SELECT ${$va... mos_acciones_correctivas" />
+            <marker date="1473440450908" expanded="true" signature="279523:279916" ph="SELECT temp.... ${$sql}" />
+            <marker date="1473440450908" expanded="true" signature="282948:283280" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="283000:283239" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="283164:283170" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="284125:284491" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="284179:284448" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="284346:284352" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="284858:285193" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="284910:285152" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="285057:285063" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="285718:286076" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="285770:286035" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="285935:285941" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="286349:286681" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="286401:286640" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="286548:286554" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="286940:287292" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="286992:287251" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="287157:287163" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="287559:287919" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="287611:287878" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="287776:287782" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="288188:288549" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="288240:288508" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="288405:288411" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="288814:289174" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="288866:289133" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="289031:289037" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="289436:289801" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="289488:289760" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="289654:289660" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="290074:290430" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="290126:290389" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="290292:290298" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="290718:291076" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="290770:291035" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="290936:290942" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="291349:291708" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="291401:291667" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="291567:291573" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="291975:292339" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="292027:292298" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="292193:292199" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="292585:292946" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="292637:292905" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="292802:292808" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="293134:293598" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="293841:294052" ph="SELECT id, d... mos_origen_ac" />
+            <marker date="1473440450908" expanded="true" signature="303980:304049" ph="SELECT campo... mos_campos_activos" />
+            <marker date="1473440450908" expanded="true" signature="305611:305833" ph="SELECT id, d... mos_tipo_ac" />
+            <marker date="1473440450908" expanded="true" signature="306080:306492" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="306739:307137" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="308141:308561" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="308797:309008" ph="SELECT id, d... mos_origen_ac" />
+            <marker date="1473440450908" expanded="true" signature="309255:309675" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="309937:310189" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="310277:310567" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="311285:311437" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="311536:311987" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="312242:312389" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="312482:312915" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="323248:323390" ph="select id as... mos_arbol_procesos" />
+            <marker date="1473440450908" expanded="true" signature="330884:331155" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="331243:331551" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="332017:332521" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="332791:333264" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="333520:333731" ph="SELECT id, d... mos_origen_ac" />
+            <marker date="1473440450908" expanded="true" signature="333997:334501" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="335302:335454" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="335611:336034" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="336201:336721" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="337006:337153" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="337246:337734" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="339991:340213" ph="SELECT id, d... mos_tipo_ac" />
+            <marker date="1473440450908" expanded="true" signature="340460:340872" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="343582:343804" ph="SELECT id, d... mos_tipo_ac" />
+            <marker date="1473440450908" expanded="true" signature="345154:345566" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="346375:346787" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="353933:354437" ph="SELECT cod_e... mos_personal" />
+            <marker date="1473440450908" expanded="true" signature="355345:355495" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="355379:355495" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="355910:356054" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="355944:356054" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="360222:360245" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="360305:360311" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="380032:380038" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="380131:380137" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="380231:380237" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="380325:380331" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="380403:380426" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="380495:380501" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="380996:381002" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="381702:381708" ph=" " />
+            <marker date="1473440450908" expanded="true" signature="382320:382534" ph="..." />
+            <marker date="1473440450908" expanded="true" signature="382401:382527" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>

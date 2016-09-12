@@ -99,12 +99,12 @@
                             ,tipo
                             ,ta.descripcion tipo_desc
                             ,accion
-                            ,DATE_FORMAT(fecha_acordada, '%d/%m/%Y') fecha_acordada
-                            ,DATE_FORMAT(fecha_realizada, '%d/%m/%Y') fecha_realizada
+                            ,DATE_FORMAT(acco.fecha_acordada, '%d/%m/%Y') fecha_acordada
+                            ,DATE_FORMAT(acco.fecha_realizada, '%d/%m/%Y') fecha_realizada
                             ,id_responsable
                             ,id_ac
                             ,id_correcion
-                            ,estado
+                            ,acco.estado
                             ,CASE WHEN NOT acco.fecha_acordada IS NULL THEN 
                                         CASE WHEN NOT acco.fecha_realizada IS NULL THEN
                                                 CASE WHEN acco.fecha_realizada <= acco.fecha_acordada
@@ -119,12 +119,17 @@
                                 END dias
                             ,CONCAT(initcap(SUBSTR(per.nombres,1,IF(LOCATE(' ' ,per.nombres,1)=0,LENGTH(per.nombres),LOCATE(' ' ,per.nombres,1)-1))),' ',initcap(per.apellido_paterno)) as responsable
                             ,(SELECT mos_nombres_campos.texto FROM mos_nombres_campos
-                                    WHERE mos_nombres_campos.nombre_campo = acco.estatus_wf AND mos_nombres_campos.modulo = 16  AND id_idioma = $_SESSION[CookIdIdioma]) as estatus_wf
+                                    WHERE mos_nombres_campos.nombre_campo = acco.estatus_wf AND mos_nombres_campos.modulo = 16  AND id_idioma = $_SESSION[CookIdIdioma]) as estatus_wf,
+                         mac.descripcion
+                         ,DATE_FORMAT(mac.fecha_generacion, '%d/%m/%Y') fecha_generacion                  
                          FROM mos_acciones_ac_co acco
+                         INNER JOIN mos_acciones_correctivas mac ON mac.id = acco.id_ac
                          INNER JOIN mos_tipo_ac ta ON ta.id = tipo
                          INNER JOIN mos_personal per on per.cod_emp = acco.id_responsable
+                         
                          WHERE acco.id = $id "; 
                 $this->operacion($sql, $atr);
+
                 return $this->dbl->data[0];
             }
             public function ingresarAccionesAC($atr){
@@ -359,8 +364,11 @@
                         $sql_col_left .= ",p$k.nom_detalle p$k ";
                         $k++;
                     }*/
-                    $cod_emp = $this->obtener_id_mos_personal($_SESSION['CookIdUsuario']);
-                    $areas = $this->ver_terceros($_SESSION['CookIdUsuario']) ? $this->obtener_areas_responsable($cod_emp) : null;
+                    import('clases.utilidades.NivelAcceso');
+                    $this->restricciones = new NivelAcceso();
+                    $this->restricciones->cargar_acceso_nodos_explicito($atr);
+
+                    //$areas = $this->ver_terceros($_SESSION['CookIdUsuario']) ? $this->obtener_areas_responsable($cod_emp) : null;
 
                     $sql_where = '';
                     if (strlen($atr[valor])>0)
@@ -392,9 +400,9 @@
                     if (strlen($atr["b-id_responsable"])>0)
                         $sql_where .= " AND id_responsable = '". $atr["b-id_responsable"] . "'";
 
-                    $sql_where .= " AND (id_responsable = '". $cod_emp . "' AND id_validador ='" . $cod_emp ."')";
+                    $sql_where .= " AND (id_responsable = '". $_SESSION['CookCodEmp'] . "' OR id_validador ='" . $_SESSION['CookCodEmp'] ."')";
                     if($areas)
-                        $sql_where .= " or (per.id_organizacion IN (".$areas."))";
+                        $sql_where .= " or (per.id_organizacion IN (".implode(',', array_keys($this->id_org_acceso_explicito))."))";
 
                     /*
                      if (isset($parametros[id_ac])){
@@ -1776,6 +1784,27 @@
                           
                 $objResponse->addScript("$('#MustraCargando').hide();");
                 $objResponse->addScript("PanelOperator.resize();");
+
+                $objResponse->addIncludeScript(PATH_TO_JS . 'acciones_ac/acciones_ac.js');
+
+                /*JS init_tabla*/
+                $objResponse->addScript("$('.ver-mas').on('click', function (event) {
+                                        event.preventDefault();
+                                        var id = $(this).attr('tok');
+                                        $('#myModal-Ventana-Cuerpo').html($('#ver-mas-'+id).val());
+                                        $('#myModal-Ventana-Titulo').html('');
+                                        $('#myModal-Ventana').modal('show');
+                                    });
+                                    PanelOperator.initPanels('');
+                                        ScrollBar.initScroll();
+
+                                    $('.ver-reporte').on('click', function (event) {
+                                        event.preventDefault();
+                                        var id = $(this).attr('tok');
+                                        
+                                        verDetalle(id);
+                                    });");
+
                 return $objResponse;
             }
          
@@ -1803,13 +1832,15 @@
 
          $val = $this->verAccionesAC($parametros[id]);
          $contenido_1['TIPO'] = $val["tipo_desc"];
+         $contenido_1['DESCRIPCION'] = $val["descripcion"];
          $contenido_1['ACCION'] = ($val["accion"]);
          $contenido_1['FECHA_ACORDADA'] = ($val["fecha_acordada"]);
          $contenido_1['FECHA_REALIZADA'] = ($val["fecha_realizada"]);
          $contenido_1['ID_RESPONSABLE'] = $val["id_responsable"];
          $contenido_1['RESPONSABLE'] = $val["responsable"];
          $contenido_1['ID_AC'] = $val["id_ac"];
-         $contenido_1['ID_CORRECION'] = $val["id_correcion"];
+         $contenido_1['ID_CORRECION'] = $val["id_ac"];
+         $contenido_1['FECHA_GENERACION'] = $val["fecha_generacion"];
 
          import('clases.acciones_trazabildiad.AccionesTrazavilidad');
          $ac = new AccionesTrazavilidad();
