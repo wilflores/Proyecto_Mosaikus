@@ -393,6 +393,7 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $acceso_areas";
                 {
                     $out['paginado']=$grid->setPaginadohtmlMSKS("verPagina", "document");
                 }
+               // echo $out;
                 return $out;
             }
      
@@ -461,28 +462,83 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $acceso_areas";
                 if ($parametros['reg_por_pagina'] != null) $reg_por_pagina = $parametros['reg_por_pagina']; 
                 $this->listarMatriz($parametros, $parametros['pag'], $reg_por_pagina);
                 $data=$this->dbl->data;
-               // print_r($data);
+              // print_r($data);
                 
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
                 }
+                $ind=0;//indice para la familia empieza en  0
                 $familias=$this->cargar_parametros_familias();
-                $id_familia=$familias[0][id];//para mostrar la primera familia en el listado. con el filtro se escoge la que se quiera mostrar
+                $id_familia=$familias[$ind][id];//para mostrar la primera familia en el listado. con el filtro se escoge la que se quiera mostrar
                 /******** extraer item de familias****/  
                 $items_familia=$this->items_familia_requisitos($id_familia);
+                $tabla='';
+                /************** COnstruir la tabla dinamica de la matriz******/
+                $tabla.= " <table width=\"100%\" class='table table-striped table-condensed' id=\"tblRequisitosCargos\"  >\n";
+
+                $tabla.="<thead><tr height=\"30px\">";
+                            $tabla.="<th rowspan=\"2\"  align=\"center\" width=\"10%\" style=\"padding-top:5px;\"><div align=\"center\">".ucwords(strtolower($familias[$ind][descripcion]))."</div></th>";
+                /***********MOstrar items***********/
+                 foreach ($items_familia as $value) {   
+                    $cant_requisitos=explode(",", $value[id_requisito]);
+                    $cant_req=count($cant_requisitos);//para calcular el colspan de la celda del items de acuerdo a la cantidad de requisitos
+                    $tabla.="<th width=\"20%\" colspan=\"$cant_req\" align=\"center\"><div align=\"center\">".ucwords(strtolower($value[desc_items])). "</div></th>";
+                }
+                $tabla.="</tr>";
+                $tabla.="<tr><th></th>";
+                /******** MOSTRAR LOS REQUISITOS DE CADA items******/
+                foreach ($items_familia as $value) {  
+                    $datos_requisitos=$this->requisitos_items($value[id_item]);
+                   // print_r($datos_requisitos);
+                    for($y=0;$y<count($datos_requisitos);$y++){
+                        $tabla.="<td width=\"10%\"><div align=\"left\">".ucwords(strtolower($datos_requisitos[$y][nombre_req])). "</div></td>";
+                    }
+                }  
+                $tabla.="</tr></thead>";              
+                $tabla.="<thead><tr height=\"30px\">";
+                $tabla.="<th width=\"20%\"><div align=\"center\">".ucwords(strtolower(htmlentities($this->nombres_columnas[id_area], ENT_QUOTES, "UTF-8")))."</div></th>";
+                $tabla.="<th width=\"20%\"><div align=\"center\">".ucwords(strtolower(htmlentities($this->nombres_columnas[id_cargo], ENT_QUOTES, "UTF-8")))."</div></th>";
+                $tabla.="</tr></thead>";
+                
+                for ($x=0;$x<count($data) ; $x++) { 
+                    $tabla.="<tr>";
+                    $tabla.="<td><div align=\"center\">".ucwords(strtolower(htmlentities($data[$x][descrip_area], ENT_QUOTES, "UTF-8")))."</div></td>";
+                    $tabla.="<td><div align=\"center\">".ucwords(strtolower(htmlentities($data[$x][descrip_cargo], ENT_QUOTES, "UTF-8")))."</div></td>";
+                    /******* Aqui se deben mostrar los requisitos minimos del area-cargo mostrada********/
+                    /******** MOSTRAR LOS REQUISITOS DE CADA items******/
+                foreach ($items_familia as $value) {  
+                    $datos_requisitos=$this->requisitos_items($value[id_item]);
+                   // print_r($datos_requisitos);
+                    for($y=0;$y<count($datos_requisitos);$y++){
+                        $requisito_minimo=$this->requisito_minimo($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);// si se escogio un form
+                        //print_r($requisito_minimo);
+                         $tabla.="<td width=\"10%\">";
+                        for($z=0;$z<count($requisito_minimo);$z++){
+                           $tabla.="<div align=\"left\">".ucwords(strtolower($requisito_minimo[$z][nombre_parametro]))."</div>";
+                        }
+                        $tabla.="</td>";
+                    }
+                }  
+                    $tabla.="</tr>";
+                    # code...
+                }
+                 
+
+                $tabla.="</table>";
                 //print_r($this->nombres_columnas);
-                $grid->SetConfiguracionMSKS("tblRequisitosCargos", "");
+
+                /*$grid->SetConfiguracionMSKS("tblRequisitosCargos", "");
                 $config_col=array();
                 $config_col=array(array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[id_area], ENT_QUOTES, "UTF-8")),
                array( "width"=>"10%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[id_cargo], ENT_QUOTES, "UTF-8")),
                array( "width"=>"10%","ValorEtiqueta"=>$familias[0][descripcion])/*,
                */
-                );
+                //);
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 }*/
 
-                $k = 3;
+               /* $k = 3;
                 foreach ($items_familia as $value) {                  
                     array_push($config_col,array( "width"=>"10%","ValorEtiqueta"=>link_titulos((ucwords(strtolower($value[desc_items]))), "p$k", $columnas_fam)));
                     $k++;
@@ -503,11 +559,11 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $acceso_areas";
                 if($_SESSION[CookE] == 'S')//if ($parametros['permiso'][3] == "1")
                     array_push($func,array('nombre'=> 'eliminarRequisitosCargos','imagen'=> "<img style='cursor:pointer' src='diseno/images/ico_eliminar.png' title='Eliminar RequisitosCargos'>"));
                */
-                $config=array();
-                //$config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));
+               /* $config=array();
+                //$config=array(array("width"=>"10%", "ValorEtiqueta"=>"&nbsp;"));*/
                 $grid->setPaginado($reg_por_pagina, $this->total_registros);
-                $array_columns =  explode('-', $parametros['mostrar-col']);
-                for($i=0;$i<count($config_col);$i++){
+               // $array_columns =  explode('-', $parametros['mostrar-col']);
+                /*for($i=0;$i<count($config_col);$i++){
                     switch ($i) {                                             
                         /*case 1:
                         case 2:
@@ -516,7 +572,7 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $acceso_areas";
                             array_push($config,$config_col[$i]);
                             break;
 */
-                        default:
+                       /* default:
                             
                             if (in_array($i, $array_columns)) {
                                 array_push($config,$config_col[$i]);
@@ -528,21 +584,23 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $acceso_areas";
                     }
                 }
                     /*Carga Acceso segun el arbol*/
-               /* if (count($this->restricciones->id_org_acceso_explicito) <= 0){
+                if (count($this->restricciones->id_org_acceso_explicito) <= 0){
                     $this->restricciones->cargar_acceso_nodos_explicito($parametros);
-                } */
-                $grid->setParent($this);
+                } 
+                 /*$grid->setParent($this);
+               
                 $grid->SetTitulosTablaMSKS("td-titulo-tabla-row", $config);
                 $grid->setFuncion("id_area", "colum_admin_matriz");
                 //$grid->setFuncion("en_proceso_inscripcion", "enProcesoInscripcion");
                 //$grid->setAligns(1,"center");
                 //$grid->hidden = array(0 => true);
     
-                $grid->setDataMSKS("td-table-data", $data, $func,$columna_funcion, $parametros['pag'] );
-                $out['tabla']= $grid->armarTabla();
+                $grid->setDataMSKS("td-table-data", $data, $func,$columna_funcion, $parametros['pag'] );*/
+                $out['tabla']= $tabla;
                 //if (($parametros['pag'] != 1)  || ($this->total_registros >= $reg_por_pagina))
                 {
-                    $out['paginado']=$grid->setPaginadohtmlMSKS("verPagina", "document");
+                    echo $pag;
+                    $out['paginado']=$grid->setPaginadohtmlMSKS("verPaginaMatriz", "document");
                 }
                 return $out;
             }
@@ -550,11 +608,36 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $acceso_areas";
              public function listarMatriz($atr, $pag, $registros_x_pagina){
                     $atr = $this->dbl->corregir_parametros($atr);
                     $sql_left = $sql_col_left = "";
+                    /* if (count($this->parametros) <= 0){
+                        $this->cargar_parametros();
+                    }                    
+                    $k = 1;                    
+                    foreach ($this->parametros as $value) {
+                        $sql_left .= " LEFT JOIN(select t1.id_registro, t2.descripcion as nom_detalle from mos_parametro_modulos t1
+                                inner join mos_parametro_det t2 on t1.cod_categoria=t2.cod_categoria and t1.cod_parametro=t2.cod_parametro and t1.cod_parametro_det=t2.cod_parametro_det
+                        where t1.cod_categoria='3' and t1.cod_parametro='$value[cod_parametro]' ) AS p$k ON p$k.id_registro = p.cod_emp "; 
+                        $sql_col_left .= ",p$k.nom_detalle p$k ";
+                        $k++;
+                    }
+                    */
+                    if (count($this->restricciones->id_org_acceso_explicito) <= 0){
+                        $this->restricciones->cargar_acceso_nodos_explicito($atr);
+                    } 
+                    if (count($this->restricciones->id_org_acceso_explicito)>0){                            
+                        $acceso_areas = " AND mco.id IN (". implode(',', array_keys($this->restricciones->id_org_acceso_explicito)) . ")";
+                    }
+                       
+                    /*FILTRO PARA EL ARBOL ORGANIZACIONAL*/
+                    $filtro_ao='';
+                    if ((strlen($atr["b-id_organizacion"])>0)){ // filtro para el arbol organizacional
+                        $id_org = ($atr["b-id_organizacion"]);
+                        $acceso_areas= " and mco.id in (". $id_org . ") ";
+                   }           
                     
-                  $sql = "SELECT COUNT(*) total_registros FROM mos_cargo mc
+                    $sql = "SELECT COUNT(*) total_registros FROM mos_cargo mc
 INNER JOIN mos_cargo_estrorg_arbolproc mco ON mc.cod_cargo = mco.cod_cargo
 INNER JOIN mos_organizacion mo ON mo.id = mco.id
-                         WHERE 1 = 1 ";
+                         WHERE 1 = 1 $acceso_areas";
                      if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND ((upper(mc.descripcion) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
                     
@@ -567,26 +650,15 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id
              if (strlen($atr["b-id_area"])>0)
                         $sql .= " AND mo.title = '". $atr["b-id_area"] . "'";
 
-                    /*FILTRO PARA EL ARBOL ORGANIZACIONAL*/
-                    $filtro_ao='';
-                    if ((strlen($atr["b-id_organizacion"])>0)){ // filtro para el arbol organizacional
-                        $id_org = ($atr["b-id_organizacion"]);
-                        $filtro_ao= " and mco.id in (". $id_org . ") ";
-                    }// 
                     $total_registros = $this->dbl->query($sql, $atr);
                     $this->total_registros = $total_registros[0][total_registros];
 
-                    $sql = "SELECT mo.title descrip_area,mc.descripcion descrip_cargo,mrf.descripcion descrip_familia,mif.descripcion descripcion_item,mr.nombre nombre_req
+            
+                    $sql = "SELECT mco.id id_area,mc.cod_cargo cod_cargo, mo.title descrip_area,mc.descripcion descrip_cargo $sql_col_left
 FROM mos_cargo mc
 INNER JOIN mos_cargo_estrorg_arbolproc mco ON mc.cod_cargo = mco.cod_cargo
-INNER JOIN mos_organizacion mo ON mo.id = mco.id
-INNER JOIN mos_requisitos_cargos mrc on mrc.id_cargo=mc.cod_cargo and mrc.id_area=mo.id  INNER JOIN mos_requisitos_familias mrf
-INNER JOIN mos_requisitos_items_familias mif ON mif.id_familia = mrf.id
-INNER JOIN mos_requisitos_item mri ON mri.id_item = mif.id
-INNER JOIN mos_requisitos mr ON mr.id = mri.id_requisitos
-group by mri.id
-ORDER BY mrf.id,mif.id";
-                  /*  if (strlen($atr['b-filtro-sencillo'])>0){
+INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $acceso_areas";
+                    if (strlen($atr['b-filtro-sencillo'])>0){
                         $sql .= " AND ((upper(mc.descripcion) like '" . strtoupper($atr["b-filtro-sencillo"]) . "%')";
                     
                         $sql .= " OR (upper(mo.title) like '%" . strtoupper($atr["b-filtro-sencillo"]) . "%'))";
@@ -598,16 +670,25 @@ ORDER BY mrf.id,mif.id";
                         $sql .= " AND mc.descripcion = '". $atr["b-id_cargo"] . "'";
                    if (strlen($atr["b-id_area"])>0)
                         $sql .= " AND mo.title = '". $atr["b-id_area"] . "'";
-*/
-                   // $sql .= " order by mc.$atr[corder] $atr[sorder] ";
-                    $sql .= " LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
+
+                    $sql .= " order by mc.$atr[corder] $atr[sorder] ";
+                    $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
                     //echo $sql;
                     $this->operacion($sql, $atr);
              }
+//OBTENER PARAMETROS ESCOGIDOS EN UN REQUISITO MINIMO
+        public function requisito_minimo($id_area,$cod_cargo,$id_requisito){
+            $consulta_req_esc="SELECT mrf.id_documento_form id_formulario,mpi.id_parametro_formulario,mpi.id_parametro_items,mpi.id,mdf.Nombre nombre_parametro,mdf.valores valor_vigente,mdf.tipo tipo_parametro FROM  mos_requisitos_cargos mrc INNER JOIN mos_requisitos_formularios mrf on mrc.id=mrf.id_requisito_cargo
+INNER JOIN mos_requisitos_parametros_index mpi on mpi.id_requisitos_formularios=mrf.id INNER JOIN mos_documentos_datos_formulario mdf on mdf.id_unico=mpi.id_parametro_formulario  where mrc.id_area=$id_area and mrc.id_cargo=$cod_cargo and mrc.id_requisito=$id_requisito and mdf.tipo<>6";
+//echo $consulta_req_esc;
+                $requisito_minimo= $this->dbl->query($consulta_req_esc, array());
+                return $requisito_minimo;
+        }
+
+             
 /*************** obtener requisitos de un items de familias********/
          private function requisitos_items($id_item){
-            $sql = "SELECT mr.nombre nombre_req FROM mos_requisitos mr WHERE id IN (SELECT  mr.id_requisito from mos_requisitos_item 
-                    WHERE id_items =$id_item)";
+            $sql = "SELECT mr.nombre nombre_req,mr.id id_req FROM mos_requisitos mr WHERE id IN (SELECT id_requisitos FROM mos_requisitos_item WHERE id_item =$id_item)";
                 $requisitos_items = $this->dbl->query($sql, array());
                 return $requisitos_items;
 
@@ -1653,7 +1734,7 @@ HAVING COUNT(id_unico) <= 1 ) AND IDDoc in (select IDDoc from mos_documentos_dat
             $atrib['id_req_formulario']=$datos_form[id_req_form];
             $respuestas= $this->Comboparametros($atrib);
             $respuesta=$respuestas[0];
-            $atrib[condicion]=3;
+            $atrib[condicion]=4;
             $atrib[id_combo]=$respuestas[1][id_combo];
             $atrib[id_vigencia]=$respuestas[1][id_vigencia];
             $atrib[id_persona]=$respuestas[1][id_persona];
@@ -1934,7 +2015,23 @@ public function eliminarRelacionRequisitosCargos($atr){
                 $objResponse->addScript("PanelOperator.resize();");
                 return $objResponse;
             }
-         
+/******** buscar la pagina a mostrar en la matriz de competencia*********/
+                  public function buscar_matriz($parametros)
+            {
+                /*Permisos en caso de que no se use el arbol organizacional*/
+                import('clases.utilidades.NivelAcceso');                
+                $this->restricciones = new NivelAcceso();
+                $this->restricciones->cargar_permisos($parametros);
+                $grid = $this->verListaMatriz($parametros);                
+                $objResponse = new xajaxResponse();
+                $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
+                $objResponse->addAssign('grid-paginado',"innerHTML",$grid['paginado']);
+                          
+                $objResponse->addScript("$('#MustraCargando').hide();");
+                $objResponse->addScript("PanelOperator.resize();");
+                return $objResponse;
+            }
+                
  
      public function ver($parametros)
             {

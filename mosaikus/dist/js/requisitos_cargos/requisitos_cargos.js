@@ -169,6 +169,30 @@
         $('#MustraCargando').show();
         xajax_Loading(array.getArray());
     }
+    /*********** funcion para matriz de competencia*****/
+     function verPaginaMatriz(pag,doc){
+        array = new XArray();
+        if (doc== null)
+        {
+             $('form')[0].reset();             
+        }
+        array.getForm('busquedaFrm'); 
+        if ((isNaN(document.getElementById("reg_por_pag").value) == true) || (parseInt(document.getElementById("reg_por_pag").value) <= 0)){
+            array.addParametro('reg_por_pagina', 10);
+            document.getElementById("reg_por_pag").value = 10
+        }
+        else
+        {
+            array.addParametro('reg_por_pagina', document.getElementById("reg_por_pag").value);
+        }
+        array.addParametro('permiso',document.getElementById('permiso_modulo').value);
+        array.addParametro('pag',pag);
+        array.setObjeto('RequisitosCargos','buscar_matriz');
+        array.addParametro('import','clases.requisitos_cargos.RequisitosCargos');
+        $('#MustraCargando').show();
+        xajax_Loading(array.getArray());
+    }
+
 
     function verRequisitosCargos(id){
         var src = 'pages/' +  document.getElementById("modulo_actual").value + '/verRequisitosCargos.php?id='+id;
