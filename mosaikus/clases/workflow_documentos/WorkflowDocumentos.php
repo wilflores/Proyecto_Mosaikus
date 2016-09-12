@@ -5,7 +5,7 @@
         private $bd;
         private $total_registros;
         private $parametros;
-        private $nombres_columnas;
+        public $nombres_columnas;
         private $placeholder;
         private $id_org_acceso;
         private $modifica_tercero;
@@ -31,13 +31,13 @@
                 $this->parametros = $this->dbl->query($sql, array());
             }
             
-            private function cargar_nombres_columnas(){
+            public function cargar_nombres_columnas(){
                 $sql = "SELECT nombre_campo, texto FROM mos_nombres_campos WHERE id_idioma=$_SESSION[CookIdIdioma] and  modulo in (23,100)";
                 $nombres_campos = $this->dbl->query($sql, array());
                 foreach ($nombres_campos as $value) {
                     $this->nombres_columnas[$value[nombre_campo]] = $value[texto];
                 }
-                
+               //print_r($this->nombres_columnas);
             }
             
             private function cargar_placeholder(){
@@ -440,7 +440,7 @@
                             $sql .= " AND upper(email_aprueba) like '%" . strtoupper($atr["b-email_aprueba"]) . "%'";
                     $sql .= " order by $atr[corder] $atr[sorder] ";
                     $sql .= "LIMIT " . (($pag - 1) * $registros_x_pagina) . ", $registros_x_pagina ";
-                    //echo $sql;
+                    //echo $sql;die;
                     $this->operacion($sql, $atr);
              }
              public function eliminarWorkflowDocumentos($atr){
@@ -629,7 +629,7 @@
                 if ($parametros['corder'] == null) $parametros['corder']="id";
                 if ($parametros['sorder'] == null) $parametros['sorder']="desc"; 
                 if ($parametros['mostrar-col'] == null) 
-                    $parametros['mostrar-col']="0-2-3-4-5-6-7"; 
+                    $parametros['mostrar-col']="0-1-2-3-4-5-6"; 
                 /*if (count($this->parametros) <= 0){
                         $this->cargar_parametros();
                 } */               
@@ -695,7 +695,9 @@
                 if (isset($parametros['html']))
                     return $template->show();
                 $objResponse = new xajaxResponse();
-                $objResponse->addAssign('contenido',"innerHTML",$template->show());
+                //$objResponse->addAssign('contenido',"innerHTML",$template->show());
+                $objResponse->addAssign('contenido',"innerHTML",str_replace('exportarExcel()', 'exportarExcelPHP()', $template->show()));
+                
                 $objResponse->addAssign('permiso_modulo',"value",$parametros['permiso']);
                 $objResponse->addAssign('modulo_actual',"value","workflow_documentos");
                 $objResponse->addIncludeScript(PATH_TO_JS . 'workflow_documentos/workflow_documentos.js');
@@ -1009,6 +1011,7 @@
  
                 public function buscar($parametros)
             {   // cargar aqui...
+                   // print_r($parametros);
                 import('clases.utilidades.NivelAcceso');
                 $nivel = new NivelAcceso();
                 $this->restricciones = new NivelAcceso();
@@ -1019,7 +1022,7 @@
                         $this->restricciones->cargar_acceso_nodos_visualiza_terceros($parametros);
                         }
                 }
-                    
+                //print_r($parametros);    
                 $grid = $this->verListaWorkflowDocumentos($parametros);                
                 $objResponse = new xajaxResponse();
                 $objResponse->addAssign('grid',"innerHTML",$grid[tabla]);
