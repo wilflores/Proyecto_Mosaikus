@@ -91,6 +91,11 @@
             public function ingresarWorkflowDocumentos($atr){
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
+                    $sql="select count(*)cant from mos_workflow_documentos where id_personal_responsable=$atr[id_personal_responsable] and id_personal_revisa=$atr[id_personal_revisa] and id_personal_aprueba=$atr[id_personal_aprueba]";
+                    $this->operacion($sql, $atr);
+                    if ($this->dbl->data[0][cant]>0){
+                        return "Esta Flujo de Trabajo ya existe";
+                    }
                     if($atr[id_personal_revisa]=='')$atr[id_personal_revisa]='NULL';
                     $sql = "INSERT INTO mos_workflow_documentos(id_personal_responsable,email_responsable,id_personal_revisa,email_revisa,id_personal_aprueba,email_aprueba)
                             VALUES(
@@ -168,6 +173,12 @@
                 try {
                     $atr = $this->dbl->corregir_parametros($atr);
                     if($atr[id_personal_revisa]=='')$atr[id_personal_revisa]='NULL';
+                    $sql="select count(*)cant from mos_workflow_documentos where id_personal_responsable=$atr[id_personal_responsable] and id_personal_revisa=$atr[id_personal_revisa] and id_personal_aprueba=$atr[id_personal_aprueba] and id <> $atr[id]";
+                    $this->operacion($sql, $atr);
+                    if ($this->dbl->data[0][cant]>0){
+                        return "Esta Flujo de Trabajo ya existe";
+                    }
+                    
                     $sql = "UPDATE mos_workflow_documentos SET                            
                                     id = $atr[id],id_personal_responsable = $atr[id_personal_responsable],email_responsable = '$atr[email_responsable]',id_personal_revisa = $atr[id_personal_revisa],email_revisa = '$atr[email_revisa]',id_personal_aprueba = $atr[id_personal_aprueba],email_aprueba = '$atr[email_aprueba]'
                             WHERE  id = $atr[id]";      
@@ -708,7 +719,7 @@
          
  
             public function crear($parametros)
-            {
+            { //print_r($parametros);
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");
                 }
@@ -749,21 +760,21 @@
                                                                             FROM mos_personal p WHERE interno = 1 and elaboro = 'S'
                                                                             AND (cod_emp = ".(strlen($_SESSION['CookCodEmp'])>0?$_SESSION['CookCodEmp']:-1).$sql_nodos.")"
                                                                     , 'cod_emp'
-                                                                    , 'nombres', $value[valor]);
+                                                                    , 'nombres');
                 $contenido_1[ID_PERSONAL_REVISA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
                                                                             FROM mos_personal p WHERE interno = 1 and reviso = 'S'
                                                                             AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
                                                                     , 'cod_emp'
-                                                                    , 'nombres', $value[valor]);
+                                                                    , 'nombres');
                 $contenido_1[ID_PERSONAL_APRUEBA] .= $ut_tool->OptionsCombo("SELECT cod_emp, 
                                                                         CONCAT(CONCAT(UPPER(LEFT(p.apellido_paterno, 1)), LOWER(SUBSTRING(p.apellido_paterno, 2))),' ', CONCAT(UPPER(LEFT(p.apellido_materno, 1)), LOWER(SUBSTRING(p.apellido_materno, 2))), ' ', CONCAT(UPPER(LEFT(p.nombres, 1)), LOWER(SUBSTRING(p.nombres, 2))),
                                                                         (case when email<>'' and email is not null then CONCAT(' &rarr; ',email) else '' end) )  nombres
                                                                             FROM mos_personal p WHERE interno = 1 and aprobo = 'S'
                                                                             AND id_organizacion IN (". implode(',', array_keys($this->id_org_acceso)) . ")"
                                                                     , 'cod_emp'
-                                                                    , 'nombres', $value[valor]);
+                                                                    , 'nombres');
                 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'workflow_documentos/';
