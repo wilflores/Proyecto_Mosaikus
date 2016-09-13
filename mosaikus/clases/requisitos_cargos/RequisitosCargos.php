@@ -536,7 +536,7 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $acceso_areas";
 
                         }
                         if(($datos_requisitos[$y][tipo_req]=='Unico') && ($datos_requisitos[$y][vigencia_req]=='N')){//3. requisito tipo unico y no aplica vigencia
-                            $requisito_minimo=$this->requisito_minimo($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);// si se escogio un form
+                            $requisito_minimo=$this->requisito_minimo_unico($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);// si se escogio un form
                             $cant_resultado=count($requisito_minimo);
                             $requisito_minimo_curso=$this->requisito_minimo_curso($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);//si se escogio curso
                             $cant_resultado_curso=count($requisito_minimo_curso);
@@ -552,12 +552,12 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $acceso_areas";
                         }
                         if(($datos_requisitos[$y][tipo_req]=='Unico') && ($datos_requisitos[$y][vigencia_req]=='S')){//4. requisito tipo unico y aplica vigencia
                             //echo "entro con vigencia unico";
-                          $requisito_minimo=$this->requisito_minimo($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);// si se escogio un form
+                          $requisito_minimo=$this->requisito_minimo_unico($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);// si se escogio un form
                             $cant_resultado=count($requisito_minimo);
                             $requisito_minimo_curso=$this->requisito_minimo_curso($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);//si se escogio curso
                             $cant_resultado_curso=count($requisito_minimo_curso);
                             if($cant_resultado>0 || $cant_resultado_curso>0){
-                                    $tabla.="<td width=\"10%\"><div align=\"left\"*</div></td>";
+                                    $tabla.="<td width=\"10%\"><div align=\"left\">*</div></td>";
                                     $tabla.="<td width=\"10%\"><div align=\"left\">*</div></td>";
                             }
                             else{
@@ -729,8 +729,15 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $acceso_areas";
 //OBTENER PARAMETROS ESCOGIDOS EN UN REQUISITO MINIMO
         public function requisito_minimo($id_area,$cod_cargo,$id_requisito){
             $consulta_req_esc="SELECT mrf.id_documento_form id_formulario,mpi.id_parametro_formulario,mpi.id_parametro_items,mpi.id,mdf.Nombre nombre_parametro,mdf.valores valor_vigente,mdfi.descripcion descripcion_parametro FROM  mos_requisitos_cargos mrc INNER JOIN mos_requisitos_formularios mrf on mrc.id=mrf.id_requisito_cargo
-INNER JOIN mos_requisitos_parametros_index mpi on mpi.id_requisitos_formularios=mrf.id INNER JOIN mos_documentos_datos_formulario mdf on mdf.id_unico=mpi.id_parametro_formulario INNER JOIN mos_documentos_formulario_items mdfi on mdfi.fk_id_unico=mdf.id_unico and mdfi.id=mpi.id_parametro_items  where mrc.id_area=$id_area and mrc.id_cargo=$cod_cargo and mrc.id_requisito=$id_requisito and mdf.tipo<>6
-";
+INNER JOIN mos_requisitos_parametros_index mpi on mpi.id_requisitos_formularios=mrf.id INNER JOIN mos_documentos_datos_formulario mdf on mdf.id_unico=mpi.id_parametro_formulario INNER JOIN mos_documentos_formulario_items mdfi on mdfi.fk_id_unico=mdf.id_unico and mdfi.id=mpi.id_parametro_items  where mrc.id_area=$id_area and mrc.id_cargo=$cod_cargo and mrc.id_requisito=$id_requisito and mdf.tipo<>6";
+//echo $consulta_req_esc;
+                $requisito_minimo= $this->dbl->query($consulta_req_esc, array());
+                return $requisito_minimo;
+        }
+//OBTENER PARAMETROS ESCOGIDOS EN UN REQUISITO MINIMO CUANDO ES UNICO
+        public function requisito_minimo_unico($id_area,$cod_cargo,$id_requisito){
+            $consulta_req_esc="SELECT mrf.id_documento_form id_formulario,mpi.id_parametro_formulario,mpi.id_parametro_items,mpi.id,mdf.Nombre nombre_parametro,mdf.valores valor_vigente,mdf.tipo tipo_parametro FROM  mos_requisitos_cargos mrc INNER JOIN mos_requisitos_formularios mrf on mrc.id=mrf.id_requisito_cargo
+INNER JOIN mos_requisitos_parametros_index mpi on mpi.id_requisitos_formularios=mrf.id INNER JOIN mos_documentos_datos_formulario mdf on mdf.id_unico=mpi.id_parametro_formulario  where mrc.id_area=$id_area and mrc.id_cargo=$cod_cargo and mrc.id_requisito=$id_requisito and mdf.tipo<>6";
 //echo $consulta_req_esc;
                 $requisito_minimo= $this->dbl->query($consulta_req_esc, array());
                 return $requisito_minimo;
