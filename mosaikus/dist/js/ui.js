@@ -253,6 +253,15 @@ var ScrollBar ={
     }
 }
 
+var Loader ={
+    loading: function(){
+        $('#MustraCargando').show();
+    },
+    done:function () {
+        $('#MustraCargando').hide();
+    }
+}
+
 /**
  * Created by Juziel Indriago on 11/29/2015.
  */

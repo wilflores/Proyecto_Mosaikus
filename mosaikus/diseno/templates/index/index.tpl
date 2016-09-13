@@ -86,6 +86,9 @@ function notifyBrowser(title,desc,url)
 </script>
 
 <body onclick="CerrarNotificacionesSiOpen();">
+    <div id="MustraCargando">
+          <img src="dist/images/loading.gif">
+        </div>
 <!-- #page-wrapper -->
 <div id="page-wrapper">
   <!-- #page -->
@@ -195,6 +198,7 @@ function notifyBrowser(title,desc,url)
       </div>
       <!-- .panels -->
       <div class="panels">
+        
 
 <!--   -->
         <div class="container-fluid" >
