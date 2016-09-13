@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
- * Bootstrap v3.3.6 (http://getbootstrap.com)
- * Copyright 2011-2015 Twitter, Inc.
+ * Bootstrap v3.3.7 (http://getbootstrap.com)
+ * Copyright 2011-2016 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
@@ -1076,7 +1076,6 @@ a {
     color: #181e22;
     text-decoration: none; }
   a:focus {
-    outline: thin dotted;
     outline: 5px auto -webkit-focus-ring-color;
     outline-offset: -2px; }
 
@@ -2737,7 +2736,6 @@ select[size] {
 input[type="file"]:focus,
 input[type="radio"]:focus,
 input[type="checkbox"]:focus {
-  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px; }
 
@@ -3251,9 +3249,8 @@ select[multiple].input-lg,
   -ms-user-select: none;
   user-select: none; }
   .btn:focus, .btn.focus, .btn:active:focus, .btn:active.focus, .btn.active:focus, .btn.active.focus {
-    outline: none !important;
-    outline: none !important;
-    outline-offset: 0; }
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: -2px; }
   .btn:hover, .btn:focus, .btn.focus {
     color: #455a64;
     text-decoration: none; }
@@ -3996,7 +3993,7 @@ tbody.collapse.in {
     .nav > li > a {
       position: relative;
       display: block;
-      padding: 8px 72px; }
+      padding: 8px 52px; }
       .nav > li > a:hover, .nav > li > a:focus {
         text-decoration: none;
         background-color: #fafafa; }
@@ -5776,12 +5773,11 @@ button.close {
   border-bottom-color: #000; }
 
 .popover {
-   position: absolute;
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 1060;
   display: none;
-  min-width: 300px;
   max-width: 300px;
   padding: 1px;
   font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -5871,7 +5867,7 @@ button.close {
     border-right-color: #eeeeee; }
 
 .popover.bottom > .arrow {
-  left: 90%;
+  left: 50%;
   margin-left: -11px;
   border-top-width: 0;
   border-bottom-color: #999999;
@@ -6316,7 +6312,7 @@ button.close {
 
 .fa {
   display: inline-block;
-  font: normal normal normal 14px / 1 FontAwesome;
+  font: normal normal normal 14px/1 FontAwesome;
   font-size: inherit;
   text-rendering: auto;
   -webkit-font-smoothing: antialiased;
@@ -8402,7 +8398,8 @@ button.close {
 .icon-user {
   background-position: -10px -127px; }
 
-
+.icon-user-document {
+  background-position: -86px -127px; }
 
 /************************************/
 .icon-radio {
@@ -8427,8 +8424,8 @@ button.close {
 .icon-search-white {
   background-position: -86px -86px; }
 
-.icon-user-document {
-  background-position: -86px -127px; }
+.icon-document-check {
+  background-position: -86px -126px; }
 
 /******************************************/
 .icon-back {
@@ -8440,6 +8437,9 @@ button.close {
 .icon-search {
   background-position: -123px -86px; }
 
+.icon-competencias {
+  background-position: -123px -126px; }
+
 /******************************************/
 .icon-new-document {
   background-position: -151px -10px; }
@@ -8449,6 +8449,9 @@ button.close {
 
 .icon-down {
   background-position: -151px -86px; }
+
+.icon-download-cc {
+  background-position: -151px -126px; }
 
 /******************************************/
 .icon-transmision {
@@ -8460,6 +8463,9 @@ button.close {
 .icon-up {
   background-position: -186px -86px; }
 
+.icon-down-big {
+  background-position: -186px -126px; }
+
 /******************************************/
 .icon-squares {
   background-position: -220px -10px; }
@@ -8469,6 +8475,9 @@ button.close {
 
 .icon-up-down {
   background-position: -220px -86px; }
+
+.icon-up-big {
+  background-position: -220px -126px; }
 
 /******************************************/
 .icon-close {
@@ -8480,6 +8489,9 @@ button.close {
 .icon-alert-white {
   background-position: -256px -86px; }
 
+.icon-vr {
+  background-position: -256px -126px; }
+
 /******************************************/
 .icon-close-white {
   background-position: -290px -10px; }
@@ -8489,6 +8501,9 @@ button.close {
 
 .icon-alert-print {
   background-position: -290px -86px; }
+
+.icon-folder-link {
+  background-position: -290px -126px; }
 
 /******************* FIN  ICONS ********************************************************/
 /******************* ICONS MOD********************************************************/
@@ -8538,6 +8553,9 @@ button.close {
 
 .icon-mod-configuracion {
   background-position: -8px -444px; }
+
+.icon-mod-pencil {
+  background-position: -8px -484px; }
 
 /******************* FIN ICONS MOD********************************************************/
 /******************* ICONS Table********************************************************/
@@ -8692,7 +8710,8 @@ body {
         float: left;
         height: auto;
         width: 100%;
-        padding: 24px; }
+        padding: 24px;
+        position: relative; }
         #page-wrapper #page .content-wrap .panels .container-fluid {
           height: auto; }
         #page-wrapper #page .content-wrap .panels .row {
@@ -8779,6 +8798,10 @@ body {
         position: relative;
         /** NIVEL 3 ******************************************************/
         /** FIN NIVEL 3 ******************************************************/ }
+        #nav ul#menu > li.li-parent ul.submenu > li i {
+          float: right; }
+        #nav ul#menu > li.li-parent ul.submenu > li i.icon-down-big {
+          display: none; }
         #nav ul#menu > li.li-parent ul.submenu > li a {
           float: left;
           width: 100%;
@@ -8800,6 +8823,10 @@ body {
             background-color: transparent; }
       #nav ul#menu > li.li-parent ul.submenu > li.active > a {
         color: #ffffff; }
+        #nav ul#menu > li.li-parent ul.submenu > li.active > a i.icon-down-big {
+          display: block; }
+        #nav ul#menu > li.li-parent ul.submenu > li.active > a i.icon-up-big {
+          display: none; }
     #nav ul#menu > li:hover,
     #nav ul#menu > li.active {
       background-color: #37474f; }
@@ -8840,6 +8867,12 @@ body {
   .close-detail i,
   .close-search i {
     margin-top: 2px; }
+
+#accordion .panel-heading, #accordion .report-heading {
+  margin-bottom: 0px; }
+
+#accordion .panel-body {
+  background-color: #fafafa; }
 
 .tabs .nav-tabs > li > a {
   border: 1px solid #cfd8dc;
@@ -8904,7 +8937,10 @@ body {
     .status-bar .notifications .popover.bottom {
       margin-left: 120px;
       margin-top: 60px;
-      font-size: 0.9em; }
+      font-size: 0.9em;
+      max-width: 300px; }
+      .status-bar .notifications .popover.bottom > .arrow {
+        left: 90%; }
       .status-bar .notifications .popover.bottom ul {
         width: 100%;
         padding: 0;
@@ -9091,19 +9127,34 @@ body {
                 color: #ffffff; }
             .page-login #page .content-wrap .panels .row #login-form .login-t .body .login-form form button:hover {
               opacity: 1; }
-            /*Nuevos*/
-            .btn-combo{
-                border-radius: 2px;
-                background-color: #fafafa;
-                padding: 6px 12px;
-                border: 1px solid #cfd8dc;
-            }
-            .nav > li > a {
-      
-      padding: 8px 52px; }
-            .bs-actionsbox .btn-default{
-                border-radius: 2px;
-                background-color: #fafafa;
-                padding: 6px 12px;
-                border: 1px solid #cfd8dc;
-            }
+
+.btn-combo {
+  border-radius: 2px;
+  background-color: #fafafa;
+  padding: 6px 12px;
+  border: 1px solid #cfd8dc; }
+
+.bs-actionsbox .btn-default {
+  border-radius: 2px;
+  background-color: #fafafa;
+  padding: 6px 12px;
+  border: 1px solid #cfd8dc; }
+
+.popover {
+  min-width: 300px; }
+
+#loading, #MustraCargando {
+  z-index: 1000;
+  position: absolute;
+  top: 45%;
+  left: 45%;
+  /*width: 100%;
+  height: 100%;
+  background-color: #ffffff;*/
+  opacity: 0.8;
+  display: none; }
+  #loading img, #MustraCargando img {
+    position: absolute;
+    left: 45%;
+    top: 30%;
+    width: 150px; }
