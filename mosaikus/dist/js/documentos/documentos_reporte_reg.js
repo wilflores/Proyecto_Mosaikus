@@ -96,6 +96,7 @@ function init_ver_registros()
             array.addParametro('cod_link',document.getElementById('cod_link').value);
             array.addParametro('id',id);
             array.addParametro('import','clases.registros.Registros');
+            Loader.loading();
             xajax_Loading(array.getArray());                                
             //window.location = 'index.php#detail-content';
             
@@ -132,6 +133,7 @@ function init_tabla_reporte(){
             array.addParametro('cod_link',document.getElementById('cod_link').value);
             array.addParametro('id',id);
             array.addParametro('import','clases.registros.Registros');
+            Loader.loading();
             xajax_Loading(array.getArray());                                
             //window.location = 'index.php#detail-content';
             
@@ -174,6 +176,7 @@ function MuestraFormulario(id){
             array.addParametro('cod_link',document.getElementById('cod_link').value);
         array.addParametro('id',id);
         array.addParametro('import','clases.registros.Registros');
+        Loader.loading();
         xajax_Loading(array.getArray());
     }
 

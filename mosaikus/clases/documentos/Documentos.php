@@ -3880,7 +3880,8 @@ echo $Consulta3;
                                        array.addParametro('cod_link',document.getElementById('cod_link').value);
                                         array.addParametro('id',id);
                                         array.addParametro('import','clases.registros.Registros');
-                                        xajax_Loading(array.getArray());                                
+                                        xajax_Loading(array.getArray());    
+                                        Loader.loading();
                                         //window.location = 'index.php#detail-content';
 
                                     });
