@@ -28,6 +28,9 @@
 </head>
 
 <body>
+    <div id="MustraCargando">
+          <img src="dist/images/loading.gif">
+        </div>
 <!-- #page-wrapper -->
 <div id="page-wrapper">
   <!-- #page -->

@@ -58,12 +58,12 @@
                 $id_cantidad = $this->dbl->data[0][0];//para saber si hy ya alguna relcion
                 if($id_cantidad==0){//NO hay asociacion. se crea nuevo
                         $html .= '<a onclick="javascript:relacion_RequisitosCargos(\''.$tupla[cod_cargo].'\',\''.$tupla[id_area].'\' );">
-                                    <i style="cursor:pointer" class="icon icon-more"  title="Administrar Requisitos del Cargo" style="cursor:pointer"></i>
+                                    <i style="cursor:pointer" class="icon icon-competencias"  title="Administrar Requisitos del Cargo" style="cursor:pointer"></i>
                                 </a>';
                 }
                 else{//para modificar la asociacion con requiditos que ya esta echa
                         $html .= '<a onclick="javascript:editarRequisitosCargos(\''.$tupla[cod_cargo].'\',\''.$tupla[id_area].'\' );">
-                                    <i style="cursor:pointer" class="icon icon-more"  title="Administrar Requisitos del Cargo" style="cursor:pointer"></i>
+                                    <i style="cursor:pointer" class="icon icon-competencias"  title="Administrar Requisitos del Cargo" style="cursor:pointer"></i>
                                 </a>';
                 }
                 /*if (strlen($tupla[id_registro])<=0){
@@ -474,24 +474,26 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $acceso_areas";
                 $items_familia=$this->items_familia_requisitos($id_familia);
                 $tabla='';
                 /************** COnstruir la tabla dinamica de la matriz******/
-                $tabla.= " <table width=\"100%\" class='table table-striped table-condensed' id=\"tblRequisitosCargos\"  >\n";
+                $tabla.= " <table width=\"100%\" class='table table-striped table-condensed' id=\"tblRequisitosCargos\">\n";
 
                 $tabla.="<thead><tr height=\"30px\">";
-                            $tabla.="<th rowspan=\"2\"  align=\"center\" width=\"10%\" style=\"padding-top:5px;\"><div align=\"center\">".ucwords(strtolower($familias[$ind][descripcion]))."</div></th>";
+                            $tabla.="<th rowspan=\"2\" colspan=\"2\" align=\"center\" width=\"10%\" style=\"padding-top:5px;\"><div align=\"center\">".ucwords(strtolower($familias[$ind][descripcion]))."</div></th>";
                 /***********MOstrar items***********/
                  foreach ($items_familia as $value) {   
                     $cant_requisitos=explode(",", $value[id_requisito]);
-                    $cant_req=count($cant_requisitos);//para calcular el colspan de la celda del items de acuerdo a la cantidad de requisitos
-                    $tabla.="<th width=\"20%\" colspan=\"$cant_req\" align=\"center\"><div align=\"center\">".ucwords(strtolower($value[desc_items])). "</div></th>";
+
+                    $cant_req=count($cant_requisitos)*2;//para calcular el colspan de la celda del items de acuerdo a la cantidad de requisitos
+                    //echo "cantidad de requisitos: ".count($cant_requisitos);
+                    $tabla.="<th  border=\"2\" width=\"20%\" colspan=\"$cant_req\" align=\"center\"><div align=\"center\">".ucwords(strtolower(htmlentities($value[desc_items]))). "</div></th>";
                 }
                 $tabla.="</tr>";
-                $tabla.="<tr><th></th>";
+                $tabla.="<tr>";
                 /******** MOSTRAR LOS REQUISITOS DE CADA items******/
                 foreach ($items_familia as $value) {  
                     $datos_requisitos=$this->requisitos_items($value[id_item]);
                    // print_r($datos_requisitos);
                     for($y=0;$y<count($datos_requisitos);$y++){
-                        $tabla.="<td width=\"10%\"><div align=\"left\">".ucwords(strtolower($datos_requisitos[$y][nombre_req])). "</div></td>";
+                        $tabla.="<td colspan=\"2\" width=\"10%\"><div align=\"left\">".ucwords(strtolower($datos_requisitos[$y][nombre_req])). "</div></td>";
                     }
                 }  
                 $tabla.="</tr></thead>";              
@@ -508,15 +510,63 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $acceso_areas";
                     /******** MOSTRAR LOS REQUISITOS DE CADA items******/
                 foreach ($items_familia as $value) {  
                     $datos_requisitos=$this->requisitos_items($value[id_item]);
-                   // print_r($datos_requisitos);
+                  // print_r($datos_requisitos);
                     for($y=0;$y<count($datos_requisitos);$y++){
-                        $requisito_minimo=$this->requisito_minimo($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);// si se escogio un form
-                        //print_r($requisito_minimo);
-                         $tabla.="<td width=\"10%\">";
-                        for($z=0;$z<count($requisito_minimo);$z++){
-                           $tabla.="<div align=\"left\">".ucwords(strtolower($requisito_minimo[$z][nombre_parametro]))."</div>";
+                        if(($datos_requisitos[$y][tipo_req]=='Listado') && ($datos_requisitos[$y][vigencia_req]=='N')){//1. requisito tipo listado y no aplica vigencia
+                            $requisito_minimo=$this->requisito_minimo($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);// si se escogio un form
+                            $cant_resultado=count($requisito_minimo);
+                            if($cant_resultado>0){
+                                    $tabla.="<td width=\"10%\"><div align=\"left\">&nbsp;</div></td>";//no aplica vigencia
+                                    $tabla.="<td width=\"10%\"><div align=\"left\">".ucwords(strtolower(htmlentities($requisito_minimo[0][descripcion_parametro])))."</div></td>";//combo                                    }
+                            }
+                            else{
+                                   $tabla.="<td width=\"10%\"></td><td width=\"10%\"></td>";
+                            }
                         }
-                        $tabla.="</td>";
+                        if(($datos_requisitos[$y][tipo_req]=='Listado') && ($datos_requisitos[$y][vigencia_req]=='S')){//2. requisito tipo listado y aplica vigencia
+                            $requisito_minimo=$this->requisito_minimo($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);// si se escogio un form
+                            $cant_resultado=count($requisito_minimo);
+                            if($cant_resultado>0){
+                                    $tabla.="<td width=\"10%\"><div align=\"left\">*</div></td>";//aplica vigencia
+                                    $tabla.="<td width=\"10%\"><div align=\"left\">".ucwords(strtolower(htmlentities($requisito_minimo[0][descripcion_parametro])))."</div></td>";
+                            }
+                            else{
+                                   $tabla.="<td width=\"10%\"></td><td width=\"10%\"></td>";
+                            }
+
+                        }
+                        if(($datos_requisitos[$y][tipo_req]=='Unico') && ($datos_requisitos[$y][vigencia_req]=='N')){//3. requisito tipo unico y no aplica vigencia
+                            $requisito_minimo=$this->requisito_minimo_unico($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);// si se escogio un form
+                            $cant_resultado=count($requisito_minimo);
+                            $requisito_minimo_curso=$this->requisito_minimo_curso($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);//si se escogio curso
+                            $cant_resultado_curso=count($requisito_minimo_curso);
+                            //echo "entro SN vigencia unico ".$cant_resultado_curso." </br>";
+                            if($cant_resultado>0 || $cant_resultado_curso>0){
+                                    $tabla.="<td width=\"10%\"><div align=\"left\">&nbsp;</div></td>";
+                                    $tabla.="<td width=\"10%\"><div align=\"left\">*</div></td>";
+                            }
+                            else{
+                                   $tabla.="<td width=\"10%\"></td><td width=\"10%\"></td>";
+                            }
+
+                        }
+                        if(($datos_requisitos[$y][tipo_req]=='Unico') && ($datos_requisitos[$y][vigencia_req]=='S')){//4. requisito tipo unico y aplica vigencia
+                            //echo "entro con vigencia unico";
+                          $requisito_minimo=$this->requisito_minimo_unico($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);// si se escogio un form
+                            $cant_resultado=count($requisito_minimo);
+                            $requisito_minimo_curso=$this->requisito_minimo_curso($data[$x][id_area],$data[$x][cod_cargo],$datos_requisitos[$y][id_req]);//si se escogio curso
+                            $cant_resultado_curso=count($requisito_minimo_curso);
+                            if($cant_resultado>0 || $cant_resultado_curso>0){
+                                    $tabla.="<td width=\"10%\"><div align=\"left\">*</div></td>";
+                                    $tabla.="<td width=\"10%\"><div align=\"left\">*</div></td>";
+                            }
+                            else{
+                                   $tabla.="<td width=\"10%\"></td><td width=\"10%\"></td>";
+                            }                             
+
+                        }
+
+                        //$tabla.="</td>";
                     }
                 }  
                     $tabla.="</tr>";
@@ -678,17 +728,33 @@ INNER JOIN mos_organizacion mo ON mo.id = mco.id where 1=1 $acceso_areas";
              }
 //OBTENER PARAMETROS ESCOGIDOS EN UN REQUISITO MINIMO
         public function requisito_minimo($id_area,$cod_cargo,$id_requisito){
+            $consulta_req_esc="SELECT mrf.id_documento_form id_formulario,mpi.id_parametro_formulario,mpi.id_parametro_items,mpi.id,mdf.Nombre nombre_parametro,mdf.valores valor_vigente,mdfi.descripcion descripcion_parametro FROM  mos_requisitos_cargos mrc INNER JOIN mos_requisitos_formularios mrf on mrc.id=mrf.id_requisito_cargo
+INNER JOIN mos_requisitos_parametros_index mpi on mpi.id_requisitos_formularios=mrf.id INNER JOIN mos_documentos_datos_formulario mdf on mdf.id_unico=mpi.id_parametro_formulario INNER JOIN mos_documentos_formulario_items mdfi on mdfi.fk_id_unico=mdf.id_unico and mdfi.id=mpi.id_parametro_items  where mrc.id_area=$id_area and mrc.id_cargo=$cod_cargo and mrc.id_requisito=$id_requisito and mdf.tipo<>6";
+//echo $consulta_req_esc;
+                $requisito_minimo= $this->dbl->query($consulta_req_esc, array());
+                return $requisito_minimo;
+        }
+//OBTENER PARAMETROS ESCOGIDOS EN UN REQUISITO MINIMO CUANDO ES UNICO
+        public function requisito_minimo_unico($id_area,$cod_cargo,$id_requisito){
             $consulta_req_esc="SELECT mrf.id_documento_form id_formulario,mpi.id_parametro_formulario,mpi.id_parametro_items,mpi.id,mdf.Nombre nombre_parametro,mdf.valores valor_vigente,mdf.tipo tipo_parametro FROM  mos_requisitos_cargos mrc INNER JOIN mos_requisitos_formularios mrf on mrc.id=mrf.id_requisito_cargo
 INNER JOIN mos_requisitos_parametros_index mpi on mpi.id_requisitos_formularios=mrf.id INNER JOIN mos_documentos_datos_formulario mdf on mdf.id_unico=mpi.id_parametro_formulario  where mrc.id_area=$id_area and mrc.id_cargo=$cod_cargo and mrc.id_requisito=$id_requisito and mdf.tipo<>6";
 //echo $consulta_req_esc;
                 $requisito_minimo= $this->dbl->query($consulta_req_esc, array());
                 return $requisito_minimo;
         }
+//obtener parametros curso
+        public function requisito_minimo_curso($id_area,$cod_cargo,$id_requisito){
+            $consulta_req_esc="SELECT mrf.* FROM  mos_requisitos_cargos mrc INNER JOIN mos_requisitos_cursos mrf on mrc.id=mrf.id_requisito_cargo
+ where mrc.id_area=$id_area and mrc.id_cargo=$cod_cargo and mrc.id_requisito=$id_requisito";
+//echo $consulta_req_esc;
+                $requisito_minimo_curso= $this->dbl->query($consulta_req_esc, array());
+                return $requisito_minimo_curso;
+        }
 
              
 /*************** obtener requisitos de un items de familias********/
          private function requisitos_items($id_item){
-            $sql = "SELECT mr.nombre nombre_req,mr.id id_req FROM mos_requisitos mr WHERE id IN (SELECT id_requisitos FROM mos_requisitos_item WHERE id_item =$id_item)";
+            $sql = "SELECT mr.nombre nombre_req,mr.id id_req,mr.tipo tipo_req,mr.vigencia vigencia_req FROM mos_requisitos mr WHERE id IN (SELECT id_requisitos FROM mos_requisitos_item WHERE id_item =$id_item)";
                 $requisitos_items = $this->dbl->query($sql, array());
                 return $requisitos_items;
 
@@ -705,7 +771,7 @@ GROUP BY mif.descripcion ORDER BY mif.id";
 //METODO PARA GENERAR LA MATRIZ DE COMPETENCIA 02/09/2016
             public function indexMatrizCompetencia($parametros)
             {
-                //print_r($parametros);
+                //print_r($parametros)
                 $contenido[TITULO_MODULO] = $parametros[nombre_modulo];
                 if(!class_exists('Template')){
                     import("clases.interfaz.Template");

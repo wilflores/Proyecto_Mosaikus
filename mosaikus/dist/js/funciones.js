@@ -159,7 +159,7 @@ function admin_ao(){
                                 'icon': ''
                             },
                             'area_espejo':{
-                                'icon': 'glyphicon glyphicon-resize-small'
+                                'icon': 'icon-folder-link' //icon glyphicon-resize-small
                             }
                         },
                         'contextmenu': {

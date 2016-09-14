@@ -51,6 +51,7 @@ function MuestraFormulario(id){
         array.addParametro('cod_link',document.getElementById('cod_link').value);
         array.addParametro('id',id);
         array.addParametro('import','clases.registros.Registros');
+        Loader.loading();
         xajax_Loading(array.getArray());
     }
 
