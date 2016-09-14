@@ -313,7 +313,9 @@
                                     ,tipo                                    
                             FROM mos_personal_hoja_vida hv				                            
                             WHERE 1 = 1 $sql_where and (tipo is null or tipo = '') 
-                             UNION ALL
+                             ";
+                    /* DESACTIVADO TEMPORALMENTE
+                    UNION ALL
                              SELECT cod_hoja_vida
                                     ,cod_emp
                                     ,DATE_FORMAT(mi.fecha, '%d/%m/%Y') fecha
@@ -352,7 +354,8 @@
                                     ,tipo                                    
                             FROM mos_personal_hoja_vida hv
                             INNER JOIN mos_accidentes_ley al ON hv.tipo = 'Acc' and hv.id_registro = al.id_accidente_ley
-                        WHERE 1 = 1 $sql_where and (tipo is null or tipo = 'Acc')";
+                        WHERE 1 = 1 $sql_where and (tipo is null or tipo = 'Acc')
+                     *                      */
                     if (strlen($atr[valor])>0)
                         $sql .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
                                  if (strlen($atr["b-cod_hoja_vida"])>0)
