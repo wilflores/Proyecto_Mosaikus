@@ -1024,7 +1024,7 @@ FROM mos_requisitos_organizacion where 1=1
                 }
                 $ut_tool = new ut_Tool();
                 $val = $this->verRequisitos($parametros[id]); 
-
+                //pendiente validar si ya esta asociado a algun area-cargo
                 if (count($this->nombres_columnas) <= 0){
                         $this->cargar_nombres_columnas();
                 }

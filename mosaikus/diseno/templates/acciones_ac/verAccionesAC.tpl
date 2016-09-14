@@ -12,7 +12,7 @@
     <div class="row">
         <table width="100%" class="table table-striped table-condensed" id="tblListaDistribucionDoc">
             <tr height="30px">
-                <th width="20%"><div align="center">{N_ID_CORRECION}</div></th>
+                <th width="20%"><div align="center">{N_ID}</div></th>
                 <td width="80%"><div align="left">{ID_CORRECION}</div></td>
             </tr>
             <tr height="30px">
@@ -28,11 +28,11 @@
                 <td width="80%"><div align="left">{ACCION}</div></td>
             </tr>
             <tr height="30px">
-                <th width="20%"><div align="center">{N_ELABORO}</div></th>
+                <th width="20%"><div align="center">{N_ID_RESPONSABLE}</div></th>
                 <td width="80%"><div align="left">{RESPONSABLE}</div></td>
             </tr>
             <tr height="30px">
-                <th width="20%"><div align="center">{N_FECHA_EJECUTADA}</div></th>
+                <th width="20%"><div align="center">{N_FECHA_ACORDADA}</div></th>
                 <td width="80%"><div align="left">{FECHA_ACORDADA}</div></td>
             </tr>
         </table>
@@ -48,8 +48,8 @@
             <thead>
             <tr>
                 <th style="width: 20%;">{N_TIPO}</th>
-                <th style="width: 60%">{N_ACCION}</th>
-                <th style="width: 20%">{N_FECHA_EJECUTADA}</th>
+                <th style="width: 60%">{N_ACCION_EJECUTADA}</th>
+                <th style="width: 20%">{N_FECHA_REALIZADA}</th>
             </tr>
             </thead>
             <tbody>

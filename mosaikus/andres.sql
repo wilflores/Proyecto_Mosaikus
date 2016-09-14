@@ -1690,7 +1690,14 @@ END;
 ;;
 
 /***********7/09/2016*******/
-INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'id_organizacion_act', 'Organizacion Actual', '1', 'Organizacion Actual',1);
+INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'id_organizacion_hist', 'Organizacion Actual', '1', 'Organizacion Actual',1);
 INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'cargo_act', 'Cargo Actual', '1', 'Cargo Actual',1);
 
 ADD COLUMN `correlativo`  varchar(5) NULL AFTER `id_organizacion`;
+/***********8/09/2016*******/
+
+INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'id_organizacion_hist', 'Area de Desempeño', '1', 'Area de Desempeño',1);
+INSERT INTO `mos_nombres_campos`(nombre_campo,texto,modulo,placeholder,id_idioma) VALUES ( 'id_organizacion_hist', 'área de atuação', '1', 'área de atuação',2);
+
+
+

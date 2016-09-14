@@ -7,7 +7,7 @@
     }
 
     function filtrar_mostrar_colums(){
-        var colums = '1-2-3-4-';
+        var colums = '0-1-2-3-4-';
          $('.checkbox-mos-col').each(function() {
                 if (this.checked){
                     colums = colums + this.value + '-';
@@ -122,4 +122,10 @@
             $("#"+correo).val($("#"+combo).select2('data').text.split(" → ")[1]);
         else
             $("#"+correo).val('');
+    }
+    function exportarExcelPHP(){
+    var params =  getForm('busquedaFrm');
+    params = params + '&modo='+$('#modo').val()+ '&cod_link='+$('#cod_link').val()+
+            '&modulo_actual='+document.getElementById("modulo_actual").value;
+    window.open('pages/' +  document.getElementById("modulo_actual").value + '/exportarExcel.php?'+params,'_blank');
     }

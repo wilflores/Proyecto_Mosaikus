@@ -52,43 +52,6 @@
                 }
                 
             }
-
-            private function obtener_id_mos_personal($id_usuario){
-                $sql = "SELECT mp.cod_emp from mos_personal mp, 
-                                       mos_usuario mu 
-                        WHERE  mu.id_usuario ='" . $id_usuario . "' 
-                        AND    mp.email = mu.email";
-                $cod_emp =  $this->dbl->query($sql, array());
-                return count($cod_emp) > 0 ? $cod_emp[0][cod_emp] : 0;
-            }
-
-            private function ver_terceros($id_usuario)
-            {
-                $sql = "SELECT count(*) as valido 
-                        FROM mos_usuario_filial muf, mos_perfil mp 
-                        WHERE muf.id_usuario = $id_usuario
-                        AND   mp.cod_perfil = muf.cod_perfil
-                        AND   mp.visualizar_terceros ='S'";
-                $this->operacion($sql, array());
-                $resultado = $this->dbl->data;
-                return $resultado[0][valido];
-            }
-
-            private function obtener_areas_responsable($cod_emp)
-            {
-                $sql = "SELECT id_organizacion from mos_responsable_area WHERE cod_emp='" . $cod_emp . "'";
-                $areas =  $this->dbl->query($sql, array());
-                if(count($areas)){
-                    $output = "";
-                    foreach ($areas as $area) {
-                        $output .= $area[id_organizacion] . ",";
-                    }
-                    return substr($output,0,strlen($output)-1);
-                }else{
-                    return null;
-                }
-
-            }
      
 
              public function verAccionesAC($id){
@@ -368,8 +331,6 @@
                     $this->restricciones = new NivelAcceso();
                     $this->restricciones->cargar_acceso_nodos_explicito($atr);
 
-                    //$areas = $this->ver_terceros($_SESSION['CookIdUsuario']) ? $this->obtener_areas_responsable($cod_emp) : null;
-
                     $sql_where = '';
                     if (strlen($atr[valor])>0)
                         $sql_where .= " AND upper($atr[campo]) like '%" . strtoupper($atr[valor]) . "%'";
@@ -401,7 +362,7 @@
                         $sql_where .= " AND id_responsable = '". $atr["b-id_responsable"] . "'";
 
                     $sql_where .= " AND (id_responsable = '". $_SESSION['CookCodEmp'] . "' OR id_validador ='" . $_SESSION['CookCodEmp'] ."')";
-                    if($areas)
+                    if(count($this->id_org_acceso_explicito) > 0)
                         $sql_where .= " or (per.id_organizacion IN (".implode(',', array_keys($this->id_org_acceso_explicito))."))";
 
                     /*
@@ -555,9 +516,9 @@
                 $config_col=array(
                     array( "width"=>"2%","ValorEtiqueta"=>"<div style='width:60px'>&nbsp;</div>"),
                     array( "width"=>"5%","ValorEtiqueta"=>htmlentities($this->nombres_columnas[estado_seguimiento], ENT_QUOTES, "UTF-8")),
-                    array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas_ac[id], "id_ac", $parametros,30)), 
-                    array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas_ac[fecha_generacion], "ac.fecha_generacion", $parametros,80,40)), 
-                    array( "width"=>"20%","ValorEtiqueta"=>link_titulos($this->nombres_columnas_ac[descripcion], "ac.descripcion", $parametros)), 
+                    array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[id], "id_ac", $parametros,30)),
+                    array( "width"=>"5%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[fecha_generacion], "ac.fecha_generacion", $parametros,80,40)),
+                    array( "width"=>"20%","ValorEtiqueta"=>link_titulos($this->nombres_columnas[descripcion], "ac.descripcion", $parametros)),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[tipo], "tipo", $parametros,"link_titulos")),
                array( "width"=>"20%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[accion], "accion", $parametros,"link_titulos")),
                array( "width"=>"5%","ValorEtiqueta"=>link_titulos_otro($this->nombres_columnas[fecha_acordada], "acco.fecha_acordada", $parametros,"link_titulos")),
@@ -812,6 +773,9 @@
                             </div>';
                     $k++;                    
                 }
+                if (count($this->nombres_columnas) <= 0){
+                    $this->cargar_nombres_columnas();
+                }
                 //echo $parametros['mostrar-col'];
                 $grid = $this->verListaAccionesAC($parametros);
                 $contenido['CORDER'] = $parametros['corder'];
@@ -830,9 +794,7 @@
 
                 $template = new Template();
                 $template->PATH = PATH_TO_TEMPLATES.'acciones_ac/';
-                if (count($this->nombres_columnas) <= 0){
-                        $this->cargar_nombres_columnas();
-                }
+
                 foreach ( $this->nombres_columnas as $key => $value) {
                     $contenido["N_" . strtoupper($key)] =  $value;
                 }  
@@ -1002,6 +964,7 @@
                         $objResponse->addScript("reset_formulario();");
                         $objResponse->addScript("verPagina_hv(1,1);");
                         $objResponse->addScriptCall('VerMensaje','exito',$respuesta);
+
                     }
                     else
                         $objResponse->addScriptCall('VerMensaje','error',$respuesta);
@@ -1545,6 +1508,47 @@
                         $parametros= $this->dbl->corregir_parametros($parametros);
                         $sql = "update mos_acciones_ac_co set estatus_wf = 'cerrada_verificar' where id = $parametros[id]";
                         $this->dbl->insert_update($sql);
+
+                        $sql = "SELECT macc.accion, mu.email, mu.recibe_notificaciones, concat(mp.nombres,' ',mp.apellido_paterno) as nombres,
+                                                   concat(mp2.nombres,' ',mp2.apellido_paterno) as responsable
+                                            FROM mos_acciones_ac_co macc,
+                                                 mos_personal mp,
+                                                 mos_personal mp2,
+                                                 mos_usuario mu
+                                            WHERE macc.id=". $parametros[id] ."
+                                            AND   mp.cod_emp = macc.id_validador
+                                            AND   mu.email = mp.email
+                                            AND   mp2.cod_emp = macc.id_responsable";
+
+                        if (count($this->nombres_columnas) <= 0){
+                            $this->cargar_nombres_columnas();
+                        }
+
+                        $resultado =  $this->dbl->query($sql, array());
+
+                        if(count($resultado)>0){
+                            $atr = array();
+                            $asunto = $this->nombres_columnas[asunto_accion_pendiente];
+                            $cuerpo = 'Sr(a). ' .$resultado[0][nombres]. '<br><br>Se le informa que tiene una Acción Correctiva Pendiente de su Validación <br><br>';
+                            $cuerpo .= $resultado[0][accion] . '<br><br>';
+                            $cuerpo .= '<b>Responsable: </b>' . $resultado[0][responsable];
+
+                            import('clases.notificaciones.Notificaciones');
+                            $noti = new Notificaciones();
+                            $atr[cuerpo] .= $resultado[0][accion];
+                            $atr[funcion] = "verAccionCorrectiva(".$parametros[id].");";
+                            $atr[modulo]='ACCIONES_CORRECTIVAS';
+                            $atr[asunto]= $this->nombres_columnas[asunto_accion_pendiente];
+                            $atr[email]= $resultado[0][email];
+                            $atr[id_entidad]=$parametros[id];
+                            $mensaje=$noti->ingresarNotificaciones($atr);
+
+                            if($resultado[0]['recibe_notificaciones'] =='S'){
+                                $ut_tool = new ut_Tool();
+                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $resultado[0][email], 'nombres'=>$resultado[0][nombres])), $asunto, $cuerpo);
+                            }
+                        }
+
                     }
                     //$respuesta = $this->modificarAccionesAC($parametros);
 
@@ -1614,6 +1618,54 @@
                             default:
                                 break;
                         }
+
+                        $sql = "SELECT macc.accion, mu.email, mu.recibe_notificaciones, concat(mp.nombres,' ',mp.apellido_paterno) as nombres,
+                                       concat(mp2.nombres,' ',mp2.apellido_paterno) as validador
+                                FROM mos_acciones_ac_co macc,
+                                     mos_personal mp,
+                                     mos_personal mp2,
+                                     mos_usuario mu
+                                WHERE macc.id=". $parametros[id] ."
+                                AND   mp.cod_emp = macc.id_responsable 
+                                AND   mu.email = mp.email
+                                AND   mp2.cod_emp = macc.id_validador";
+
+                        if (count($this->nombres_columnas) <= 0){
+                            $this->cargar_nombres_columnas();
+                        }
+
+                        $resultado =  $this->dbl->query($sql, array());
+
+                        if(count($resultado)>0){
+                            $atr = array();
+                            $asunto = $this->nombres_columnas[asunto_accion_rechazada];
+                            $cuerpo = 'Sr(a). ' .$resultado[0][nombres]. '<br><br>Se informa que ha sido rechazado el cierre de la acción "'.$resultado[0][accion].'"<br>';
+                            $cuerpo .= '<b>Motivo del Rechazo</b><br>';
+                            $cuerpo .= '<p style="color:red;">'. $parametros[observacion_rechazo] .'</p>';
+                            $cuerpo .= '<b>Responsable: </b>' . $resultado[0][validador];
+
+                            import('clases.notificaciones.Notificaciones');
+                            $noti = new Notificaciones();
+                            $atr[cuerpo] .= $resultado[0][accion];
+                            $atr[funcion] = "verAccionCorrectiva(".$parametros[id].");";
+                            $atr[modulo]='ACCIONES_CORRECTIVAS';
+                            $atr[asunto]= $this->nombres_columnas[asunto_accion_rechazada];
+                            $atr[email]= $resultado[0][email];
+                            $atr[id_entidad]=$parametros[id];
+                            $mensaje=$noti->ingresarNotificaciones($atr);
+
+                            if($resultado[0]['recibe_notificaciones'] =='S'){
+                                $ut_tool = new ut_Tool();
+                                $ut_tool->EnviarEMail('Notificaciones Mosaikus', array(array('correo' => $resultado[0][email], 'nombres'=>$resultado[0][nombres])), $asunto, $cuerpo);
+                            }
+                        }
+
+
+
+
+
+
+
                         
                         //echo $correowf[email];
                         /*$this->cargar_nombres_columnas();
@@ -1852,9 +1904,11 @@
          $trazabilidad = "";
          foreach($data as $d)
          {
+             $trazabilidad .= "<tr>";
              $trazabilidad .= "<td>". $d[tipo] ."</td>";
              $trazabilidad .= "<td>". $d[observacion] ."</td>";
              $trazabilidad .= "<td>". $d[fecha_evi_a] ."</td>";
+             $trazabilidad .= "</tr>";
          }
          $contenido_1['TABLA_TRAZA'] = $trazabilidad;
          $template = new Template();
@@ -1884,6 +1938,14 @@
                         PanelOperator.showDetail('');
                         PanelOperator.hideSearch('');
                     });");
+         if($parametros[notificacion_interna]=='S'){
+             $objResponse->addScript("$('.search-show').hide();
+                $('.close-detail').hide();
+                $('#main-content').hide();
+                $('#detail-content').removeClass('col-xs-7').addClass('col-xs-24');
+                $('#detail-content').css({padding:'35px 2.5%'});
+             ");
+         }
          $objResponse->addScript("PanelOperator.showDetail('');");
          $objResponse->addScript("PanelOperator.resize();");
          return $objResponse;
