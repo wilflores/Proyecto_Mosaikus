@@ -1110,6 +1110,7 @@
             }
             $template->setVars($contenido_1);            
 
+            
             return $template->show();
         }
         
@@ -1254,10 +1255,12 @@
                         $data_hijo = $this->MuestraHijos($arrP[id],$contar,$parametros);
                         if ((is_array($parametros[nodos_seleccionados]))&&(in_array($arrP[id], $parametros[nodos_seleccionados]))){
                             $select_aux = 'jstree-clicked';
-                            //$select_aux = '';
+                            $select_aux = ',"selected":true';
                         }
-                        else $select_aux = '';
-                        $cuerpo .= "<li  id=\"phtml_".$arrP[id]."\" class=\"jstree-open\">";
+                        else 
+                            $select_aux = '';
+                        $data_tree_area_espejo = (strlen($arrP['area_espejo'])>0)?',"icon":"icon-folder-link"': '';
+                        $cuerpo .= '<li id=\'phtml_'.$arrP[id].'\' data-jstree=\'{"opened":true'.$select_aux.$data_tree_area_espejo.'}\' >';
                         switch ($contar) {
                             case 1:
                                 $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
@@ -1273,7 +1276,7 @@
                                 $data_aux = $this->dbl->query($sql, $atr);
                                 $contador = $data_aux[0][total] + 0;
                                 //$cuerpo .= "<a href=\"#\">".($arrP[title])." (". ($contador + $data_hijo[contador]) .")</a>";
-                                $cuerpo .= "<a href=\"#\" class=\"$select_aux\">".($arrP[title])." (". ($contador). ")</a>";
+                                $cuerpo .= "<a href=\"#\" class=\"$select_aux\" >".($arrP[title])." (". ($contador). ")</a>";
                                 break;
                             case 2:
                                 $sql = "SELECT COUNT(DISTINCT(eao.IDDoc)) total "
@@ -1380,8 +1383,9 @@
                                     $cuerpo .= "<a href=\"#\" class=\"$select_aux\">".($arrP[title])." (". ($contador_uni.';'.$contador). ")</a>";
                                 break;
 
-                            default:
-                                $cuerpo .= "<a href=\"#\" class=\"$select_aux\">".($arrP[title])." </a>";
+                            default://class=\"$select_aux\"
+                                //$cuerpo .= "<a href=\"#\"  data-jstree=\"{'icon':'glyphicon glyphicon-leaf'}\">".($arrP[title])." </a>";
+                                $cuerpo .= ($arrP[title]);
                                 break;
                         }
                         $cuerpo .= "$data_hijo[html]";
@@ -1417,10 +1421,16 @@
                     $data_hijo = $this->MuestraHijos($arr[id],$contar,$parametros);
                     if ((is_array($parametros[nodos_seleccionados]))&&(in_array($arr[id], $parametros[nodos_seleccionados]))){
                         $select_aux = 'jstree-clicked';
+                        $select_aux = '"selected":true';
                         //$select_aux = '';
                     }
                     else $select_aux = '';
-                    $extra .= "<li id=\"phtml_".$arr[id]."\" >";
+                    //$extra .= "<li id=\"phtml_".$arr[id]."\" >";
+                    $data_tree_area_espejo = (strlen($arr['area_espejo'])>0)
+                            ? (strlen($select_aux) > 0) ? ',"icon":"icon-folder-link"' : '"icon":"icon-folder-link"'
+                            : '';
+                    
+                    $extra .= '<li id=\'phtml_'.$arr[id].'\' data-jstree=\'{'.$select_aux.$data_tree_area_espejo.'}\' >';
                     switch ($contar) {
                             case 1:
                                 $sql = "SELECT COUNT(*) total "
@@ -1548,7 +1558,8 @@
                             
                             default:
                                 //
-                                $extra .= "<a href=\"#\" class=\"$select_aux\">".($arr[title])."</a>";
+                                //$extra .= "<a href=\"#\" class=\"$select_aux\">".($arr[title])."</a>";
+                                $extra .= $arr[title];
                                 break;
                         }
 			$extra .= $data_hijo[html]."

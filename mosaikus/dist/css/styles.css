@@ -8502,8 +8502,16 @@ button.close {
 .icon-alert-print {
   background-position: -290px -86px; }
 
-.icon-folder-link {
+/*.icon-folder-link {
   background-position: -290px -126px; }
+*/
+.icon-folder-link {
+  /*float: left;
+  display: block;
+  width: 24px;
+  height: 2px;*/
+  background-image: url("../images/area-espejo.png") !important;
+  background-repeat: no-repeat; }
 
 /******************* FIN  ICONS ********************************************************/
 /******************* ICONS MOD********************************************************/
